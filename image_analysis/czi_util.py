@@ -1,10 +1,12 @@
 """
-Python script containing utilitary functions to be used for handling .czi images.
+Python script containing utility functions to be used for handling .czi images.
 
 These functions are supposed to work with the CZI format files used with POM images.
 Since Python doesn't offer a lot of libraries (and those available are not well documented (some are just not) or
-requiering weird stuff) to play with that format, I needed to do a little file so that it's easier to breath in the
+requiring weird stuff) to play with that format, I needed to do a little file so that it's easier to breath in the
 .czi jungle.
+
+The main object used in this file is the CziFile object from the czifile library
 
 Hope it works correctly!
 """
@@ -136,7 +138,7 @@ def save_image_array_to_TIFF(image_array, filename=None):
         if filename is not None:
             tifffile.imwrite("{}_{}.tif".format(filename, i), image)
         else:
-            tifffile.imwrite("array2tiff_{}.tiff".format(i), image)
+            tifffile.imwrite("array2tiff_{}.tif".format(i), image)
 
 
 if __name__ == '__main__':
