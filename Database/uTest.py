@@ -1,31 +1,44 @@
 import Database.database as db
 import sqlite3 as lite
 import unittest
+import os
 
-# since database.py was change, most of these need to be reworked.
-class TestConnection(unittest.TestCase):
-    def test_CreateConnection(self):
-        connection_test = db.CreateConnection('test.db')
-        self.assertIs(type(connection_test), lite.Connection)
-        db.CloseConnection(connection_test)
 
-        connection_test = db.CreateConnection(r'C:\sqlite3\Database\Test.db')
-        self.assertIs(type(connection_test), lite.Connection)
-        db.CloseConnection(connection_test)
+class TestDatabase(unittest.TestCase):
+    def test_createConnection(self):
+        directory = os.path.dirname(__file__)
+        fileName = os.path.join(directory, 'data', 'test.db')
 
-        with self.assertRaises(Exception): db.CreateConnection('')
-        with self.assertRaises(Exception): db.CreateConnection('tst.db')
+        database = db.Database(fileName, 'test.db')
+        self.assertEqual(database.createConnection(), 'connected')
+        database.closeConnection()
 
-    def test_CloseConnection(self):
-        connection_test = lite.connect('test.db')
-        self.assertTrue(db.CloseConnection(connection_test))
-        with self.assertRaises(TypeError): db.CloseConnection(0)
-        connection_test.close()
+        database = db.Database(fileName, 'test.db')
+        database.createConnection()
+        with self.assertRaises(Exception): database.createConnection()
 
-        connection_test = lite.connect(r'C:\sqlite3\Database\test.db')
-        self.assertTrue(db.CloseConnection(connection_test))
-        with self.assertRaises(TypeError): db.CloseConnection(0)
-        connection_test.close()
+        fileName = os.path.join(directory, 'data', 'tst.db')
+        database = db.Database(fileName, 'test.db')
+        with self.assertRaises(Exception): database.createConnection()
+
+    def test_closeConnection(self):
+        directory = os.path.dirname(__file__)
+        fileName = os.path.join(directory, 'data', 'test.db')
+        database = db.Database(fileName, 'test.db')
+        database.createConnection()
+        self.assertEqual(database.closeConnection(), 'disconnected')
+
+        with self.assertRaises(Exception): database.closeConnection()
+
+    def test_checkConnection(self):
+        directory = os.path.dirname(__file__)
+        fileName = os.path.join(directory, 'data', 'test.db')
+        database = db.Database(fileName, 'test.db')
+        database.createConnection()
+        self.assertTrue(database.checkConnection())
+
+        database.closeConnection()
+        self.assertFalse(database.checkConnection())
 
     def test_path_to_uri(self):
         self.assertEqual(db.PathToURI('test.db'), 'file:test.db?mode=ro')
