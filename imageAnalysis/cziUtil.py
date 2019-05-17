@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 import tifffile
 
 
-def read_czi_file(filename):
+def readCziImage(filename):
     """
     Function that read a .czi file.
     :param filename: Name of the file.
@@ -30,32 +30,32 @@ def read_czi_file(filename):
     return czi
 
 
-def close(czi_object):
+def closeCziFileObject(cziObject):
     """
     Function that closes a CziFile instance object. It must be closed according to the CziFile documentation.
-    :param czi_object: The CziFile object to be closed
+    :param cziObject: The CziFile object to be closed
     :return: Nothing
     """
-    czi_object.close()
+    cziObject.close()
 
 
-def extract_metadata(czi_object, save_file_name=None):
+def extractMetadataFromCziFileObject(cziObject, saveFileName=None):
     """
     Function that raeds the metadata form a CziFile object
-    :param czi_object: The CziFile object
-    :param save_file_name: Name of the file that is used to save the metadata (XML file). If None (default), doesn't
+    :param cziObject: The CziFile object
+    :param saveFileName: Name of the file that is used to save the metadata (XML file). If None (default), doesn't
     save the metadata.
     :return: The metadata in XML format.
     """
-    meta = czi_object.metadata
-    if save_file_name is not None:
-        file_xml = open("{}.xml".format(save_file_name), "w")
+    meta = cziObject.metadata
+    if saveFileName is not None:
+        file_xml = open("{}.xml".format(saveFileName), "w")
         file_xml.write(meta)
         file_xml.close()
     return meta
 
 
-def get_array_from_czi_image(czi_object):
+def getArrayFromCziFileObject(cziObject):
     """
     Function that transform a CziFile object into a numpy array. WARNING: The returning numpy array is tricky to use.
     It is multi-dimensional (like 5-6 dimensions) and each of the dimensions meaning are not well explained.
@@ -88,63 +88,69 @@ def get_array_from_czi_image(czi_object):
 
     Arrays can have different dimensions, depending on the number of channel or z-plane in the original czi file.
 
-    :param czi_object: The CziFile object
+    :param cziObject: The CziFile object
     :return: Numpy array representing the CziFile/image
     """
-    images_array = czi_object.asarray()
+    images_array = cziObject.asarray()
     return images_array
 
 
-def get_images_from_czi_image(czi_object):
+def getImagesFromCziFileObject(cziObject):
     """
     Function that returns the images from a czi file object, with every channel.
-    :param czi_object: The CziFile object
+    :param cziObject: The CziFile object
     :return: Numpy array containing the images
     """
     array_return = []
-    subblocks_iter = czi_object.subblocks()
+    subblocks_iter = cziObject.subblocks()
     for iterator in subblocks_iter:
         array_return.append(np.squeeze(iterator.data()))
     return np.array(array_return)
 
 
-def show_images_from_czi_image(czi_object):
+def showImagesFromCziFileObject(cziObject):
     """
     Function that shows the images in a czi file object. The function shows them one by one, no subplots.
-    :param czi_object: CziFile object
+    :param cziObject: CziFile object
     :return: Numpy array of matplotlib.image.AxesImage (each of the matplotlib.image.AxesImage of the initial image)
     """
-    subblocks_iter = czi_object.subblocks()
-    images_return = []
-    for iterator in subblocks_iter:
+    subblocksIters = cziObject.subblocks()
+    imagesReturn = []
+    for iterator in subblocksIters:
         image = (np.squeeze(iterator.data()))
         image_return = plt.imshow(image)
-        images_return.append(image_return)
+        imagesReturn.append(image_return)
         plt.show()
-    return np.array(images_return)
+    return np.array(imagesReturn)
 
 
-def save_image_array_to_TIFF(image_array, filename=None):
+def saveImagesToTIFF(imageArray, filename=None):
     """
     Function that saves every image in an array to a TIFF file.
-    :param image_array: Array of images to be saved
-    :return: Nothing
+    :param imageArray: Array of images to be saved. If the array is empty, nothing is done.
+    :param filename: The file name to save the new tiff image. If None (default), a default name is given.
+    :return: bool. True if the image is saved, False if nothing is done.
     """
-    if len(image_array) == 0:
-        raise ValueError("Image array empty.")
-    i = 0
-    for image in image_array:
-        i += 1
-        if filename is not None:
-            tifffile.imwrite("{}_{}.tif".format(filename, i), image)
-        else:
-            tifffile.imwrite("array2tiff_{}.tif".format(i), image)
+    isSaved = False
+    if len(imageArray) != 0:
+        isSaved = True
+        i = 0
+        for image in imageArray:
+            i += 1
+            if filename is not None:
+                tifffile.imwrite("{}_{}.tif".format(filename, i), image)
+            else:
+                tifffile.imwrite("array2tiff_{}.tif".format(i), image)
+    return isSaved
 
 
+# Temporary main to test things
 if __name__ == '__main__':
-    czi = read_czi_file("test_czi.czi")
-    image = get_images_from_czi_image(czi)[0]
-    close(czi)
+    czi = readCziImage("unitTesting/testCziFile.czi")
+    images = getImagesFromCziFileObject(czi)
+    image = images[0]
+    saveImagesToTIFF(images, "toto")
+    closeCziFileObject(czi)
     print(image)
     image_2 = np.array(image, dtype=np.float32)
     print(image_2)

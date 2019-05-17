@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8edb79ed-101c-49e3-a876-b403393446ee" name="Default Changelist" comment="">
+    <list default="true" id="8edb79ed-101c-49e3-a876-b403393446ee" name="Default Changelist" comment="New package in image_analysis&#10;&#10;New unit testing folder that will contain the unit tests files for image_analysis and the resources required for these files.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/image_analysis/czi_util.py" beforeDir="false" afterPath="$PROJECT_DIR$/image_analysis/czi_util.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/image_analysis/czi_util.py" beforeDir="false" afterPath="$PROJECT_DIR$/imageAnalysis/cziUtil.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/image_analysis/unit_testing/czi_util_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/imageAnalysis/unitTesting/cziUtilTests.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/image_analysis/unit_testing/test_czi.czi" beforeDir="false" afterPath="$PROJECT_DIR$/imageAnalysis/unitTesting/testCziFile.czi" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/image_analysis/unit_testing/test_pas_czi.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/imageAnalysis/unitTesting/testNotCziFile.jpg" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -40,7 +43,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Database/DB_management.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="238">
+            <state relative-caret-position="187">
               <caret line="14" column="25" selection-start-line="14" selection-start-column="25" selection-end-line="14" selection-end-column="25" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
@@ -50,23 +53,24 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/image_analysis/czi_util.py">
+        <entry file="file://$PROJECT_DIR$/imageAnalysis/cziUtil.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="576">
-              <caret line="151" column="37" lean-forward="true" selection-start-line="151" selection-start-column="37" selection-end-line="151" selection-end-column="37" />
+            <state relative-caret-position="161">
+              <caret line="146" column="31" selection-start-line="146" selection-start-column="31" selection-end-line="146" selection-end-column="31" />
               <folding>
-                <element signature="e#490#504#0" expanded="true" />
+                <element signature="e#569#583#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/image_analysis/czi_util_test.py">
+        <entry file="file://$PROJECT_DIR$/imageAnalysis/unitTesting/cziUtilTests.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
+            <state relative-caret-position="1190">
+              <caret line="74" column="22" selection-start-line="74" selection-start-column="8" selection-end-line="74" selection-end-column="22" />
               <folding>
-                <element signature="e#0#15#0" expanded="true" />
+                <element signature="e#0#33#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -80,6 +84,11 @@
         <option value="Python Script" />
       </list>
     </option>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>czi_util</find>
+    </findStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -100,6 +109,9 @@
         <option value="$PROJECT_DIR$/Database/uTest.py" />
         <option value="$PROJECT_DIR$/Database/DB_management.py" />
         <option value="$PROJECT_DIR$/image_analysis/czi_util.py" />
+        <option value="$PROJECT_DIR$/image_analysis/unit_testing/czi_util_test.py" />
+        <option value="$PROJECT_DIR$/imageAnalysis/unitTesting/cziUtilTests.py" />
+        <option value="$PROJECT_DIR$/imageAnalysis/cziUtil.py" />
       </list>
     </option>
   </component>
@@ -114,7 +126,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -130,18 +141,25 @@
             <path>
               <item name="BigData-ImageAnalysis" type="b2602c69:ProjectViewProjectNode" />
               <item name="BigData-ImageAnalysis" type="462c0819:PsiDirectoryNode" />
-              <item name="image_analysis" type="462c0819:PsiDirectoryNode" />
+              <item name="imageAnalysis" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="BigData-ImageAnalysis" type="b2602c69:ProjectViewProjectNode" />
+              <item name="BigData-ImageAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="imageAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="unitTesting" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -154,6 +172,50 @@
         </RuleState>
       </list>
     </option>
+  </component>
+  <component name="RunManager" selected="Python.cziUtil">
+    <configuration name="cziUtil" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="BigData-ImageAnalysis" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/imageAnalysis" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/imageAnalysis/cziUtil.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest for imageAnalysis.unitTesting.cziUtilTests.TestCziUtil.testShowImages" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="BigData-ImageAnalysis" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/imageAnalysis/unitTesting" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;imageAnalysis.unitTesting.cziUtilTests.TestCziUtil.testShowImages&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.cziUtil" />
+        <item itemvalue="Python tests.pytest for imageAnalysis.unitTesting.cziUtilTests.TestCziUtil.testShowImages" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -173,19 +235,38 @@
       <option name="project" value="LOCAL" />
       <updated>1558097940770</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Small modifications of the image_analysis package&#10;&#10;Spelling corrections and other small changes in documentation">
+      <created>1558098404510</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1558098404510</updated>
+    </task>
+    <task id="LOCAL-00003" summary="New package in image_analysis&#10;&#10;New unit testing folder that will contain the unit tests files for image_analysis and the resources required for these files.">
+      <created>1558098626304</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1558098626304</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
+  </component>
+  <component name="TestHistory">
+    <history-entry file="pytest_for_cziUtilTests_TestCziUtil_test_show_images - 2019.05.17 at 09h 36m 01s.xml">
+      <configuration name="pytest for cziUtilTests.TestCziUtil.test_show_images" configurationId="tests" />
+    </history-entry>
   </component>
   <component name="ToolWindowManager">
     <frame x="1592" y="-8" width="1456" height="876" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.15303244" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.15303244" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32974428" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.32974428" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -220,9 +301,12 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="image_analysis initial commit&#10;&#10;Utilitary file added to play with czi files" />
-    <option name="LAST_COMMIT_MESSAGE" value="image_analysis initial commit&#10;&#10;Utilitary file added to play with czi files" />
+    <MESSAGE value="Small modifications of the image_analysis package&#10;&#10;Spelling corrections and other small changes in documentation" />
+    <MESSAGE value="New package in image_analysis&#10;&#10;New unit testing folder that will contain the unit tests files for image_analysis and the resources required for these files." />
+    <option name="LAST_COMMIT_MESSAGE" value="New package in image_analysis&#10;&#10;New unit testing folder that will contain the unit tests files for image_analysis and the resources required for these files." />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/image_analysis/czi_util_test.py" />
     <entry file="file://$PROJECT_DIR$/Database/uTest.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="34">
@@ -245,7 +329,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Database/DB_management.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
+        <state relative-caret-position="187">
           <caret line="14" column="25" selection-start-line="14" selection-start-column="25" selection-end-line="14" selection-end-column="25" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
@@ -253,21 +337,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/image_analysis/czi_util_test.py">
+    <entry file="file://$PROJECT_DIR$/imageAnalysis/unitTesting/cziUtilTests.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
+        <state relative-caret-position="1190">
+          <caret line="74" column="22" selection-start-line="74" selection-start-column="8" selection-end-line="74" selection-end-column="22" />
           <folding>
-            <element signature="e#0#15#0" expanded="true" />
+            <element signature="e#0#33#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/image_analysis/czi_util.py">
+    <entry file="file://$PROJECT_DIR$/imageAnalysis/cziUtil.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="576">
-          <caret line="151" column="37" lean-forward="true" selection-start-line="151" selection-start-column="37" selection-end-line="151" selection-end-column="37" />
+        <state relative-caret-position="161">
+          <caret line="146" column="31" selection-start-line="146" selection-start-column="31" selection-end-line="146" selection-end-column="31" />
           <folding>
-            <element signature="e#490#504#0" expanded="true" />
+            <element signature="e#569#583#0" expanded="true" />
           </folding>
         </state>
       </provider>
