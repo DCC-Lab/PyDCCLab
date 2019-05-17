@@ -142,17 +142,3 @@ def saveImagesToTIFF(imageArray, filename=None):
             else:
                 tifffile.imwrite("array2tiff_{}.tif".format(i), image)
     return isSaved
-
-
-# Temporary main to test things
-if __name__ == '__main__':
-    czi = readCziImage("unitTesting/testCziFile.czi")
-    images = getImagesFromCziFileObject(czi)
-    image = images[0]
-    saveImagesToTIFF(images, "toto")
-    closeCziFileObject(czi)
-    print(image)
-    image_2 = np.array(image, dtype=np.float32)
-    print(image_2)
-    image_3 = image == image_2
-    print(np.where(image_3 is False))
