@@ -4,7 +4,6 @@ import numpy as np
 from unittest.mock import Mock, patch
 
 
-
 class TestCziUtil(unittest.TestCase):
 
     def TestReadCziFile(self):
