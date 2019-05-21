@@ -13,7 +13,7 @@ class Database:
 
     def createConnection(self, mode='ro'):
         if self.checkConnection() is False:
-            path = PathToURI(self.path, mode)
+            path = pathToURI(self.path, mode)
             try:
                 self.conn = lite.connect(path, uri=True)
                 return 'connected'
@@ -39,12 +39,17 @@ class Database:
         else:
             return False
 
+    # How to test it?
     def changeConnection(self, path, name='', mode='ro'):
         if self.checkConnection():
             self.closeConnection()
-        self.path = path
-        self.name = name
-        self.createConnection(mode)
+        try:
+            self.path = path
+            self.name = name
+            self.createConnection(mode)
+            return True
+        except Exception:
+            pass
 
     def Commit(self):
         if self.conn is not None:
@@ -72,7 +77,7 @@ class Database:
             raise Exception('Connection does not exist.')
 
 
-def PathToURI(path, mode='ro'):
+def pathToURI(path, mode='ro'):
     path = pathlib.Path(path)
     if FindingOperatingSystem() == 'Windows':
         return 'file:' + parse.quote(path.as_posix(), safe=':/') + '?mode=' + mode

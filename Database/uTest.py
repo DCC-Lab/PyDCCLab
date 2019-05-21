@@ -40,11 +40,18 @@ class TestDatabase(unittest.TestCase):
         database.closeConnection()
         self.assertFalse(database.checkConnection())
 
-    def test_path_to_uri(self):
-        self.assertEqual(db.PathToURI('test.db'), 'file:test.db?mode=ro')
-        self.assertEqual(db.PathToURI('test.db', 'rw'), 'file:test.db?mode=rw')
-        self.assertEqual(db.PathToURI(r'C:\sqlite3\Database\test.db'), 'file:C:/sqlite3/Database/test.db?mode=ro')
-        self.assertEqual(db.PathToURI(r'C:\sqlite3\Database\test.db', 'rw'), 'file:C:/sqlite3/Database/test.db?mode=rw')
+    def test_changeConnection(self):
+        directory = os.path.dirname(__file__)
+        fileName = os.path.join(directory, 'data', 'test.db')
+        database = db.Database(fileName, 'test.db')
+
+        pass
+
+    def test_patToURI(self):
+        self.assertEqual(db.pathToURI('test.db'), 'file:test.db?mode=ro')
+        self.assertEqual(db.pathToURI('test.db', 'rw'), 'file:test.db?mode=rw')
+        self.assertEqual(db.pathToURI(r'C:\sqlite3\Database\test.db'), 'file:C:/sqlite3/Database/test.db?mode=ro')
+        self.assertEqual(db.pathToURI(r'C:\sqlite3\Database\test.db', 'rw'), 'file:C:/sqlite3/Database/test.db?mode=rw')
 
     def test_ResolvingPlatform(self):
         # Only for windows for now.
