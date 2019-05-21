@@ -3,8 +3,46 @@
   <component name="ChangeListManager">
     <list default="true" id="8edb79ed-101c-49e3-a876-b403393446ee" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziUtil.py" beforeDir="false" afterPath="$PROJECT_DIR$/imageAnalysis/cziUtil.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/imageAnalysis/unitTesting/cziUtilTests.py" beforeDir="false" afterPath="$PROJECT_DIR$/imageAnalysis/unitTesting/cziUtilTests.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/DCC-Images.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/CZI-Doc/DS_ZISRAW-FileFormat.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/CZI-Doc/XmlSchemas/CommonTypes.xsd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/CZI-Doc/XmlSchemas/Dimensions.xsd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/CZI-Doc/XmlSchemas/DisplaySetting.xsd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/CZI-Doc/XmlSchemas/ImageAnalysisSetting.xsd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/CZI-Doc/XmlSchemas/ImageMetadata.xsd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/CZI-Doc/XmlSchemas/Information.xsd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/CZI-Doc/XmlSchemas/Instrument.xsd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/CZI-Doc/XmlSchemas/Layers.xsd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/CZI-Doc/XmlSchemas/PhysiologySetting.xsd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/CZI-Doc/XmlSchemas/Scaling.xsd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/CZI-Doc/XmlSchemas/Timeline.xsd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/CZI-Doc/XmlSchemas/Views.xsd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/SimpleImageViewer/App.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/SimpleImageViewer/App.xaml.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/SimpleImageViewer/MainWindow.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/SimpleImageViewer/MainWindow.xaml.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/SimpleImageViewer/Properties/AssemblyInfo.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/SimpleImageViewer/Properties/Resources.Designer.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/SimpleImageViewer/Properties/Resources.resx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/SimpleImageViewer/Properties/Settings.Designer.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/SimpleImageViewer/Properties/Settings.settings" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/SimpleImageViewer/SimpleImageViewer.csproj" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/SimpleImageViewer/SimpleImageViewer.sln" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/SimpleImageViewer/app.config" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/SimpleImageViewer/bin/Release/WBa.SimpleImageViewer.exe" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/SimpleImageViewer/bin/Release/ZeissImageLib.dll" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/ZeissImageLib/ZeissImageLib.dll" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/ZeissImageLib/ZeissImageLib.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziUtil.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/unitTesting/.cache/v/cache/lastfailed" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/unitTesting/cziUtilTests.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/unitTesting/testCziFile2Images.czi" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/unitTesting/testNotCziFile.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/unitTesting/testSaveTIFF_1.tif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/unitTesting/testSaveTIFF_2.tif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/unitTesting/test_meta.xml" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -15,10 +53,10 @@
   <component name="FileEditorManager">
     <leaf>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/imageAnalysis/cziUtil.py">
+        <entry file="file://$PROJECT_DIR$/ImageAnalysis/cziUtil.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="986">
-              <caret line="155" column="18" selection-start-line="155" selection-start-column="18" selection-end-line="155" selection-end-column="18" />
+            <state relative-caret-position="2737">
+              <caret line="161" selection-start-line="161" selection-end-line="161" />
               <folding>
                 <element signature="e#569#583#0" expanded="true" />
               </folding>
@@ -27,13 +65,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/imageAnalysis/unitTesting/cziUtilTests.py">
+        <entry file="file://$PROJECT_DIR$/ImageAnalysis/unitTesting/cziUtilTests.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="326">
-              <caret line="116" column="41" selection-start-line="116" selection-start-column="41" selection-end-line="116" selection-end-column="41" />
-              <folding>
-                <element signature="e#0#33#0" expanded="true" />
-              </folding>
+            <state>
+              <caret column="33" lean-forward="true" selection-start-column="33" selection-end-column="33" />
             </state>
           </provider>
         </entry>
@@ -50,8 +85,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../hello-world/czi_util.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="289">
-              <caret line="185" column="5" selection-start-line="185" selection-start-column="5" selection-end-line="185" selection-end-column="5" />
+            <state relative-caret-position="346">
+              <caret line="186" column="36" selection-start-line="186" selection-start-column="36" selection-end-line="186" selection-end-column="36" />
               <folding>
                 <element signature="e#490#504#0" expanded="true" />
               </folding>
@@ -60,13 +95,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/imageAnalysis/DCC-Images.py">
+        <entry file="file://$PROJECT_DIR$/ImageAnalysis/DCC-Images.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="119">
-              <caret line="7" column="35" selection-start-line="7" selection-start-column="35" selection-end-line="7" selection-end-column="35" />
-              <folding>
-                <element signature="e#0#18#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="17">
+              <caret line="1" column="25" lean-forward="true" selection-start-line="1" selection-start-column="25" selection-end-line="1" selection-end-column="25" />
             </state>
           </provider>
         </entry>
@@ -91,9 +123,12 @@
       <list>
         <option value="$PROJECT_DIR$/Database/uTest.py" />
         <option value="$PROJECT_DIR$/Database/DB_management.py" />
+        <option value="$PROJECT_DIR$/imageAnalysis/unitTesting/cziUtilTests.py" />
         <option value="$PROJECT_DIR$/../hello-world/czi_util.py" />
         <option value="$PROJECT_DIR$/imageAnalysis/cziUtil.py" />
-        <option value="$PROJECT_DIR$/imageAnalysis/unitTesting/cziUtilTests.py" />
+        <option value="$PROJECT_DIR$/imageAnalysis/DCC-Images.py" />
+        <option value="$PROJECT_DIR$/ImageAnalysis/DCC-Images.py" />
+        <option value="$PROJECT_DIR$/ImageAnalysis/unitTesting/cziUtilTests.py" />
       </list>
     </option>
   </component>
@@ -118,12 +153,12 @@
             <path>
               <item name="BigData-ImageAnalysis" type="b2602c69:ProjectViewProjectNode" />
               <item name="BigData-ImageAnalysis" type="462c0819:PsiDirectoryNode" />
-              <item name="imageAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="ImageAnalysis" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="BigData-ImageAnalysis" type="b2602c69:ProjectViewProjectNode" />
               <item name="BigData-ImageAnalysis" type="462c0819:PsiDirectoryNode" />
-              <item name="imageAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="ImageAnalysis" type="462c0819:PsiDirectoryNode" />
               <item name="unitTesting" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
@@ -193,18 +228,18 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="pytest for cziUtilTests.TestCziUtil.testMetadataFormatted" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+    <configuration name="pytest for ImageAnalysis.unitTesting.cziUtilTests.TestCziUtil.testMetadataFormatted" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
       <module name="BigData-ImageAnalysis" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/imageAnalysis/unitTesting" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ImageAnalysis/unitTesting" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="_new_keywords" value="&quot;&quot;" />
       <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;cziUtilTests.TestCziUtil.testMetadataFormatted&quot;" />
+      <option name="_new_target" value="&quot;ImageAnalysis.unitTesting.cziUtilTests.TestCziUtil.testMetadataFormatted&quot;" />
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
@@ -213,13 +248,13 @@
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/imageAnalysis/unitTesting" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ImageAnalysis/unitTesting" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="_new_keywords" value="&quot;&quot;" />
       <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;$PROJECT_DIR$/imageAnalysis/unitTesting/cziUtilTests.py&quot;" />
+      <option name="_new_target" value="&quot;$PROJECT_DIR$/ImageAnalysis/unitTesting/cziUtilTests.py&quot;" />
       <option name="_new_targetType" value="&quot;PATH&quot;" />
       <method v="2" />
     </configuration>
@@ -228,7 +263,7 @@
         <item itemvalue="Python.czi_util" />
         <item itemvalue="Python tests.pytest in cziUtilTests.py" />
         <item itemvalue="Python.cziUtil" />
-        <item itemvalue="Python tests.pytest for cziUtilTests.TestCziUtil.testMetadataFormatted" />
+        <item itemvalue="Python tests.pytest for ImageAnalysis.unitTesting.cziUtilTests.TestCziUtil.testMetadataFormatted" />
       </list>
     </recent_temporary>
   </component>
@@ -243,15 +278,24 @@
       <option name="presentableId" value="Default" />
       <updated>1558095021635</updated>
     </task>
+    <task id="LOCAL-00001" summary="New utility function to get formatted metadata&#10;&#10;NEw utility function that format metadata and new unit test for this function.">
+      <created>1558465011588</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1558465011588</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Remove temporary main from cziUtil.">
+      <created>1558465071505</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1558465071505</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="pytest_in_cziUtilTests_py - 2019.05.21 at 14h 22m 03s.xml">
-      <configuration name="pytest in cziUtilTests.py" configurationId="tests" />
-    </history-entry>
-    <history-entry file="pytest_in_cziUtilTests_py - 2019.05.21 at 14h 28m 08s.xml">
-      <configuration name="pytest in cziUtilTests.py" configurationId="tests" />
-    </history-entry>
     <history-entry file="pytest_in_cziUtilTests_py - 2019.05.21 at 14h 34m 36s.xml">
       <configuration name="pytest in cziUtilTests.py" configurationId="tests" />
     </history-entry>
@@ -276,17 +320,22 @@
     <history-entry file="pytest_in_cziUtilTests_py - 2019.05.21 at 14h 53m 27s.xml">
       <configuration name="pytest in cziUtilTests.py" configurationId="tests" />
     </history-entry>
+    <history-entry file="pytest_in_cziUtilTests_py - 2019.05.21 at 14h 54m 39s.xml">
+      <configuration name="pytest in cziUtilTests.py" configurationId="tests" />
+    </history-entry>
+    <history-entry file="pytest_in_cziUtilTests_py - 2019.05.21 at 14h 55m 27s.xml">
+      <configuration name="pytest in cziUtilTests.py" configurationId="tests" />
+    </history-entry>
   </component>
   <component name="ToolWindowManager">
     <frame x="1592" y="-8" width="1456" height="876" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2496474" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.2496474" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.24495289" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.24495289" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -302,7 +351,9 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Small modifications of the util file. New class started to create new data structure." />
-    <option name="LAST_COMMIT_MESSAGE" value="Small modifications of the util file. New class started to create new data structure." />
+    <MESSAGE value="New utility function to get formatted metadata&#10;&#10;NEw utility function that format metadata and new unit test for this function." />
+    <MESSAGE value="Remove temporary main from cziUtil." />
+    <option name="LAST_COMMIT_MESSAGE" value="Remove temporary main from cziUtil." />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/Database/uTest.py">
@@ -335,32 +386,45 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/imageAnalysis/DCC-Images.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="7" column="35" selection-start-line="7" selection-start-column="35" selection-end-line="7" selection-end-column="35" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/imageAnalysis/cziUtil.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="986">
-          <caret line="155" column="18" selection-start-line="155" selection-start-column="18" selection-end-line="155" selection-end-column="18" />
-          <folding>
-            <element signature="e#569#583#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../hello-world/czi_util.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
-          <caret line="185" column="5" selection-start-line="185" selection-start-column="5" selection-end-line="185" selection-end-column="5" />
+        <state relative-caret-position="346">
+          <caret line="186" column="36" selection-start-line="186" selection-start-column="36" selection-end-line="186" selection-end-column="36" />
           <folding>
             <element signature="e#490#504#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ImageAnalysis/unitTesting/test_meta.xml">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ImageAnalysis/unitTesting/testNotCziFile.jpg">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ImageAnalysis/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="34">
+            <caret line="2" lean-forward="true" selection-start-line="2" selection-end-line="2" />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ImageAnalysis/DCC-Images.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="1" column="25" lean-forward="true" selection-start-line="1" selection-start-column="25" selection-end-line="1" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ImageAnalysis/cziUtil.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2737">
+          <caret line="161" selection-start-line="161" selection-end-line="161" />
+          <folding>
+            <element signature="e#569#583#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -372,13 +436,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/imageAnalysis/unitTesting/cziUtilTests.py">
+    <entry file="file://$PROJECT_DIR$/ImageAnalysis/unitTesting/cziUtilTests.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="326">
-          <caret line="116" column="41" selection-start-line="116" selection-start-column="41" selection-end-line="116" selection-end-column="41" />
-          <folding>
-            <element signature="e#0#33#0" expanded="true" />
-          </folding>
+        <state>
+          <caret column="33" lean-forward="true" selection-start-column="33" selection-end-column="33" />
         </state>
       </provider>
     </entry>
