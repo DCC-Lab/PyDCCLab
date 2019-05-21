@@ -11,19 +11,40 @@ class Database:
         self.conn = None
         self.curs = None
 
-    def CreateConnection(self, mode='ro'):
-        path = PathToURI(self.path, mode)
-        try:
-            self.conn = lite.connect(path, uri=True)
-        except lite.OperationalError:
-            raise Exception('Path does not work :' + path)
+    def createConnection(self, mode='ro'):
+        if self.checkConnection() is False:
+            path = PathToURI(self.path, mode)
+            try:
+                self.conn = lite.connect(path, uri=True)
+                return 'connected'
+            except lite.OperationalError:
+                raise Exception('Path does not work :' + path)
+        else:
+            raise Exception('Already connected to a database : ' + self.name + " : " + self.path)
 
-    def CloseConnection(self):
-        if self.conn is not None:
+    def closeConnection(self):
+        if self.checkConnection():
+            if self.curs is not None:
+                self.curs.close()
+                self.curs = None
             self.conn.close()
             self.conn = None
+            return 'disconnected'
         else:
             raise Exception('Connection does not exist.')
+
+    def checkConnection(self):
+        if self.conn is not None:
+            return True
+        else:
+            return False
+
+    def changeConnection(self, path, name='', mode='ro'):
+        if self.checkConnection():
+            self.closeConnection()
+        self.path = path
+        self.name = name
+        self.createConnection(mode)
 
     def Commit(self):
         if self.conn is not None:
@@ -36,8 +57,8 @@ class Database:
 
     def CreateNewDatabase(self):
         try:
-            self.conn.CreateConnection(self.path, 'rwc')
-            self.CloseConnection()
+            self.conn.createConnection(self.path, 'rwc')
+            self.closeConnection()
         except lite.OperationalError:
             raise Exception('Database could not be created : ' + str(self.path))
 
