@@ -101,3 +101,22 @@ class TestCziUtil(unittest.TestCase):
         images = []
         isSaved = cziUtil.saveImagesToTIFF(images, "test0Images")
         self.assertFalse(isSaved)
+
+    def testMetadataFormatted(self):
+        meta = "<Test>Hello</Test>"
+        formattedMeta = cziUtil.getFormatedMetadata(meta)
+        self.assertEqual(formattedMeta, "Test : Hello\n")
+
+    def testMetadataFormattedBigger(self):
+        meta = "<Test>\n<Test2>\nHello\n</Test2>\n</Test>"
+        formattedMeta = cziUtil.getFormatedMetadata(meta)
+        self.assertEqual(formattedMeta, "Test : \n\nTest2 : \nHello\n\n")
+
+    def testMetadataFormattedInvalid(self):
+        meta = "Hello. <This>String</This><is><not>good</not></is>"
+        with self.assertRaises(ValueError):
+            cziUtil.getFormatedMetadata(meta)
+
+
+if __name__ == '__main__':
+    unittest.main()

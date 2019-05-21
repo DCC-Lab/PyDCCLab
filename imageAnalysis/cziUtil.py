@@ -17,6 +17,7 @@ import czifile
 import numpy as np
 import matplotlib.pyplot as plt
 import tifffile
+import xml.etree.ElementTree as ET
 
 
 def readCziImage(filename):
@@ -124,6 +125,22 @@ def showImagesFromCziFileObject(cziObject):
     return np.array(imagesReturn)
 
 
+def getFormatedMetadata(metadata):
+    """
+    Function that formats the XMl-string metadata in a more convenient way, easier to read and to browse.
+    :param metadata: XML formatted string containing the metadata.
+    :return: String containing the formatted metadata
+    """
+    returnString = ""
+    try:
+        tree = ET.ElementTree(ET.fromstringlist(metadata))
+        for iterator in tree.iter():
+            returnString += "{} : {}\n".format(iterator.tag, iterator.text)
+    except ET.ParseError as exception:
+        raise ValueError("Exception with string \"{}\"; {}".format(metadata, exception.msg))
+    return returnString
+
+
 def saveImagesToTIFF(imageArray, filename=None):
     """
     Function that saves every image in an array to a TIFF file.
@@ -142,3 +159,7 @@ def saveImagesToTIFF(imageArray, filename=None):
             else:
                 tifffile.imwrite("array2tiff_{}.tif".format(i), image)
     return isSaved
+
+if __name__ == '__main__':
+    meta = ""
+    getFormatedMetadata(meta)
