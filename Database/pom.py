@@ -1,3 +1,4 @@
+import xml.etree.ElementTree as et
 import os
 import fnmatch
 import imageAnalysis.cziUtil as czi
@@ -33,10 +34,26 @@ def exportListToCSV(list):
 '''
 
 if __name__ == '__main__':
-    # Image Document et Metadata pourraient etre ignorer.
+    # ImageDocument et Metadata pourraient etre ignorer.
     czipath = 'testCziFile.czi'
     image = czi.readCziImage(czipath)
-    metadata = czi.extractMetadataFromCziFileObject(image)
+    xmlString = czi.extractMetadataFromCziFileObject(image)
+
+    # The root is on ImageDocument. It contains no informations of value. Metadata within is what we want.
+    imageDocument = et.fromstring(xmlString)
+    metadata = imageDocument[0]
+    # Metadata is simillar to ImageDocument, it contains no informations of value. It's children are, again, what we want.
+    #metadata = {}
+    for data in metadata:
+        #print(data.tag, data.attrib)
+        for subdata in data:
+            #print(subdata.tag, subdata.attrib)
+            for subsubdata in subdata:
+                #print(subsubdata.tag, subsubdata.attrib)
+                for subsubsubdata in subsubdata:
+                    print(subsubsubdata.tag, subsubsubdata.attrib)
+
+    '''
     open('test.txt', 'w').write(metadata)
     data = xml2dict(metadata)
     print(data)
@@ -49,6 +66,7 @@ if __name__ == '__main__':
         keys.append(line)
     for key in keys:
         print(soussousdata[key])
+    '''
 
     #CZIs = findAllCZI('P:\\injection AAV\\résultats bruts')
 
