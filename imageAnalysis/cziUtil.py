@@ -159,7 +159,3 @@ def saveImagesToTIFF(imageArray, filename=None):
             else:
                 tifffile.imwrite("array2tiff_{}.tif".format(i), image)
     return isSaved
-
-if __name__ == '__main__':
-    meta = ""
-    getFormatedMetadata(meta)
