@@ -1,4 +1,7 @@
 import unittest
+
+from torch._C import dtype
+
 import ImageAnalysis.DCCImages as DCCImages
 import ImageAnalysis.DCCImagesExceptions as dccExcep
 import numpy as np
@@ -85,6 +88,13 @@ class TestDCCImageMethods(unittest.TestCase):
         imageCopy = self.image.copyDCCImage()
         self.assertTrue(self.image == imageCopy)
 
+    def testModifiedCopy(self):
+        imageCopy = self.image.copyDCCImage()
+        arrayCopy = imageCopy.getDCCImageAsArray()
+        arrayCopy[100][79] = 1.2
+        imageNotCopy = DCCImages.DCCImage(arrayCopy)
+        self.assertFalse(self.image == imageNotCopy)
+
 
 class TestDCCImageStackConstructor(unittest.TestCase):
 
@@ -116,8 +126,8 @@ class TestDCCImageStackConstructor(unittest.TestCase):
 
     def testInvalidConstructor1Element(self):
         image = np.ones((10, 10))
-        with self.assertRaises(AttributeError):
-            DCCImages.DCCImage([image])
+        with self.assertRaises(dccExcep.NotDCCImageException):
+            DCCImages.DCCImageStack([image])
 
     def testInvalidConstructor11Elements(self):
         imageList = []
@@ -127,7 +137,7 @@ class TestDCCImageStackConstructor(unittest.TestCase):
             image = DCCImages.DCCImage(array)
             imageList.append(image)
         imageList.append(np.ones((10, 10)))
-        with self.assertRaises(AttributeError):
+        with self.assertRaises(dccExcep.NotDCCImageException):
             DCCImages.DCCImageStack(imageList)
 
 
@@ -142,19 +152,105 @@ class TesDCCImageStackMethods(unittest.TestCase):
             self.imageList.append(image)
         self.stack = DCCImages.DCCImageStack(self.imageList)
 
+    def testImageInStackInvalidImage(self):
+        invalidImage = np.ones((1250, 1251), dtype=np.float32)
+        with self.assertRaises(dccExcep.NotDCCImageException):
+            self.stack.isImageInStack(invalidImage)
+
     def testImageNotInStack(self):
-        imageNotInStack = DCCImages.DCCImage(np.zeros((1250, 1251), dtype=np.float32))
-        index = self.stack.isImageInStack(imageNotInStack)
-        self.assertEqual(index, 5)
+        arrayNotInStack = np.ones((1250, 1251), dtype=np.float32)
+        arrayNotInStack[0][0] = 0.00001
+        imageNotInStack = DCCImages.DCCImage(arrayNotInStack)
+        self.assertFalse(self.stack.isImageInStack(imageNotInStack))
 
     def testImageInStack(self):
-        imageInStack = DCCImages.DCCImage(np.ones((1250, 1251), dtype=np.float32))
-        index = self.stack.isImageInStack(imageInStack)
-        self.assertEqual(index, 2)
+        imageInStack = self.imageList[-1].copyDCCImage()
+        self.assertTrue(self.stack.isImageInStack(imageInStack))
 
-    def testAddNotDCCImage(self):
-        imageNotDCC = np.ones((1454, 3025), dtype=np.float32)
-        with self.assertRaises()
+    def testGetIndexOfInvalidImage(self):
+        invalidImage = np.ones((1250, 1251), dtype=np.float32)
+        with self.assertRaises(dccExcep.NotDCCImageException):
+            self.stack.getIndexOfImage(invalidImage)
+
+    def testGetIndexOfImageNotInStack(self):
+        arrayNotInStack = np.ones((1250, 1251), dtype=np.float32)
+        arrayNotInStack[0][0] = 0.00001
+        imageNotInStack = DCCImages.DCCImage(arrayNotInStack)
+        with self.assertRaises(dccExcep.ImageNotInStackException):
+            self.stack.getIndexOfImage(imageNotInStack)
+
+    def testGetIndexImageInStack(self):
+        imageInStack = self.imageList[2].copyDCCImage()
+        self.assertEqual(self.stack.getIndexOfImage(imageInStack), 2)
+
+    def testAddInvalidImage(self):
+        invalidImage = np.ones((1250, 1251), dtype=np.float32)
+        with self.assertRaises(dccExcep.NotDCCImageException):
+            self.stack.addDCCImage(invalidImage)
+
+    def testAddImageAlreadyIn(self):
+        imageAlreadyIn = self.imageList[-1]
+        with self.assertRaises(dccExcep.ImageAlreadyInStackException):
+            self.stack.addDCCImage(imageAlreadyIn)
+
+    def testAddImageNotAlreadyIn(self):
+        imageNotAlreadyIn = DCCImages.DCCImage(np.zeros((1250, 1251), dtype=np.float32))
+        indexOfAddedImage = self.stack.addDCCImage(imageNotAlreadyIn)
+        self.assertEqual(indexOfAddedImage, 5)
+
+    def testRemoveAtIndexOutOfBound(self):
+        with self.assertRaises(IndexError):
+            self.stack.removeAtIndex(5)
+
+    def testRemoveImageAtIndex(self):
+        imageToRemove = self.imageList[-1]
+        removedImage = self.stack.removeAtIndex(-1)
+        self.assertTrue(imageToRemove == removedImage)
+
+    def testRemoveImageWithInvalidImage(self):
+        invalidImage = np.ones((125, 12547), dtype=np.float32)
+        with self.assertRaises(dccExcep.NotDCCImageException):
+            self.stack.removeDCCImage(invalidImage)
+
+    def testRemoveImageWithImageNotInStack(self):
+        arrayNotInStack = np.ones((1250, 1251), dtype=np.float32)
+        arrayNotInStack[0][0] = 0.00001
+        imageNotInStack = DCCImages.DCCImage(arrayNotInStack)
+        with self.assertRaises(dccExcep.ImageNotInStackException):
+            self.stack.removeDCCImage(imageNotInStack)
+
+    def testRemoveImageWithImage(self):
+        imageInStack = self.imageList[0].copyDCCImage()
+        indexOfRemovedImage = self.stack.removeDCCImage(imageInStack)
+        self.assertEqual(indexOfRemovedImage, 0)
+
+    def testDetNumberOfImages(self):
+        numberOfImages = len(self.imageList)
+        self.assertEqual(self.stack.getNumberOfImages(), numberOfImages)
+
+    def testGetNumberOfImagesAddedImage(self):
+        numberOfImages = len(self.imageList)
+        imageNotAlreadyIn = DCCImages.DCCImage(np.zeros((1250, 1251), dtype=np.float32))
+        self.stack.addDCCImage(imageNotAlreadyIn)
+        self.assertEqual(self.stack.getNumberOfImages(), numberOfImages + 1)
+
+    def testGetNumberOfImagesRemovedImage(self):
+        numberOfImages = len(self.imageList)
+        self.stack.removeAtIndex(0)
+        self.assertEqual(self.stack.getNumberOfImages(), numberOfImages - 1)
+
+    def testImageStackAsNumpyArray(self):
+        imageArray = np.array(self.imageList)
+        arrayFromStack = self.stack.asNumpyArray()
+        self.assertTrue(np.array_equal(imageArray, arrayFromStack))
+
+    def testImageStackAsList(self):
+        listFromStack = self.stack.asList()
+        self.assertTrue(listFromStack == self.imageList)
+
+    def testClearStack(self):
+        self.stack.clearAll()
+        self.assertTrue(len(self.stack) == 0)
 
 
 if __name__ == '__main__':

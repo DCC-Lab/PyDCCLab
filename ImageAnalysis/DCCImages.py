@@ -10,10 +10,10 @@ from ImageAnalysis.DCCImagesExceptions import ImageNotInStackException, ImageAlr
 
 class DCCImage:
     def __init__(self, imageAsArray: np.ndarray):
-        if not (1 < imageAsArray.ndim <= 3):
-            raise ImageDimensionsException(imageAsArray.ndim)
         if not imageAsArray.dtype == np.float32:
             raise PixelTypeException
+        if not (1 < imageAsArray.ndim <= 3):
+            raise ImageDimensionsException(imageAsArray.ndim)
         self.__pixelArray = imageAsArray
         self.__dimensions = imageAsArray.ndim
         self.__shape = imageAsArray.shape
@@ -57,25 +57,32 @@ class DCCImageStack:
         self.__imageStack = DCCImageArray
         self.__numberOfImages = len(DCCImageArray)
 
-
-    #Voir si ça ne serait pas mieux de juste avoir le lancement de l'exception dans isImageIn
-    def isImageInStack(self, image: DCCImage):
+    def __knowIfImageInStackAndPosition(self, image):
         if not isinstance(image, DCCImage):
             raise NotDCCImageException
         isFound = False
-        index = 0
-        while index < self.__numberOfImages and not isFound:
-            isFound = self.__imageStack[index] == image
+        index = -1
+        while index < self.__numberOfImages - 1 and not isFound:
             index += 1
+            isFound = self.__imageStack[index] == image
+        return isFound, index
+
+    def isImageInStack(self, image: DCCImage):
+        return self.__knowIfImageInStackAndPosition(image)[0]
+
+    def getIndexOfImage(self, image: DCCImage):
+        isInStack = self.isImageInStack(image)
+        index = self.__knowIfImageInStackAndPosition(image)[-1]
+        if not isInStack:
+            raise ImageNotInStackException
         return index
 
-    def addDCCImage(self, image: DCCImage):
-        if not isinstance(image, DCCImage):
-            raise NotDCCImageException
-        if self.isImageInStack(image) >= self.__numberOfImages:
+    def addDCCImage(self, image: DCCImage) -> int:
+        if self.isImageInStack(image):
             raise ImageAlreadyInStackException
         self.__imageStack.append(image)
         self.__numberOfImages += 1
+        return self.__numberOfImages - 1
 
     def removeAtIndex(self, index: int):
         removedImage = self.__imageStack.pop(index)
@@ -83,31 +90,29 @@ class DCCImageStack:
         return removedImage
 
     def removeDCCImage(self, image: DCCImage):
-        imageIndex = self.isImageInStack(image)
-        if imageIndex >= self.__numberOfImages:
-            raise ImageNotInStackException
+        imageIndex = self.getIndexOfImage(image)
         del self.__imageStack[imageIndex]
         self.__numberOfImages -= 1
         return imageIndex
 
-    def asNumpyArray(self):
-        return np.array(self.__imageStack)
-
     def getNumberOfImages(self):
         return self.__numberOfImages
 
-    def __del__(self):
-        for image in self.__imageStack:
-            del image
+    def __len__(self):
+        return self.getNumberOfImages()
+
+    def asNumpyArray(self):
+        return np.array(self.__imageStack)
+
+    def asList(self):
+        return self.__imageStack
+
+    def getImageAtIndex(self, index: int):
+        return self.__imageStack[index]
+
+    def clearAll(self):
+        self.__imageStack.clear()
+        self.__numberOfImages = 0
+        print(self.__imageStack)
 
 
-if __name__ == '__main__':
-    imageList = []
-    for i in range(5):
-        array = np.ones((1250, 1251), dtype=np.float32)
-        array[i][i] = i
-        image = DCCImage(array)
-        imageList.append(image)
-    stack = DCCImageStack(imageList)
-    image = DCCImage(np.zeros((10, 10), dtype=np.float32))
-    stack.isImageInStack(image)
