@@ -2,6 +2,7 @@ import unittest
 import ImageAnalysis.DCCImages as DCCImages
 import ImageAnalysis.DCCImagesExceptions as dccExcep
 import numpy as np
+from unittest.mock import Mock, patch
 
 
 class TestDCCImageConstructor(unittest.TestCase):
@@ -116,6 +117,19 @@ class TestDCCImageMethods(unittest.TestCase):
         except FileNotFoundError:
             isSaved = False
         self.assertTrue(isSaved)
+
+    def testGetMetadataNone(self):
+        self.assertIsNone(self.image.getMetadata())
+
+    def testGetMetadataNotNone(self):
+        array = np.ones((1250, 1250), dtype=np.float32)
+        metadata = "This is a metadata test"
+        image = DCCImages.DCCImage(array, metadata)
+        self.assertTrue(image.getMetadata() == metadata)
+
+    def testSetMetadata(self):
+        self.image.setMetadata("Hello world")
+        self.assertTrue(self.image.getMetadata() == "Hello world")
 
 
 class TestDCCImageStackConstructor(unittest.TestCase):
@@ -273,6 +287,49 @@ class TesDCCImageStackMethods(unittest.TestCase):
     def testClearStack(self):
         self.stack.clearAll()
         self.assertTrue(len(self.stack) == 0)
+
+    @patch("matplotlib.pyplot.show", new=Mock)
+    def testShowImages(self):
+        nbOfImagesShown = self.stack.showImages()
+        self.assertEqual(nbOfImagesShown, 5)
+
+
+class TestDCCImagesFromCZIFileConstructor(unittest.TestCase):
+
+    def testInvalidPathConstructor(self):
+        with self.assertRaises(FileNotFoundError):
+            DCCImages.DCCImagesFromCZIFile("noSuchFile.czi")
+
+    def testNotCziFile(self):
+        with self.assertRaises(ValueError):
+            DCCImages.DCCImagesFromCZIFile("testNotCziFile.jpg")
+
+    def testCorrectPath(self):
+        imagesFromCzi = DCCImages.DCCImagesFromCZIFile("testCziFile2Images.czi")
+        self.assertIsInstance(imagesFromCzi, DCCImages.DCCImagesFromCZIFile)
+
+
+class testDCCImagesFromCZIFileMethods(unittest.TestCase):
+
+    def setUp(self) -> None:
+        import ImageAnalysis.cziUtil as cziUtil
+        self.imagesFromCzi = DCCImages.DCCImagesFromCZIFile("testCziFile2Images.czi")
+        self.metadata = cziUtil.extractMetadataFromCziFileObject(cziUtil.readCziImage("testCziFile2Images.czi"))
+
+    def testGetMetadata(self):
+        self.assertTrue(self.metadata == self.imagesFromCzi.getMetadata())
+
+    def testSetMetadataAll(self):
+        self.imagesFromCzi.setMetadata("New Metadata")
+        self.assertTrue("New Metadata" == self.imagesFromCzi.getMetadata())
+
+    def testSetMetadataEveryImageCheck(self):
+        self.imagesFromCzi.setMetadata("Hello")
+        self.assertTrue(all(image.getMetadata() == "Hello" for image in self.imagesFromCzi.asList()))
+
+    def testSetMetadataInvalidNotAString(self):
+        with self.assertRaises(TypeError):
+            self.imagesFromCzi.setMetadata(123432)
 
 
 if __name__ == '__main__':

@@ -133,9 +133,12 @@ class DCCImageStack:
         self.__numberOfImages = 0
         print(self.__imageStack)
 
-    def showImages(self) -> None:
+    def showImages(self) -> int:
+        imagesShown = 0
         for image in self.__imageStack:
             image.showImage()
+            imagesShown += 1
+        return imagesShown
 
 
 class DCCImagesFromCZIFile(DCCImageStack):
@@ -156,7 +159,11 @@ class DCCImagesFromCZIFile(DCCImageStack):
         return self.__metadata
 
     def setMetadata(self, newMetadata: str) -> None:
+        if not isinstance(newMetadata, str):
+            raise TypeError("Metadata must be a string object")
         self.__metadata = newMetadata
+        for image in self.asList():
+            image.setMetadata(self.__metadata)
 
     def saveMetadata(self, filename: str) -> None:
         unacceptedChars = ["?", "/", "\\", "*", "<", ">", "|", "."]
