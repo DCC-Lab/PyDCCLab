@@ -166,7 +166,7 @@ class DCCImagesFromCZIFile(DCCImageStack):
             image.setMetadata(self.__metadata)
 
     def saveMetadata(self, filename: str) -> None:
-        unacceptedChars = ["?", "/", "\\", "*", "<", ">", "|", "."]
+        unacceptedChars = ["?", "/", "\\", "*", "<", ">", "|", ".", ","]
         filename = filename.strip()
         if len(filename) == 0 or filename.isspace() or any(char in filename for char in unacceptedChars):
             raise InvalidMetadataFileName
@@ -180,9 +180,9 @@ class DCCImagesFromCZIFile(DCCImageStack):
 class DCCImageFromNormalFile(DCCImage):
     def __init__(self, path: str):
         self.__path = path
-        if path.__contains__(".tiff") or path.__contains__(".tif"):
+        if path.lower().__contains__(".tiff") or path.lower().__contains__(".tif"):
             raise InvalidFileFormat("To read tiff files, please use DCCImagesFromTiffFile.")
-        elif path.__contains__(".czi"):
+        elif path.lower().__contains__(".czi"):
             raise InvalidFileFormat("To read czi files, please use DCCImagesFromCZIFile.")
         image = PIL.Image.open(path)
         imageToArray = np.array(image, dtype=np.float32)
@@ -195,6 +195,8 @@ class DCCImageFromNormalFile(DCCImage):
 class DCCImagesFromTiffFile(DCCImageStack):
     def __init__(self, path: str):
         self.__path = path
+        if not (path.lower().__contains__(".tiff") or path.lower().__contains__(".tif")):
+            raise InvalidFileFormat("Please use the right class to extract the image(s) form the file.")
         tiffFileObject = tifffile.TiffFile(path)
         imageAsArray = tiffFileObject.asarray().astype(dtype="float32")
         self.__metadata = tiffFileObject.ome_metadata
@@ -207,13 +209,15 @@ class DCCImagesFromTiffFile(DCCImageStack):
         return self.__metadata
 
     def setMetadata(self, newMetadata: str) -> None:
+        if not isinstance(newMetadata, str):
+            raise TypeError("Metadata must be a string object")
         self.__metadata = newMetadata
 
     def saveMetadata(self, filename: str) -> None:
-        unacceptedChars = ["?", "/", "\\", "*", "<", ">", "|", "."]
+        unacceptedChars = ["?", "/", "\\", "*", "<", ">", "|", ".", ","]
         filename = filename.strip()
         if len(filename) == 0 or filename.isspace() or any(char in filename for char in unacceptedChars):
-            raise InvalidImageName
+            raise InvalidMetadataFileName
         with open("{}.xml".format(filename), "w") as file:
             file.write(self.__metadata)
 

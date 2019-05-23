@@ -372,5 +372,61 @@ class TestDCCImageFromNormalFileConstructor(unittest.TestCase):
         self.assertIsInstance(imageFromJPG, DCCImages.DCCImageFromNormalFile)
 
 
+class TestDCCImageFromNormalFileMethods(unittest.TestCase):
+
+    def setUp(self) -> None:
+        self.imageFromJPG = DCCImages.DCCImageFromNormalFile("testNotCziFile.jpg")
+
+    def testGetPath(self):
+        self.assertTrue(self.imageFromJPG.getPath() == "testNotCziFile.jpg")
+
+
+class TestDCCImagesFromTiffFileConstructor(unittest.TestCase):
+
+    def testInvalidConstructorNotSupportedFile(self):
+        with self.assertRaises(dccExcep.InvalidFileFormat):
+            DCCImages.DCCImagesFromTiffFile("testNotCziFile.jpg")
+
+    def testValidConstructor(self):
+        imageFromTiff = DCCImages.DCCImagesFromTiffFile("testTiff3Images.tiff")
+        self.assertIsInstance(imageFromTiff, DCCImages.DCCImagesFromTiffFile)
+
+
+class TestDCCImagesFromTiffFileMethods(unittest.TestCase):
+
+    def setUp(self) -> None:
+        self.images = DCCImages.DCCImagesFromTiffFile("testTiff3Images.tiff")
+
+    def testGetMetadata(self):
+        import tifffile
+        metadata = tifffile.TiffFile("testTiff3Images.tiff").ome_metadata
+        self.assertTrue(metadata == self.images.getMetadata())
+
+    def testSetMetadataInvalid(self):
+        with self.assertRaises(TypeError):
+            self.images.setMetadata(np.zeros(12))
+
+    def testSetMetadataValid(self):
+        self.images.setMetadata("Hello")
+        self.assertTrue(self.images.getMetadata() == "Hello")
+
+    def testSaveMetadataInvalidName(self):
+        with self.assertRaises(dccExcep.InvalidMetadataFileName):
+            self.images.saveMetadata("meta.data")
+
+    def testSaveMetadata(self):
+        self.images.saveMetadata("testSaveMetaDCCImagesTest_fromTiff")
+        isSaved = True
+        try:
+            fileTest = open("testSaveMetaDCCImagesTest_fromTiff.xml", "r", encoding="utf-8")
+            fileTest.close()
+        except FileNotFoundError:
+            isSaved = False
+        self.assertTrue(isSaved)
+
+    def testGetPath(self):
+        self.assertTrue(self.images.getPath() == "testTiff3Images.tiff")
+
+
 if __name__ == '__main__':
     unittest.main()
