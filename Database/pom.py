@@ -1,4 +1,5 @@
 import xml.etree.ElementTree as et
+import xml.etree.cElementTree as cet
 import os
 import fnmatch
 import imageAnalysis.cziUtil as czi
@@ -14,6 +15,16 @@ def findAllCZI(path):
                 allCZIs.append([file, os.path.join(root, file)])
     print('...Done! ' + str(len(allCZIs)) + ' files found!')
     return allCZIs
+
+# Pas bon
+def xmlParser(data, tags):
+    tree = cet.iterparse(data, events=('start', 'end'))
+    _, root = next(tree)
+
+    for event, node in tree:
+        if node.tag in tags:
+            yield node.tag, node.text
+        root.clear()
 
 '''
 def exportListToCSV(list):
@@ -37,21 +48,35 @@ if __name__ == '__main__':
     # ImageDocument et Metadata pourraient etre ignorer.
     czipath = 'testCziFile.czi'
     image = czi.readCziImage(czipath)
-    xmlString = czi.extractMetadataFromCziFileObject(image)
 
-    # The root is on ImageDocument. It contains no informations of value. Metadata within is what we want.
-    imageDocument = et.fromstring(xmlString)
-    metadata = imageDocument[0]
-    # Metadata is simillar to ImageDocument, it contains no informations of value. It's children are, again, what we want.
-    #metadata = {}
-    for data in metadata:
-        #print(data.tag, data.attrib)
-        for subdata in data:
-            #print(subdata.tag, subdata.attrib)
-            for subsubdata in subdata:
-                #print(subsubdata.tag, subsubdata.attrib)
-                for subsubsubdata in subsubdata:
-                    print(subsubsubdata.tag, subsubsubdata.attrib)
+    xmlString = czi.extractMetadataFromCziFileObject(image)
+    xml = cet.fromstring(xmlString)
+    tags = ['Channel', 'AutofocusResult', 'Intensity']
+
+    root = cet.fromstring(xmlString)
+
+    '''
+    for tag in tags:
+        print('-=-=-=', tag, '=-=-=-')
+        for elem in root.iter(tag):
+            print(elem.attrib)
+    '''
+
+    tree = et.fromstring(xmlString)
+    tree.findall('Channel')
+    for elem in tree.findall('Channel'):
+        print(elem)
+
+    '''
+    # The first and second root, which are ImageDocument and Metadata do not contain, by themselves, anything of value.
+    # We want the information contained within metadata.
+    root = et.fromstring(xmlString)
+    roo = root[0]
+    metadata = roo[0]
+    print(metadata.tag, metadata.text)
+    for info in metadata:
+        print(info.tag, info.text)
+    '''
 
     '''
     open('test.txt', 'w').write(metadata)

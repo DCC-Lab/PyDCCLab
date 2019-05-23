@@ -2,10 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8edb79ed-101c-49e3-a876-b403393446ee" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Database/test.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Database/testCziFile.czi" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Database/pom.py" beforeDir="false" afterPath="$PROJECT_DIR$/Database/pom.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -16,23 +12,23 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Database/pom.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="211">
-              <caret line="51" column="17" selection-start-line="51" selection-start-column="17" selection-end-line="51" selection-end-column="17" />
+            <state relative-caret-position="58">
+              <caret line="58" column="20" lean-forward="true" selection-start-line="58" selection-start-column="20" selection-end-line="58" selection-end-column="20" />
               <folding>
-                <element signature="e#0#6#0" expanded="true" />
+                <element signature="e#0#34#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Database/test.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-37353">
-              <caret line="2" column="30" selection-start-line="2" selection-start-column="30" selection-end-line="2" selection-end-column="30" />
+            <state relative-caret-position="250">
+              <caret line="1400" column="9" selection-start-line="1400" selection-start-column="9" selection-end-line="1400" selection-end-column="18" />
             </state>
           </provider>
         </entry>
@@ -92,17 +88,6 @@
               <item name="BigData-ImageAnalysis" type="b2602c69:ProjectViewProjectNode" />
               <item name="BigData-ImageAnalysis" type="462c0819:PsiDirectoryNode" />
               <item name="Database" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="BigData-ImageAnalysis" type="b2602c69:ProjectViewProjectNode" />
-              <item name="BigData-ImageAnalysis" type="462c0819:PsiDirectoryNode" />
-              <item name="imageAnalysis" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="BigData-ImageAnalysis" type="b2602c69:ProjectViewProjectNode" />
-              <item name="BigData-ImageAnalysis" type="462c0819:PsiDirectoryNode" />
-              <item name="imageAnalysis" type="462c0819:PsiDirectoryNode" />
-              <item name="unitTesting" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -181,19 +166,25 @@
       <option name="project" value="LOCAL" />
       <updated>1558438378796</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Test on CZI Metadata">
+      <created>1558440736935</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1558440736935</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1295" height="695" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.15329626" />
+      <window_info content_ui="combo" id="Project" order="0" weight="0.15329626" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49960285" visible="true" weight="0.32978722" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49960285" weight="0.32978722" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -269,20 +260,38 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Database/pom.py">
+    <entry file="file://$PROJECT_DIR$/imageAnalysis/cziDoc/CZI-Doc/XmlSchemas/Dimensions.xsd">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/imageAnalysis/cziDoc/CZI-Doc/XmlSchemas/CommonTypes.xsd">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/imageAnalysis/cziDoc/CZI-Doc/XmlSchemas/ImageMetadata.xsd">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="211">
-          <caret line="51" column="17" selection-start-line="51" selection-start-column="17" selection-end-line="51" selection-end-column="17" />
-          <folding>
-            <element signature="e#0#6#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="-782">
+          <caret line="5" lean-forward="true" selection-start-line="5" selection-end-line="5" />
         </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/imageAnalysis/cziDoc/CZI-Doc/XmlSchemas/Layers.xsd">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2397" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Database/test.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-37353">
-          <caret line="2" column="30" selection-start-line="2" selection-start-column="30" selection-end-line="2" selection-end-column="30" />
+        <state relative-caret-position="250">
+          <caret line="1400" column="9" selection-start-line="1400" selection-start-column="9" selection-end-line="1400" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Database/pom.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="58">
+          <caret line="58" column="20" lean-forward="true" selection-start-line="58" selection-start-column="20" selection-end-line="58" selection-end-column="20" />
+          <folding>
+            <element signature="e#0#34#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
