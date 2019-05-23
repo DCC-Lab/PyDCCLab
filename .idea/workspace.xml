@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8edb79ed-101c-49e3-a876-b403393446ee" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/Database/pom.py" beforeDir="false" afterPath="$PROJECT_DIR$/Database/pom.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Database/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/Database/database.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Database/uTest.py" beforeDir="false" afterPath="$PROJECT_DIR$/Database/uTest.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -15,20 +17,11 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Database/pom.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="58">
-              <caret line="58" column="20" lean-forward="true" selection-start-line="58" selection-start-column="20" selection-end-line="58" selection-end-column="20" />
+            <state relative-caret-position="476">
+              <caret line="43" column="26" lean-forward="true" selection-start-line="43" selection-start-column="26" selection-end-line="43" selection-end-column="26" />
               <folding>
-                <element signature="e#0#34#0" expanded="true" />
+                <element signature="e#1#37#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Database/test.txt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="250">
-              <caret line="1400" column="9" selection-start-line="1400" selection-start-column="9" selection-end-line="1400" selection-end-column="18" />
             </state>
           </provider>
         </entry>
@@ -59,10 +52,10 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/Database/DB_management.py" />
-        <option value="$PROJECT_DIR$/Database/uTest.py" />
-        <option value="$PROJECT_DIR$/Database/database.py" />
         <option value="$PROJECT_DIR$/imageAnalysis/cziUtil.py" />
         <option value="$PROJECT_DIR$/Database/pom.py" />
+        <option value="$PROJECT_DIR$/Database/uTest.py" />
+        <option value="$PROJECT_DIR$/Database/database.py" />
       </list>
     </option>
   </component>
@@ -89,6 +82,11 @@
               <item name="BigData-ImageAnalysis" type="462c0819:PsiDirectoryNode" />
               <item name="Database" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="BigData-ImageAnalysis" type="b2602c69:ProjectViewProjectNode" />
+              <item name="BigData-ImageAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="imageAnalysis" type="462c0819:PsiDirectoryNode" />
+            </path>
           </expand>
           <select />
         </subPane>
@@ -113,7 +111,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.pom">
     <configuration name="pom" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="BigData-ImageAnalysis" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -135,9 +133,73 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="pytest for uTest.TestDatabase.test_CreateCursor" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="BigData-ImageAnalysis" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Database" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;uTest.TestDatabase.test_CreateCursor&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest for uTest.TestDatabase.test_closeCursor" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="BigData-ImageAnalysis" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Database" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;uTest.TestDatabase.test_closeCursor&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest for uTest.TestDatabase.test_commit" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="BigData-ImageAnalysis" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Database" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;uTest.TestDatabase.test_commit&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest for uTest.TestDatabase.test_createCursor" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="BigData-ImageAnalysis" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Database" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;uTest.TestDatabase.test_createCursor&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
         <item itemvalue="Python.pom" />
+        <item itemvalue="Python tests.pytest for uTest.TestDatabase.test_commit" />
+        <item itemvalue="Python tests.pytest for uTest.TestDatabase.test_closeCursor" />
+        <item itemvalue="Python tests.pytest for uTest.TestDatabase.test_createCursor" />
+        <item itemvalue="Python tests.pytest for uTest.TestDatabase.test_CreateCursor" />
       </list>
     </recent_temporary>
   </component>
@@ -173,18 +235,65 @@
       <option name="project" value="LOCAL" />
       <updated>1558440736935</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Test on CZI Metadata">
+      <created>1558612151786</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1558612151786</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Test on CZI Metadata">
+      <created>1558617317777</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1558617317777</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
+  </component>
+  <component name="TestHistory">
+    <history-entry file="pytest_for_uTest_TestDatabase_test_createConnection - 2019.05.23 at 09h 32m 49s.xml">
+      <configuration name="pytest for uTest.TestDatabase.test_createConnection" configurationId="tests" />
+    </history-entry>
+    <history-entry file="pytest_for_uTest_TestDatabase_test_changeConnection - 2019.05.23 at 09h 36m 24s.xml">
+      <configuration name="pytest for uTest.TestDatabase.test_changeConnection" configurationId="tests" />
+    </history-entry>
+    <history-entry file="pytest_for_uTest_TestDatabase_test_patToURI - 2019.05.23 at 09h 39m 59s.xml">
+      <configuration name="pytest for uTest.TestDatabase.test_patToURI" configurationId="tests" />
+    </history-entry>
+    <history-entry file="pytest_for_uTest_TestDatabase_test_CreateCursor - 2019.05.23 at 09h 49m 27s.xml">
+      <configuration name="pytest for uTest.TestDatabase.test_CreateCursor" configurationId="tests" />
+    </history-entry>
+    <history-entry file="pytest_for_uTest_TestDatabase_test_createCursor - 2019.05.23 at 09h 59m 20s.xml">
+      <configuration name="pytest for uTest.TestDatabase.test_createCursor" configurationId="tests" />
+    </history-entry>
+    <history-entry file="pytest_for_uTest_TestDatabase_test_createCursor - 2019.05.23 at 10h 01m 18s.xml">
+      <configuration name="pytest for uTest.TestDatabase.test_createCursor" configurationId="tests" />
+    </history-entry>
+    <history-entry file="pytest_for_uTest_TestDatabase_test_closeCursor - 2019.05.23 at 10h 02m 51s.xml">
+      <configuration name="pytest for uTest.TestDatabase.test_closeCursor" configurationId="tests" />
+    </history-entry>
+    <history-entry file="pytest_for_uTest_TestDatabase_test_commit - 2019.05.23 at 10h 07m 44s.xml">
+      <configuration name="pytest for uTest.TestDatabase.test_commit" configurationId="tests" />
+    </history-entry>
+    <history-entry file="pytest_for_uTest_TestDatabase_test_commit - 2019.05.23 at 10h 09m 24s.xml">
+      <configuration name="pytest for uTest.TestDatabase.test_commit" configurationId="tests" />
+    </history-entry>
+    <history-entry file="pytest_for_uTest_TestDatabase_test_commit - 2019.05.23 at 10h 25m 59s.xml">
+      <configuration name="pytest for uTest.TestDatabase.test_commit" configurationId="tests" />
+    </history-entry>
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1295" height="695" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" weight="0.15329626" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49960285" weight="0.32978722" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32978722" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49960285" visible="true" weight="0.32978722" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -198,12 +307,12 @@
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
     </layout>
     <layout-to-restore>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.15329626" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.15329626" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49960285" weight="0.32978722" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49960285" visible="true" weight="0.32978722" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -223,43 +332,6 @@
     <option name="LAST_COMMIT_MESSAGE" value="Test on CZI Metadata" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/Database/uTest.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="992">
-          <caret line="149" column="7" selection-start-line="149" selection-start-column="7" selection-end-line="149" selection-end-column="7" />
-          <folding>
-            <element signature="e#0#30#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/imageAnalysis/cziUtil.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="16" column="18" selection-start-line="16" selection-start-column="18" selection-end-line="16" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Database/database.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1201">
-          <caret line="52" selection-start-line="52" selection-end-line="52" />
-          <folding>
-            <element signature="e#0#22#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Database/DB_management.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="16" lean-forward="true" selection-start-line="16" selection-end-line="16" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/imageAnalysis/cziDoc/CZI-Doc/XmlSchemas/Dimensions.xsd">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -278,19 +350,75 @@
         <state relative-caret-position="-2397" />
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Database/test.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="1319" column="81" selection-start-line="1319" selection-start-column="81" selection-end-line="1319" selection-end-column="81" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/imageAnalysis/cziUtil.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1540">
+          <caret line="51" column="75" selection-start-line="51" selection-start-column="75" selection-end-line="51" selection-end-column="75" />
+          <folding>
+            <element signature="e#569#583#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Database/test.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="250">
+        <state relative-caret-position="319">
           <caret line="1400" column="9" selection-start-line="1400" selection-start-column="9" selection-end-line="1400" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Database/DB_management.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="272">
+          <caret line="16" lean-forward="true" selection-start-line="16" selection-end-line="16" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Database/database.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2669">
+          <caret line="157" column="54" selection-start-line="157" selection-start-column="54" selection-end-line="157" selection-end-column="54" />
+          <folding>
+            <element signature="e#0#22#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Database/uTest.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1411">
+          <caret line="164" lean-forward="true" selection-start-line="164" selection-end-line="164" />
+          <folding>
+            <element signature="e#0#30#0" expanded="true" />
+            <element signature="e#166#765#0" />
+            <element signature="e#811#1138#0" />
+            <element signature="e#1184#1512#0" />
+            <element signature="e#1571#1923#0" />
+            <element signature="e#1763#2144#0" />
+            <element signature="e#2192#2284#0" />
+            <element signature="e#2512#2858#0" />
+            <element signature="e#2909#3235#0" />
+            <element signature="e#3255#3621#0" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Database/pom.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="58">
-          <caret line="58" column="20" lean-forward="true" selection-start-line="58" selection-start-column="20" selection-end-line="58" selection-end-column="20" />
+        <state relative-caret-position="476">
+          <caret line="43" column="26" lean-forward="true" selection-start-line="43" selection-start-column="26" selection-end-line="43" selection-end-column="26" />
           <folding>
-            <element signature="e#0#34#0" expanded="true" />
+            <element signature="e#1#37#0" expanded="true" />
           </folding>
         </state>
       </provider>
