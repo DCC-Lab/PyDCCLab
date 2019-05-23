@@ -49,7 +49,7 @@ def extractMetadataFromCziFileObject(cziObject, saveFileName=None):
     """
     meta = cziObject.metadata
     if saveFileName is not None:
-        file_xml = open("{}.xml".format(saveFileName), "w")
+        file_xml = open("{}.xml".format(saveFileName), "w", encoding='utf-8')
         file_xml.write(meta)
         file_xml.close()
     return meta

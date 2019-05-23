@@ -1,9 +1,7 @@
-import xml.etree.ElementTree as et
 import xml.etree.cElementTree as cet
 import os
 import fnmatch
 import imageAnalysis.cziUtil as czi
-from tifffile import xml2dict
 
 
 def findAllCZI(path):
@@ -16,111 +14,32 @@ def findAllCZI(path):
     print('...Done! ' + str(len(allCZIs)) + ' files found!')
     return allCZIs
 
-# Pas bon
-def xmlParser(data, tags):
-    tree = cet.iterparse(data, events=('start', 'end'))
-    _, root = next(tree)
 
-    for event, node in tree:
-        if node.tag in tags:
-            yield node.tag, node.text
-        root.clear()
+def xmlParser(cziFile, filter=None):  # TODO filter
+    try:
+        # We create a temporary XML file to use in iterparse.
+        image = czi.readCziImage(cziFile)
+        czi.extractMetadataFromCziFileObject(image, 'temp')
 
-'''
-def exportListToCSV(list):
-    filename = 'list.csv'
-    with open(filename, 'w') as file:
+        # TODO searchResults = []
+        iterable = cet.iterparse('temp.xml', events=('start', 'end'))
+        iterator = iter(iterable)
 
-        file.write(CreateCSVHeader(cur))
+        event, root = iterator.__next__()
 
-        for row in cur.execute('SELECT * FROM ' + str(table)):
-            line = ""
-            for cell in row:
-                line += str(cell) + ","
-            line = str(line)[:-1] + "\n"
-            file.write(line)
-        file.close()
-        cur.close()
-        conn.close()
-'''
+        for event, elem in iterator:
+            if event == 'end':  # and element.tag == filter:
+                # searchResults.append([elem.tag, elem.text])
+                print(elem.tag, elem.text)
+                elem.clear()
+                root.clear()
+        # TODO return searchResults
+    except cet.ParseError as error:
+        return error
+    finally:
+        # In all cases, we delete the xml file.
+        os.remove('temp.xml')
+
 
 if __name__ == '__main__':
-    # ImageDocument et Metadata pourraient etre ignorer.
-    czipath = 'testCziFile.czi'
-    image = czi.readCziImage(czipath)
-
-    xmlString = czi.extractMetadataFromCziFileObject(image)
-    xml = cet.fromstring(xmlString)
-    tags = ['Channel', 'AutofocusResult', 'Intensity']
-
-    root = cet.fromstring(xmlString)
-
-    '''
-    for tag in tags:
-        print('-=-=-=', tag, '=-=-=-')
-        for elem in root.iter(tag):
-            print(elem.attrib)
-    '''
-
-    tree = et.fromstring(xmlString)
-    tree.findall('Channel')
-    for elem in tree.findall('Channel'):
-        print(elem)
-
-    '''
-    # The first and second root, which are ImageDocument and Metadata do not contain, by themselves, anything of value.
-    # We want the information contained within metadata.
-    root = et.fromstring(xmlString)
-    roo = root[0]
-    metadata = roo[0]
-    print(metadata.tag, metadata.text)
-    for info in metadata:
-        print(info.tag, info.text)
-    '''
-
-    '''
-    open('test.txt', 'w').write(metadata)
-    data = xml2dict(metadata)
-    print(data)
-    sousdata = data['ImageDocument']
-    print(sousdata)
-    soussousdata = sousdata['Metadata']
-    print(soussousdata)
-    keys = []
-    for line in soussousdata:
-        keys.append(line)
-    for key in keys:
-        print(soussousdata[key])
-    '''
-
-    #CZIs = findAllCZI('P:\\injection AAV\\résultats bruts')
-
-
-    #for file in os.listdir('P:\injection AAV\S58_AAV595.numbers'):
-    #    if fnmatch.fnmatch(file, '*.jpg'):
-    #        print(file)
-    '''
-    # Example code
-    some_dir = '/'
-    ignore_list = ['*.tmp', 'tmp/', '*.py']
-    for dirname, _, filenames in os.walk(some_dir):
-        for filename in filenames:
-            should_ignore = False
-            for pattern in ignore_list:
-                if fnmatch.fnmatch(filename, pattern):
-                    should_ignore = True
-            if should_ignore:
-                print ('Ignore', filename)
-                continue
-
-    # Simplified loop
-    for dirname, _, filenames in os.walk(some_dir):
-        for filename in filenames:
-            if any(fnmatch.fnmatch(filename, pattern) for pattern in ignore_list):
-                print('Ignore', filename)
-                continue
-
-    # Other method
-    files = [f for f in os.listdir('P:/') if re.match(r'*.czi', f)]
-    '''
-
+    xmlParser('testCziFile.czi')
