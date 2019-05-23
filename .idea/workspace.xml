@@ -2,9 +2,52 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8edb79ed-101c-49e3-a876-b403393446ee" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ImageAnalysis/DCCImages.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ImageAnalysis/DCCImagesExceptions.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ImageAnalysis/unitTesting/.cache/v/cache/lastfailed" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ImageAnalysis/unitTesting/DCCImagesTests.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ImageAnalysis/unitTesting/cziUtilTests.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ImageAnalysis/unitTesting/testSaveTIFF_1.tif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ImageAnalysis/unitTesting/testSaveTIFF_2.tif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ImageAnalysis/unitTesting/testSaveToTiff.tif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ImageAnalysis/unitTesting/test_meta.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Database/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/Database/database.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Database/uTest.py" beforeDir="false" afterPath="$PROJECT_DIR$/Database/uTest.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/CZI-Doc/DS_ZISRAW-FileFormat.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/cziDoc/CZI-Doc/DS_ZISRAW-FileFormat.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/CZI-Doc/XmlSchemas/CommonTypes.xsd" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/cziDoc/CZI-Doc/XmlSchemas/CommonTypes.xsd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/CZI-Doc/XmlSchemas/Dimensions.xsd" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/cziDoc/CZI-Doc/XmlSchemas/Dimensions.xsd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/CZI-Doc/XmlSchemas/DisplaySetting.xsd" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/cziDoc/CZI-Doc/XmlSchemas/DisplaySetting.xsd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/CZI-Doc/XmlSchemas/ImageAnalysisSetting.xsd" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/cziDoc/CZI-Doc/XmlSchemas/ImageAnalysisSetting.xsd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/CZI-Doc/XmlSchemas/ImageMetadata.xsd" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/cziDoc/CZI-Doc/XmlSchemas/ImageMetadata.xsd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/CZI-Doc/XmlSchemas/Information.xsd" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/cziDoc/CZI-Doc/XmlSchemas/Information.xsd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/CZI-Doc/XmlSchemas/Instrument.xsd" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/cziDoc/CZI-Doc/XmlSchemas/Instrument.xsd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/CZI-Doc/XmlSchemas/Layers.xsd" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/cziDoc/CZI-Doc/XmlSchemas/Layers.xsd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/CZI-Doc/XmlSchemas/PhysiologySetting.xsd" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/cziDoc/CZI-Doc/XmlSchemas/PhysiologySetting.xsd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/CZI-Doc/XmlSchemas/Scaling.xsd" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/cziDoc/CZI-Doc/XmlSchemas/Scaling.xsd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/CZI-Doc/XmlSchemas/Timeline.xsd" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/cziDoc/CZI-Doc/XmlSchemas/Timeline.xsd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/CZI-Doc/XmlSchemas/Views.xsd" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/cziDoc/CZI-Doc/XmlSchemas/Views.xsd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/cziDoc/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/SimpleImageViewer/App.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/cziDoc/SimpleImageViewer/App.xaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/SimpleImageViewer/App.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/cziDoc/SimpleImageViewer/App.xaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/SimpleImageViewer/MainWindow.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/cziDoc/SimpleImageViewer/MainWindow.xaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/SimpleImageViewer/MainWindow.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/cziDoc/SimpleImageViewer/MainWindow.xaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/SimpleImageViewer/Properties/AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/cziDoc/SimpleImageViewer/Properties/AssemblyInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/SimpleImageViewer/Properties/Resources.Designer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/cziDoc/SimpleImageViewer/Properties/Resources.Designer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/SimpleImageViewer/Properties/Resources.resx" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/cziDoc/SimpleImageViewer/Properties/Resources.resx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/SimpleImageViewer/Properties/Settings.Designer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/cziDoc/SimpleImageViewer/Properties/Settings.Designer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/SimpleImageViewer/Properties/Settings.settings" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/cziDoc/SimpleImageViewer/Properties/Settings.settings" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/SimpleImageViewer/SimpleImageViewer.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/cziDoc/SimpleImageViewer/SimpleImageViewer.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/SimpleImageViewer/SimpleImageViewer.sln" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/cziDoc/SimpleImageViewer/SimpleImageViewer.sln" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/SimpleImageViewer/app.config" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/cziDoc/SimpleImageViewer/app.config" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/SimpleImageViewer/bin/Release/WBa.SimpleImageViewer.exe" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/cziDoc/SimpleImageViewer/bin/Release/WBa.SimpleImageViewer.exe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/SimpleImageViewer/bin/Release/ZeissImageLib.dll" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/cziDoc/SimpleImageViewer/bin/Release/ZeissImageLib.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/ZeissImageLib/ZeissImageLib.dll" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/cziDoc/ZeissImageLib/ZeissImageLib.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziDoc/ZeissImageLib/ZeissImageLib.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/cziDoc/ZeissImageLib/ZeissImageLib.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/cziUtil.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/unitTesting/cziUtilTests.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/unitTesting/testCziFile.czi" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/unitTesting/testCziFile2Images.czi" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/imageAnalysis/unitTesting/testNotCziFile.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/unitTesting/testNotCziFile.jpg" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -14,15 +57,27 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Database/pom.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="476">
-              <caret line="43" column="26" lean-forward="true" selection-start-line="43" selection-start-column="26" selection-end-line="43" selection-end-column="26" />
+            <state relative-caret-position="194">
+              <caret line="43" column="26" selection-start-line="43" selection-start-column="26" selection-end-line="43" selection-end-column="26" />
               <folding>
                 <element signature="e#1#37#0" expanded="true" />
               </folding>
             </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/imageAnalysis/DCCImagesExceptions.py">
+          <provider selected="true" editor-type-id="text-editor" />
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/imageAnalysis/cziUtil.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-663" />
           </provider>
         </entry>
       </file>
@@ -35,11 +90,21 @@
       </list>
     </option>
   </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>imageNotInStack</find>
+      <find>meta</find>
+      <find>DefaultU</find>
+    </findStrings>
+    <replaceStrings>
+      <replace />
+    </replaceStrings>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="updateDatabase" />
+        <entry key="$PROJECT_DIR$" value="Test_Meta_CZI" />
       </map>
     </option>
   </component>
@@ -51,18 +116,27 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/Database/DB_management.py" />
-        <option value="$PROJECT_DIR$/imageAnalysis/cziUtil.py" />
-        <option value="$PROJECT_DIR$/Database/pom.py" />
         <option value="$PROJECT_DIR$/Database/uTest.py" />
-        <option value="$PROJECT_DIR$/Database/database.py" />
+        <option value="$PROJECT_DIR$/Database/DB_management.py" />
+        <option value="$PROJECT_DIR$/imageAnalysis/unitTesting/cziUtilTests.py" />
+        <option value="$PROJECT_DIR$/../hello-world/czi_util.py" />
+        <option value="$PROJECT_DIR$/imageAnalysis/cziUtil.py" />
+        <option value="$PROJECT_DIR$/imageAnalysis/DCC-Images.py" />
+        <option value="$PROJECT_DIR$/ImageAnalysis/unitTesting/cziUtilTests.py" />
+        <option value="$PROJECT_DIR$/ImageAnalysis/DCC-Images.py" />
+        <option value="$PROJECT_DIR$/ImageAnalysis/unitTesting/DCC-ImagesTests.py" />
+        <option value="$PROJECT_DIR$/ImageAnalysis/DCCImagesExceptions.py" />
+        <option value="$PROJECT_DIR$/ImageAnalysis/DCCImages.py" />
+        <option value="$PROJECT_DIR$/ImageAnalysis/unitTesting/DCCImagesTests.py" />
+        <option value="$PROJECT_DIR$/ImageAnalysis/cziUtil.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-12" />
-    <option name="width" value="981" />
-    <option name="height" value="1032" />
+    <option name="x" value="1595" />
+    <option name="y" value="-14" />
+    <option name="width" value="1600" />
+    <option name="height" value="876" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -97,7 +171,7 @@
   <component name="PropertiesComponent">
     <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+    <property name="settings.editor.selected.configurable" value="File.Encoding" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -111,8 +185,8 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.pom">
-    <configuration name="pom" type="PythonConfigurationType" factoryName="Python" temporary="true">
+  <component name="RunManager" selected="Python.cziUtil">
+    <configuration name="DCCImages" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="BigData-ImageAnalysis" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -120,11 +194,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Database" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ImageAnalysis" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Database/pom.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ImageAnalysis/DCCImages.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -133,73 +207,79 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="pytest for uTest.TestDatabase.test_CreateCursor" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+    <configuration name="cziUtil" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="BigData-ImageAnalysis" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ImageAnalysis" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ImageAnalysis/cziUtil.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest for DCCImagesTests.TestDCCImageMethods.testSaveToTIFF" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
       <module name="BigData-ImageAnalysis" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Database" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ImageAnalysis/unitTesting" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="_new_keywords" value="&quot;&quot;" />
       <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;uTest.TestDatabase.test_CreateCursor&quot;" />
+      <option name="_new_target" value="&quot;DCCImagesTests.TestDCCImageMethods.testSaveToTIFF&quot;" />
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
-    <configuration name="pytest for uTest.TestDatabase.test_closeCursor" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+    <configuration name="pytest for DCCImagesTests.TestDCCImageMethods.testSaveToTIFFInvalidCharacterName" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
       <module name="BigData-ImageAnalysis" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Database" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ImageAnalysis/unitTesting" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="_new_keywords" value="&quot;&quot;" />
       <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;uTest.TestDatabase.test_closeCursor&quot;" />
+      <option name="_new_target" value="&quot;DCCImagesTests.TestDCCImageMethods.testSaveToTIFFInvalidCharacterName&quot;" />
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
-    <configuration name="pytest for uTest.TestDatabase.test_commit" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+    <configuration name="pytest for DCCImagesTests.TestDCCImageMethods.testSaveToTIFFInvalidName" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
       <module name="BigData-ImageAnalysis" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Database" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ImageAnalysis/unitTesting" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="_new_keywords" value="&quot;&quot;" />
       <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;uTest.TestDatabase.test_commit&quot;" />
-      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
-      <method v="2" />
-    </configuration>
-    <configuration name="pytest for uTest.TestDatabase.test_createCursor" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
-      <module name="BigData-ImageAnalysis" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Database" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="_new_keywords" value="&quot;&quot;" />
-      <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;uTest.TestDatabase.test_createCursor&quot;" />
+      <option name="_new_target" value="&quot;DCCImagesTests.TestDCCImageMethods.testSaveToTIFFInvalidName&quot;" />
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.pom" />
-        <item itemvalue="Python tests.pytest for uTest.TestDatabase.test_commit" />
-        <item itemvalue="Python tests.pytest for uTest.TestDatabase.test_closeCursor" />
-        <item itemvalue="Python tests.pytest for uTest.TestDatabase.test_createCursor" />
-        <item itemvalue="Python tests.pytest for uTest.TestDatabase.test_CreateCursor" />
+        <item itemvalue="Python.cziUtil" />
+        <item itemvalue="Python tests.pytest for DCCImagesTests.TestDCCImageMethods.testSaveToTIFF" />
+        <item itemvalue="Python tests.pytest for DCCImagesTests.TestDCCImageMethods.testSaveToTIFFInvalidCharacterName" />
+        <item itemvalue="Python tests.pytest for DCCImagesTests.TestDCCImageMethods.testSaveToTIFFInvalidName" />
+        <item itemvalue="Python.DCCImages" />
       </list>
     </recent_temporary>
   </component>
@@ -214,94 +294,104 @@
       <option name="presentableId" value="Default" />
       <updated>1558095021635</updated>
     </task>
-    <task id="LOCAL-00001" summary="update to Database">
-      <created>1558102940121</created>
+    <task id="LOCAL-00001" summary="New utility function to get formatted metadata&#10;&#10;NEw utility function that format metadata and new unit test for this function.">
+      <created>1558465011588</created>
       <option name="number" value="00001" />
       <option name="presentableId" value="LOCAL-00001" />
       <option name="project" value="LOCAL" />
-      <updated>1558102940121</updated>
+      <updated>1558465011588</updated>
     </task>
-    <task id="LOCAL-00002" summary="Test on CZI Metadata">
-      <created>1558438378796</created>
+    <task id="LOCAL-00002" summary="Remove temporary main from cziUtil.">
+      <created>1558465071505</created>
       <option name="number" value="00002" />
       <option name="presentableId" value="LOCAL-00002" />
       <option name="project" value="LOCAL" />
-      <updated>1558438378796</updated>
+      <updated>1558465071505</updated>
     </task>
-    <task id="LOCAL-00003" summary="Test on CZI Metadata">
-      <created>1558440736935</created>
+    <task id="LOCAL-00003" summary="Rename imageAnalysis to ImageAnalysis">
+      <created>1558466938107</created>
       <option name="number" value="00003" />
       <option name="presentableId" value="LOCAL-00003" />
       <option name="project" value="LOCAL" />
-      <updated>1558440736935</updated>
+      <updated>1558466938107</updated>
     </task>
-    <task id="LOCAL-00004" summary="Test on CZI Metadata">
-      <created>1558612151786</created>
+    <task id="LOCAL-00004" summary="New methods in DCCImages and test cases for DCCImages&#10;&#10;Created new methods for DCCImage and DCCImageStack and started to do unit testing on those functions.">
+      <created>1558540640462</created>
       <option name="number" value="00004" />
       <option name="presentableId" value="LOCAL-00004" />
       <option name="project" value="LOCAL" />
-      <updated>1558612151786</updated>
+      <updated>1558540640462</updated>
     </task>
-    <task id="LOCAL-00005" summary="Test on CZI Metadata">
-      <created>1558617317777</created>
+    <task id="LOCAL-00005" summary="Modified and added methods in DCCImages. Added and modified unit tests of DCCImagesTest">
+      <created>1558550086461</created>
       <option name="number" value="00005" />
       <option name="presentableId" value="LOCAL-00005" />
       <option name="project" value="LOCAL" />
-      <updated>1558617317777</updated>
+      <updated>1558550086461</updated>
     </task>
     <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="pytest_for_uTest_TestDatabase_test_createConnection - 2019.05.23 at 09h 32m 49s.xml">
-      <configuration name="pytest for uTest.TestDatabase.test_createConnection" configurationId="tests" />
+    <history-entry file="pytest_in_DCCImagesTests_py - 2019.05.22 at 14h 26m 26s.xml">
+      <configuration name="pytest in DCCImagesTests.py" configurationId="tests" />
     </history-entry>
-    <history-entry file="pytest_for_uTest_TestDatabase_test_changeConnection - 2019.05.23 at 09h 36m 24s.xml">
-      <configuration name="pytest for uTest.TestDatabase.test_changeConnection" configurationId="tests" />
+    <history-entry file="pytest_in_DCCImagesTests_py - 2019.05.22 at 14h 27m 42s.xml">
+      <configuration name="pytest in DCCImagesTests.py" configurationId="tests" />
     </history-entry>
-    <history-entry file="pytest_for_uTest_TestDatabase_test_patToURI - 2019.05.23 at 09h 39m 59s.xml">
-      <configuration name="pytest for uTest.TestDatabase.test_patToURI" configurationId="tests" />
+    <history-entry file="pytest_in_DCCImagesTests_py - 2019.05.22 at 14h 29m 01s.xml">
+      <configuration name="pytest in DCCImagesTests.py" configurationId="tests" />
     </history-entry>
-    <history-entry file="pytest_for_uTest_TestDatabase_test_CreateCursor - 2019.05.23 at 09h 49m 27s.xml">
-      <configuration name="pytest for uTest.TestDatabase.test_CreateCursor" configurationId="tests" />
+    <history-entry file="pytest_in_DCCImagesTests_py - 2019.05.22 at 14h 30m 04s.xml">
+      <configuration name="pytest in DCCImagesTests.py" configurationId="tests" />
     </history-entry>
-    <history-entry file="pytest_for_uTest_TestDatabase_test_createCursor - 2019.05.23 at 09h 59m 20s.xml">
-      <configuration name="pytest for uTest.TestDatabase.test_createCursor" configurationId="tests" />
+    <history-entry file="pytest_in_DCCImagesTests_py - 2019.05.22 at 14h 30m 42s.xml">
+      <configuration name="pytest in DCCImagesTests.py" configurationId="tests" />
     </history-entry>
-    <history-entry file="pytest_for_uTest_TestDatabase_test_createCursor - 2019.05.23 at 10h 01m 18s.xml">
-      <configuration name="pytest for uTest.TestDatabase.test_createCursor" configurationId="tests" />
+    <history-entry file="pytest_in_DCCImagesTests_py - 2019.05.22 at 14h 31m 29s.xml">
+      <configuration name="pytest in DCCImagesTests.py" configurationId="tests" />
     </history-entry>
-    <history-entry file="pytest_for_uTest_TestDatabase_test_closeCursor - 2019.05.23 at 10h 02m 51s.xml">
-      <configuration name="pytest for uTest.TestDatabase.test_closeCursor" configurationId="tests" />
+    <history-entry file="pytest_in_DCCImagesTests_py - 2019.05.22 at 14h 33m 42s.xml">
+      <configuration name="pytest in DCCImagesTests.py" configurationId="tests" />
     </history-entry>
-    <history-entry file="pytest_for_uTest_TestDatabase_test_commit - 2019.05.23 at 10h 07m 44s.xml">
-      <configuration name="pytest for uTest.TestDatabase.test_commit" configurationId="tests" />
+    <history-entry file="pytest_for_DCCImagesTests_TestDCCImageMethods_testSaveToTIFFInvalidName - 2019.05.22 at 16h 12m 52s.xml">
+      <configuration name="pytest for DCCImagesTests.TestDCCImageMethods.testSaveToTIFFInvalidName" configurationId="tests" />
     </history-entry>
-    <history-entry file="pytest_for_uTest_TestDatabase_test_commit - 2019.05.23 at 10h 09m 24s.xml">
-      <configuration name="pytest for uTest.TestDatabase.test_commit" configurationId="tests" />
+    <history-entry file="pytest_for_DCCImagesTests_TestDCCImageMethods_testSaveToTIFFInvalidCharacterName - 2019.05.22 at 16h 14m 17s.xml">
+      <configuration name="pytest for DCCImagesTests.TestDCCImageMethods.testSaveToTIFFInvalidCharacterName" configurationId="tests" />
     </history-entry>
-    <history-entry file="pytest_for_uTest_TestDatabase_test_commit - 2019.05.23 at 10h 25m 59s.xml">
-      <configuration name="pytest for uTest.TestDatabase.test_commit" configurationId="tests" />
+    <history-entry file="pytest_for_DCCImagesTests_TestDCCImageMethods_testSaveToTIFF - 2019.05.22 at 16h 18m 24s.xml">
+      <configuration name="pytest for DCCImagesTests.TestDCCImageMethods.testSaveToTIFF" configurationId="tests" />
     </history-entry>
+  </component>
+  <component name="TodoView" selected-index="4">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1295" height="695" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" weight="0.15329626" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.15329626" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info active="true" anchor="bottom" id="Messages" visible="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.32978722" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49960285" visible="true" weight="0.32978722" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32974428" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.46702558" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.39973083" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Version Control" order="7" weight="0.32978722" />
+      <window_info anchor="bottom" id="TODO" order="6" weight="0.32974428" />
+      <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Terminal" order="8" />
       <window_info anchor="bottom" id="Python Console" order="9" />
-      <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.50039715" side_tool="true" weight="0.32978722" />
+      <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -327,100 +417,150 @@
     </layout-to-restore>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="update to Database" />
-    <MESSAGE value="Test on CZI Metadata" />
-    <option name="LAST_COMMIT_MESSAGE" value="Test on CZI Metadata" />
+    <MESSAGE value="Small modifications of the util file. New class started to create new data structure." />
+    <MESSAGE value="New utility function to get formatted metadata&#10;&#10;NEw utility function that format metadata and new unit test for this function." />
+    <MESSAGE value="Remove temporary main from cziUtil." />
+    <MESSAGE value="Rename imageAnalysis to ImageAnalysis" />
+    <MESSAGE value="New methods in DCCImages and test cases for DCCImages&#10;&#10;Created new methods for DCCImage and DCCImageStack and started to do unit testing on those functions." />
+    <MESSAGE value="Modified and added methods in DCCImages. Added and modified unit tests of DCCImagesTest" />
+    <option name="LAST_COMMIT_MESSAGE" value="Modified and added methods in DCCImages. Added and modified unit tests of DCCImagesTest" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/imageAnalysis/cziDoc/CZI-Doc/XmlSchemas/Dimensions.xsd">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/imageAnalysis/cziDoc/CZI-Doc/XmlSchemas/CommonTypes.xsd">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/imageAnalysis/cziDoc/CZI-Doc/XmlSchemas/ImageMetadata.xsd">
+    <entry file="file://$PROJECT_DIR$/Database/uTest.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-782">
-          <caret line="5" lean-forward="true" selection-start-line="5" selection-end-line="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/imageAnalysis/cziDoc/CZI-Doc/XmlSchemas/Layers.xsd">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2397" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Database/test.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="1319" column="81" selection-start-line="1319" selection-start-column="81" selection-end-line="1319" selection-end-column="81" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/imageAnalysis/cziUtil.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1540">
-          <caret line="51" column="75" selection-start-line="51" selection-start-column="75" selection-end-line="51" selection-end-column="75" />
+        <state relative-caret-position="68">
+          <caret line="4" column="66" selection-start-line="4" selection-start-column="66" selection-end-line="4" selection-end-column="66" />
           <folding>
-            <element signature="e#569#583#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Database/test.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="319">
-          <caret line="1400" column="9" selection-start-line="1400" selection-start-column="9" selection-end-line="1400" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Database/DB_management.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="16" lean-forward="true" selection-start-line="16" selection-end-line="16" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#0#30#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Database/database.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2669">
-          <caret line="157" column="54" selection-start-line="157" selection-start-column="54" selection-end-line="157" selection-end-column="54" />
+        <state relative-caret-position="578">
+          <caret line="61" column="46" lean-forward="true" selection-start-line="61" selection-start-column="46" selection-end-line="61" selection-end-column="46" />
           <folding>
             <element signature="e#0#22#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Database/uTest.py">
+    <entry file="file://$PROJECT_DIR$/Database/DB_management.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1411">
-          <caret line="164" lean-forward="true" selection-start-line="164" selection-end-line="164" />
+        <state relative-caret-position="238">
+          <caret line="14" column="25" selection-start-line="14" selection-start-column="25" selection-end-line="14" selection-end-column="25" />
           <folding>
-            <element signature="e#0#30#0" expanded="true" />
-            <element signature="e#166#765#0" />
-            <element signature="e#811#1138#0" />
-            <element signature="e#1184#1512#0" />
-            <element signature="e#1571#1923#0" />
-            <element signature="e#1763#2144#0" />
-            <element signature="e#2192#2284#0" />
-            <element signature="e#2512#2858#0" />
-            <element signature="e#2909#3235#0" />
-            <element signature="e#3255#3621#0" />
+            <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Database/pom.py">
+    <entry file="file://$PROJECT_DIR$/imageAnalysis/unitTesting/testNotCziFile.jpg">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/imageAnalysis/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="34">
+            <caret line="2" lean-forward="true" selection-start-line="2" selection-end-line="2" />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/imageAnalysis/unitTesting/cziUtilTests.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="476">
-          <caret line="43" column="26" lean-forward="true" selection-start-line="43" selection-start-column="26" selection-end-line="43" selection-end-column="26" />
+        <state relative-caret-position="153">
+          <caret line="9" column="22" selection-start-line="9" selection-start-column="22" selection-end-line="9" selection-end-column="22" />
           <folding>
-            <element signature="e#1#37#0" expanded="true" />
+            <element signature="e#0#33#0" expanded="true" />
           </folding>
         </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../hello-world/test_meta.xml" />
+    <entry file="file://$USER_HOME$/.PyCharmCE2019.1/system/python_stubs/-5491199/numpy/core/_multiarray_umath.py" />
+    <entry file="file://$APPLICATION_HOME_DIR$/helpers/typeshed/stdlib/3/typing.pyi">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2040" />
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/matplotlib/pyplot.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="2318" column="15" lean-forward="true" selection-start-line="2318" selection-start-column="15" selection-end-line="2318" selection-end-column="15" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/matplotlib/image.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="1302" column="4" selection-start-line="1302" selection-start-column="4" selection-end-line="1302" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/PIL/Image.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="39">
+          <caret line="38" column="19" lean-forward="true" selection-start-line="38" selection-start-column="19" selection-end-line="38" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.PyCharmCE2019.1/system/python_stubs/-5491199/builtins.py" />
+    <entry file="file://$PROJECT_DIR$/imageAnalysis/unitTesting/testSaveToTiff.tif">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../hello-world/czi_util.py" />
+    <entry file="file://$PROJECT_DIR$/imageAnalysis/DCCImages.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="884">
+          <caret line="61" column="34" selection-start-line="61" selection-start-column="34" selection-end-line="61" selection-end-column="34" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../hello-world/todoCompletion.py" />
+    <entry file="file://$PROJECT_DIR$/imageAnalysis/DCCImagesExceptions.py">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/imageAnalysis/unitTesting/DCCImagesTests.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1445">
+          <caret line="122" selection-start-line="122" selection-end-line="122" />
+          <folding>
+            <element signature="e#0#15#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/czifile/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="51">
+          <caret line="3" column="10" lean-forward="true" selection-start-line="3" selection-start-column="10" selection-end-line="3" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/imageAnalysis/unitTesting/test_meta.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2754">
+          <caret line="1370" column="40" selection-start-line="1370" selection-start-column="40" selection-end-line="1370" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/czifile/czifile.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="272">
+          <caret line="593" column="50" lean-forward="true" selection-start-line="593" selection-start-column="50" selection-end-line="593" selection-end-column="50" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ImageAnalysis/testMu.xml" />
+    <entry file="file://$PROJECT_DIR$/imageAnalysis/cziUtil.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-663" />
       </provider>
     </entry>
   </component>
