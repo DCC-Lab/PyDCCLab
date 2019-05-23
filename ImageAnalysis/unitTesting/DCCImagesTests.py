@@ -95,6 +95,32 @@ class TestDCCImageMethods(unittest.TestCase):
         imageNotCopy = DCCImages.DCCImage(arrayCopy)
         self.assertFalse(self.image == imageNotCopy)
 
+    def testShowImage(self):
+        # todo
+        pass
+
+    def testSaveToTIFFInvalidEmptyName(self):
+        name = ""
+        with self.assertRaises(dccExcep.InvalidImageName):
+            self.image.saveToTIFF(name)
+
+    def testSaveToTIFFInvalidCharacterName(self):
+        name = "test?"
+        with self.assertRaises(dccExcep.InvalidImageName):
+            self.image.saveToTIFF(name)
+
+    def testSaveToTIFF(self):
+        name = "testSaveToTiff"
+        self.image.saveToTIFF(name)
+        isSaved = True
+        try:
+            file = open("{}.tif".format(name), "r")
+            file.close()
+        except FileNotFoundError:
+            isSaved = False
+        self.assertTrue(isSaved)
+
+
 
 class TestDCCImageStackConstructor(unittest.TestCase):
 

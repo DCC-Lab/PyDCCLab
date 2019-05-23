@@ -25,3 +25,7 @@ class InvalidEqualityTest(Exception):
 class NotDCCImageException(Exception):
     def __init__(self):
         Exception.__init__(self, "Attribute must be a DCCImage instance.")
+
+class InvalidImageName(Exception):
+    def __init__(self):
+        Exception.__init__(self, "The given name/filename is invalid.")
