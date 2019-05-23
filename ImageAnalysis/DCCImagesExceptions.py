@@ -41,3 +41,8 @@ class InvalidMetadataFileName(Exception):
 class InvalidFileFormat(Exception):
     def __init__(self, message: str):
         Exception.__init__(self, message)
+
+#Voir si on pourrait pas merge avec invalid dimension image exception
+class MatrixDimensionException(Exception):
+    def __init__(self, reqDim, givenDim):
+        Exception.__init__(self, "Image must be of dim {} not {}.".format(reqDim, givenDim))

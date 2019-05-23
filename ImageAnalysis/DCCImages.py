@@ -1,8 +1,11 @@
 import numpy as np
 import tifffile
 import typing
+from skimage import color, data, filters, img_as_float32, measure
 import ImageAnalysis.cziUtil as cziUtil
 import PIL.Image
+import PIL.ImageStat as stats
+from scipy.signal import convolve2d
 from ImageAnalysis.DCCImagesExceptions import *
 import matplotlib.pyplot as plt
 
@@ -66,6 +69,60 @@ class DCCImage:
 
     def setMetadata(self, newMetadata):
         self.__metadata = newMetadata
+
+    # Now, interesting part:
+    def grayscaleConversion(self):
+        # todo test unitaire
+        if self.getDCCImageNumberOfChannels() == 1:
+            grayConversion = self.getDCCImageAsArray()
+        else:
+            # raises ValueError if not 3 or 4
+            grayConversion = color.rgb2gray(self.getDCCImageAsArray())
+        return DCCImage(grayConversion.astype("float32"))
+
+    def grayscaleHistogram(self, normed=False):
+        # todo faire en sorte d'avoir un histogramme et être capable de le normaliser + trouver le bon nombre de bins
+        pass
+
+    def RGBHistogram(self, normed=False):
+        # todo faire en sorte d'avoir un histogramme et être capable de le normaliser + trouver le bon nombre de bins
+        pass
+
+    # Garder private ou mettre public?
+    @staticmethod
+    def __convolution2D(inputImage: np.ndarray, matrix: np.ndarray):
+        convolvedImage = np.zeros_like(inputImage)
+        if inputImage.shape[-1] > 1:
+            for channel in range(inputImage.shape[-1]):
+                convolvedImage[..., channel] = convolve2d(inputImage[..., channel], matrix, mode="same",
+                                                          boundary="symm")
+        else:
+            convolvedImage = convolve2d(inputImage, matrix, mode="same", boundary="symm")
+        return convolvedImage.astype("float32")
+
+    def DCCImageXAxisDerivative(self):
+        dxFilter = [[-1, 0, 1]]
+        dxImage = self.__convolution2D(self.grayscaleConversion().getDCCImageAsArray(), dxFilter)
+        return DCCImage(dxImage)
+
+    def DCCImageYAxisDerivative(self):
+        dyFilter = [[-1], [0], [1]]
+        dyImage = self.__convolution2D(self.grayscaleConversion().getDCCImageAsArray(), dyFilter)
+        return DCCImage(dyImage)
+
+    def __DCCImageBasicStats(self):
+        PILImage = self.toPILImage()
+        return stats.Stat(PILImage)
+
+    def DCCImageAverage(self):
+        return self.__DCCImageBasicStats().mean
+
+    def DCCImageStandardDeviation(self):
+        return self.__DCCImageBasicStats().stddev
+
+    def DCCImageShannonEntropy(self, base=2):
+        grayscaleImage = self.grayscaleConversion()
+        return measure.shannon_entropy(grayscaleImage, base)
 
 
 class DCCImageStack:
@@ -229,4 +286,10 @@ if __name__ == '__main__':
     path = "C:\\Users\\goubi\\PycharmProjects\\BigData-ImageAnalysis\\ImageAnalysis\\unitTesting\\testCziFile2Images.czi"
     path2 = "C:\\Users\\goubi\\PycharmProjects\\BigData-ImageAnalysis\\ImageAnalysis\\unitTesting\\testNotCziFile.jpg"
     cziImages = DCCImagesFromCZIFile(path)
-    cziImages.showImages()
+    image = cziImages.asList()[0]
+    print(image.getDCCImageAsArray())
+    jpeg = DCCImageFromNormalFile(path2)
+    print(jpeg.getDCCImageAsArray())
+    jpeg_gris = jpeg.grayscaleConversion()
+    print(jpeg_gris.getDCCImageAsArray())
+    jpeg_gris.showImage()
