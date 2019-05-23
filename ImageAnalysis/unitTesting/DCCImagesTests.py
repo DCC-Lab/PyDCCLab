@@ -1,7 +1,4 @@
 import unittest
-
-from torch._C import dtype
-
 import ImageAnalysis.DCCImages as DCCImages
 import ImageAnalysis.DCCImagesExceptions as dccExcep
 import numpy as np
@@ -119,7 +116,6 @@ class TestDCCImageMethods(unittest.TestCase):
         except FileNotFoundError:
             isSaved = False
         self.assertTrue(isSaved)
-
 
 
 class TestDCCImageStackConstructor(unittest.TestCase):

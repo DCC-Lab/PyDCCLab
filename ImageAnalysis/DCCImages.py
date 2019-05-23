@@ -1,17 +1,14 @@
 import numpy as np
+import tifffile
 import typing
-import typing
-from skimage import color
 import ImageAnalysis.cziUtil as cziUtil
-import cv2
 import PIL.Image
-from ImageAnalysis.DCCImagesExceptions import ImageNotInStackException, ImageAlreadyInStackException, \
-    ImageDimensionsException, PixelTypeException, InvalidEqualityTest, NotDCCImageException, InvalidImageName
+from ImageAnalysis.DCCImagesExceptions import *
 import matplotlib.pyplot as plt
 
 
 class DCCImage:
-    def __init__(self, imageAsArray: np.ndarray):
+    def __init__(self, imageAsArray: np.ndarray, metadata: str = None):
         if not imageAsArray.dtype == np.float32:
             raise PixelTypeException
         if not (1 < imageAsArray.ndim <= 3):
@@ -19,6 +16,7 @@ class DCCImage:
         self.__pixelArray = imageAsArray
         self.__dimensions = imageAsArray.ndim
         self.__shape = imageAsArray.shape
+        self.__metadata = metadata
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, DCCImage):
@@ -62,6 +60,12 @@ class DCCImage:
             raise InvalidImageName
         image = self.toPILImage()
         image.save("{}.tif".format(name))
+
+    def getMetadata(self):
+        return self.__metadata
+
+    def setMetadata(self, newMetadata):
+        self.__metadata = newMetadata
 
 
 class DCCImageStack:
@@ -129,35 +133,81 @@ class DCCImageStack:
         self.__numberOfImages = 0
         print(self.__imageStack)
 
-    def showImages(self):
+    def showImages(self) -> None:
         for image in self.__imageStack:
             image.showImage()
 
 
 class DCCImagesFromCZIFile(DCCImageStack):
 
-    def __init__(self, path):
+    def __init__(self, path: str):
+        self.__path = path
         cziObject = cziUtil.readCziImage(path)
         arrayOfImages = cziUtil.getImagesFromCziFileObject(cziObject).astype(np.float32)
         listOfImages = []
         self.__metadata = cziUtil.extractMetadataFromCziFileObject(cziObject)
         cziUtil.closeCziFileObject(cziObject)
         for image in arrayOfImages:
-            listOfImages.append(DCCImage(image))
+            listOfImages.append(
+                DCCImage(image, metadata=self.__metadata))  # Voir si pertinent que DCCImage ait un attribut metadata
         DCCImageStack.__init__(self, listOfImages)
 
-    def getMetadata(self):
+    def getMetadata(self) -> str:
         return self.__metadata
 
-    def setMetadata(self, newMetadata):
+    def setMetadata(self, newMetadata: str) -> None:
         self.__metadata = newMetadata
+
+    def saveMetadata(self, filename: str) -> None:
+        unacceptedChars = ["?", "/", "\\", "*", "<", ">", "|", "."]
+        filename = filename.strip()
+        if len(filename) == 0 or filename.isspace() or any(char in filename for char in unacceptedChars):
+            raise InvalidImageName
+        with open("{}.xml".format(filename), "w") as file:
+            file.write(self.__metadata)
+
+    def getPath(self) -> str:
+        return self.__path
 
 
 class DCCImageFromNormalFile(DCCImage):
-    def __init__(self, path):
+    def __init__(self, path: str):
+        self.__path = path
         image = PIL.Image.open(path)
         imageToArray = np.array(image, dtype=np.float32)
         DCCImage.__init__(self, imageToArray)
+
+    def getPath(self) -> str:
+        return self.__path
+
+
+class DCCImageFromTiffFile(DCCImageStack):
+    def __init__(self, path: str):
+        self.__path = path
+        tiffFileObject = tifffile.TiffFile(path)
+        imageAsArray = tiffFileObject.asarray().astype(dtype="float32")
+        self.__metadata = tiffFileObject.ome_metadata
+        imageList = []
+        for i in range(imageAsArray.shape[0]):
+            imageList.append(DCCImage(imageAsArray[i], metadata=self.__metadata))
+        DCCImageStack.__init__(self, imageList)
+
+    def getMetadata(self) -> str:
+        return self.__metadata
+
+    def setMetadata(self, newMetadata: str) -> None:
+        self.__metadata = newMetadata
+
+    def saveMetadata(self, filename: str) -> None:
+        unacceptedChars = ["?", "/", "\\", "*", "<", ">", "|", "."]
+        filename = filename.strip()
+        if len(filename) == 0 or filename.isspace() or any(char in filename for char in unacceptedChars):
+            raise InvalidImageName
+        with open("{}.xml".format(filename), "w") as file:
+            file.write(self.__metadata)
+
+    def getPath(self) -> str:
+        return self.__path
 
 
 if __name__ == '__main__':
