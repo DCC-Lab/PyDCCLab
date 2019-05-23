@@ -45,7 +45,7 @@ def extractMetadataFromCziFileObject(cziObject, saveFileName=None):
     :param cziObject: The CziFile object
     :param saveFileName: Name of the file that is used to save the metadata (XML file). If None (default), doesn't
     save the metadata.
-    :return: The metadata in XML format.
+    :return: The metadata in XML formated string.
     """
     meta = cziObject.metadata
     if saveFileName is not None:
@@ -101,11 +101,11 @@ def getImagesFromCziFileObject(cziObject):
     :param cziObject: The CziFile object
     :return: Numpy array containing the images
     """
-    array_return = []
-    subblocks_iter = cziObject.subblocks()
-    for iterator in subblocks_iter:
-        array_return.append(np.squeeze(iterator.data()))
-    return np.array(array_return)
+    arrayReturn = []
+    subblocksIters = cziObject.subblocks()
+    for iterator in subblocksIters:
+        arrayReturn.append(np.squeeze(iterator.data()))
+    return np.array(arrayReturn)
 
 
 def showImagesFromCziFileObject(cziObject):
@@ -142,17 +142,3 @@ def saveImagesToTIFF(imageArray, filename=None):
             else:
                 tifffile.imwrite("array2tiff_{}.tif".format(i), image)
     return isSaved
-
-
-# Temporary main to test things
-if __name__ == '__main__':
-    czi = readCziImage("unitTesting/testCziFile.czi")
-    images = getImagesFromCziFileObject(czi)
-    image = images[0]
-    saveImagesToTIFF(images, "toto")
-    closeCziFileObject(czi)
-    print(image)
-    image_2 = np.array(image, dtype=np.float32)
-    print(image_2)
-    image_3 = image == image_2
-    print(np.where(image_3 is False))
