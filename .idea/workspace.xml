@@ -4,6 +4,7 @@
     <list default="true" id="8edb79ed-101c-49e3-a876-b403393446ee" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ImageAnalysis/DCCImages.py" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/DCCImages.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ImageAnalysis/DCCImagesExceptions.py" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/DCCImagesExceptions.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ImageAnalysis/unitTesting/DCCImagesTests.py" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/unitTesting/DCCImagesTests.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -17,8 +18,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ImageAnalysis/cziUtil.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2737">
-              <caret line="161" selection-start-line="161" selection-end-line="161" />
+            <state relative-caret-position="459">
+              <caret line="52" column="76" selection-start-line="52" selection-start-column="60" selection-end-line="52" selection-end-column="76" />
               <folding>
                 <element signature="e#569#583#0" expanded="true" />
               </folding>
@@ -29,8 +30,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../hello-world/czi_util.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="349">
-              <caret line="182" column="19" selection-start-line="182" selection-start-column="19" selection-end-line="182" selection-end-column="19" />
+            <state relative-caret-position="380">
+              <caret line="181" column="22" selection-start-line="181" selection-start-column="22" selection-end-line="181" selection-end-column="22" />
               <folding>
                 <element signature="e#490#504#0" expanded="true" />
               </folding>
@@ -39,21 +40,24 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/PIL/Image.py">
+        <entry file="file://$PROJECT_DIR$/ImageAnalysis/DCCImages.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="187">
-              <caret line="2030" column="12" selection-start-line="2030" selection-start-column="8" selection-end-line="2030" selection-end-column="12" />
+            <state relative-caret-position="357">
+              <caret line="187" column="56" selection-start-line="187" selection-start-column="56" selection-end-line="187" selection-end-column="56" />
+              <folding>
+                <element signature="e#0#18#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/ImageAnalysis/DCCImages.py">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/ImageAnalysis/unitTesting/DCCImagesTests.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="380">
-              <caret line="216" column="26" lean-forward="true" selection-start-line="216" selection-start-column="26" selection-end-line="216" selection-end-column="26" />
+            <state relative-caret-position="329">
+              <caret line="372" selection-start-line="372" selection-end-line="372" />
               <folding>
-                <element signature="e#0#18#0" expanded="true" />
+                <element signature="e#0#15#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -69,15 +73,6 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/ImageAnalysis/unitTesting/DCCImagesTests.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1955">
-              <caret column="15" selection-start-column="15" selection-end-column="15" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../hello-world/todoCompletion.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="17">
@@ -86,11 +81,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ImageAnalysis/DCCImagesExceptions.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="462">
-              <caret line="30" column="69" selection-start-line="30" selection-start-column="69" selection-end-line="30" selection-end-column="69" />
+            <state relative-caret-position="363">
+              <caret line="37" column="66" lean-forward="true" selection-start-line="37" selection-start-column="66" selection-end-line="37" selection-end-column="66" />
             </state>
           </provider>
         </entry>
@@ -113,10 +108,10 @@
       <find>metadata</find>
       <find>new</find>
       <find>open</find>
-      <find>show</find>
       <find>is_ome</find>
       <find>ImageDesc</find>
       <find>tags</find>
+      <find>show</find>
     </findStrings>
     <replaceStrings>
       <replace />
@@ -146,12 +141,12 @@
         <option value="$PROJECT_DIR$/ImageAnalysis/unitTesting/cziUtilTests.py" />
         <option value="$PROJECT_DIR$/ImageAnalysis/DCC-Images.py" />
         <option value="$PROJECT_DIR$/ImageAnalysis/unitTesting/DCC-ImagesTests.py" />
-        <option value="$PROJECT_DIR$/ImageAnalysis/DCCImagesExceptions.py" />
         <option value="$PROJECT_DIR$/ImageAnalysis/cziUtil.py" />
         <option value="$PROJECT_DIR$/ImageAnalysis/README.md" />
-        <option value="$PROJECT_DIR$/ImageAnalysis/unitTesting/DCCImagesTests.py" />
         <option value="$PROJECT_DIR$/../hello-world/czi_util.py" />
+        <option value="$PROJECT_DIR$/ImageAnalysis/DCCImagesExceptions.py" />
         <option value="$PROJECT_DIR$/ImageAnalysis/DCCImages.py" />
+        <option value="$PROJECT_DIR$/ImageAnalysis/unitTesting/DCCImagesTests.py" />
       </list>
     </option>
   </component>
@@ -208,50 +203,8 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.czi_util">
-    <configuration name="cziUtil" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="BigData-ImageAnalysis" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ImageAnalysis" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ImageAnalysis/cziUtil.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="czi_util" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="BigData-ImageAnalysis" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../hello-world" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/../hello-world/czi_util.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="pytest for DCCImagesTests.TestDCCImageMethods.testSaveToTIFF" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Python tests.pytest for DCCImagesTests.TestDCCImageFromNormalFileConstructor.testValidConstructor">
+    <configuration name="pytest for DCCImagesTests.TestDCCImageFromNormalFileConstructor.testInvalidConstructorCZIFile" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
       <module name="BigData-ImageAnalysis" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -262,11 +215,11 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="_new_keywords" value="&quot;&quot;" />
       <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;DCCImagesTests.TestDCCImageMethods.testSaveToTIFF&quot;" />
+      <option name="_new_target" value="&quot;DCCImagesTests.TestDCCImageFromNormalFileConstructor.testInvalidConstructorCZIFile&quot;" />
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
-    <configuration name="pytest for DCCImagesTests.TestDCCImageMethods.testSaveToTIFFInvalidCharacterName" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+    <configuration name="pytest for DCCImagesTests.TestDCCImageFromNormalFileConstructor.testInvalidConstructorNotASupportedImageFormat" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
       <module name="BigData-ImageAnalysis" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -277,11 +230,11 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="_new_keywords" value="&quot;&quot;" />
       <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;DCCImagesTests.TestDCCImageMethods.testSaveToTIFFInvalidCharacterName&quot;" />
+      <option name="_new_target" value="&quot;DCCImagesTests.TestDCCImageFromNormalFileConstructor.testInvalidConstructorNotASupportedImageFormat&quot;" />
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
-    <configuration name="pytest for DCCImagesTests.TestDCCImageMethods.testSaveToTIFFInvalidName" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+    <configuration name="pytest for DCCImagesTests.TestDCCImageFromNormalFileConstructor.testInvalidConstructorTIFFFile" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
       <module name="BigData-ImageAnalysis" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -292,17 +245,47 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="_new_keywords" value="&quot;&quot;" />
       <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;DCCImagesTests.TestDCCImageMethods.testSaveToTIFFInvalidName&quot;" />
+      <option name="_new_target" value="&quot;DCCImagesTests.TestDCCImageFromNormalFileConstructor.testInvalidConstructorTIFFFile&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest for DCCImagesTests.TestDCCImageFromNormalFileConstructor.testValidConstructor" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="BigData-ImageAnalysis" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ImageAnalysis/unitTesting" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;DCCImagesTests.TestDCCImageFromNormalFileConstructor.testValidConstructor&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest for DCCImagesTests.testDCCImagesFromCZIFileMethods.testGetPath" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="BigData-ImageAnalysis" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ImageAnalysis/unitTesting" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;DCCImagesTests.testDCCImagesFromCZIFileMethods.testGetPath&quot;" />
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.czi_util" />
-        <item itemvalue="Python.cziUtil" />
-        <item itemvalue="Python tests.pytest for DCCImagesTests.TestDCCImageMethods.testSaveToTIFF" />
-        <item itemvalue="Python tests.pytest for DCCImagesTests.TestDCCImageMethods.testSaveToTIFFInvalidCharacterName" />
-        <item itemvalue="Python tests.pytest for DCCImagesTests.TestDCCImageMethods.testSaveToTIFFInvalidName" />
+        <item itemvalue="Python tests.pytest for DCCImagesTests.TestDCCImageFromNormalFileConstructor.testValidConstructor" />
+        <item itemvalue="Python tests.pytest for DCCImagesTests.TestDCCImageFromNormalFileConstructor.testInvalidConstructorCZIFile" />
+        <item itemvalue="Python tests.pytest for DCCImagesTests.TestDCCImageFromNormalFileConstructor.testInvalidConstructorTIFFFile" />
+        <item itemvalue="Python tests.pytest for DCCImagesTests.TestDCCImageFromNormalFileConstructor.testInvalidConstructorNotASupportedImageFormat" />
+        <item itemvalue="Python tests.pytest for DCCImagesTests.testDCCImagesFromCZIFileMethods.testGetPath" />
       </list>
     </recent_temporary>
   </component>
@@ -366,39 +349,53 @@
       <option name="project" value="LOCAL" />
       <updated>1558617463083</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="New class ans modification of already present classes&#10;&#10;Added a class that read tif files and convert them to DCCImageStack since tif file can contain more than one image.">
+      <created>1558622481943</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1558622481943</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Added new test cases for the new methods and other little changes in methods">
+      <created>1558625769776</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1558625769776</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="pytest_in_DCCImagesTests_py - 2019.05.22 at 14h 26m 26s.xml">
-      <configuration name="pytest in DCCImagesTests.py" configurationId="tests" />
+    <history-entry file="pytest_for_DCCImagesTests_testDCCImagesFromCZIFileMethods_testSaveMetadataValidName - 2019.05.23 at 11h 42m 19s.xml">
+      <configuration name="pytest for DCCImagesTests.testDCCImagesFromCZIFileMethods.testSaveMetadataValidName" configurationId="tests" />
     </history-entry>
-    <history-entry file="pytest_in_DCCImagesTests_py - 2019.05.22 at 14h 27m 42s.xml">
-      <configuration name="pytest in DCCImagesTests.py" configurationId="tests" />
+    <history-entry file="pytest_for_DCCImagesTests_testDCCImagesFromCZIFileMethods_testSaveMetadataValidName - 2019.05.23 at 11h 42m 37s.xml">
+      <configuration name="pytest for DCCImagesTests.testDCCImagesFromCZIFileMethods.testSaveMetadataValidName" configurationId="tests" />
     </history-entry>
-    <history-entry file="pytest_in_DCCImagesTests_py - 2019.05.22 at 14h 29m 01s.xml">
-      <configuration name="pytest in DCCImagesTests.py" configurationId="tests" />
+    <history-entry file="pytest_for_DCCImagesTests_testDCCImagesFromCZIFileMethods_testSaveMetadataValidName - 2019.05.23 at 11h 44m 24s.xml">
+      <configuration name="pytest for DCCImagesTests.testDCCImagesFromCZIFileMethods.testSaveMetadataValidName" configurationId="tests" />
     </history-entry>
-    <history-entry file="pytest_in_DCCImagesTests_py - 2019.05.22 at 14h 30m 04s.xml">
-      <configuration name="pytest in DCCImagesTests.py" configurationId="tests" />
+    <history-entry file="pytest_for_DCCImagesTests_testDCCImagesFromCZIFileMethods_testGetPath - 2019.05.23 at 11h 45m 23s.xml">
+      <configuration name="pytest for DCCImagesTests.testDCCImagesFromCZIFileMethods.testGetPath" configurationId="tests" />
     </history-entry>
-    <history-entry file="pytest_in_DCCImagesTests_py - 2019.05.22 at 14h 30m 42s.xml">
-      <configuration name="pytest in DCCImagesTests.py" configurationId="tests" />
+    <history-entry file="pytest_for_DCCImagesTests_TestDCCImageFromNormalFileConstructor_testInvalidConstructorNotASupportedImageFormat - 2019.05.23 at 11h 53m 16s.xml">
+      <configuration name="pytest for DCCImagesTests.TestDCCImageFromNormalFileConstructor.testInvalidConstructorNotASupportedImageFormat" configurationId="tests" />
     </history-entry>
-    <history-entry file="pytest_in_DCCImagesTests_py - 2019.05.22 at 14h 31m 29s.xml">
-      <configuration name="pytest in DCCImagesTests.py" configurationId="tests" />
+    <history-entry file="pytest_for_DCCImagesTests_TestDCCImageFromNormalFileConstructor_testInvalidConstructorNotASupportedImageFormat - 2019.05.23 at 11h 53m 39s.xml">
+      <configuration name="pytest for DCCImagesTests.TestDCCImageFromNormalFileConstructor.testInvalidConstructorNotASupportedImageFormat" configurationId="tests" />
     </history-entry>
-    <history-entry file="pytest_in_DCCImagesTests_py - 2019.05.22 at 14h 33m 42s.xml">
-      <configuration name="pytest in DCCImagesTests.py" configurationId="tests" />
+    <history-entry file="pytest_for_DCCImagesTests_TestDCCImageFromNormalFileConstructor_testInvalidConstructorTIFFFile - 2019.05.23 at 11h 55m 04s.xml">
+      <configuration name="pytest for DCCImagesTests.TestDCCImageFromNormalFileConstructor.testInvalidConstructorTIFFFile" configurationId="tests" />
     </history-entry>
-    <history-entry file="pytest_for_DCCImagesTests_TestDCCImageMethods_testSaveToTIFFInvalidName - 2019.05.22 at 16h 12m 52s.xml">
-      <configuration name="pytest for DCCImagesTests.TestDCCImageMethods.testSaveToTIFFInvalidName" configurationId="tests" />
+    <history-entry file="pytest_for_DCCImagesTests_TestDCCImageFromNormalFileConstructor_testInvalidConstructorTIFFFile - 2019.05.23 at 11h 55m 35s.xml">
+      <configuration name="pytest for DCCImagesTests.TestDCCImageFromNormalFileConstructor.testInvalidConstructorTIFFFile" configurationId="tests" />
     </history-entry>
-    <history-entry file="pytest_for_DCCImagesTests_TestDCCImageMethods_testSaveToTIFFInvalidCharacterName - 2019.05.22 at 16h 14m 17s.xml">
-      <configuration name="pytest for DCCImagesTests.TestDCCImageMethods.testSaveToTIFFInvalidCharacterName" configurationId="tests" />
+    <history-entry file="pytest_for_DCCImagesTests_TestDCCImageFromNormalFileConstructor_testInvalidConstructorCZIFile - 2019.05.23 at 11h 56m 36s.xml">
+      <configuration name="pytest for DCCImagesTests.TestDCCImageFromNormalFileConstructor.testInvalidConstructorCZIFile" configurationId="tests" />
     </history-entry>
-    <history-entry file="pytest_for_DCCImagesTests_TestDCCImageMethods_testSaveToTIFF - 2019.05.22 at 16h 18m 24s.xml">
-      <configuration name="pytest for DCCImagesTests.TestDCCImageMethods.testSaveToTIFF" configurationId="tests" />
+    <history-entry file="pytest_for_DCCImagesTests_TestDCCImageFromNormalFileConstructor_testValidConstructor - 2019.05.23 at 11h 57m 54s.xml">
+      <configuration name="pytest for DCCImagesTests.TestDCCImageFromNormalFileConstructor.testValidConstructor" configurationId="tests" />
     </history-entry>
   </component>
   <component name="TodoView" selected-index="4">
@@ -442,7 +439,9 @@
     <MESSAGE value="Modified and added methods in DCCImages. Added and modified unit tests of DCCImagesTest" />
     <MESSAGE value="New tests for DCCImages and change encoding of the function that extracts metadata to utf-8 so mu character is saved properly." />
     <MESSAGE value="Update README file" />
-    <option name="LAST_COMMIT_MESSAGE" value="Update README file" />
+    <MESSAGE value="New class ans modification of already present classes&#10;&#10;Added a class that read tif files and convert them to DCCImageStack since tif file can contain more than one image." />
+    <MESSAGE value="Added new test cases for the new methods and other little changes in methods" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added new test cases for the new methods and other little changes in methods" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/Database/uTest.py">
@@ -478,16 +477,6 @@
     <entry file="file://$PROJECT_DIR$/ImageAnalysis/unitTesting/testNotCziFile.jpg">
       <provider selected="true" editor-type-id="images" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/ImageAnalysis/unitTesting/cziUtilTests.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="9" column="22" selection-start-line="9" selection-start-column="22" selection-end-line="9" selection-end-column="22" />
-          <folding>
-            <element signature="e#0#33#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../hello-world/test_meta.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="245">
@@ -511,13 +500,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="85">
           <caret line="1302" column="4" selection-start-line="1302" selection-start-column="4" selection-end-line="1302" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/.PyCharmCE2019.1/system/python_stubs/-5491199/builtins.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="178">
-          <caret line="3937" column="6" selection-start-line="3937" selection-start-column="6" selection-end-line="3937" selection-end-column="6" />
         </state>
       </provider>
     </entry>
@@ -567,16 +549,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ImageAnalysis/cziUtil.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2737">
-          <caret line="161" selection-start-line="161" selection-end-line="161" />
-          <folding>
-            <element signature="e#569#583#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../hello-world/todoCompletion.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="17">
@@ -584,51 +556,13 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ImageAnalysis/DCCImagesExceptions.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="462">
-          <caret line="30" column="69" selection-start-line="30" selection-start-column="69" selection-end-line="30" selection-end-column="69" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/ImageAnalysis/unitTesting/testSaveToTiff.tif">
       <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ImageAnalysis/unitTesting/DCCImagesTests.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1955">
-          <caret column="15" selection-start-column="15" selection-end-column="15" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/PIL/Image.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="2030" column="12" selection-start-line="2030" selection-start-column="8" selection-end-line="2030" selection-end-column="12" />
-        </state>
-      </provider>
     </entry>
     <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/PIL/TiffImagePlugin.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="187">
           <caret line="969" column="41" lean-forward="true" selection-start-line="969" selection-start-column="41" selection-end-line="969" selection-end-column="41" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../hello-world/czi_util.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="349">
-          <caret line="182" column="19" selection-start-line="182" selection-start-column="19" selection-end-line="182" selection-end-column="19" />
-          <folding>
-            <element signature="e#490#504#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/tifffile/tifffile.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="3407" column="23" selection-start-line="3407" selection-start-column="19" selection-end-line="3407" selection-end-column="23" />
         </state>
       </provider>
     </entry>
@@ -639,13 +573,81 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ImageAnalysis/DCCImages.py">
+    <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/tifffile/tifffile.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="3407" column="23" selection-start-line="3407" selection-start-column="19" selection-end-line="3407" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ImageAnalysis/unitTesting/cziUtilTests.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1224">
+          <caret line="72" column="4" selection-start-line="72" selection-start-column="4" selection-end-line="72" selection-end-column="46" />
+          <folding>
+            <element signature="e#0#33#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.PyCharmCE2019.1/system/python_stubs/-5491199/builtins.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="174">
+          <caret line="5556" column="6" selection-start-line="5556" selection-start-column="6" selection-end-line="5556" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/PIL/Image.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="2030" column="12" selection-start-line="2030" selection-start-column="8" selection-end-line="2030" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../hello-world/czi_util.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="380">
-          <caret line="216" column="26" lean-forward="true" selection-start-line="216" selection-start-column="26" selection-end-line="216" selection-end-column="26" />
+          <caret line="181" column="22" selection-start-line="181" selection-start-column="22" selection-end-line="181" selection-end-column="22" />
+          <folding>
+            <element signature="e#490#504#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ImageAnalysis/unitTesting/DCCImagesTests.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="329">
+          <caret line="372" selection-start-line="372" selection-end-line="372" />
+          <folding>
+            <element signature="e#0#15#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ImageAnalysis/DCCImages.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="357">
+          <caret line="187" column="56" selection-start-line="187" selection-start-column="56" selection-end-line="187" selection-end-column="56" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ImageAnalysis/cziUtil.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="459">
+          <caret line="52" column="76" selection-start-line="52" selection-start-column="60" selection-end-line="52" selection-end-column="76" />
+          <folding>
+            <element signature="e#569#583#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ImageAnalysis/DCCImagesExceptions.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="363">
+          <caret line="37" column="66" lean-forward="true" selection-start-line="37" selection-start-column="66" selection-end-line="37" selection-end-column="66" />
         </state>
       </provider>
     </entry>

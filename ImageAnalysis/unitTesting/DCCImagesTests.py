@@ -331,6 +331,46 @@ class testDCCImagesFromCZIFileMethods(unittest.TestCase):
         with self.assertRaises(TypeError):
             self.imagesFromCzi.setMetadata(123432)
 
+    def testSaveMetadataInvalidName(self):
+        with self.assertRaises(dccExcep.InvalidMetadataFileName):
+            self.imagesFromCzi.saveMetadata("/*")
+
+    def testSaveMetadataValidName(self):
+        self.imagesFromCzi.saveMetadata("testSaveMetaDCCImagesTest")
+        isSaved = True
+        try:
+            fileTest = open("testSaveMetaDCCImagesTest.xml", "r", encoding="utf-8")
+            fileTest.close()
+        except FileNotFoundError:
+            isSaved = False
+        self.assertTrue(isSaved)
+
+    def testGetPath(self):
+        self.assertTrue("testCziFile2Images.czi" == self.imagesFromCzi.getPath())
+
+
+class TestDCCImageFromNormalFileConstructor(unittest.TestCase):
+
+    def testInvalidConstructorNotASupportedImageFormat(self):
+        file = "testSaveMetaDCCImagesTest.xml"
+        with self.assertRaises(OSError):
+            DCCImages.DCCImageFromNormalFile(file)
+
+    def testInvalidConstructorTIFFFile(self):
+        file = "testTiff3Images.tiff"
+        with self.assertRaises(dccExcep.InvalidFileFormat):
+            DCCImages.DCCImageFromNormalFile(file)
+
+    def testInvalidConstructorCZIFile(self):
+        file = "testCziFile2Images.czi"
+        with self.assertRaises(dccExcep.InvalidFileFormat):
+            DCCImages.DCCImageFromNormalFile(file)
+
+    def testValidConstructor(self):
+        file = "testNotCziFile.jpg"
+        imageFromJPG = DCCImages.DCCImageFromNormalFile(file)
+        self.assertIsInstance(imageFromJPG, DCCImages.DCCImageFromNormalFile)
+
 
 if __name__ == '__main__':
     unittest.main()
