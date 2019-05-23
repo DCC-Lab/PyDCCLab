@@ -22,10 +22,27 @@ class InvalidEqualityTest(Exception):
     def __init__(self, otherType):
         Exception.__init__(self, "Can't compare equality of a DCCImage instance and {}.".format(otherType))
 
+
 class NotDCCImageException(Exception):
     def __init__(self):
         Exception.__init__(self, "Attribute must be a DCCImage instance.")
 
+
 class InvalidImageName(Exception):
     def __init__(self):
         Exception.__init__(self, "The given name/filename is invalid.")
+
+
+class InvalidMetadataFileName(Exception):
+    def __init__(self):
+        Exception.__init__(self, "The given filename is invalid.")
+
+
+class InvalidFileFormat(Exception):
+    def __init__(self, message: str):
+        Exception.__init__(self, message)
+
+#Voir si on pourrait pas merge avec invalid dimension image exception
+class MatrixDimensionException(Exception):
+    def __init__(self, reqDim, givenDim):
+        Exception.__init__(self, "Image must be of dim {} not {}.".format(reqDim, givenDim))
