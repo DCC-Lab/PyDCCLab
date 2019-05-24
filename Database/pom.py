@@ -15,11 +15,12 @@ def findAllCZI(path):
     return allCZIs
 
 
-def xmlParser(cziFile, filter=None):  # TODO filter
+def xmlParser(cziFilePath, filter=None):  # TODO filter
     try:
-        # We create a temporary XML file to use in iterparse.
-        image = czi.readCziImage(cziFile)
-        czi.extractMetadataFromCziFileObject(image, 'temp')
+        # We create a temporary XML file to use with iterparse.
+        # Going directly through a string didn't work.
+        cziImageObject = czi.readCziImage(cziFilePath)
+        czi.extractMetadataFromCziFileObject(cziImageObject, 'temp')
 
         # TODO searchResults = []
         iterable = cet.iterparse('temp.xml', events=('start', 'end'))
@@ -28,8 +29,8 @@ def xmlParser(cziFile, filter=None):  # TODO filter
         event, root = iterator.__next__()
 
         for event, elem in iterator:
-            if event == 'end':  # and element.tag == filter:
-                # searchResults.append([elem.tag, elem.text])
+            if event == 'end':  # TODO and element.tag == filter:
+                # TODO searchResults.append([elem.tag, elem.text])
                 print(elem.tag, elem.text)
                 elem.clear()
                 root.clear()
@@ -37,7 +38,7 @@ def xmlParser(cziFile, filter=None):  # TODO filter
     except cet.ParseError as error:
         return error
     finally:
-        # In all cases, we delete the xml file.
+        # In all cases, we delete the temporary xml file.
         os.remove('temp.xml')
 
 
