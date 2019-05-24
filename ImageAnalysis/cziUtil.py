@@ -121,6 +121,7 @@ def showImagesFromCziFileObject(cziObject):
         image = (np.squeeze(iterator.data()))
         image_return = plt.imshow(image)
         imagesReturn.append(image_return)
+        plt.set_cmap("gray")
         plt.show()
     return np.array(imagesReturn)
 
@@ -159,3 +160,7 @@ def saveImagesToTIFF(imageArray, filename=None):
             else:
                 tifffile.imwrite("array2tiff_{}.tif".format(i), image)
     return isSaved
+
+if __name__ == '__main__':
+    path = r"C:\Users\goubi\PycharmProjects\BigData-ImageAnalysis\ImageAnalysis\unitTesting\testCziFile2Images.czi"
+    showImagesFromCziFileObject(readCziImage(path))
