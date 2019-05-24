@@ -4,7 +4,6 @@
     <list default="true" id="8edb79ed-101c-49e3-a876-b403393446ee" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Database/pom.py" beforeDir="false" afterPath="$PROJECT_DIR$/Database/pom.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Database/uTest.py" beforeDir="false" afterPath="$PROJECT_DIR$/Database/uTest.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -17,8 +16,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Database/pom.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="164">
-              <caret line="40" column="47" selection-start-line="40" selection-start-column="47" selection-end-line="40" selection-end-column="47" />
+            <state relative-caret-position="1258">
+              <caret line="110" column="3" lean-forward="true" selection-start-line="110" selection-start-column="3" selection-end-line="110" selection-end-column="3" />
               <folding>
                 <element signature="e#0#36#0" expanded="true" />
               </folding>
@@ -27,24 +26,19 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Database/database.py">
+        <entry file="file://$PROJECT_DIR$/Database/temp_full.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-272">
-              <caret line="8" column="24" selection-start-line="8" selection-start-column="24" selection-end-line="8" selection-end-column="24" />
+            <state relative-caret-position="-1062">
+              <caret line="1975" column="15" lean-forward="true" selection-start-line="1975" selection-start-column="15" selection-end-line="1975" selection-end-column="35" />
               <folding>
-                <element signature="e#0#22#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Database/uTest.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="420">
-              <caret line="50" column="60" selection-start-line="50" selection-start-column="60" selection-end-line="50" selection-end-column="60" />
-              <folding>
-                <element signature="e#0#30#0" expanded="true" />
+                <element signature="n#Experiment#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+                <element signature="n#HardwareSetting#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+                <element signature="n#Application#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+                <element signature="n#Document#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+                <element signature="n#Microscopes#0;n#Instrument#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+                <element signature="n#Microscope#0;n#Microscopes#0;n#Instrument#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+                <element signature="n#LightSources#0;n#Instrument#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+                <element signature="n#Detectors#0;n#Instrument#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
               </folding>
             </state>
           </provider>
@@ -138,6 +132,11 @@
               <item name="BigData-ImageAnalysis" type="462c0819:PsiDirectoryNode" />
               <item name="Database" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="BigData-ImageAnalysis" type="b2602c69:ProjectViewProjectNode" />
+              <item name="BigData-ImageAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="ImageAnalysis" type="462c0819:PsiDirectoryNode" />
+            </path>
           </expand>
           <select />
         </subPane>
@@ -161,7 +160,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python tests.pytest for uTest.TestDatabase.test_changeConnectionMode">
+  <component name="RunManager" selected="Python.pom">
     <configuration name="DCCImages" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="BigData-ImageAnalysis" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -251,8 +250,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python tests.pytest for uTest.TestDatabase.test_changeConnectionMode" />
         <item itemvalue="Python.pom" />
+        <item itemvalue="Python tests.pytest for uTest.TestDatabase.test_changeConnectionMode" />
         <item itemvalue="Python.DCCImages" />
         <item itemvalue="Python tests.pytest in DCCImagesTests.py" />
         <item itemvalue="Python tests.pytest for DCCImagesTests.TestDCCImagesFromTiffFileMethods.testSaveMetadataInvalidName" />
@@ -382,13 +381,24 @@
       <option name="project" value="LOCAL" />
       <updated>1558700070471</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="Miscellaneous changes to uTest">
+      <created>1558702527558</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1558702527558</updated>
+    </task>
+    <task id="LOCAL-00018" summary="Work on filtering and extracting important metadata.">
+      <created>1558702569146</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1558702569146</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="pytest_for_DCCImagesTests_TestDCCImagesFromTiffFileMethods_testGetMetadata - 2019.05.23 at 13h 07m 16s.xml">
-      <configuration name="pytest for DCCImagesTests.TestDCCImagesFromTiffFileMethods.testGetMetadata" configurationId="tests" />
-    </history-entry>
     <history-entry file="pytest_for_DCCImagesTests_TestDCCImagesFromTiffFileMethods_testSetMetadataInvalid - 2019.05.23 at 13h 08m 45s.xml">
       <configuration name="pytest for DCCImagesTests.TestDCCImagesFromTiffFileMethods.testSetMetadataInvalid" configurationId="tests" />
     </history-entry>
@@ -416,6 +426,9 @@
     <history-entry file="pytest_in_DCCImagesTests_py - 2019.05.23 at 13h 43m 00s.xml">
       <configuration name="pytest in DCCImagesTests.py" configurationId="tests" />
     </history-entry>
+    <history-entry file="pytest_for_uTest_TestDatabase_test_changeConnectionMode - 2019.05.24 at 08h 53m 50s.xml">
+      <configuration name="pytest for uTest.TestDatabase.test_changeConnectionMode" configurationId="tests" />
+    </history-entry>
   </component>
   <component name="TodoView" selected-index="4">
     <todo-panel id="selected-file">
@@ -428,12 +441,13 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1295" height="695" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2494043" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.16203336" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.32974428" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.3280142" />
       <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.26241136" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39973083" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
@@ -466,19 +480,11 @@
     <MESSAGE value="Work on the Metadata of the CZI files" />
     <MESSAGE value="uTest Fixes and cleanups" />
     <MESSAGE value="Merging Issues, trying to fix." />
-    <option name="LAST_COMMIT_MESSAGE" value="Merging Issues, trying to fix." />
+    <MESSAGE value="Miscellaneous changes to uTest" />
+    <MESSAGE value="Work on filtering and extracting important metadata." />
+    <option name="LAST_COMMIT_MESSAGE" value="Work on filtering and extracting important metadata." />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/Database/DB_management.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="14" column="25" selection-start-line="14" selection-start-column="25" selection-end-line="14" selection-end-column="25" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/ImageAnalysis/unitTesting/testNotCziFile.jpg">
       <provider selected="true" editor-type-id="images" />
     </entry>
@@ -659,16 +665,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ImageAnalysis/cziUtil.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="459">
-          <caret line="52" column="76" selection-start-line="52" selection-start-column="60" selection-end-line="52" selection-end-column="76" />
-          <folding>
-            <element signature="e#569#583#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/Desktop/backup/pom.py">
       <provider selected="true" editor-type-id="text-editor">
         <state>
@@ -678,9 +674,29 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Database/DB_management.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="238">
+          <caret line="14" column="25" selection-start-line="14" selection-start-column="25" selection-end-line="14" selection-end-column="25" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Database/uTest.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-850">
+          <caret line="46" lean-forward="true" selection-start-line="46" selection-end-line="46" />
+          <folding>
+            <element signature="e#0#30#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Database/database.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-272">
+        <state relative-caret-position="-2301">
           <caret line="8" column="24" selection-start-line="8" selection-start-column="24" selection-end-line="8" selection-end-column="24" />
           <folding>
             <element signature="e#0#22#0" expanded="true" />
@@ -688,20 +704,89 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Database/uTest.py">
+    <entry file="file://$PROJECT_DIR$/Database/temp.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="420">
-          <caret line="50" column="60" selection-start-line="50" selection-start-column="60" selection-end-line="50" selection-end-column="60" />
+        <state relative-caret-position="68">
+          <caret line="1934" column="4" lean-forward="true" selection-start-line="1934" selection-start-column="4" selection-end-line="2151" selection-end-column="18" />
           <folding>
-            <element signature="e#0#30#0" expanded="true" />
+            <element signature="n#Experiment#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#AutoSave#0;n#Experiment#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#Scripting#0;n#Experiment#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#ExperimentBlocks#0;n#Experiment#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#AcquisitionBlock#0;n#ExperimentBlocks#0;n#Experiment#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#SubDimensionSetups#0;n#AcquisitionBlock#0;n#ExperimentBlocks#0;n#Experiment#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#MultiTrackSetup#0;n#SubDimensionSetups#0;n#AcquisitionBlock#0;n#ExperimentBlocks#0;n#Experiment#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#ZStackSetup#0;n#SubDimensionSetups#0;n#AcquisitionBlock#0;n#ExperimentBlocks#0;n#Experiment#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#HardwareSettingsPool#0;n#Experiment#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#ExperimentFeedback#0;n#Experiment#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#Metadata#0;n#Experiment#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#HardwareSetting#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#ParameterCollection#0;n#HardwareSetting#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#ParameterCollection#1;n#HardwareSetting#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#ParameterCollection#2;n#HardwareSetting#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#Application#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#Document#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#Image#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#Tracks#0;n#Dimensions#0;n#Image#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#Track#0;n#Tracks#0;n#Dimensions#0;n#Image#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#ChannelRefs#0;n#Track#0;n#Tracks#0;n#Dimensions#0;n#Image#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#Track#1;n#Tracks#0;n#Dimensions#0;n#Image#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#ChannelRefs#0;n#Track#1;n#Tracks#0;n#Dimensions#0;n#Image#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#T#0;n#Dimensions#0;n#Image#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#Positions#0;n#T#0;n#Dimensions#0;n#Image#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#BinaryList#0;n#Positions#0;n#T#0;n#Dimensions#0;n#Image#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#MicroscopeSettings#0;n#Image#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#EyepieceSettings#0;n#MicroscopeSettings#0;n#Image#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#Instrument#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#Microscope#0;n#Microscopes#0;n#Instrument#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#LightSourceType#0;n#LightSource#0;n#LightSources#0;n#Instrument#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#Arc#0;n#LightSourceType#0;n#LightSource#0;n#LightSources#0;n#Instrument#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#LightSourceType#0;n#LightSource#1;n#LightSources#0;n#Instrument#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#Arc#0;n#LightSourceType#0;n#LightSource#1;n#LightSources#0;n#Instrument#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#Scaling#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#AutoScaling#0;n#Scaling#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#Items#0;n#Scaling#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#Distance#0;n#Items#0;n#Scaling#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#Distance#1;n#Items#0;n#Scaling#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#DisplaySetting#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#Channel#0;n#Channels#0;n#DisplaySetting#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#Channel#1;n#Channels#0;n#DisplaySetting#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ImageAnalysis/cziUtil.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="49" column="7" lean-forward="true" selection-start-line="49" selection-start-column="7" selection-end-line="49" selection-end-column="7" />
+          <folding>
+            <element signature="e#569#583#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Database/temp_full.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1062">
+          <caret line="1975" column="15" lean-forward="true" selection-start-line="1975" selection-start-column="15" selection-end-line="1975" selection-end-column="35" />
+          <folding>
+            <element signature="n#Experiment#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#HardwareSetting#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#Application#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#Document#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#Microscopes#0;n#Instrument#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#Microscope#0;n#Microscopes#0;n#Instrument#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#LightSources#0;n#Instrument#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#Detectors#0;n#Instrument#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Database/pom.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="164">
-          <caret line="40" column="47" selection-start-line="40" selection-start-column="47" selection-end-line="40" selection-end-column="47" />
+        <state relative-caret-position="1258">
+          <caret line="110" column="3" lean-forward="true" selection-start-line="110" selection-start-column="3" selection-end-line="110" selection-end-column="3" />
           <folding>
             <element signature="e#0#36#0" expanded="true" />
           </folding>
