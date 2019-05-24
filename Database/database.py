@@ -13,20 +13,18 @@ class Database:
 
     def createConnection(self, mode='ro'):
         if self.checkConnection() is False:
-            path = PathToURI(self.path, mode)
+            path = pathToURI(self.path, mode)
             try:
                 self.conn = lite.connect(path, uri=True)
                 return 'connected'
-            except lite.OperationalError:
-                raise Exception('Path does not work :' + path)
+            except lite.OperationalError as error:
+                raise error
         else:
             raise Exception('Already connected to a database : ' + self.name + " : " + self.path)
 
     def closeConnection(self):
         if self.checkConnection():
-            if self.curs is not None:
-                self.curs.close()
-                self.curs = None
+            self.closeCursor()
             self.conn.close()
             self.conn = None
             return 'disconnected'
@@ -39,50 +37,54 @@ class Database:
         else:
             return False
 
-    def changeConnection(self, path, name='', mode='ro'):
+    def changeConnectionMode(self, mode):
         if self.checkConnection():
             self.closeConnection()
-        self.path = path
-        self.name = name
-        self.createConnection(mode)
+            try:
+                self.createConnection(mode)
+                return True
+            except lite.OperationalError as error:
+                raise error
+        else:
+            return False
 
-    def Commit(self):
-        if self.conn is not None:
+    def createCursor(self):
+        if self.checkConnection():
+            try:
+                self.closeCursor()
+                self.curs = self.conn.cursor()
+                return True
+            except lite.OperationalError as error:
+                raise error
+        else:
+            raise Exception('Connection does not exist.')
+
+    def closeCursor(self):
+        if self.curs is not None:
+            self.curs.close()
+            self.curs = None
+            return True
+        else:
+            return False
+
+    def commit(self):
+        if self.checkConnection() and self.curs is not None:
             try:
                 self.conn.commit()
-            except lite.OperationalError:
-                raise Exception('Command could not be commited.')
+                return True
+            except lite.OperationalError as error:
+                raise error
         else:
-            raise Exception('Connection does not exist.')
+            raise Exception('Connection/cursor does not exist.')
 
-    def CreateNewDatabase(self):
-        try:
-            self.conn.createConnection(self.path, 'rwc')
-            self.closeConnection()
-        except lite.OperationalError:
-            raise Exception('Database could not be created : ' + str(self.path))
-
-    def CreateCursor(self):
-        if self.conn is not None:
-            try:
-                self.curs = self.conn.cursor()
-            except lite.OperationalError:
-                raise Exception('Cursor could not be created')
-        else:
-            raise Exception('Connection does not exist.')
-
-
-def PathToURI(path, mode='ro'):
-    path = pathlib.Path(path)
-    if FindingOperatingSystem() == 'Windows':
-        return 'file:' + parse.quote(path.as_posix(), safe=':/') + '?mode=' + mode
-    if path.is_absolute():
-        return path.as_uri() + '?mode=' + mode
-
-
-# 'Windows' for windows, 'Linux' for linux or 'Darwin' for mac.
-def FindingOperatingSystem():
-    return platform.system()
+# TODO Below is stuff to do eventually.
+'''
+def CreateNewDatabase(self):
+    try:
+        self.conn.createConnection(self.path, 'rwc')
+        self.closeConnection()
+    except lite.OperationalError as error:
+        raise error
 
 
 def CreateTable(cursor, tableName, paramList):
@@ -141,3 +143,18 @@ def ListAllTables(cursor):
         return formatedNamesList
     except connect.lite.OperationalError:
         raise Exception("An unforseen error has occurred.")
+'''
+
+
+def pathToURI(path, mode='ro'):
+    path = pathlib.Path(path)
+    if findingOS() == 'Windows':
+        return 'file:' + parse.quote(path.as_posix(), safe=':/') + '?mode=' + mode
+    if path.is_absolute():
+        return path.as_uri() + '?mode=' + mode
+
+
+# 'Windows' for windows, 'Linux' for linux or 'Darwin' for mac.
+# Currently not very useful but will be in the future.
+def findingOS():
+    return platform.system()
