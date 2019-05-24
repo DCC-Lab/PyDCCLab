@@ -152,31 +152,32 @@ class DCCImage:
         grayscaleImage = self.grayscaleConversion().getDCCImageAsArray()
         return measure.shannon_entropy(grayscaleImage, base)
 
-    def __getDCCImageExtremaIntensityPixels(self) -> typing.List[tuple]:
-        stats = self.__DCCImageBasicStats()
-        return stats.extrema
+    def __getDCCImageExtremaOfIntensity(self) -> typing.List[typing.Tuple[float]]:
+        pass
 
-    # Might not work correctly with float 32 images....
-    def minimumIntensityPixelsPosition(self) -> typing.Union[typing.List[tuple], typing.List[typing.List[tuple]]]:
+    def minimumIntensityPixelsPositionPerChannel(self) -> typing.Union[
+        typing.List[typing.Tuple[int, int]], typing.List[typing.List[typing.Tuple[int, int]]]]:
         """
         Function that returns a list of tuples representing the (x, y) position of the minimum intensity pixels
         of the DCCImage. If the image is in grayscale, the returning list only contains the tuples, but if the image is
         in color, the returning list contains a list of tuples for each color channel.
         :return: List of tuples or a list of lists of tuples
         """
-        extrema = self.__getDCCImageExtremaIntensityPixels()
+        minimumsCoordsList = []
         image = self.getDCCImageAsArray()
-        minimums = []
-        if self.getDCCImageNumberOfChannels() == 1:
-            minimumsTemp = np.where(image[:, :] == extrema[0][0])
-            minimumsCoords = list(zip(minimumsTemp[0], minimumsTemp[1]))
-            minimums.append(minimumsCoords)
+        if image.ndim == 2:
+            minimum = np.min(image)
+            minimumCoordTemp = np.where(image[:, :] == minimum)
+            minimumCoord = list(zip(minimumCoordTemp[0], minimumCoordTemp[1]))
+            minimumsCoordsList.append(minimumCoord)
+            minimumsCoordsList = minimumsCoordsList[0]
         else:
-            for channel in range(self.getDCCImageNumberOfChannels()):
-                minimumsTemp = np.where(image[..., channel] == extrema[channel][0])
-                minimumsCoords = list(zip(minimumsTemp[0], minimumsTemp[1]))
-                minimums.append(minimumsCoords)
-        return minimums
+            for channel in range(image.shape[-1]):
+                minimum = np.min(image[..., channel])
+                minimumCoordTemp = np.where(image[..., channel] == minimum)
+                minimumCoord = list(zip(minimumCoordTemp[0], minimumCoordTemp[1]))
+                minimumsCoordsList.append(minimumCoord)
+        return minimumsCoordsList
 
     def maximumIntensityPixelsPositions(self) -> typing.Union[typing.List[tuple], typing.List[typing.List[tuple]]]:
         """
@@ -185,19 +186,21 @@ class DCCImage:
         in color, the returning list contains a list of tuples for each color channel.
         :return: List of tuples or a list of lists of tuples
         """
-        extrema = self.__getDCCImageExtremaIntensityPixels()
+        maximumsCoordsList = []
         image = self.getDCCImageAsArray()
-        maximums = []
-        if self.getDCCImageNumberOfChannels() == 1:
-            maximumsTemps = np.where(image[:, :] == extrema[0][1])
-            maximumsCoords = list(zip(maximumsTemps[0], maximumsTemps[1]))
-            maximums.append(maximumsCoords)
+        if image.ndim == 2:
+            maximum = np.min(image)
+            maximumCoordTemp = np.where(image[:, :] == maximum)
+            maximumCoord = list(zip(maximumCoordTemp[0], maximumCoordTemp[1]))
+            maximumsCoordsList.append(maximumCoord)
+            maximumsCoordsList = maximumsCoordsList[0]
         else:
-            for channel in range(self.getDCCImageNumberOfChannels()):
-                maximumsTemps = np.where(image[..., channel] == extrema[channel][1])
-                maximumsCoords = list(zip(maximumsTemps[0], maximumsTemps[1]))
-                maximums.append(maximumsCoords)
-        return maximums
+            for channel in range(image.shape[-1]):
+                maximum = np.min(image[..., channel])
+                maximumCoordTemp = np.where(image[..., channel] == maximum)
+                maximumCoord = list(zip(maximumCoordTemp[0], maximumCoordTemp[1]))
+                maximumsCoordsList.append(maximumCoord)
+        return maximumsCoordsList
 
     def DCCImageWithEntropyFilter(self, filterSize: int):
         image = self.grayscaleConversion().getDCCImageAsArray()
@@ -391,10 +394,8 @@ class DCCImagesFromTiffFile(DCCImageStack):
 if __name__ == '__main__':
     path = "C:\\Users\\goubi\\PycharmProjects\\BigData-ImageAnalysis\\ImageAnalysis\\unitTesting\\testCziFile2Images.czi"
     path2 = "C:\\Users\\goubi\\PycharmProjects\\BigData-ImageAnalysis\\ImageAnalysis\\unitTesting\\testNotCziFile.jpg"
-    array = np.ones((10, 10, 3), dtype=np.float32)
-    array[0][0][0] = 0
-    array[0][0][1] = 12
-    array[0][0][2] = 234
+    array = np.ones((10, 10), dtype=np.float32)
+    array[0][7] = 12
     image = DCCImage(array)
-    averages = image.DCCImageAverage()
-    print(averages)
+    positionsMin = image.minimumIntensityPixelsPositionPerChannel()
+    print(positionsMin)

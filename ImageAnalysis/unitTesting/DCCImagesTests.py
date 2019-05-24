@@ -216,8 +216,15 @@ class TestDCCImageMethods(unittest.TestCase):
         self.assertTrue(np.allclose(stanDevS, image.DCCImageStandardDeviation()))
 
     def testDCCImageShannonEntropy(self):
+        base = 2
         uniqueValues, counts = np.unique(self.image.getDCCImageAsArray(), return_counts=True)
-        #entropy
+        entropy = -np.sum(
+            counts / self.image.getNumberOfPixels() * np.log(counts / self.image.getNumberOfPixels()) / np.log(base))
+        self.assertAlmostEqual(entropy, self.image.DCCImageShannonEntropy(base))
+
+    def testDCCImageMinimumIntensityPixels(self):
+        minimumPosition = (0, 0)
+        self.assertTrue(True)
 
 
 class TestDCCImageStackConstructor(unittest.TestCase):
