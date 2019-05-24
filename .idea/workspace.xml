@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8edb79ed-101c-49e3-a876-b403393446ee" name="Default Changelist" comment="" />
+    <list default="true" id="8edb79ed-101c-49e3-a876-b403393446ee" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -10,13 +12,25 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Database/database.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="136">
               <caret line="8" column="24" selection-start-line="8" selection-start-column="24" selection-end-line="8" selection-end-column="24" />
               <folding>
                 <element signature="e#0#22#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Database/uTest.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="2074">
+              <caret line="191" column="7" selection-start-line="191" selection-start-column="7" selection-end-line="191" selection-end-column="7" />
+              <folding>
+                <element signature="e#0#30#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -67,7 +81,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/Database/uTest.py" />
         <option value="$PROJECT_DIR$/Database/DB_management.py" />
         <option value="$PROJECT_DIR$/imageAnalysis/unitTesting/cziUtilTests.py" />
         <option value="$PROJECT_DIR$/imageAnalysis/cziUtil.py" />
@@ -82,6 +95,7 @@
         <option value="$PROJECT_DIR$/ImageAnalysis/DCCImagesExceptions.py" />
         <option value="$PROJECT_DIR$/ImageAnalysis/DCCImages.py" />
         <option value="$PROJECT_DIR$/Database/database.py" />
+        <option value="$PROJECT_DIR$/Database/uTest.py" />
       </list>
     </option>
   </component>
@@ -133,6 +147,87 @@
     </option>
   </component>
   <component name="RunManager" selected="Python.DCCImages">
+    <configuration name="DCCImages" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="BigData-ImageAnalysis" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ImageAnalysis" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ImageAnalysis/DCCImages.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest for DCCImagesTests.TestDCCImagesFromTiffFileMethods.testGetMetadata" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="BigData-ImageAnalysis" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ImageAnalysis/unitTesting" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;DCCImagesTests.TestDCCImagesFromTiffFileMethods.testGetMetadata&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest for DCCImagesTests.TestDCCImagesFromTiffFileMethods.testSaveMetadataInvalidName" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="BigData-ImageAnalysis" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ImageAnalysis/unitTesting" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;DCCImagesTests.TestDCCImagesFromTiffFileMethods.testSaveMetadataInvalidName&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest for DCCImagesTests.TestDCCImagesFromTiffFileMethods.testSetMetadataInvalid" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="BigData-ImageAnalysis" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ImageAnalysis/unitTesting" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;DCCImagesTests.TestDCCImagesFromTiffFileMethods.testSetMetadataInvalid&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest in DCCImagesTests.py" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="BigData-ImageAnalysis" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ImageAnalysis/unitTesting" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;$PROJECT_DIR$/ImageAnalysis/unitTesting/DCCImagesTests.py&quot;" />
+      <option name="_new_targetType" value="&quot;PATH&quot;" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
         <item itemvalue="Python.DCCImages" />
@@ -252,7 +347,14 @@
       <option name="project" value="LOCAL" />
       <updated>1558698928812</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="uTest Fixes and cleanups">
+      <created>1558699219911</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1558699219911</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -298,7 +400,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1295" height="695" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2494043" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -335,10 +436,10 @@
     <MESSAGE value="New test cases v2 added files related to test cases" />
     <MESSAGE value="Database Fixes and Cleanups" />
     <MESSAGE value="Work on the Metadata of the CZI files" />
-    <option name="LAST_COMMIT_MESSAGE" value="Work on the Metadata of the CZI files" />
+    <MESSAGE value="uTest Fixes and cleanups" />
+    <option name="LAST_COMMIT_MESSAGE" value="uTest Fixes and cleanups" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/Database/uTest.py" />
     <entry file="file://$PROJECT_DIR$/Database/DB_management.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="238">
@@ -554,6 +655,16 @@
           <caret line="8" column="24" selection-start-line="8" selection-start-column="24" selection-end-line="8" selection-end-column="24" />
           <folding>
             <element signature="e#0#22#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Database/uTest.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2074">
+          <caret line="191" column="7" selection-start-line="191" selection-start-column="7" selection-end-line="191" selection-end-column="7" />
+          <folding>
+            <element signature="e#0#30#0" expanded="true" />
           </folding>
         </state>
       </provider>
