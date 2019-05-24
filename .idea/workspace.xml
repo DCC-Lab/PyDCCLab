@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8edb79ed-101c-49e3-a876-b403393446ee" name="Default Changelist" comment="Database Fixes and Cleanups">
-      <change afterPath="$PROJECT_DIR$/Database/pom.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Database/testCziFile.czi" afterDir="false" />
+    <list default="true" id="8edb79ed-101c-49e3-a876-b403393446ee" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -13,13 +12,25 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Database/database.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="136">
               <caret line="8" column="24" selection-start-line="8" selection-start-column="24" selection-end-line="8" selection-end-column="24" />
               <folding>
                 <element signature="e#0#22#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Database/uTest.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="2074">
+              <caret line="191" column="7" selection-start-line="191" selection-start-column="7" selection-end-line="191" selection-end-column="7" />
+              <folding>
+                <element signature="e#0#30#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -58,7 +69,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="master" />
+        <entry key="$PROJECT_DIR$" value="POMAndCZIMeta" />
       </map>
     </option>
   </component>
@@ -70,7 +81,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/Database/uTest.py" />
         <option value="$PROJECT_DIR$/Database/DB_management.py" />
         <option value="$PROJECT_DIR$/imageAnalysis/unitTesting/cziUtilTests.py" />
         <option value="$PROJECT_DIR$/imageAnalysis/cziUtil.py" />
@@ -85,6 +95,7 @@
         <option value="$PROJECT_DIR$/ImageAnalysis/DCCImagesExceptions.py" />
         <option value="$PROJECT_DIR$/ImageAnalysis/DCCImages.py" />
         <option value="$PROJECT_DIR$/Database/database.py" />
+        <option value="$PROJECT_DIR$/Database/uTest.py" />
       </list>
     </option>
   </component>
@@ -329,7 +340,21 @@
       <option name="project" value="LOCAL" />
       <updated>1558698689629</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Work on the Metadata of the CZI files">
+      <created>1558698928812</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1558698928812</updated>
+    </task>
+    <task id="LOCAL-00015" summary="uTest Fixes and cleanups">
+      <created>1558699219911</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1558699219911</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -375,9 +400,8 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1295" height="695" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.2494043" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2494043" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -387,7 +411,7 @@
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32974428" />
-      <window_info anchor="bottom" id="Version Control" order="7" />
+      <window_info anchor="bottom" id="Version Control" order="7" weight="0.32978722" />
       <window_info anchor="bottom" id="Terminal" order="8" />
       <window_info anchor="bottom" id="Python Console" order="9" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
@@ -411,10 +435,11 @@
     <MESSAGE value="New test cases" />
     <MESSAGE value="New test cases v2 added files related to test cases" />
     <MESSAGE value="Database Fixes and Cleanups" />
-    <option name="LAST_COMMIT_MESSAGE" value="Database Fixes and Cleanups" />
+    <MESSAGE value="Work on the Metadata of the CZI files" />
+    <MESSAGE value="uTest Fixes and cleanups" />
+    <option name="LAST_COMMIT_MESSAGE" value="uTest Fixes and cleanups" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/Database/uTest.py" />
     <entry file="file://$PROJECT_DIR$/Database/DB_management.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="238">
@@ -630,6 +655,16 @@
           <caret line="8" column="24" selection-start-line="8" selection-start-column="24" selection-end-line="8" selection-end-column="24" />
           <folding>
             <element signature="e#0#22#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Database/uTest.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2074">
+          <caret line="191" column="7" selection-start-line="191" selection-start-column="7" selection-end-line="191" selection-end-column="7" />
+          <folding>
+            <element signature="e#0#30#0" expanded="true" />
           </folding>
         </state>
       </provider>

@@ -19,7 +19,7 @@ class TestDatabase(unittest.TestCase):
 
         fileName = os.path.join(directory, 'data', 'tst.db')
         database = db.Database(fileName, 'test.db')
-        with self.assertRaises(Exception): database.createConnection()
+        with self.assertRaises(lite.OperationalError): database.createConnection()
 
     def test_closeConnection(self):
         directory = os.path.dirname(__file__)
@@ -40,24 +40,72 @@ class TestDatabase(unittest.TestCase):
         database.closeConnection()
         self.assertFalse(database.checkConnection())
 
-    def test_path_to_uri(self):
-        self.assertEqual(db.PathToURI('test.db'), 'file:test.db?mode=ro')
-        self.assertEqual(db.PathToURI('test.db', 'rw'), 'file:test.db?mode=rw')
-        self.assertEqual(db.PathToURI(r'C:\sqlite3\Database\test.db'), 'file:C:/sqlite3/Database/test.db?mode=ro')
-        self.assertEqual(db.PathToURI(r'C:\sqlite3\Database\test.db', 'rw'), 'file:C:/sqlite3/Database/test.db?mode=rw')
+    def test_changeConnection(self):
+        directory = os.path.dirname(__file__)
+        fileName = os.path.join(directory, 'data', 'test.db')
+        database = db.Database(fileName, 'test.db')
 
-    def test_ResolvingPlatform(self):
+        self.assertFalse(database.changeConnectionMode('rw'))
+
+        database.createConnection()
+        self.assertTrue(database.changeConnectionMode('rw'))
+        # How to test OperationalError?
+
+    def test_pathToURI(self):
+        self.assertEqual(db.pathToURI('test.db'), 'file:test.db?mode=ro')
+        self.assertEqual(db.pathToURI('test.db', 'rw'), 'file:test.db?mode=rw')
+        self.assertEqual(db.pathToURI(r'C:\sqlite3\Database\test.db'), 'file:C:/sqlite3/Database/test.db?mode=ro')
+        self.assertEqual(db.pathToURI(r'C:\sqlite3\Database\test.db', 'rw'), 'file:C:/sqlite3/Database/test.db?mode=rw')
+
+    def test_findingOS(self):
         # Only for windows for now.
-        self.assertEqual(db.FindingOperatingSystem(), 'Windows')
+        self.assertEqual(db.findingOS(), 'Windows')
 
-    def test_CreateCursor(self):
-        connection_test = db.CreateConnection('test.db')
-        self.assertIs(type(db.CreateCursor(connection_test)), lite.Cursor)
-        db.CloseConnection(connection_test)
+    def test_createCursor(self):
+        directory = os.path.dirname(__file__)
+        fileName = os.path.join(directory, 'data', 'test.db')
+        database = db.Database(fileName, 'test.db')
 
-        with self.assertRaises(Exception): db.CreateCursor('')
+        with self.assertRaises(Exception): database.createCursor()
 
+        database.createConnection()
+        self.assertTrue(database.createCursor())
+        # How to test OperationalError?
+
+    def test_closeCursor(self):
+        directory = os.path.dirname(__file__)
+        fileName = os.path.join(directory, 'data', 'test.db')
+        database = db.Database(fileName, 'test.db')
+
+        self.assertFalse(database.closeCursor())
+
+        database.createConnection()
+        database.createCursor()
+        self.assertTrue(database.closeCursor())
+
+    def test_commit(self):
+        directory = os.path.dirname(__file__)
+        fileName = os.path.join(directory, 'data', 'test.db')
+        database = db.Database(fileName, 'test.db')
+
+        with self.assertRaises(Exception): database.commit()
+
+        database.createConnection()
+        database.createCursor()
+        self.assertTrue(database.commit())
+        # How to test OperationalError?
+
+    '''
     def test_CreateTable(self):
+        # This is one of the more complex test.
+        # Would very much like to simplify it.
+        directory = os.path.dirname(__file__)
+        fileName = os.path.join(directory, 'data', 'test.db')
+        database = db.Database(fileName, 'test.db')
+
+        #database.createConnection()
+        #database.createCursor()
+
         # Setting up the test.
         connection_test = db.CreateConnection('test.db', 'rw')
         cursor_test = db.CreateCursor(connection_test)
@@ -109,6 +157,7 @@ class TestDatabase(unittest.TestCase):
         cursor_test = db.CreateCursor(connection_test)
 
         self.assertGreater(len(db.ListAllTables(cursor_test)), 0)
+    '''
 
 
 if __name__ == '__main__':
