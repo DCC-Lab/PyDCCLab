@@ -40,7 +40,7 @@ class TestDatabase(unittest.TestCase):
         database.closeConnection()
         self.assertFalse(database.checkConnection())
 
-    def test_changeConnection(self):
+    def test_changeConnectionMode(self):
         directory = os.path.dirname(__file__)
         fileName = os.path.join(directory, 'data', 'test.db')
         database = db.Database(fileName, 'test.db')
@@ -49,7 +49,8 @@ class TestDatabase(unittest.TestCase):
 
         database.createConnection()
         self.assertTrue(database.changeConnectionMode('rw'))
-        # How to test OperationalError?
+
+        with self.assertRaises(lite.OperationalError): database.changeConnectionMode('abcd')
 
     def test_pathToURI(self):
         self.assertEqual(db.pathToURI('test.db'), 'file:test.db?mode=ro')
