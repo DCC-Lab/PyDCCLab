@@ -314,7 +314,8 @@ class TestDCCImageMethods(unittest.TestCase):
         dccImageGaussianArray = image.DCCImageWithGaussianFilterColors(sigma).getDCCImageAsArray()
         self.assertTrue(np.allclose(dccImageGaussianArray, gaussianBlurredArray))
 
-
+    def testDCCImageWithStandardDeviationFilter_MK1(self):
+        array = np.zeros((5, 5), dtype=np.float32)
 
 
 class TestDCCImageStackConstructor(unittest.TestCase):
