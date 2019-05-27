@@ -131,6 +131,94 @@ class TestDCCImageMethods(unittest.TestCase):
         self.image.setMetadata("Hello world")
         self.assertTrue(self.image.getMetadata() == "Hello world")
 
+    def testSetMetadataReturn(self):
+        newMeta = self.image.setMetadata("Yo")
+        self.assertTrue(newMeta == "Yo")
+
+    def testGrayScaleConversionImageAlreadyGray(self):
+        grayScale = self.image.grayscaleConversion()
+        self.assertTrue(grayScale == self.image)
+
+    def testGrayScaleConversion(self):
+        image = np.ones((10, 10, 3), dtype=np.float32)
+        image[..., -1] = 0.
+        image[..., -2] = 0.
+        dccImage = DCCImages.DCCImage(image)
+        grayScale = dccImage.grayscaleConversion()
+        self.assertTrue(grayScale.getDCCImageNumberOfChannels() == 1)
+
+    # todo Faire tests unitaires des méthodes d'histogrammes
+
+    def testDCCImageXDerivativeZerosOutput(self):
+        array = np.ones((5, 5), dtype=np.float32)
+        image = DCCImages.DCCImage(array)
+        dxImage = image.DCCImageXAxisDerivative()
+        supposedDerivative = DCCImages.DCCImage(np.zeros_like(array))
+        self.assertTrue(dxImage == supposedDerivative)
+
+    def testDCCImageXDerivative(self):
+        array = np.zeros((3, 3), dtype=np.float32)
+        array[1][1] = 2
+        image = DCCImages.DCCImage(array)
+        dxImage = image.DCCImageXAxisDerivative()
+        supposedDerivativeArray = np.array([[0, 0, 0], [-2, 0, 2], [0, 0, 0]], dtype=np.float32)
+        supposedDerivativeImage = DCCImages.DCCImage(supposedDerivativeArray)
+        self.assertTrue(supposedDerivativeImage == dxImage)
+
+    def testDCCImageYDerivativeZerosOutput(self):
+        array = np.zeros((5, 5), dtype=np.float32)
+        image = DCCImages.DCCImage(array)
+        dyImage = image.DCCImageYAxisDerivative()
+        supposedDerivative = DCCImages.DCCImage(np.zeros_like(array))
+        self.assertTrue(dyImage == supposedDerivative)
+
+    def testDCCImageYDerivative(self):
+        array = np.zeros((3, 3), dtype=np.float32)
+        array[1][1] = 2
+        image = DCCImages.DCCImage(array)
+        dyImage = image.DCCImageYAxisDerivative()
+        supposedDerivativeArray = np.array([[0, 0, 0], [-2, 0, 2], [0, 0, 0]], dtype=np.float32).T
+        supposedDerivativeImage = DCCImages.DCCImage(supposedDerivativeArray)
+        self.assertTrue(supposedDerivativeImage == dyImage)
+
+    def testDCCImageAverage(self):
+        sumPixelValues = np.sum(self.image.getDCCImageAsArray())
+        average = sumPixelValues / self.image.getNumberOfPixels()
+        self.assertEqual(average, self.image.DCCImageAverage())
+
+    def testDCCImageAverageColors(self):
+        array = np.ones((10, 10, 3), dtype=np.float32)
+        array[0][0][0] = 0
+        array[0][0][1] = 0
+        array[0][0][2] = 0
+        image = DCCImages.DCCImage(array)
+        supposedAverage = [np.sum(array[..., 0]) / image.getNumberOfPixels(),
+                           np.sum(array[..., 1]) / image.getNumberOfPixels(),
+                           np.sum(array[..., 2]) / image.getNumberOfPixels()]
+        self.assertTrue(image.DCCImageAverage() == supposedAverage)
+
+    def testDCCImageStandardDev(self):
+        average = self.image.DCCImageAverage()[0]
+        stanDevP1 = np.float_power(np.add(self.image.getDCCImageAsArray(), -average), 2)
+        stanDev = np.sqrt(np.sum(stanDevP1) / self.image.getNumberOfPixels())
+        self.assertTrue(np.allclose(stanDev, self.image.DCCImageStandardDeviation()))
+
+    def testDCCImageStandardDevColors(self):
+        array = np.ones((10, 10, 3), dtype=np.float32)
+        image = DCCImages.DCCImage(array)
+        averageS = image.DCCImageAverage()
+        stanDevS = []
+        for i in range(image.getDCCImageNumberOfChannels()):
+            average = averageS[i]
+            stanDevSP1 = np.float_power(np.add(image.getDCCImageAsArray()[..., i], -average),
+                                        2)
+            stanDevS.append(np.sqrt(np.sum(stanDevSP1) / image.getNumberOfPixels()))
+        self.assertTrue(np.allclose(stanDevS, image.DCCImageStandardDeviation()))
+
+    def testDCCImageShannonEntropy(self):
+        uniqueValues, counts = np.unique(self.image.getDCCImageAsArray(), return_counts=True)
+        #entropy
+
 
 class TestDCCImageStackConstructor(unittest.TestCase):
 
