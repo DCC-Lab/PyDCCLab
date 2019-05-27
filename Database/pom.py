@@ -30,26 +30,56 @@ def xmlParser(cziFilePath, filter):
         fullXml = czi.extractMetadataFromCziFileObject(cziImageObject, 'temp_full')
 
         root = ET.fromstring(fullXml)
-        '''
-        # Finding SizeX, SizeY, SizeB?, PixelType?
+
+        lstData = []
+
+        # Finding SizeX, SizeY, SizeB, PixelType
         tags = ['SizeX', 'SizeY', 'SizeB', 'PixelType']
-        for data in root.find('./Metadata/Information/Image'):
-            if data.tag in tags:
-                print(data.tag, data.attrib, data.text)
-        '''
+        for imageData in root.find('./Metadata/Information/Image'):
+            if imageData.tag in tags:
+                lstData.append([imageData.tag, imageData.text])
 
         # Finding all the channels, their id and name.
+        # Then we check for the info we want in those channels.
         tags = ['ExcitationWavelength', 'EmissionWavelength', 'DyeId', 'Color', 'Fluor', 'ExposureTime', 'Reflector',
                 'IlluminationType']
-        for data in root.find('./Metadata/Information/Image/Dimensions/Channels'):
-            print(data.attrib['Id'], data.attrib['Name'])
+        for channel in root.find('./Metadata/Information/Image/Dimensions/Channels'):
+            lstChannel = [[channel.attrib['Id'], channel.attrib['Name']]]
             # Finding all of the relevant channel infos.
-            for subdata in data:
-                if subdata.tag in tags:
-                    print(subdata.tag, subdata.attrib, subdata.text)
-                if subdata.tag == 'LightSourcesSettings':
-                    intensity = subdata.find('LightSourceSettings/Intensity')
-                    print(intensity.tag, intensity.attrib, intensity.text)
+            for channelData in channel:
+                if channelData.tag in tags:
+                    lstChannel.append([channelData.tag, channelData.text])
+                if channelData.tag == 'LightSourcesSettings':
+                    intensity = channelData.find('LightSourceSettings/Intensity')
+                    lstChannel.append([intensity.tag, intensity.text])
+            lstData.append(lstChannel)
+
+        # Finding the objectives' model/name.
+        for objective in root.find('./Metadata/Information/Instrument/Objectives'):
+            lstData.append(objective.attrib['Name'])
+        
+        # Another way to find the objectives' model would be :
+        for objective in root.find('./Metadata/Information/Instrument/Objectives'):
+            for objectiveData in objective:
+                if objectiveData.tag == 'Manufacturer':
+                    lstData.append(objectiveData.find('./Model').text)
+
+        # Finding all of the filters CutIn and CutOut.
+        for filter in root.find('./Metadata/Information/Instrument/Filters'):
+            lstFilter = []
+            for cut in filter.find('./TransmittanceRange'):
+                lstFilter.append([cut.tag, cut.text])
+            lstData.append(lstFilter)
+
+        # Finding informations relevant to the Dichroic.
+        for dichroic in root.find('./Metadata/Information/Instrument/Dichroics'):
+            lstDichroic = [dichroic.attrib['Id']]
+            for wavelength in dichroic.find('./Wavelengths'):
+                lstDichroic.append(wavelength.text)
+            lstData.append(lstDichroic)
+
+        for entry in lstData:
+            print(entry)
 
         '''
         metadata = extractRelevantDataFromRoot(fullXml)
