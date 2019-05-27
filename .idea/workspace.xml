@@ -2,12 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8edb79ed-101c-49e3-a876-b403393446ee" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/Database/pom.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Database/temp_full.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Database/testCziFile.czi" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Database/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/Database/database.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Database/uTest.py" beforeDir="false" afterPath="$PROJECT_DIR$/Database/uTest.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ImageAnalysis/DCCImages.py" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/DCCImages.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ImageAnalysis/unitTesting/DCCImagesTests.py" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/unitTesting/DCCImagesTests.py" afterDir="false" />
     </list>
@@ -22,7 +17,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ImageAnalysis/cziUtil.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="357">
+            <state>
               <caret line="50" column="29" selection-start-line="50" selection-start-column="29" selection-end-line="50" selection-end-column="29" />
               <folding>
                 <element signature="e#569#583#0" expanded="true" />
@@ -34,7 +29,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../hello-world/czi_util.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="366">
+            <state relative-caret-position="2941">
               <caret line="180" selection-start-line="180" selection-end-line="180" />
               <folding>
                 <element signature="e#490#504#0" expanded="true" />
@@ -46,8 +41,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ImageAnalysis/DCCImages.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="119">
-              <caret line="193" column="16" selection-start-line="193" selection-start-column="16" selection-end-line="193" selection-end-column="16" />
+            <state relative-caret-position="1326">
+              <caret line="396" column="80" lean-forward="true" selection-start-line="395" selection-start-column="8" selection-end-line="396" selection-end-column="80" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -56,28 +51,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/numpy/core/multiarray.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="465">
-              <caret line="336" column="28" lean-forward="true" selection-start-line="336" selection-start-column="28" selection-end-line="336" selection-end-column="28" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/scipy/ndimage/measurements.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-799">
-              <caret line="1190" column="4" selection-start-line="1190" selection-start-column="4" selection-end-line="1190" selection-end-column="4" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ImageAnalysis/unitTesting/DCCImagesTests.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="425">
-              <caret line="224" selection-start-line="224" selection-end-line="224" />
+            <state relative-caret-position="102">
+              <caret line="316" selection-start-line="316" selection-end-line="316" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
@@ -88,7 +65,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../hello-world/todoCompletion.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2499">
+            <state relative-caret-position="5083">
               <caret line="299" column="23" selection-start-line="299" selection-start-column="23" selection-end-line="299" selection-end-column="23" />
               <folding>
                 <element signature="e#0#37#0" expanded="true" />
@@ -123,6 +100,8 @@
       <find>asty</find>
       <find>wher</find>
       <find>where</find>
+      <find>rank</find>
+      <find>gauss</find>
     </findStrings>
     <replaceStrings>
       <replace />
@@ -157,22 +136,23 @@
         <option value="$PROJECT_DIR$/ImageAnalysis/README.md" />
         <option value="$PROJECT_DIR$/../hello-world/czi_util.py" />
         <option value="$PROJECT_DIR$/ImageAnalysis/DCCImagesExceptions.py" />
-        <option value="$PROJECT_DIR$/ImageAnalysis/unitTesting/DCCImagesTests.py" />
         <option value="$PROJECT_DIR$/ImageAnalysis/DCCImages.py" />
+        <option value="$PROJECT_DIR$/ImageAnalysis/unitTesting/DCCImagesTests.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="1595" />
-    <option name="y" value="-14" />
+    <option name="x" value="1484" />
+    <option name="y" value="-15" />
     <option name="width" value="1600" />
-    <option name="height" value="876" />
+    <option name="height" value="867" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -195,7 +175,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -215,7 +194,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.DCCImages">
+  <component name="RunManager" selected="Python tests.pytest for DCCImagesTests.TestDCCImageMethods.testGaussianFilterColors">
     <configuration name="DCCImages" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="BigData-ImageAnalysis" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -237,7 +216,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="pytest for DCCImagesTests.TestDCCImageMethods.testDCCImageShannonEntropy" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+    <configuration name="pytest for DCCImagesTests.TestDCCImageMethods.testEntropyFilter" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
       <module name="BigData-ImageAnalysis" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -248,11 +227,11 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="_new_keywords" value="&quot;&quot;" />
       <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;DCCImagesTests.TestDCCImageMethods.testDCCImageShannonEntropy&quot;" />
+      <option name="_new_target" value="&quot;DCCImagesTests.TestDCCImageMethods.testEntropyFilter&quot;" />
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
-    <configuration name="pytest for DCCImagesTests.TestDCCImagesFromTiffFileMethods.testSaveMetadataInvalidName" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+    <configuration name="pytest for DCCImagesTests.TestDCCImageMethods.testGaussianFilter" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
       <module name="BigData-ImageAnalysis" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -263,11 +242,11 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="_new_keywords" value="&quot;&quot;" />
       <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;DCCImagesTests.TestDCCImagesFromTiffFileMethods.testSaveMetadataInvalidName&quot;" />
+      <option name="_new_target" value="&quot;DCCImagesTests.TestDCCImageMethods.testGaussianFilter&quot;" />
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
-    <configuration name="pytest for DCCImagesTests.TestDCCImagesFromTiffFileMethods.testSetMetadataInvalid" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+    <configuration name="pytest for DCCImagesTests.TestDCCImageMethods.testGaussianFilterColors" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
       <module name="BigData-ImageAnalysis" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -278,7 +257,7 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="_new_keywords" value="&quot;&quot;" />
       <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;DCCImagesTests.TestDCCImagesFromTiffFileMethods.testSetMetadataInvalid&quot;" />
+      <option name="_new_target" value="&quot;DCCImagesTests.TestDCCImageMethods.testGaussianFilterColors&quot;" />
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
@@ -299,11 +278,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python tests.pytest for DCCImagesTests.TestDCCImageMethods.testGaussianFilterColors" />
         <item itemvalue="Python.DCCImages" />
-        <item itemvalue="Python tests.pytest for DCCImagesTests.TestDCCImageMethods.testDCCImageShannonEntropy" />
+        <item itemvalue="Python tests.pytest for DCCImagesTests.TestDCCImageMethods.testGaussianFilter" />
+        <item itemvalue="Python tests.pytest for DCCImagesTests.TestDCCImageMethods.testEntropyFilter" />
         <item itemvalue="Python tests.pytest in DCCImagesTests.py" />
-        <item itemvalue="Python tests.pytest for DCCImagesTests.TestDCCImagesFromTiffFileMethods.testSaveMetadataInvalidName" />
-        <item itemvalue="Python tests.pytest for DCCImagesTests.TestDCCImagesFromTiffFileMethods.testSetMetadataInvalid" />
       </list>
     </recent_temporary>
   </component>
@@ -409,39 +388,46 @@
       <option name="project" value="LOCAL" />
       <updated>1558724466192</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="New methods and test cases">
+      <created>1558729094615</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1558729094615</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="pytest_for_DCCImagesTests_TestDCCImagesFromTiffFileMethods_testSaveMetadataInvalidName - 2019.05.23 at 13h 12m 42s.xml">
-      <configuration name="pytest for DCCImagesTests.TestDCCImagesFromTiffFileMethods.testSaveMetadataInvalidName" configurationId="tests" />
+    <history-entry file="pytest_for_DCCImagesTests_TestDCCImageMethods_testGaussianFilterColors - 2019.05.27 at 14h 58m 18s.xml">
+      <configuration name="pytest for DCCImagesTests.TestDCCImageMethods.testGaussianFilterColors" configurationId="tests" />
     </history-entry>
-    <history-entry file="pytest_for_DCCImagesTests_TestDCCImagesFromTiffFileMethods_testSaveMetadataInvalidName - 2019.05.23 at 13h 13m 08s.xml">
-      <configuration name="pytest for DCCImagesTests.TestDCCImagesFromTiffFileMethods.testSaveMetadataInvalidName" configurationId="tests" />
+    <history-entry file="pytest_for_DCCImagesTests_TestDCCImageMethods_testGaussianFilterColors - 2019.05.27 at 14h 59m 06s.xml">
+      <configuration name="pytest for DCCImagesTests.TestDCCImageMethods.testGaussianFilterColors" configurationId="tests" />
     </history-entry>
-    <history-entry file="pytest_in_DCCImagesTests_py - 2019.05.23 at 13h 16m 32s.xml">
-      <configuration name="pytest in DCCImagesTests.py" configurationId="tests" />
+    <history-entry file="pytest_for_DCCImagesTests_TestDCCImageMethods_testGaussianFilterColors - 2019.05.27 at 15h 01m 20s.xml">
+      <configuration name="pytest for DCCImagesTests.TestDCCImageMethods.testGaussianFilterColors" configurationId="tests" />
     </history-entry>
-    <history-entry file="pytest_in_DCCImagesTests_py - 2019.05.23 at 13h 41m 10s.xml">
-      <configuration name="pytest in DCCImagesTests.py" configurationId="tests" />
+    <history-entry file="pytest_for_DCCImagesTests_TestDCCImageMethods_testGaussianFilterColors - 2019.05.27 at 15h 01m 32s.xml">
+      <configuration name="pytest for DCCImagesTests.TestDCCImageMethods.testGaussianFilterColors" configurationId="tests" />
     </history-entry>
-    <history-entry file="pytest_in_DCCImagesTests_py - 2019.05.23 at 13h 43m 00s.xml">
-      <configuration name="pytest in DCCImagesTests.py" configurationId="tests" />
+    <history-entry file="pytest_for_DCCImagesTests_TestDCCImageMethods_testGaussianFilterColors - 2019.05.27 at 15h 02m 30s.xml">
+      <configuration name="pytest for DCCImagesTests.TestDCCImageMethods.testGaussianFilterColors" configurationId="tests" />
     </history-entry>
-    <history-entry file="pytest_for_DCCImagesTests_TestDCCImageMethods_testDCCImageShannonEntropy - 2019.05.24 at 15h 14m 04s.xml">
-      <configuration name="pytest for DCCImagesTests.TestDCCImageMethods.testDCCImageShannonEntropy" configurationId="tests" />
+    <history-entry file="pytest_for_DCCImagesTests_TestDCCImageMethods_testGaussianFilterColors - 2019.05.27 at 15h 03m 25s.xml">
+      <configuration name="pytest for DCCImagesTests.TestDCCImageMethods.testGaussianFilterColors" configurationId="tests" />
     </history-entry>
-    <history-entry file="pytest_for_DCCImagesTests_TestDCCImageMethods_testDCCImageShannonEntropy - 2019.05.24 at 15h 18m 13s.xml">
-      <configuration name="pytest for DCCImagesTests.TestDCCImageMethods.testDCCImageShannonEntropy" configurationId="tests" />
+    <history-entry file="pytest_for_DCCImagesTests_TestDCCImageMethods_testGaussianFilterColors - 2019.05.27 at 15h 07m 17s.xml">
+      <configuration name="pytest for DCCImagesTests.TestDCCImageMethods.testGaussianFilterColors" configurationId="tests" />
     </history-entry>
-    <history-entry file="pytest_for_DCCImagesTests_TestDCCImageMethods_testDCCImageShannonEntropy - 2019.05.24 at 15h 25m 59s.xml">
-      <configuration name="pytest for DCCImagesTests.TestDCCImageMethods.testDCCImageShannonEntropy" configurationId="tests" />
+    <history-entry file="pytest_for_DCCImagesTests_TestDCCImageMethods_testGaussianFilterColors - 2019.05.27 at 15h 08m 12s.xml">
+      <configuration name="pytest for DCCImagesTests.TestDCCImageMethods.testGaussianFilterColors" configurationId="tests" />
     </history-entry>
-    <history-entry file="pytest_for_DCCImagesTests_TestDCCImageMethods_testDCCImageShannonEntropy - 2019.05.24 at 15h 26m 36s.xml">
-      <configuration name="pytest for DCCImagesTests.TestDCCImageMethods.testDCCImageShannonEntropy" configurationId="tests" />
+    <history-entry file="pytest_for_DCCImagesTests_TestDCCImageMethods_testGaussianFilterColors - 2019.05.27 at 15h 08m 25s.xml">
+      <configuration name="pytest for DCCImagesTests.TestDCCImageMethods.testGaussianFilterColors" configurationId="tests" />
     </history-entry>
-    <history-entry file="pytest_for_DCCImagesTests_TestDCCImageMethods_testDCCImageShannonEntropy - 2019.05.24 at 15h 27m 10s.xml">
-      <configuration name="pytest for DCCImagesTests.TestDCCImageMethods.testDCCImageShannonEntropy" configurationId="tests" />
+    <history-entry file="pytest_for_DCCImagesTests_TestDCCImageMethods_testGaussianFilterColors - 2019.05.27 at 15h 08m 52s.xml">
+      <configuration name="pytest for DCCImagesTests.TestDCCImageMethods.testGaussianFilterColors" configurationId="tests" />
     </history-entry>
   </component>
   <component name="TodoView" selected-index="4">
@@ -491,7 +477,8 @@
     <MESSAGE value="New test cases" />
     <MESSAGE value="New test cases v2 added files related to test cases" />
     <MESSAGE value="New methods and test cases (3rd commit about the same changes)" />
-    <option name="LAST_COMMIT_MESSAGE" value="New methods and test cases (3rd commit about the same changes)" />
+    <MESSAGE value="New methods and test cases" />
+    <option name="LAST_COMMIT_MESSAGE" value="New methods and test cases" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/Database/uTest.py">
@@ -627,16 +614,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ImageAnalysis/cziUtil.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="357">
-          <caret line="50" column="29" selection-start-line="50" selection-start-column="29" selection-end-line="50" selection-end-column="29" />
-          <folding>
-            <element signature="e#569#583#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$APPLICATION_HOME_DIR$/helpers/typeshed/stdlib/3/builtins.pyi">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="174">
@@ -689,37 +666,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../hello-world/todoCompletion.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2499">
-          <caret line="299" column="23" selection-start-line="299" selection-start-column="23" selection-end-line="299" selection-end-column="23" />
-          <folding>
-            <element signature="e#0#37#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../hello-world/czi_util.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="366">
-          <caret line="180" selection-start-line="180" selection-end-line="180" />
-          <folding>
-            <element signature="e#490#504#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/numpy/core/fromnumeric.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="187">
           <caret line="85" selection-start-line="85" selection-end-line="85" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/.PyCharmCE2019.1/system/python_stubs/-5491199/numpy/core/_multiarray_umath.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-7140">
-          <caret line="4735" column="4" selection-start-line="4735" selection-start-column="4" selection-end-line="4735" selection-end-column="4" />
         </state>
       </provider>
     </entry>
@@ -751,23 +701,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ImageAnalysis/unitTesting/DCCImagesTests.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="425">
-          <caret line="224" selection-start-line="224" selection-end-line="224" />
-          <folding>
-            <element signature="e#0#15#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/scipy/ndimage/measurements.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-799">
-          <caret line="1190" column="4" selection-start-line="1190" selection-start-column="4" selection-end-line="1190" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/numpy/core/multiarray.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="465">
@@ -775,10 +708,106 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/ImageAnalysis/cziUtil.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret line="50" column="29" selection-start-line="50" selection-start-column="29" selection-end-line="50" selection-end-column="29" />
+          <folding>
+            <element signature="e#569#583#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../hello-world/czi_util.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2941">
+          <caret line="180" selection-start-line="180" selection-end-line="180" />
+          <folding>
+            <element signature="e#490#504#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/scipy/ndimage/measurements.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="20111">
+          <caret line="1190" column="4" selection-start-line="1190" selection-start-column="4" selection-end-line="1190" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/skimage/morphology/selem.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="51">
+          <caret line="5" column="4" selection-start-line="5" selection-start-column="4" selection-end-line="5" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.PyCharmCE2019.1/system/python_stubs/-5491199/skimage/filters/rank/generic_cy.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="174">
+          <caret line="20" column="4" selection-start-line="20" selection-start-column="4" selection-end-line="20" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/skimage/filters/rank/generic.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="234">
+          <caret line="112" column="16" selection-start-line="112" selection-start-column="16" selection-end-line="112" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.PyCharmCE2019.1/system/python_stubs/-5491199/numpy/core/_multiarray_umath.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="174">
+          <caret line="5291" column="4" selection-start-line="5291" selection-start-column="4" selection-end-line="5291" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/scipy/signal/signaltools.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1309">
+          <caret line="972" column="4" selection-start-line="972" selection-start-column="4" selection-end-line="972" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/skimage/filters/_gaussian.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="272">
+          <caret line="93" column="38" lean-forward="true" selection-start-line="93" selection-start-column="38" selection-end-line="93" selection-end-column="38" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/scipy/ndimage/filters.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2142">
+          <caret line="135" column="4" selection-start-line="135" selection-start-column="4" selection-end-line="135" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../hello-world/todoCompletion.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="5083">
+          <caret line="299" column="23" selection-start-line="299" selection-start-column="23" selection-end-line="299" selection-end-column="23" />
+          <folding>
+            <element signature="e#0#37#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ImageAnalysis/unitTesting/DCCImagesTests.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="316" selection-start-line="316" selection-end-line="316" />
+          <folding>
+            <element signature="e#0#15#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/ImageAnalysis/DCCImages.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="193" column="16" selection-start-line="193" selection-start-column="16" selection-end-line="193" selection-end-column="16" />
+        <state relative-caret-position="1326">
+          <caret line="396" column="80" lean-forward="true" selection-start-line="395" selection-start-column="8" selection-end-line="396" selection-end-column="80" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>

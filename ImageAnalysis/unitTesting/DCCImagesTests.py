@@ -1,6 +1,6 @@
 import unittest
 import ImageAnalysis.DCCImages as DCCImages
-import ImageAnalysis.DCCImagesExceptions as dccExcep
+import ImageAnalysis.DCCImagesExceptions as DCCExcep
 import numpy as np
 from unittest.mock import Mock, patch
 
@@ -12,11 +12,11 @@ class TestDCCImageConstructor(unittest.TestCase):
         self.assertIsInstance(image, DCCImages.DCCImage)
 
     def testInvalidDimensionsConstructor(self):
-        with self.assertRaises(dccExcep.ImageDimensionsException):
+        with self.assertRaises(DCCExcep.ImageDimensionsException):
             DCCImages.DCCImage(np.zeros(12, dtype=np.float32))
 
     def testInvalidTypeConstructor(self):
-        with self.assertRaises(dccExcep.PixelTypeException):
+        with self.assertRaises(DCCExcep.PixelTypeException):
             DCCImages.DCCImage(np.ones((1250, 1500, 3), dtype=np.complex))
 
 
@@ -41,7 +41,7 @@ class TestDCCImageMethods(unittest.TestCase):
 
     def testInvalidEquality(self):
         testArray = np.copy(self.array)
-        with self.assertRaises(dccExcep.InvalidEqualityTest):
+        with self.assertRaises(DCCExcep.InvalidEqualityTest):
             self.image == testArray
 
     def testGetDCCImageAsNumpyArray(self):
@@ -99,12 +99,12 @@ class TestDCCImageMethods(unittest.TestCase):
 
     def testSaveToTIFFInvalidEmptyName(self):
         name = ""
-        with self.assertRaises(dccExcep.InvalidImageName):
+        with self.assertRaises(DCCExcep.InvalidImageName):
             self.image.saveToTIFF(name)
 
     def testSaveToTIFFInvalidCharacterName(self):
         name = "test?"
-        with self.assertRaises(dccExcep.InvalidImageName):
+        with self.assertRaises(DCCExcep.InvalidImageName):
             self.image.saveToTIFF(name)
 
     def testSaveToTIFF(self):
@@ -224,7 +224,97 @@ class TestDCCImageMethods(unittest.TestCase):
 
     def testDCCImageMinimumIntensityPixels(self):
         minimumPosition = (0, 0)
-        self.assertTrue(True)
+        self.assertTrue(self.image.minimumIntensityPixelsPositionPerChannel() == [minimumPosition])
+
+    def testDCCImageMinimumIntensityPixels2Pixels(self):
+        self.array[10][10] = 0
+        image = DCCImages.DCCImage(self.array)
+        minimumsPosition = [(0, 0), (10, 10)]
+        self.assertTrue(image.minimumIntensityPixelsPositionPerChannel() == minimumsPosition)
+
+    def testDCCImageMinimumIntensityPixelsColors(self):
+        array = np.ones((10, 10, 3), dtype=np.float32)
+        array[0][0][0] = 0
+        array[2][2][0] = 0
+        array[0][0][1] = -10
+        array[0][0][2] = -0.1
+        image = DCCImages.DCCImage(array)
+        minimumsPosition = [[(0, 0), (2, 2)], [(0, 0)], [(0, 0)]]
+        self.assertTrue(image.minimumIntensityPixelsPositionPerChannel() == minimumsPosition)
+
+    def testDCCImageMaximumIntensityPixels(self):
+        maximumPosition = [(100, 100)]
+        self.assertTrue(self.image.maximumIntensityPixelsPositionPerChannel() == maximumPosition)
+
+    def testDCCImageMaximumIntensityPixels2Pixels(self):
+        self.array[50][50] = 100.0
+        image = DCCImages.DCCImage(self.array)
+        maximumsPosition = [(50, 50), (100, 100)]
+        self.assertTrue(image.maximumIntensityPixelsPositionPerChannel() == maximumsPosition)
+
+    def testDCCImageMaximumIntensityPixelsColors(self):
+        array = np.ones((10, 10, 3), dtype=np.float32)
+        array[0][0][0] = 10
+        array[2][2][0] = 10
+        array[0][0][1] = 1.01
+        array[0][0][2] = 100
+        image = DCCImages.DCCImage(array)
+        minimumsPosition = [[(0, 0), (2, 2)], [(0, 0)], [(0, 0)]]
+        self.assertTrue(image.maximumIntensityPixelsPositionPerChannel() == minimumsPosition)
+
+    def testEntropyFilter(self):
+        filterSize = 3
+        array = np.zeros((5, 5), dtype=np.float32)
+        array[2][2] = 1
+        resultEntropyArray = np.zeros_like(array)
+        for i in range(1, 4):
+            for j in range(1, 4):
+                resultEntropyArray[i][j] = 503.2583348E-3
+        resultEntropyImage = DCCImages.DCCImage(resultEntropyArray)
+        self.assertTrue(resultEntropyImage == DCCImages.DCCImage(array).DCCImageWithEntropyFilter(filterSize))
+
+    def testGaussianFilter(self):
+        sigma = 0.4
+        array = np.zeros((5, 5), dtype=np.float32)
+        array[2][2] = 1
+        image = DCCImages.DCCImage(array)
+        gaussianBlurredArray = np.zeros_like(array)
+        for i in range(5):
+            for j in range(5):
+                gaussianBlurredArray[i][j] = np.exp(-((i - 2) ** 2 + (j - 2) ** 2) / (2 * sigma ** 2)) / (
+                        2 * np.pi * sigma ** 2)
+        normalizedGaussianBlurredArray = gaussianBlurredArray / np.sum(gaussianBlurredArray)
+        dccImageGaussianArray = image.DCCImageWithGaussianFilterGray(sigma).getDCCImageAsArray()
+        self.assertTrue(np.allclose(dccImageGaussianArray, normalizedGaussianBlurredArray))
+
+    def testGaussianFilterColors(self):
+        sigma = 0.4
+        array = np.zeros((5, 5, 3), dtype=np.float32)
+        array[2][2][0] = 1
+        array[2][2][1] = 1.2
+        array[2][2][2] = 2
+        image = DCCImages.DCCImage(array)
+        gaussianBlurredArray = np.zeros_like(array)
+        # Because of the nature of the discrete convolution used in the gaussian filter
+        # and because of the nature of the input array (which contains only 0s except for the middle pixel):
+        # We must multiply the resulting array by that non zero digit. In cases where there are more non zero values:
+        # It would be more complicated. (In the case of filters, convolution of two matrix (a and b) is represented
+        # by a (or b) "moving over" b (or a) and the elements of the resulting matrix would be the sum of the 1-1
+        # product of each element of a and b (a11*b11+a12*b12+...). Since we only have one non zero element
+        # and since size of gaussian filter = size of input, the output is the normalized gaussian filter multiplied
+        # by the only non zero input element. Hope it helps!
+        multiplicationFactors = [1, 1.2, 2]
+        for channel in range(3):
+            for i in range(5):
+                for j in range(5):
+                    gaussianBlurredArray[i][j][channel] = np.exp(-((i - 2) ** 2 + (j - 2) ** 2) / (2 * sigma ** 2)) / (
+                            2 * np.pi * sigma ** 2)
+            gaussianBlurredArray[..., channel] = gaussianBlurredArray[..., channel] / np.sum(
+                gaussianBlurredArray[..., channel]) * multiplicationFactors[channel]
+        dccImageGaussianArray = image.DCCImageWithGaussianFilterColors(sigma).getDCCImageAsArray()
+        self.assertTrue(np.allclose(dccImageGaussianArray, gaussianBlurredArray))
+
+
 
 
 class TestDCCImageStackConstructor(unittest.TestCase):
@@ -257,7 +347,7 @@ class TestDCCImageStackConstructor(unittest.TestCase):
 
     def testInvalidConstructor1Element(self):
         image = np.ones((10, 10))
-        with self.assertRaises(dccExcep.NotDCCImageException):
+        with self.assertRaises(DCCExcep.NotDCCImageException):
             DCCImages.DCCImageStack([image])
 
     def testInvalidConstructor11Elements(self):
@@ -268,7 +358,7 @@ class TestDCCImageStackConstructor(unittest.TestCase):
             image = DCCImages.DCCImage(array)
             imageList.append(image)
         imageList.append(np.ones((10, 10)))
-        with self.assertRaises(dccExcep.NotDCCImageException):
+        with self.assertRaises(DCCExcep.NotDCCImageException):
             DCCImages.DCCImageStack(imageList)
 
 
@@ -285,7 +375,7 @@ class TesDCCImageStackMethods(unittest.TestCase):
 
     def testImageInStackInvalidImage(self):
         invalidImage = np.ones((1250, 1251), dtype=np.float32)
-        with self.assertRaises(dccExcep.NotDCCImageException):
+        with self.assertRaises(DCCExcep.NotDCCImageException):
             self.stack.isImageInStack(invalidImage)
 
     def testImageNotInStack(self):
@@ -300,14 +390,14 @@ class TesDCCImageStackMethods(unittest.TestCase):
 
     def testGetIndexOfInvalidImage(self):
         invalidImage = np.ones((1250, 1251), dtype=np.float32)
-        with self.assertRaises(dccExcep.NotDCCImageException):
+        with self.assertRaises(DCCExcep.NotDCCImageException):
             self.stack.getIndexOfImage(invalidImage)
 
     def testGetIndexOfImageNotInStack(self):
         arrayNotInStack = np.ones((1250, 1251), dtype=np.float32)
         arrayNotInStack[0][0] = 0.00001
         imageNotInStack = DCCImages.DCCImage(arrayNotInStack)
-        with self.assertRaises(dccExcep.ImageNotInStackException):
+        with self.assertRaises(DCCExcep.ImageNotInStackException):
             self.stack.getIndexOfImage(imageNotInStack)
 
     def testGetIndexImageInStack(self):
@@ -316,12 +406,12 @@ class TesDCCImageStackMethods(unittest.TestCase):
 
     def testAddInvalidImage(self):
         invalidImage = np.ones((1250, 1251), dtype=np.float32)
-        with self.assertRaises(dccExcep.NotDCCImageException):
+        with self.assertRaises(DCCExcep.NotDCCImageException):
             self.stack.addDCCImage(invalidImage)
 
     def testAddImageAlreadyIn(self):
         imageAlreadyIn = self.imageList[-1]
-        with self.assertRaises(dccExcep.ImageAlreadyInStackException):
+        with self.assertRaises(DCCExcep.ImageAlreadyInStackException):
             self.stack.addDCCImage(imageAlreadyIn)
 
     def testAddImageNotAlreadyIn(self):
@@ -340,14 +430,14 @@ class TesDCCImageStackMethods(unittest.TestCase):
 
     def testRemoveImageWithInvalidImage(self):
         invalidImage = np.ones((125, 12547), dtype=np.float32)
-        with self.assertRaises(dccExcep.NotDCCImageException):
+        with self.assertRaises(DCCExcep.NotDCCImageException):
             self.stack.removeDCCImage(invalidImage)
 
     def testRemoveImageWithImageNotInStack(self):
         arrayNotInStack = np.ones((1250, 1251), dtype=np.float32)
         arrayNotInStack[0][0] = 0.00001
         imageNotInStack = DCCImages.DCCImage(arrayNotInStack)
-        with self.assertRaises(dccExcep.ImageNotInStackException):
+        with self.assertRaises(DCCExcep.ImageNotInStackException):
             self.stack.removeDCCImage(imageNotInStack)
 
     def testRemoveImageWithImage(self):
@@ -427,7 +517,7 @@ class testDCCImagesFromCZIFileMethods(unittest.TestCase):
             self.imagesFromCzi.setMetadata(123432)
 
     def testSaveMetadataInvalidName(self):
-        with self.assertRaises(dccExcep.InvalidMetadataFileName):
+        with self.assertRaises(DCCExcep.InvalidMetadataFileName):
             self.imagesFromCzi.saveMetadata("/*")
 
     def testSaveMetadataValidName(self):
@@ -453,12 +543,12 @@ class TestDCCImageFromNormalFileConstructor(unittest.TestCase):
 
     def testInvalidConstructorTIFFFile(self):
         file = "testTiff3Images.tiff"
-        with self.assertRaises(dccExcep.InvalidFileFormat):
+        with self.assertRaises(DCCExcep.InvalidFileFormat):
             DCCImages.DCCImageFromNormalFile(file)
 
     def testInvalidConstructorCZIFile(self):
         file = "testCziFile2Images.czi"
-        with self.assertRaises(dccExcep.InvalidFileFormat):
+        with self.assertRaises(DCCExcep.InvalidFileFormat):
             DCCImages.DCCImageFromNormalFile(file)
 
     def testValidConstructor(self):
@@ -479,7 +569,7 @@ class TestDCCImageFromNormalFileMethods(unittest.TestCase):
 class TestDCCImagesFromTiffFileConstructor(unittest.TestCase):
 
     def testInvalidConstructorNotSupportedFile(self):
-        with self.assertRaises(dccExcep.InvalidFileFormat):
+        with self.assertRaises(DCCExcep.InvalidFileFormat):
             DCCImages.DCCImagesFromTiffFile("testNotCziFile.jpg")
 
     def testValidConstructor(self):
@@ -506,7 +596,7 @@ class TestDCCImagesFromTiffFileMethods(unittest.TestCase):
         self.assertTrue(self.images.getMetadata() == "Hello")
 
     def testSaveMetadataInvalidName(self):
-        with self.assertRaises(dccExcep.InvalidMetadataFileName):
+        with self.assertRaises(DCCExcep.InvalidMetadataFileName):
             self.images.saveMetadata("meta.data")
 
     def testSaveMetadata(self):

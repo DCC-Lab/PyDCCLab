@@ -2,10 +2,12 @@ import numpy as np
 import tifffile
 import typing
 from skimage import color, data, filters, img_as_float32, measure, morphology
+from skimage.filters.rank import entropy
 import ImageAnalysis.cziUtil as cziUtil
 import PIL.Image
 from scipy.signal import convolve2d
-from scipy.ndimage import filters, measurements
+from scipy.ndimage import measurements
+from skimage.filters import gaussian
 from ImageAnalysis.DCCImagesExceptions import *
 import matplotlib.pyplot as plt
 
@@ -101,25 +103,6 @@ class DCCImage:
             convolvedImage = convolve2d(inputImage, matrix, mode="same", boundary="symm")
         return convolvedImage.astype("float32")
 
-    # Voir si pertinent de décomposer convolution2D en deux méthodes
-    """
-    @staticmethod
-    def __convolution2DGray(inputGray: np.ndarray, matrix: np.ndarray):
-        if not inputGray.ndim == 2:
-            raise ImageDimensionsException(inputGray.ndim)
-        return convolve2d(inputGray, matrix, mode="same", boundary="symm").astype(np.float32)
-
-    @staticmethod
-    def __convolution2DColors(inputColors: np.ndarray, matrix: np.ndarray):
-        if inputColors.ndim == 2:
-            raise ImageDimensionsException(inputColors.ndim)
-        convolvedColoredImage = np.zeros_like(inputColors)
-        for channel in range(inputColors.shape[-1]):
-            convolvedColoredImage[..., channel] = convolve2d(inputColors[..., channel], matrix, mode="same",
-                                                             boundary="symm")
-        return convolvedColoredImage.astype(np.float32)
-        """
-
     def DCCImageXAxisDerivative(self):
         dxFilter = [[-1, 0, 1]]
         dxImage = self.__convolution2D(self.grayscaleConversion().getDCCImageAsArray(), dxFilter)
@@ -179,7 +162,8 @@ class DCCImage:
                 minimumsCoordsList.append(minimumCoord)
         return minimumsCoordsList
 
-    def maximumIntensityPixelsPositions(self) -> typing.Union[typing.List[tuple], typing.List[typing.List[tuple]]]:
+    def maximumIntensityPixelsPositionPerChannel(self) -> typing.Union[
+        typing.List[typing.Tuple[int, int]], typing.List[typing.List[typing.Tuple[int, int]]]]:
         """
         Function that returns a list of tuples representing the (x, y) position of the maximum intensity pixels
         of the DCCImage. If the image is in grayscale, the returning list only contains the tuples, but if the image is
@@ -189,14 +173,14 @@ class DCCImage:
         maximumsCoordsList = []
         image = self.getDCCImageAsArray()
         if image.ndim == 2:
-            maximum = np.min(image)
+            maximum = np.max(image)
             maximumCoordTemp = np.where(image[:, :] == maximum)
             maximumCoord = list(zip(maximumCoordTemp[0], maximumCoordTemp[1]))
             maximumsCoordsList.append(maximumCoord)
             maximumsCoordsList = maximumsCoordsList[0]
         else:
             for channel in range(image.shape[-1]):
-                maximum = np.min(image[..., channel])
+                maximum = np.max(image[..., channel])
                 maximumCoordTemp = np.where(image[..., channel] == maximum)
                 maximumCoord = list(zip(maximumCoordTemp[0], maximumCoordTemp[1]))
                 maximumsCoordsList.append(maximumCoord)
@@ -204,7 +188,9 @@ class DCCImage:
 
     def DCCImageWithEntropyFilter(self, filterSize: int):
         image = self.grayscaleConversion().getDCCImageAsArray()
-        entropyFiltered = filters.rank.entropy(image, morphology.selem.square(filterSize, dtype=np.float32))
+        # I have to cast as 16-bits unsigned integer because the entropy filter only works in uint8 or uint16
+        image = image.astype(np.uint16)
+        entropyFiltered = entropy(image, morphology.selem.square(filterSize, dtype=np.float32))
         return DCCImage(entropyFiltered.astype(np.float32))
 
     def DCCImageWithStandardDeviationFilter_MK1(self, filterSize: int):
@@ -225,12 +211,12 @@ class DCCImage:
 
     def DCCImageWithGaussianFilterGray(self, sigma: float):
         image = self.grayscaleConversion().getDCCImageAsArray()
-        gaussianFiltered = filters.gaussian(image, sigma, mode="nearest", multichannel=False, preserve_range=True)
+        gaussianFiltered = gaussian(image, sigma, mode="nearest", multichannel=False, preserve_range=True)
         return DCCImage(gaussianFiltered.astype(np.float32))
 
     def DCCImageWithGaussianFilterColors(self, sigma: float):
         image = self.getDCCImageAsArray()
-        gaussianFiltered = filters.gaussian(image, sigma, mode="nearest", multichannel=True, preserve_range=True)
+        gaussianFiltered = gaussian(image, sigma, mode="nearest", multichannel=True, preserve_range=True)
         return DCCImage(gaussianFiltered.astype(np.float32))
 
 
@@ -394,8 +380,23 @@ class DCCImagesFromTiffFile(DCCImageStack):
 if __name__ == '__main__':
     path = "C:\\Users\\goubi\\PycharmProjects\\BigData-ImageAnalysis\\ImageAnalysis\\unitTesting\\testCziFile2Images.czi"
     path2 = "C:\\Users\\goubi\\PycharmProjects\\BigData-ImageAnalysis\\ImageAnalysis\\unitTesting\\testNotCziFile.jpg"
-    array = np.ones((10, 10), dtype=np.float32)
-    array[0][7] = 12
+    sigma = 0.4
+    array = np.zeros((5, 5, 3), dtype=np.float32)
+    array[2][2][0] = 1
+    array[2][2][1] = 1.2
+    array[2][2][2] = 2
     image = DCCImage(array)
-    positionsMin = image.minimumIntensityPixelsPositionPerChannel()
-    print(positionsMin)
+    gaussianBlurredArray = np.zeros_like(array)
+    multiplicationFactors = [1, 1.2, 2]
+    for channel in range(3):
+        for i in range(5):
+            for j in range(5):
+                gaussianBlurredArray[i][j][channel] = np.exp(-((i - 2) ** 2 + (j - 2) ** 2) / (2 * sigma ** 2)) / (
+                        2 * np.pi * sigma ** 2)
+        gaussianBlurredArray[..., channel] = gaussianBlurredArray[..., channel] / np.sum(
+            gaussianBlurredArray[..., channel]) * multiplicationFactors[channel]
+    dccImageGaussianArray = image.DCCImageWithGaussianFilterColors(sigma).getDCCImageAsArray()
+    for i in range(3):
+        print(dccImageGaussianArray[..., i])
+        print(gaussianBlurredArray[..., i])
+        print(np.allclose(dccImageGaussianArray[..., i], gaussianBlurredArray[..., i]))
