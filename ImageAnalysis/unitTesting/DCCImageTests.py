@@ -1,23 +1,23 @@
 import unittest
 import numpy as np
 from unittest.mock import Mock, patch
-import DCCImages
+import DCCImage
 import DCCImagesExceptions as DCCExcep
 
 
 class TestDCCImageConstructor(unittest.TestCase):
 
     def testValidConstructor(self):
-        image = DCCImages.DCCImage(np.ones((1250, 1500, 3), dtype=np.float32))
-        self.assertIsInstance(image, DCCImages.DCCImage)
+        image = DCCImage.DCCImage(np.ones((1250, 1500, 3), dtype=np.float32))
+        self.assertIsInstance(image, DCCImage.DCCImage)
 
     def testInvalidDimensionsConstructor(self):
         with self.assertRaises(DCCExcep.ImageDimensionsException):
-            DCCImages.DCCImage(np.zeros(12, dtype=np.float32))
+            DCCImage.DCCImage(np.zeros(12, dtype=np.float32))
 
     def testInvalidTypeConstructor(self):
         with self.assertRaises(DCCExcep.PixelTypeException):
-            DCCImages.DCCImage(np.ones((1250, 1500, 3), dtype=np.complex))
+            DCCImage.DCCImage(np.ones((1250, 1500, 3), dtype=np.complex))
 
 
 class TestDCCImageMethods(unittest.TestCase):
@@ -26,17 +26,17 @@ class TestDCCImageMethods(unittest.TestCase):
         self.array = np.ones((1250, 1251), dtype=np.float32) * 25.56
         self.array[100][100] = 100.0
         self.array[0][0] = 0.0
-        self.image = DCCImages.DCCImage(self.array)
+        self.image = DCCImage.DCCImage(self.array)
 
     def testEquals(self):
         testArray = np.copy(self.array)
-        testImage = DCCImages.DCCImage(testArray)
+        testImage = DCCImage.DCCImage(testArray)
         self.assertTrue(testImage == self.image)
 
     def testNotEquals(self):
         testArray = np.copy(self.array)
         testArray[0][0] = 0.0001
-        testImage = DCCImages.DCCImage(testArray)
+        testImage = DCCImage.DCCImage(testArray)
         self.assertFalse(testImage == self.image)
 
     def testInvalidEquality(self):
@@ -65,7 +65,7 @@ class TestDCCImageMethods(unittest.TestCase):
     def testGetDCCImageChannels3Channels(self):
         nbChannels = 3
         tempArray = np.zeros((1250, 1800, 3), dtype=np.float32)
-        tempImage = DCCImages.DCCImage(tempArray)
+        tempImage = DCCImage.DCCImage(tempArray)
         self.assertEqual(tempImage.getDCCImageNumberOfChannels(), nbChannels)
 
     def testGetNumberOFPixels(self):
@@ -80,7 +80,7 @@ class TestDCCImageMethods(unittest.TestCase):
 
     def testCopyDCCImage(self):
         imageCopy = self.image.copyDCCImage()
-        self.assertIsInstance(imageCopy, DCCImages.DCCImage)
+        self.assertIsInstance(imageCopy, DCCImage.DCCImage)
 
     def testCopyDCCImageEquality(self):
         imageCopy = self.image.copyDCCImage()
@@ -90,7 +90,7 @@ class TestDCCImageMethods(unittest.TestCase):
         imageCopy = self.image.copyDCCImage()
         arrayCopy = imageCopy.getDCCImageAsArray()
         arrayCopy[100][79] = 1.2
-        imageNotCopy = DCCImages.DCCImage(arrayCopy)
+        imageNotCopy = DCCImage.DCCImage(arrayCopy)
         self.assertFalse(self.image == imageNotCopy)
 
     def testShowImage(self):
@@ -124,7 +124,7 @@ class TestDCCImageMethods(unittest.TestCase):
     def testGetMetadataNotNone(self):
         array = np.ones((1250, 1250), dtype=np.float32)
         metadata = "This is a metadata test"
-        image = DCCImages.DCCImage(array, metadata)
+        image = DCCImage.DCCImage(array, metadata)
         self.assertTrue(image.getMetadata() == metadata)
 
     def testSetMetadata(self):
@@ -143,7 +143,7 @@ class TestDCCImageMethods(unittest.TestCase):
         image = np.ones((10, 10, 3), dtype=np.float32)
         image[..., -1] = 0.
         image[..., -2] = 0.
-        dccImage = DCCImages.DCCImage(image)
+        dccImage = DCCImage.DCCImage(image)
         grayScale = dccImage.grayscaleConversion()
         self.assertTrue(grayScale.getDCCImageNumberOfChannels() == 1)
 
@@ -151,34 +151,34 @@ class TestDCCImageMethods(unittest.TestCase):
 
     def testDCCImageXDerivativeZerosOutput(self):
         array = np.ones((5, 5), dtype=np.float32)
-        image = DCCImages.DCCImage(array)
+        image = DCCImage.DCCImage(array)
         dxImage = image.DCCImageXAxisDerivative()
-        supposedDerivative = DCCImages.DCCImage(np.zeros_like(array))
+        supposedDerivative = DCCImage.DCCImage(np.zeros_like(array))
         self.assertTrue(dxImage == supposedDerivative)
 
     def testDCCImageXDerivative(self):
         array = np.zeros((3, 3), dtype=np.float32)
         array[1][1] = 2
-        image = DCCImages.DCCImage(array)
+        image = DCCImage.DCCImage(array)
         dxImage = image.DCCImageXAxisDerivative()
         supposedDerivativeArray = np.array([[0, 0, 0], [-2, 0, 2], [0, 0, 0]], dtype=np.float32)
-        supposedDerivativeImage = DCCImages.DCCImage(supposedDerivativeArray)
+        supposedDerivativeImage = DCCImage.DCCImage(supposedDerivativeArray)
         self.assertTrue(supposedDerivativeImage == dxImage)
 
     def testDCCImageYDerivativeZerosOutput(self):
         array = np.zeros((5, 5), dtype=np.float32)
-        image = DCCImages.DCCImage(array)
+        image = DCCImage.DCCImage(array)
         dyImage = image.DCCImageYAxisDerivative()
-        supposedDerivative = DCCImages.DCCImage(np.zeros_like(array))
+        supposedDerivative = DCCImage.DCCImage(np.zeros_like(array))
         self.assertTrue(dyImage == supposedDerivative)
 
     def testDCCImageYDerivative(self):
         array = np.zeros((3, 3), dtype=np.float32)
         array[1][1] = 2
-        image = DCCImages.DCCImage(array)
+        image = DCCImage.DCCImage(array)
         dyImage = image.DCCImageYAxisDerivative()
         supposedDerivativeArray = np.array([[0, 0, 0], [-2, 0, 2], [0, 0, 0]], dtype=np.float32).T
-        supposedDerivativeImage = DCCImages.DCCImage(supposedDerivativeArray)
+        supposedDerivativeImage = DCCImage.DCCImage(supposedDerivativeArray)
         self.assertTrue(supposedDerivativeImage == dyImage)
 
     def testDCCImageAverage(self):
@@ -191,7 +191,7 @@ class TestDCCImageMethods(unittest.TestCase):
         array[0][0][0] = 0
         array[0][0][1] = 0
         array[0][0][2] = 0
-        image = DCCImages.DCCImage(array)
+        image = DCCImage.DCCImage(array)
         supposedAverage = [np.sum(array[..., 0]) / image.getNumberOfPixels(),
                            np.sum(array[..., 1]) / image.getNumberOfPixels(),
                            np.sum(array[..., 2]) / image.getNumberOfPixels()]
@@ -205,7 +205,7 @@ class TestDCCImageMethods(unittest.TestCase):
 
     def testDCCImageStandardDevColors(self):
         array = np.ones((10, 10, 3), dtype=np.float32)
-        image = DCCImages.DCCImage(array)
+        image = DCCImage.DCCImage(array)
         averageS = image.DCCImageAverage()
         stanDevS = []
         for i in range(image.getDCCImageNumberOfChannels()):
@@ -228,7 +228,7 @@ class TestDCCImageMethods(unittest.TestCase):
 
     def testDCCImageMinimumIntensityPixels2Pixels(self):
         self.array[10][10] = 0
-        image = DCCImages.DCCImage(self.array)
+        image = DCCImage.DCCImage(self.array)
         minimumsPosition = [(0, 0), (10, 10)]
         self.assertTrue(image.minimumIntensityPixelsPositionPerChannel() == minimumsPosition)
 
@@ -238,7 +238,7 @@ class TestDCCImageMethods(unittest.TestCase):
         array[2][2][0] = 0
         array[0][0][1] = -10
         array[0][0][2] = -0.1
-        image = DCCImages.DCCImage(array)
+        image = DCCImage.DCCImage(array)
         minimumsPosition = [[(0, 0), (2, 2)], [(0, 0)], [(0, 0)]]
         self.assertTrue(image.minimumIntensityPixelsPositionPerChannel() == minimumsPosition)
 
@@ -248,7 +248,7 @@ class TestDCCImageMethods(unittest.TestCase):
 
     def testDCCImageMaximumIntensityPixels2Pixels(self):
         self.array[50][50] = 100.0
-        image = DCCImages.DCCImage(self.array)
+        image = DCCImage.DCCImage(self.array)
         maximumsPosition = [(50, 50), (100, 100)]
         self.assertTrue(image.maximumIntensityPixelsPositionPerChannel() == maximumsPosition)
 
@@ -258,7 +258,7 @@ class TestDCCImageMethods(unittest.TestCase):
         array[2][2][0] = 10
         array[0][0][1] = 1.01
         array[0][0][2] = 100
-        image = DCCImages.DCCImage(array)
+        image = DCCImage.DCCImage(array)
         minimumsPosition = [[(0, 0), (2, 2)], [(0, 0)], [(0, 0)]]
         self.assertTrue(image.maximumIntensityPixelsPositionPerChannel() == minimumsPosition)
 
@@ -270,14 +270,14 @@ class TestDCCImageMethods(unittest.TestCase):
         for i in range(1, 4):
             for j in range(1, 4):
                 resultEntropyArray[i][j] = 503.2583348E-3
-        resultEntropyImage = DCCImages.DCCImage(resultEntropyArray)
-        self.assertTrue(resultEntropyImage == DCCImages.DCCImage(array).DCCImageWithEntropyFilter(filterSize))
+        resultEntropyImage = DCCImage.DCCImage(resultEntropyArray)
+        self.assertTrue(resultEntropyImage == DCCImage.DCCImage(array).DCCImageWithEntropyFilter(filterSize))
 
     def testGaussianFilter(self):
         sigma = 0.4
         array = np.zeros((5, 5), dtype=np.float32)
         array[2][2] = 1
-        image = DCCImages.DCCImage(array)
+        image = DCCImage.DCCImage(array)
         gaussianBlurredArray = np.zeros_like(array)
         for i in range(5):
             for j in range(5):
@@ -293,7 +293,7 @@ class TestDCCImageMethods(unittest.TestCase):
         array[2][2][0] = 1
         array[2][2][1] = 1.2
         array[2][2][2] = 2
-        image = DCCImages.DCCImage(array)
+        image = DCCImage.DCCImage(array)
         gaussianBlurredArray = np.zeros_like(array)
         # Because of the nature of the discrete convolution used in the gaussian filter
         # and because of the nature of the input array (which contains only 0s except for the middle pixel):
@@ -326,14 +326,14 @@ class TestDCCImageMethods(unittest.TestCase):
         # Smaller array of size 3x3 resulting of the convolution
         for i in range(5):
             for j in range(5):
-                listOfImages.append(DCCImages.DCCImage(
+                listOfImages.append(DCCImage.DCCImage(
                     np.array([paddedArray[i][j:j + 3], paddedArray[i + 1][j:j + 3], paddedArray[i + 2][j:j + 3]],
                              dtype=np.float32)))
         # Compute the standard deviation of the smaller arrays
         resultArray = np.array([image.DCCImageStandardDeviation() for image in listOfImages], dtype=np.float32).reshape(
             (5, 5))
 
-        stdDevImageAsArray = DCCImages.DCCImage(array).DCCImageWithStandardDeviationFilter_MK1(
+        stdDevImageAsArray = DCCImage.DCCImage(array).DCCImageWithStandardDeviationFilter_MK1(
             filterSize=3).getDCCImageAsArray()
         self.assertTrue(np.allclose(resultArray, stdDevImageAsArray))
 
@@ -349,20 +349,20 @@ class TestDCCImageMethods(unittest.TestCase):
         # Smaller array of size 3x3 resulting of the convolution
         for i in range(5):
             for j in range(5):
-                listOfImages.append(DCCImages.DCCImage(
+                listOfImages.append(DCCImage.DCCImage(
                     np.array([paddedArray[i][j:j + 3], paddedArray[i + 1][j:j + 3], paddedArray[i + 2][j:j + 3]],
                              dtype=np.float32)))
         # Compute the standard deviation of the smaller arrays
         resultArray = np.array([image.DCCImageStandardDeviation() for image in listOfImages], dtype=np.float32).reshape(
             (5, 5))
 
-        stdDevImageAsArray = DCCImages.DCCImage(array).DCCImageWithStandardDeviationFilter_MK2(
+        stdDevImageAsArray = DCCImage.DCCImage(array).DCCImageWithStandardDeviationFilter_MK2(
             filterSize=3).getDCCImageAsArray()
         self.assertTrue(np.allclose(resultArray, stdDevImageAsArray))
 
     def testDCCImageSTDDevFilterMK1AndMK2Equality(self):
         array = np.arange(16).reshape((4, 4)).astype(np.float32)
-        image = DCCImages.DCCImage(array)
+        image = DCCImage.DCCImage(array)
         mk1 = image.DCCImageWithStandardDeviationFilter_MK1(3).getDCCImageAsArray()
         mk2 = image.DCCImageWithStandardDeviationFilter_MK2(3).getDCCImageAsArray()
         self.assertTrue(np.allclose(mk1, mk2))
@@ -370,7 +370,7 @@ class TestDCCImageMethods(unittest.TestCase):
     def testDCCImageSTDDevMk1SlowerThanMK2(self):
         import time
         array = np.arange(50000).reshape((500, 100)).astype(np.float32)
-        image = DCCImages.DCCImage(array)
+        image = DCCImage.DCCImage(array)
         beforeMK1 = time.clock()
         image.DCCImageWithStandardDeviationFilter_MK1(3).getDCCImageAsArray()
         afterMK1 = time.clock()
@@ -378,306 +378,6 @@ class TestDCCImageMethods(unittest.TestCase):
         image.DCCImageWithStandardDeviationFilter_MK2(3).getDCCImageAsArray()
         afterMK2 = time.clock()
         self.assertTrue((afterMK1 - beforeMK1) >= (afterMK2 - beforeMK2))
-
-
-
-
-
-class TestDCCImageStackConstructor(unittest.TestCase):
-
-    def testValidConstructorEmpty(self):
-
-        valid = True
-        try:
-            DCCImages.DCCImageStack([])
-        except AttributeError:
-            valid = False
-
-        self.assertTrue(valid)
-
-    def testValidConstructorOneElement(self):
-        array = np.ones((130, 145), dtype=np.float32)
-        image = DCCImages.DCCImage(array)
-        stack = DCCImages.DCCImageStack([image])
-        self.assertIsInstance(stack, DCCImages.DCCImageStack)
-
-    def testValidConstructor100Elements(self):
-        imageList = []
-        for i in range(100):
-            array = np.ones((1250, 1251), dtype=np.float32)
-            array[i][i] = i
-            image = DCCImages.DCCImage(array)
-            imageList.append(image)
-        stack = DCCImages.DCCImageStack(imageList)
-        self.assertIsInstance(stack, DCCImages.DCCImageStack)
-
-    def testInvalidConstructor1Element(self):
-        image = np.ones((10, 10))
-        with self.assertRaises(DCCExcep.NotDCCImageException):
-            DCCImages.DCCImageStack([image])
-
-    def testInvalidConstructor11Elements(self):
-        imageList = []
-        for i in range(10):
-            array = np.ones((1250, 1251), dtype=np.float32)
-            array[i][i] = i
-            image = DCCImages.DCCImage(array)
-            imageList.append(image)
-        imageList.append(np.ones((10, 10)))
-        with self.assertRaises(DCCExcep.NotDCCImageException):
-            DCCImages.DCCImageStack(imageList)
-
-
-class TesDCCImageStackMethods(unittest.TestCase):
-
-    def setUp(self) -> None:
-        self.imageList = []
-        for i in range(5):
-            array = np.ones((1250, 1251), dtype=np.float32)
-            array[i][i] = i
-            image = DCCImages.DCCImage(array)
-            self.imageList.append(image)
-        self.stack = DCCImages.DCCImageStack(self.imageList)
-
-    def testImageInStackInvalidImage(self):
-        invalidImage = np.ones((1250, 1251), dtype=np.float32)
-        with self.assertRaises(DCCExcep.NotDCCImageException):
-            self.stack.isImageInStack(invalidImage)
-
-    def testImageNotInStack(self):
-        arrayNotInStack = np.ones((1250, 1251), dtype=np.float32)
-        arrayNotInStack[0][0] = 0.00001
-        imageNotInStack = DCCImages.DCCImage(arrayNotInStack)
-        self.assertFalse(self.stack.isImageInStack(imageNotInStack))
-
-    def testImageInStack(self):
-        imageInStack = self.imageList[-1].copyDCCImage()
-        self.assertTrue(self.stack.isImageInStack(imageInStack))
-
-    def testGetIndexOfInvalidImage(self):
-        invalidImage = np.ones((1250, 1251), dtype=np.float32)
-        with self.assertRaises(DCCExcep.NotDCCImageException):
-            self.stack.getIndexOfImage(invalidImage)
-
-    def testGetIndexOfImageNotInStack(self):
-        arrayNotInStack = np.ones((1250, 1251), dtype=np.float32)
-        arrayNotInStack[0][0] = 0.00001
-        imageNotInStack = DCCImages.DCCImage(arrayNotInStack)
-        with self.assertRaises(DCCExcep.ImageNotInStackException):
-            self.stack.getIndexOfImage(imageNotInStack)
-
-    def testGetIndexImageInStack(self):
-        imageInStack = self.imageList[2].copyDCCImage()
-        self.assertEqual(self.stack.getIndexOfImage(imageInStack), 2)
-
-    def testAddInvalidImage(self):
-        invalidImage = np.ones((1250, 1251), dtype=np.float32)
-        with self.assertRaises(DCCExcep.NotDCCImageException):
-            self.stack.addDCCImage(invalidImage)
-
-    def testAddImageAlreadyIn(self):
-        imageAlreadyIn = self.imageList[-1]
-        with self.assertRaises(DCCExcep.ImageAlreadyInStackException):
-            self.stack.addDCCImage(imageAlreadyIn)
-
-    def testAddImageNotAlreadyIn(self):
-        imageNotAlreadyIn = DCCImages.DCCImage(np.zeros((1250, 1251), dtype=np.float32))
-        indexOfAddedImage = self.stack.addDCCImage(imageNotAlreadyIn)
-        self.assertEqual(indexOfAddedImage, 5)
-
-    def testRemoveAtIndexOutOfBound(self):
-        with self.assertRaises(IndexError):
-            self.stack.removeAtIndex(5)
-
-    def testRemoveImageAtIndex(self):
-        imageToRemove = self.imageList[-1]
-        removedImage = self.stack.removeAtIndex(-1)
-        self.assertTrue(imageToRemove == removedImage)
-
-    def testRemoveImageWithInvalidImage(self):
-        invalidImage = np.ones((125, 12547), dtype=np.float32)
-        with self.assertRaises(DCCExcep.NotDCCImageException):
-            self.stack.removeDCCImage(invalidImage)
-
-    def testRemoveImageWithImageNotInStack(self):
-        arrayNotInStack = np.ones((1250, 1251), dtype=np.float32)
-        arrayNotInStack[0][0] = 0.00001
-        imageNotInStack = DCCImages.DCCImage(arrayNotInStack)
-        with self.assertRaises(DCCExcep.ImageNotInStackException):
-            self.stack.removeDCCImage(imageNotInStack)
-
-    def testRemoveImageWithImage(self):
-        imageInStack = self.imageList[0].copyDCCImage()
-        indexOfRemovedImage = self.stack.removeDCCImage(imageInStack)
-        self.assertEqual(indexOfRemovedImage, 0)
-
-    def testDetNumberOfImages(self):
-        numberOfImages = len(self.imageList)
-        self.assertEqual(self.stack.getNumberOfImages(), numberOfImages)
-
-    def testGetNumberOfImagesAddedImage(self):
-        numberOfImages = len(self.imageList)
-        imageNotAlreadyIn = DCCImages.DCCImage(np.zeros((1250, 1251), dtype=np.float32))
-        self.stack.addDCCImage(imageNotAlreadyIn)
-        self.assertEqual(self.stack.getNumberOfImages(), numberOfImages + 1)
-
-    def testGetNumberOfImagesRemovedImage(self):
-        numberOfImages = len(self.imageList)
-        self.stack.removeAtIndex(0)
-        self.assertEqual(self.stack.getNumberOfImages(), numberOfImages - 1)
-
-    def testImageStackAsNumpyArray(self):
-        imageArray = np.array(self.imageList)
-        arrayFromStack = self.stack.asNumpyArray()
-        self.assertTrue(np.array_equal(imageArray, arrayFromStack))
-
-    def testImageStackAsList(self):
-        listFromStack = self.stack.asList()
-        self.assertTrue(listFromStack == self.imageList)
-
-    def testClearStack(self):
-        self.stack.clearAll()
-        self.assertTrue(len(self.stack) == 0)
-
-    @patch("matplotlib.pyplot.show", new=Mock)
-    def testShowImages(self):
-        nbOfImagesShown = self.stack.showImages()
-        self.assertEqual(nbOfImagesShown, 5)
-
-
-class TestDCCImagesFromCZIFileConstructor(unittest.TestCase):
-
-    def testInvalidPathConstructor(self):
-        with self.assertRaises(FileNotFoundError):
-            DCCImages.DCCImagesFromCZIFile("noSuchFile.czi")
-
-    def testNotCziFile(self):
-        with self.assertRaises(ValueError):
-            DCCImages.DCCImagesFromCZIFile("testNotCziFile.jpg")
-
-    def testCorrectPath(self):
-        imagesFromCzi = DCCImages.DCCImagesFromCZIFile("testCziFile2Images.czi")
-        self.assertIsInstance(imagesFromCzi, DCCImages.DCCImagesFromCZIFile)
-
-
-class testDCCImagesFromCZIFileMethods(unittest.TestCase):
-
-    def setUp(self) -> None:
-        import ImageAnalysis.source.cziUtil as cziUtil
-        self.imagesFromCzi = DCCImages.DCCImagesFromCZIFile("testCziFile2Images.czi")
-        self.metadata = cziUtil.extractMetadataFromCziFileObject(cziUtil.readCziImage("testCziFile2Images.czi"))
-
-    def testGetMetadata(self):
-        self.assertTrue(self.metadata == self.imagesFromCzi.getMetadata())
-
-    def testSetMetadataAll(self):
-        self.imagesFromCzi.setMetadata("New Metadata")
-        self.assertTrue("New Metadata" == self.imagesFromCzi.getMetadata())
-
-    def testSetMetadataEveryImageCheck(self):
-        self.imagesFromCzi.setMetadata("Hello")
-        self.assertTrue(all(image.getMetadata() == "Hello" for image in self.imagesFromCzi.asList()))
-
-    def testSetMetadataInvalidNotAString(self):
-        with self.assertRaises(TypeError):
-            self.imagesFromCzi.setMetadata(123432)
-
-    def testSaveMetadataInvalidName(self):
-        with self.assertRaises(DCCExcep.InvalidMetadataFileName):
-            self.imagesFromCzi.saveMetadata("/*")
-
-    def testSaveMetadataValidName(self):
-        self.imagesFromCzi.saveMetadata("testSaveMetaDCCImagesTest")
-        isSaved = True
-        try:
-            fileTest = open("testSaveMetaDCCImagesTest.xml", "r", encoding="utf-8")
-            fileTest.close()
-        except FileNotFoundError:
-            isSaved = False
-        self.assertTrue(isSaved)
-
-    def testGetPath(self):
-        self.assertTrue("testCziFile2Images.czi" == self.imagesFromCzi.getPath())
-
-
-class TestDCCImageFromNormalFileConstructor(unittest.TestCase):
-
-    def testInvalidConstructorNotASupportedImageFormat(self):
-        file = "testSaveMetaDCCImagesTest.xml"
-        with self.assertRaises(OSError):
-            DCCImages.DCCImageFromNormalFile(file)
-
-    def testInvalidConstructorTIFFFile(self):
-        file = "testTiff3Images.tiff"
-        with self.assertRaises(DCCExcep.InvalidFileFormat):
-            DCCImages.DCCImageFromNormalFile(file)
-
-    def testInvalidConstructorCZIFile(self):
-        file = "testCziFile2Images.czi"
-        with self.assertRaises(DCCExcep.InvalidFileFormat):
-            DCCImages.DCCImageFromNormalFile(file)
-
-    def testValidConstructor(self):
-        file = "testNotCziFile.jpg"
-        imageFromJPG = DCCImages.DCCImageFromNormalFile(file)
-        self.assertIsInstance(imageFromJPG, DCCImages.DCCImageFromNormalFile)
-
-
-class TestDCCImageFromNormalFileMethods(unittest.TestCase):
-
-    def setUp(self) -> None:
-        self.imageFromJPG = DCCImages.DCCImageFromNormalFile("testNotCziFile.jpg")
-
-    def testGetPath(self):
-        self.assertTrue(self.imageFromJPG.getPath() == "testNotCziFile.jpg")
-
-
-class TestDCCImagesFromTiffFileConstructor(unittest.TestCase):
-
-    def testInvalidConstructorNotSupportedFile(self):
-        with self.assertRaises(DCCExcep.InvalidFileFormat):
-            DCCImages.DCCImagesFromTiffFile("testNotCziFile.jpg")
-
-    def testValidConstructor(self):
-        imageFromTiff = DCCImages.DCCImagesFromTiffFile("testTiff3Images.tiff")
-        self.assertIsInstance(imageFromTiff, DCCImages.DCCImagesFromTiffFile)
-
-
-class TestDCCImagesFromTiffFileMethods(unittest.TestCase):
-
-    def setUp(self) -> None:
-        self.images = DCCImages.DCCImagesFromTiffFile("testTiff3Images.tiff")
-
-    def testGetMetadata(self):
-        import tifffile
-        metadata = tifffile.TiffFile("testTiff3Images.tiff").ome_metadata
-        self.assertTrue(metadata == self.images.getMetadata())
-
-    def testSetMetadataInvalid(self):
-        with self.assertRaises(TypeError):
-            self.images.setMetadata(np.zeros(12))
-
-    def testSetMetadataValid(self):
-        self.images.setMetadata("Hello")
-        self.assertTrue(self.images.getMetadata() == "Hello")
-
-    def testSaveMetadataInvalidName(self):
-        with self.assertRaises(DCCExcep.InvalidMetadataFileName):
-            self.images.saveMetadata("meta.data")
-
-    def testSaveMetadata(self):
-        self.images.saveMetadata("testSaveMetaDCCImagesTest_fromTiff")
-        isSaved = True
-        try:
-            fileTest = open("testSaveMetaDCCImagesTest_fromTiff.xml", "r", encoding="utf-8")
-            fileTest.close()
-        except FileNotFoundError:
-            isSaved = False
-        self.assertTrue(isSaved)
-
-    def testGetPath(self):
-        self.assertTrue(self.images.getPath() == "testTiff3Images.tiff")
-
 
 if __name__ == '__main__':
     unittest.main()
