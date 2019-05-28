@@ -1,14 +1,12 @@
 import numpy as np
-import tifffile
 import typing
-from skimage import color, data, filters, img_as_float32, measure, morphology
+from skimage import color, filters, measure, morphology
 from skimage.filters.rank import entropy
-import ImageAnalysis.cziUtil as cziUtil
 import PIL.Image
 from scipy.signal import convolve2d
 from scipy.ndimage import measurements, filters
 from skimage.filters import gaussian
-from ImageAnalysis.DCCImagesExceptions import *
+from DCCImagesExceptions import *
 import matplotlib.pyplot as plt
 
 
@@ -205,8 +203,8 @@ class DCCImage:
         # and NaN appear throughout the resulting image.
         image += np.random.rand(image.shape[0], image.shape[1]) * 1e-6
         stdFilterPart1 = filters.uniform_filter(image, filterSize, mode="nearest")
-        stdFilterPart2 = filters.uniform_filter(np.float_power(image, 2), filterSize, mode="nearest")
-        stdFiltered = np.sqrt(stdFilterPart2, np.float_power(stdFilterPart1, 2))
+        stdFilterPart2 = filters.uniform_filter(image * image, filterSize, mode="nearest")
+        stdFiltered = np.sqrt(stdFilterPart2 - stdFilterPart1 * stdFilterPart1)
         return DCCImage(stdFiltered.astype(np.float32))
 
     def DCCImageWithGaussianFilterGray(self, sigma: float):
@@ -220,194 +218,3 @@ class DCCImage:
         return DCCImage(gaussianFiltered.astype(np.float32))
 
 
-class DCCImageStack:
-    def __init__(self, DCCImageArray: typing.List[DCCImage]):
-        if not all(isinstance(image, DCCImage) for image in DCCImageArray):
-            raise NotDCCImageException
-        self.__imageStack = DCCImageArray
-        self.__numberOfImages = len(DCCImageArray)
-
-    def __knowIfImageInStackAndPosition(self, image: DCCImage) -> tuple:
-        if not isinstance(image, DCCImage):
-            raise NotDCCImageException
-        isFound = False
-        index = -1
-        while index < self.__numberOfImages - 1 and not isFound:
-            index += 1
-            isFound = self.__imageStack[index] == image
-        return isFound, index
-
-    def isImageInStack(self, image: DCCImage) -> bool:
-        return self.__knowIfImageInStackAndPosition(image)[0]
-
-    def getIndexOfImage(self, image: DCCImage) -> int:
-        isInStack = self.isImageInStack(image)
-        index = self.__knowIfImageInStackAndPosition(image)[-1]
-        if not isInStack:
-            raise ImageNotInStackException
-        return index
-
-    def addDCCImage(self, image: DCCImage) -> int:
-        if self.isImageInStack(image):
-            raise ImageAlreadyInStackException
-        self.__imageStack.append(image)
-        self.__numberOfImages += 1
-        return self.__numberOfImages - 1
-
-    def removeAtIndex(self, index: int) -> DCCImage:
-        removedImage = self.__imageStack.pop(index)
-        self.__numberOfImages -= 1
-        return removedImage
-
-    def removeDCCImage(self, image: DCCImage) -> int:
-        imageIndex = self.getIndexOfImage(image)
-        del self.__imageStack[imageIndex]
-        self.__numberOfImages -= 1
-        return imageIndex
-
-    def getNumberOfImages(self) -> int:
-        return self.__numberOfImages
-
-    def __len__(self) -> int:
-        return self.getNumberOfImages()
-
-    def asNumpyArray(self) -> np.ndarray:
-        return np.array(self.__imageStack)
-
-    def asList(self) -> list:
-        return self.__imageStack
-
-    def getImageAtIndex(self, index: int) -> DCCImage:
-        return self.__imageStack[index]
-
-    def clearAll(self) -> None:
-        self.__imageStack.clear()
-        self.__numberOfImages = 0
-        print(self.__imageStack)
-
-    def showImages(self) -> int:
-        imagesShown = 0
-        for image in self.__imageStack:
-            image.showImage()
-            imagesShown += 1
-        return imagesShown
-
-
-class DCCImagesFromCZIFile(DCCImageStack):
-
-    def __init__(self, path: str):
-        self.__path = path
-        cziObject = cziUtil.readCziImage(path)
-        arrayOfImages = cziUtil.getImagesFromCziFileObject(cziObject).astype(np.float32)
-        listOfImages = []
-        self.__metadata = cziUtil.extractMetadataFromCziFileObject(cziObject)
-        cziUtil.closeCziFileObject(cziObject)
-        for image in arrayOfImages:
-            listOfImages.append(
-                DCCImage(image, metadata=self.__metadata))  # Voir si pertinent que DCCImage ait un attribut metadata
-        DCCImageStack.__init__(self, listOfImages)
-
-    def getMetadata(self) -> str:
-        return self.__metadata
-
-    def setMetadata(self, newMetadata: str) -> None:
-        if not isinstance(newMetadata, str):
-            raise TypeError("Metadata must be a string object")
-        self.__metadata = newMetadata
-        for image in self.asList():
-            image.setMetadata(self.__metadata)
-
-    def saveMetadata(self, filename: str) -> None:
-        unacceptedChars = ["?", "/", "\\", "*", "<", ">", "|", ".", ","]
-        filename = filename.strip()
-        if len(filename) == 0 or filename.isspace() or any(char in filename for char in unacceptedChars):
-            raise InvalidMetadataFileName
-        with open("{}.xml".format(filename), "w", encoding="utf-8") as file:
-            file.write(self.__metadata)
-
-    def getPath(self) -> str:
-        return self.__path
-
-
-class DCCImageFromNormalFile(DCCImage):
-    def __init__(self, path: str):
-        self.__path = path
-        if path.lower().__contains__(".tiff") or path.lower().__contains__(".tif"):
-            raise InvalidFileFormat("To read tiff files, please use DCCImagesFromTiffFile.")
-        elif path.lower().__contains__(".czi"):
-            raise InvalidFileFormat("To read czi files, please use DCCImagesFromCZIFile.")
-        image = PIL.Image.open(path)
-        imageToArray = np.array(image, dtype=np.float32)
-        DCCImage.__init__(self, imageToArray)
-
-    def getPath(self) -> str:
-        return self.__path
-
-
-class DCCImagesFromTiffFile(DCCImageStack):
-    def __init__(self, path: str):
-        self.__path = path
-        if not (path.lower().__contains__(".tiff") or path.lower().__contains__(".tif")):
-            raise InvalidFileFormat("Please use the right class to extract the image(s) form the file.")
-        tiffFileObject = tifffile.TiffFile(path)
-        imageAsArray = tiffFileObject.asarray().astype(dtype="float32")
-        self.__metadata = tiffFileObject.ome_metadata
-        imageList = []
-        for i in range(imageAsArray.shape[0]):
-            imageList.append(DCCImage(imageAsArray[i], metadata=self.__metadata))
-        DCCImageStack.__init__(self, imageList)
-
-    def getMetadata(self) -> str:
-        return self.__metadata
-
-    def setMetadata(self, newMetadata: str) -> None:
-        if not isinstance(newMetadata, str):
-            raise TypeError("Metadata must be a string object")
-        self.__metadata = newMetadata
-
-    def saveMetadata(self, filename: str) -> None:
-        unacceptedChars = ["?", "/", "\\", "*", "<", ">", "|", ".", ","]
-        filename = filename.strip()
-        if len(filename) == 0 or filename.isspace() or any(char in filename for char in unacceptedChars):
-            raise InvalidMetadataFileName
-        with open("{}.xml".format(filename), "w") as file:
-            file.write(self.__metadata)
-
-    def getPath(self) -> str:
-        return self.__path
-
-
-if __name__ == '__main__':
-    path = "C:\\Users\\goubi\\PycharmProjects\\BigData-ImageAnalysis\\ImageAnalysis\\unitTesting\\testCziFile2Images.czi"
-    path2 = "C:\\Users\\goubi\\PycharmProjects\\BigData-ImageAnalysis\\ImageAnalysis\\unitTesting\\testNotCziFile.jpg"
-    size = 3
-    array = np.zeros((5, 5), dtype=np.float32)
-    output = np.zeros_like(array)
-    for i in range(1, 4):
-        for j in range(1, 4):
-            array[i][j] = 1
-    image = DCCImage(array)
-    stdImage = image.DCCImageWithStandardDeviationFilter_MK1(size)
-    print(stdImage.getDCCImageAsArray())
-    testArray = [[0] * 3, [0] * 3, [0, 0, 1]]
-    testArray2 = [[0] * 3, [0] * 3, [0, 1, 1]]
-    testArray3 = [[0] * 3, [0] * 3, [1, 1, 1]]
-    testArray9 = [[1] * 3, [1] * 3, [1, 1, 1]]
-    testArray6 = [[0] * 3, [1] * 3, [1, 1, 1]]
-    testArray4 = [[0] * 3, [0, 0, 1], [1, 1, 1]]
-    arrays = [testArray, testArray2, testArray3, testArray2, testArray, testArray2, testArray4, testArray6, testArray4,
-              testArray2, testArray3, testArray6, testArray9, testArray6, testArray2, testArray4, testArray6,
-              testArray2,
-              testArray, testArray2, testArray3, testArray2, testArray, testArray6,
-              testArray9]
-    images = []
-    #print(len(arrays))
-    for Array in arrays:
-        images.append(DCCImage(np.array(Array, dtype=np.float32)))
-    resultArray = [x.DCCImageStandardDeviation() for x in images]
-    #print(resultArray)
-    resultArray = np.array(resultArray, dtype=np.float32).reshape((5, 5))
-    print(resultArray)
-    testArray = np.array(testArray, dtype=np.float32)
-    testImage = DCCImage(testArray).DCCImageStandardDeviation()
-    print(testImage)

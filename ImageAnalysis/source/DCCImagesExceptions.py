@@ -1,11 +1,11 @@
-class ImageNotInStackException(Exception):
+class ImageNotInCollectionException(Exception):
     def __init__(self):
-        Exception.__init__(self, "The image is not present in the stack.")
+        Exception.__init__(self, "The image is not present in the collection.")
 
 
-class ImageAlreadyInStackException(Exception):
+class ImageAlreadyInCollectionException(Exception):
     def __init__(self):
-        Exception.__init__(self, "The image is already in the stack.")
+        Exception.__init__(self, "The image is already in the collection.")
 
 
 class ImageDimensionsException(Exception):

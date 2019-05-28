@@ -1,4 +1,4 @@
-from ImageAnalysis import cziUtil
+from ImageAnalysis.source import cziUtil
 import unittest
 import numpy as np
 from unittest.mock import Mock, patch
