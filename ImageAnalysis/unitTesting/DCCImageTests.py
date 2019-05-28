@@ -1,11 +1,8 @@
-try:
-    import unittest
-    import numpy as np
-    from unittest.mock import Mock, patch
-    import DCCImage
-    import DCCImagesExceptions as DCCExcep
-except ImportError:
-    print("Please install the required libraries.")
+import unittest
+import numpy as np
+from unittest.mock import Mock, patch
+import DCCImage
+import DCCImagesExceptions as DCCExcep
 
 
 class TestDCCImageConstructor(unittest.TestCase):
@@ -49,37 +46,34 @@ class TestDCCImageMethods(unittest.TestCase):
 
     def testGetDCCImageAsNumpyArray(self):
         testArray = np.copy(self.array)
-        getArray = self.image.getArray()
+        getArray = self.image.getDCCImageAsArray()
         equality = np.array_equal(testArray, getArray)
         self.assertTrue(equality)
 
     def testGetDCCImageWidth(self):
         width = 1250
-        self.assertEqual(self.image.getWidth(), width)
+        self.assertEqual(self.image.getDCCImageWidth(), width)
 
     def testGetDCCImageLength(self):
         length = 1251
-        self.assertEqual(self.image.getLength(), length)
+        self.assertEqual(self.image.getDCCImageLength(), length)
 
     def testGetDCCImageChannels(self):
         nbChannel = 1
-        self.assertEqual(self.image.getNumberOfChannel(), nbChannel)
+        self.assertEqual(self.image.getDCCImageNumberOfChannels(), nbChannel)
 
     def testGetDCCImageChannels3Channels(self):
         nbChannels = 3
         tempArray = np.zeros((1250, 1800, 3), dtype=np.float32)
         tempImage = DCCImage.DCCImage(tempArray)
-        self.assertEqual(tempImage.getNumberOfChannel(), nbChannels)
+        self.assertEqual(tempImage.getDCCImageNumberOfChannels(), nbChannels)
 
     def testGetNumberOFPixels(self):
         nbPixels = 1563750
         self.assertEqual(self.image.getNumberOfPixels(), nbPixels)
 
     def testToPILImage(self):
-        try:
-            import PIL.Image
-        except ImportError:
-            print("Please install the required library.")
+        import PIL.Image
         pilImage = PIL.Image.fromarray(np.copy(self.array))
         getPilImage = self.image.toPILImage()
         self.assertTrue(pilImage == getPilImage)
@@ -94,15 +88,14 @@ class TestDCCImageMethods(unittest.TestCase):
 
     def testModifiedCopy(self):
         imageCopy = self.image.copyDCCImage()
-        arrayCopy = imageCopy.getArray()
+        arrayCopy = imageCopy.getDCCImageAsArray()
         arrayCopy[100][79] = 1.2
         imageNotCopy = DCCImage.DCCImage(arrayCopy)
         self.assertFalse(self.image == imageNotCopy)
 
-    @patch("matplotlib.pyplot.show", new=Mock)
     def testShowImage(self):
-        imageReturn = self.image.showImage()
-        self.assertIsInstance(imageReturn, DCCImage.DCCImage)
+        # todo
+        pass
 
     def testSaveToTIFFInvalidEmptyName(self):
         name = ""
@@ -143,7 +136,7 @@ class TestDCCImageMethods(unittest.TestCase):
         self.assertTrue(newMeta == "Yo")
 
     def testGrayScaleConversionImageAlreadyGray(self):
-        grayScale = self.image.getGrayscaleConversion()
+        grayScale = self.image.grayscaleConversion()
         self.assertTrue(grayScale == self.image)
 
     def testGrayScaleConversion(self):
@@ -151,15 +144,15 @@ class TestDCCImageMethods(unittest.TestCase):
         image[..., -1] = 0.
         image[..., -2] = 0.
         dccImage = DCCImage.DCCImage(image)
-        grayScale = dccImage.getGrayscaleConversion()
-        self.assertTrue(grayScale.getNumberOfChannel() == 1)
+        grayScale = dccImage.grayscaleConversion()
+        self.assertTrue(grayScale.getDCCImageNumberOfChannels() == 1)
 
     # todo Faire tests unitaires des méthodes d'histogrammes
 
     def testDCCImageXDerivativeZerosOutput(self):
         array = np.ones((5, 5), dtype=np.float32)
         image = DCCImage.DCCImage(array)
-        dxImage = image.getXAxisDerivative()
+        dxImage = image.DCCImageXAxisDerivative()
         supposedDerivative = DCCImage.DCCImage(np.zeros_like(array))
         self.assertTrue(dxImage == supposedDerivative)
 
@@ -167,7 +160,7 @@ class TestDCCImageMethods(unittest.TestCase):
         array = np.zeros((3, 3), dtype=np.float32)
         array[1][1] = 2
         image = DCCImage.DCCImage(array)
-        dxImage = image.getXAxisDerivative()
+        dxImage = image.DCCImageXAxisDerivative()
         supposedDerivativeArray = np.array([[0, 0, 0], [-2, 0, 2], [0, 0, 0]], dtype=np.float32)
         supposedDerivativeImage = DCCImage.DCCImage(supposedDerivativeArray)
         self.assertTrue(supposedDerivativeImage == dxImage)
@@ -175,7 +168,7 @@ class TestDCCImageMethods(unittest.TestCase):
     def testDCCImageYDerivativeZerosOutput(self):
         array = np.zeros((5, 5), dtype=np.float32)
         image = DCCImage.DCCImage(array)
-        dyImage = image.getYAxisDerivative()
+        dyImage = image.DCCImageYAxisDerivative()
         supposedDerivative = DCCImage.DCCImage(np.zeros_like(array))
         self.assertTrue(dyImage == supposedDerivative)
 
@@ -183,15 +176,15 @@ class TestDCCImageMethods(unittest.TestCase):
         array = np.zeros((3, 3), dtype=np.float32)
         array[1][1] = 2
         image = DCCImage.DCCImage(array)
-        dyImage = image.getYAxisDerivative()
+        dyImage = image.DCCImageYAxisDerivative()
         supposedDerivativeArray = np.array([[0, 0, 0], [-2, 0, 2], [0, 0, 0]], dtype=np.float32).T
         supposedDerivativeImage = DCCImage.DCCImage(supposedDerivativeArray)
         self.assertTrue(supposedDerivativeImage == dyImage)
 
     def testDCCImageAverage(self):
-        sumPixelValues = np.sum(self.image.getArray())
+        sumPixelValues = np.sum(self.image.getDCCImageAsArray())
         average = sumPixelValues / self.image.getNumberOfPixels()
-        self.assertEqual(average, self.image.getAverageValueOfImage())
+        self.assertEqual(average, self.image.DCCImageAverage())
 
     def testDCCImageAverageColors(self):
         array = np.ones((10, 10, 3), dtype=np.float32)
@@ -202,42 +195,42 @@ class TestDCCImageMethods(unittest.TestCase):
         supposedAverage = [np.sum(array[..., 0]) / image.getNumberOfPixels(),
                            np.sum(array[..., 1]) / image.getNumberOfPixels(),
                            np.sum(array[..., 2]) / image.getNumberOfPixels()]
-        self.assertTrue(image.getAverageValueOfImage() == supposedAverage)
+        self.assertTrue(image.DCCImageAverage() == supposedAverage)
 
     def testDCCImageStandardDev(self):
-        average = self.image.getAverageValueOfImage()[0]
-        stanDevP1 = np.float_power(np.add(self.image.getArray(), -average), 2)
+        average = self.image.DCCImageAverage()[0]
+        stanDevP1 = np.float_power(np.add(self.image.getDCCImageAsArray(), -average), 2)
         stanDev = np.sqrt(np.sum(stanDevP1) / self.image.getNumberOfPixels())
-        self.assertTrue(np.allclose(stanDev, self.image.getStadardDeviationValueOfImage()))
+        self.assertTrue(np.allclose(stanDev, self.image.DCCImageStandardDeviation()))
 
     def testDCCImageStandardDevColors(self):
         array = np.ones((10, 10, 3), dtype=np.float32)
         image = DCCImage.DCCImage(array)
-        averageS = image.getAverageValueOfImage()
+        averageS = image.DCCImageAverage()
         stanDevS = []
-        for i in range(image.getNumberOfChannel()):
+        for i in range(image.getDCCImageNumberOfChannels()):
             average = averageS[i]
-            stanDevSP1 = np.float_power(np.add(image.getArray()[..., i], -average),
+            stanDevSP1 = np.float_power(np.add(image.getDCCImageAsArray()[..., i], -average),
                                         2)
             stanDevS.append(np.sqrt(np.sum(stanDevSP1) / image.getNumberOfPixels()))
-        self.assertTrue(np.allclose(stanDevS, image.getStadardDeviationValueOfImage()))
+        self.assertTrue(np.allclose(stanDevS, image.DCCImageStandardDeviation()))
 
     def testDCCImageShannonEntropy(self):
         base = 2
-        uniqueValues, counts = np.unique(self.image.getArray(), return_counts=True)
+        uniqueValues, counts = np.unique(self.image.getDCCImageAsArray(), return_counts=True)
         entropy = -np.sum(
             counts / self.image.getNumberOfPixels() * np.log(counts / self.image.getNumberOfPixels()) / np.log(base))
-        self.assertAlmostEqual(entropy, self.image.getShannonEntropyOfImage(base))
+        self.assertAlmostEqual(entropy, self.image.DCCImageShannonEntropy(base))
 
     def testDCCImageMinimumIntensityPixels(self):
         minimumPosition = (0, 0)
-        self.assertTrue(self.image.getMinimumIntensityPixels() == [minimumPosition])
+        self.assertTrue(self.image.minimumIntensityPixelsPositionPerChannel() == [minimumPosition])
 
     def testDCCImageMinimumIntensityPixels2Pixels(self):
         self.array[10][10] = 0
         image = DCCImage.DCCImage(self.array)
         minimumsPosition = [(0, 0), (10, 10)]
-        self.assertTrue(image.getMinimumIntensityPixels() == minimumsPosition)
+        self.assertTrue(image.minimumIntensityPixelsPositionPerChannel() == minimumsPosition)
 
     def testDCCImageMinimumIntensityPixelsColors(self):
         array = np.ones((10, 10, 3), dtype=np.float32)
@@ -247,17 +240,17 @@ class TestDCCImageMethods(unittest.TestCase):
         array[0][0][2] = -0.1
         image = DCCImage.DCCImage(array)
         minimumsPosition = [[(0, 0), (2, 2)], [(0, 0)], [(0, 0)]]
-        self.assertTrue(image.getMinimumIntensityPixels() == minimumsPosition)
+        self.assertTrue(image.minimumIntensityPixelsPositionPerChannel() == minimumsPosition)
 
     def testDCCImageMaximumIntensityPixels(self):
         maximumPosition = [(100, 100)]
-        self.assertTrue(self.image.getMaximumIntensityPixels() == maximumPosition)
+        self.assertTrue(self.image.maximumIntensityPixelsPositionPerChannel() == maximumPosition)
 
     def testDCCImageMaximumIntensityPixels2Pixels(self):
         self.array[50][50] = 100.0
         image = DCCImage.DCCImage(self.array)
         maximumsPosition = [(50, 50), (100, 100)]
-        self.assertTrue(image.getMaximumIntensityPixels() == maximumsPosition)
+        self.assertTrue(image.maximumIntensityPixelsPositionPerChannel() == maximumsPosition)
 
     def testDCCImageMaximumIntensityPixelsColors(self):
         array = np.ones((10, 10, 3), dtype=np.float32)
@@ -266,9 +259,8 @@ class TestDCCImageMethods(unittest.TestCase):
         array[0][0][1] = 1.01
         array[0][0][2] = 100
         image = DCCImage.DCCImage(array)
-        maximumIntensityPositions = [[(0, 0), (2, 2)], [(0, 0)], [(0, 0)]]
-        other = image.getMaximumIntensityPixels()
-        self.assertTrue(other == maximumIntensityPositions)
+        minimumsPosition = [[(0, 0), (2, 2)], [(0, 0)], [(0, 0)]]
+        self.assertTrue(image.maximumIntensityPixelsPositionPerChannel() == minimumsPosition)
 
     def testEntropyFilter(self):
         filterSize = 3
@@ -279,7 +271,7 @@ class TestDCCImageMethods(unittest.TestCase):
             for j in range(1, 4):
                 resultEntropyArray[i][j] = 503.2583348E-3
         resultEntropyImage = DCCImage.DCCImage(resultEntropyArray)
-        self.assertTrue(resultEntropyImage == DCCImage.DCCImage(array).getEntropyFiltering(filterSize))
+        self.assertTrue(resultEntropyImage == DCCImage.DCCImage(array).DCCImageWithEntropyFilter(filterSize))
 
     def testGaussianFilter(self):
         sigma = 0.4
@@ -292,7 +284,7 @@ class TestDCCImageMethods(unittest.TestCase):
                 gaussianBlurredArray[i][j] = np.exp(-((i - 2) ** 2 + (j - 2) ** 2) / (2 * sigma ** 2)) / (
                         2 * np.pi * sigma ** 2)
         normalizedGaussianBlurredArray = gaussianBlurredArray / np.sum(gaussianBlurredArray)
-        dccImageGaussianArray = image.getGrayGaussianFiltering(sigma).getArray()
+        dccImageGaussianArray = image.DCCImageWithGaussianFilterGray(sigma).getDCCImageAsArray()
         self.assertTrue(np.allclose(dccImageGaussianArray, normalizedGaussianBlurredArray))
 
     def testGaussianFilterColors(self):
@@ -319,7 +311,7 @@ class TestDCCImageMethods(unittest.TestCase):
                             2 * np.pi * sigma ** 2)
             gaussianBlurredArray[..., channel] = gaussianBlurredArray[..., channel] / np.sum(
                 gaussianBlurredArray[..., channel]) * multiplicationFactors[channel]
-        dccImageGaussianArray = image.getColorGaussianFiltering(sigma).getArray()
+        dccImageGaussianArray = image.DCCImageWithGaussianFilterColors(sigma).getDCCImageAsArray()
         self.assertTrue(np.allclose(dccImageGaussianArray, gaussianBlurredArray))
 
     def testDCCImageWithStandardDeviationFilter_MK1(self):
@@ -338,33 +330,21 @@ class TestDCCImageMethods(unittest.TestCase):
                     np.array([paddedArray[i][j:j + 3], paddedArray[i + 1][j:j + 3], paddedArray[i + 2][j:j + 3]],
                              dtype=np.float32)))
         # Compute the standard deviation of the smaller arrays
-        resultArray = np.array([image.getStadardDeviationValueOfImage() for image in listOfImages],
-                               dtype=np.float32).reshape(
+        resultArray = np.array([image.DCCImageStandardDeviation() for image in listOfImages], dtype=np.float32).reshape(
             (5, 5))
 
-        stdDevImageAsArray = DCCImage.DCCImage(array).getStandardDeviationFilteringSlow(
-            filterSize=3).getArray()
+        stdDevImageAsArray = DCCImage.DCCImage(array).DCCImageWithStandardDeviationFilter_MK1(
+            filterSize=3).getDCCImageAsArray()
         self.assertTrue(np.allclose(resultArray, stdDevImageAsArray))
 
-    def testDCCImageWithStandardDeviationFilter_MK1Warning(self):
-        import warnings
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("error")
-            with self.assertRaises(UserWarning):
-                self.image.getStandardDeviationFilteringSlow(3)
-
     def testDCCImageWithStandardDeviationFilter_MK2(self):
-        # Due to some weird stuff happening (memory problems/rounding/casting in my opinion) this test fails.
-        # Changing the tolerance in the final assertion can make it succeed.
-        # By looking at the arrays, we can see that they are really close (for example, 6.2853920e-01 vs 0.6285394)
-        # What confuses me is that sometimes it works with the default tolerance.
         array = np.zeros((5, 5), dtype=np.float32)
         # Padded array (internally happens when computing convolution with another matrix)
         paddedArray = np.zeros((7, 7), dtype=np.float32)
         for i in range(1, 4):
             for j in range(1, 4):
-                array[i][j] = 2
-                paddedArray[i + 1][j + 1] = 2
+                array[i][j] = 2.36
+                paddedArray[i + 1][j + 1] = 2.36
         listOfImages = []
         # Smaller array of size 3x3 resulting of the convolution
         for i in range(5):
@@ -373,19 +353,18 @@ class TestDCCImageMethods(unittest.TestCase):
                     np.array([paddedArray[i][j:j + 3], paddedArray[i + 1][j:j + 3], paddedArray[i + 2][j:j + 3]],
                              dtype=np.float32)))
         # Compute the standard deviation of the smaller arrays
-        resultArray = np.array([image.getStadardDeviationValueOfImage() for image in listOfImages],
-                               dtype=np.float32).reshape(
+        resultArray = np.array([image.DCCImageStandardDeviation() for image in listOfImages], dtype=np.float32).reshape(
             (5, 5))
 
-        stdDevImageAsArray = DCCImage.DCCImage(array).getStandardDeviationFiltering(
-            filterSize=3).getArray()
-        self.assertTrue(np.allclose(resultArray, stdDevImageAsArray, rtol=1e-4, atol=1e-4))
+        stdDevImageAsArray = DCCImage.DCCImage(array).DCCImageWithStandardDeviationFilter_MK2(
+            filterSize=3).getDCCImageAsArray()
+        self.assertTrue(np.allclose(resultArray, stdDevImageAsArray))
 
     def testDCCImageSTDDevFilterMK1AndMK2Equality(self):
         array = np.arange(16).reshape((4, 4)).astype(np.float32)
         image = DCCImage.DCCImage(array)
-        mk1 = image.getStandardDeviationFilteringSlow(3).getArray()
-        mk2 = image.getStandardDeviationFiltering(3).getArray()
+        mk1 = image.DCCImageWithStandardDeviationFilter_MK1(3).getDCCImageAsArray()
+        mk2 = image.DCCImageWithStandardDeviationFilter_MK2(3).getDCCImageAsArray()
         self.assertTrue(np.allclose(mk1, mk2))
 
     def testDCCImageSTDDevMk1SlowerThanMK2(self):
@@ -393,59 +372,12 @@ class TestDCCImageMethods(unittest.TestCase):
         array = np.arange(50000).reshape((500, 100)).astype(np.float32)
         image = DCCImage.DCCImage(array)
         beforeMK1 = time.clock()
-        image.getStandardDeviationFilteringSlow(3).getArray()
+        image.DCCImageWithStandardDeviationFilter_MK1(3).getDCCImageAsArray()
         afterMK1 = time.clock()
         beforeMK2 = time.clock()
-        image.getStandardDeviationFiltering(3).getArray()
+        image.DCCImageWithStandardDeviationFilter_MK2(3).getDCCImageAsArray()
         afterMK2 = time.clock()
         self.assertTrue((afterMK1 - beforeMK1) >= (afterMK2 - beforeMK2))
-
-    def testDCCImageGetPixelsOfIntensityGray(self):
-        intensity = 100
-        position = [(100, 100)]
-        self.assertTrue(self.image.getPixelsOfIntensityGrayImage(intensity) == position)
-
-    def testDCCImageGetPixelsOfIntensityGrayNoPixels(self):
-        intensity = 100.01
-        self.assertIsNone(self.image.getPixelsOfIntensityGrayImage(intensity))
-
-    def testDCCImageGetPixelsOfIntensityGrayMoreThanOne(self):
-        array = np.ones((5, 5), dtype=np.float32)
-        image = DCCImage.DCCImage(array)
-        coords = []
-        for i in range(5):
-            for j in range(5):
-                coords.append((i, j))
-        self.assertTrue(image.getPixelsOfIntensityGrayImage(1) == coords)
-
-    def testDCCImageGetPixelsOfIntensityColorAllChannels(self):
-        array = np.ones((5, 5, 3), dtype=np.float32)
-        array[0][0][0] = 0
-        coords = [[(0, 0)], None, None]
-        image = DCCImage.DCCImage(array)
-        self.assertTrue(image.getPixelsOfIntensityColorImageAllChannels(0) == coords)
-
-    def testDCCImageGetPixelsOfIntensityColorAllChannelsAllNone(self):
-        nones = [None, None, None]
-        image = DCCImage.DCCImage(np.zeros((1000, 1000, 3), dtype=np.float32))
-        supposed = image.getPixelsOfIntensityColorImageAllChannels(125)
-        self.assertTrue(supposed == nones)
-
-    def testDCCImageGetPixelsOfIntensityColorAllChannelsMultiplePixels(self):
-        listCoordsChannel0 = []
-        listCoordsChannel2 = []
-        array = np.ones((1000, 1000, 3), dtype=np.float32)
-        for i in range(235, 754):
-            for j in range(296, 407):
-                array[i][j][0] = 12.56
-                listCoordsChannel0.append((i, j))
-                if i / (j + 1) >= 1.05:
-                    array[i][j][2] = 12.56
-                    listCoordsChannel2.append((i, j))
-        listCoords = [listCoordsChannel0, None, listCoordsChannel2]
-        image = DCCImage.DCCImage(array)
-        self.assertTrue(image.getPixelsOfIntensityColorImageAllChannels(12.56) == listCoords)
-
 
 if __name__ == '__main__':
     unittest.main()

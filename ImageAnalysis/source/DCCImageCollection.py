@@ -1,7 +1,6 @@
 from DCCImage import *
 from DCCImagesExceptions import *
 
-
 class DCCImageCollection:
     def __init__(self, DCCImageArray: typing.List[DCCImage]):
         if not all(isinstance(image, DCCImage) for image in DCCImageArray):
