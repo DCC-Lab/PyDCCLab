@@ -1,8 +1,10 @@
 import unittest
-import ImageAnalysis.DCCImages as DCCImages
-import ImageAnalysis.DCCImagesExceptions as DCCExcep
 import numpy as np
 from unittest.mock import Mock, patch
+import DCCImages
+import DCCImagesExceptions as DCCExcep
+
+
 
 
 class TestDCCImageConstructor(unittest.TestCase):
@@ -498,7 +500,7 @@ class TestDCCImagesFromCZIFileConstructor(unittest.TestCase):
 class testDCCImagesFromCZIFileMethods(unittest.TestCase):
 
     def setUp(self) -> None:
-        import ImageAnalysis.cziUtil as cziUtil
+        import ImageAnalysis.source.cziUtil as cziUtil
         self.imagesFromCzi = DCCImages.DCCImagesFromCZIFile("testCziFile2Images.czi")
         self.metadata = cziUtil.extractMetadataFromCziFileObject(cziUtil.readCziImage("testCziFile2Images.czi"))
 

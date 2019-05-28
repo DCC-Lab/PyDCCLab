@@ -1,14 +1,14 @@
 import numpy as np
 import tifffile
 import typing
-from skimage import color, data, filters, img_as_float32, measure, morphology
+from skimage import color, filters, measure, morphology
 from skimage.filters.rank import entropy
-import ImageAnalysis.cziUtil as cziUtil
+import ImageAnalysis.source.cziUtil as cziUtil
 import PIL.Image
 from scipy.signal import convolve2d
 from scipy.ndimage import measurements, filters
 from skimage.filters import gaussian
-from ImageAnalysis.DCCImagesExceptions import *
+from ImageAnalysis.source.DCCImagesExceptions import *
 import matplotlib.pyplot as plt
 
 
