@@ -5,8 +5,6 @@ import DCCImages
 import DCCImagesExceptions as DCCExcep
 
 
-
-
 class TestDCCImageConstructor(unittest.TestCase):
 
     def testValidConstructor(self):
@@ -318,6 +316,71 @@ class TestDCCImageMethods(unittest.TestCase):
 
     def testDCCImageWithStandardDeviationFilter_MK1(self):
         array = np.zeros((5, 5), dtype=np.float32)
+        # Padded array (internally happens when computing convolution with another matrix)
+        paddedArray = np.zeros((7, 7), dtype=np.float32)
+        for i in range(1, 4):
+            for j in range(1, 4):
+                array[i][j] = 3
+                paddedArray[i + 1][j + 1] = 3
+        listOfImages = []
+        # Smaller array of size 3x3 resulting of the convolution
+        for i in range(5):
+            for j in range(5):
+                listOfImages.append(DCCImages.DCCImage(
+                    np.array([paddedArray[i][j:j + 3], paddedArray[i + 1][j:j + 3], paddedArray[i + 2][j:j + 3]],
+                             dtype=np.float32)))
+        # Compute the standard deviation of the smaller arrays
+        resultArray = np.array([image.DCCImageStandardDeviation() for image in listOfImages], dtype=np.float32).reshape(
+            (5, 5))
+
+        stdDevImageAsArray = DCCImages.DCCImage(array).DCCImageWithStandardDeviationFilter_MK1(
+            filterSize=3).getDCCImageAsArray()
+        self.assertTrue(np.allclose(resultArray, stdDevImageAsArray))
+
+    def testDCCImageWithStandardDeviationFilter_MK2(self):
+        array = np.zeros((5, 5), dtype=np.float32)
+        # Padded array (internally happens when computing convolution with another matrix)
+        paddedArray = np.zeros((7, 7), dtype=np.float32)
+        for i in range(1, 4):
+            for j in range(1, 4):
+                array[i][j] = 2.36
+                paddedArray[i + 1][j + 1] = 2.36
+        listOfImages = []
+        # Smaller array of size 3x3 resulting of the convolution
+        for i in range(5):
+            for j in range(5):
+                listOfImages.append(DCCImages.DCCImage(
+                    np.array([paddedArray[i][j:j + 3], paddedArray[i + 1][j:j + 3], paddedArray[i + 2][j:j + 3]],
+                             dtype=np.float32)))
+        # Compute the standard deviation of the smaller arrays
+        resultArray = np.array([image.DCCImageStandardDeviation() for image in listOfImages], dtype=np.float32).reshape(
+            (5, 5))
+
+        stdDevImageAsArray = DCCImages.DCCImage(array).DCCImageWithStandardDeviationFilter_MK2(
+            filterSize=3).getDCCImageAsArray()
+        self.assertTrue(np.allclose(resultArray, stdDevImageAsArray))
+
+    def testDCCImageSTDDevFilterMK1AndMK2Equality(self):
+        array = np.arange(16).reshape((4, 4)).astype(np.float32)
+        image = DCCImages.DCCImage(array)
+        mk1 = image.DCCImageWithStandardDeviationFilter_MK1(3).getDCCImageAsArray()
+        mk2 = image.DCCImageWithStandardDeviationFilter_MK2(3).getDCCImageAsArray()
+        self.assertTrue(np.allclose(mk1, mk2))
+
+    def testDCCImageSTDDevMk1SlowerThanMK2(self):
+        import time
+        array = np.arange(50000).reshape((500, 100)).astype(np.float32)
+        image = DCCImages.DCCImage(array)
+        beforeMK1 = time.clock()
+        image.DCCImageWithStandardDeviationFilter_MK1(3).getDCCImageAsArray()
+        afterMK1 = time.clock()
+        beforeMK2 = time.clock()
+        image.DCCImageWithStandardDeviationFilter_MK2(3).getDCCImageAsArray()
+        afterMK2 = time.clock()
+        self.assertTrue((afterMK1 - beforeMK1) >= (afterMK2 - beforeMK2))
+
+
+
 
 
 class TestDCCImageStackConstructor(unittest.TestCase):
