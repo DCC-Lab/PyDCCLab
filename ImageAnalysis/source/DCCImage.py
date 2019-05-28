@@ -87,17 +87,14 @@ class DCCImage:
         return DCCImage(grayConversion.astype("float32"))
 
     def grayscaleHistogram(self, normed=False):
-        # todo faire en sorte d'avoir un histogramme et être capable de le normaliser + trouver le bon nombre de bins
         array = self.getGrayscaleConversion().getArray()
         if not np.alltrue(np.mod(array, 1) == 0):
             warnings.warn("Conversion to 16-bits unsigned integers may cause loss of precision.")
-        array = array.astype(np.uint16)
-        array = array.flatten()
-        print(array)
-        nbBins = len(np.bincount(array))
-        normalize = self.getNumberOfPixels() if normed else 1
-        yValues, xValues = np.histogram(array, bins=nbBins)
-        plt.hist(array, nbBins)
+        arrayUint = array.astype(np.uint16)
+        arrayRaveled = arrayUint.ravel()
+        nbBins = len(np.bincount(arrayRaveled))
+        hist, bins, patches = plt.hist(arrayRaveled, nbBins, [0, nbBins], density=normed)
+        print(np.sum(hist))
         plt.show()
 
     def RGBHistogram(self, normed=False):
@@ -184,7 +181,6 @@ class DCCImage:
         coordsTemp = np.where(array[..., channel] == intensity)
         coords = list(zip(coordsTemp[0], coordsTemp[1])) if len(coordsTemp[0]) != 0 else None
         coordsList.append(coords)
-        # coordsList = coordsList
         return coordsList
 
     def getMinimumIntensityPixels(self) -> typing.Union[
@@ -269,11 +265,4 @@ if __name__ == '__main__':
     cziImage = DCCImagesFromFiles.DCCImagesFromCZIFile(
         r"C:\Users\goubi\PycharmProjects\BigData-ImageAnalysis\ImageAnalysis\unitTesting\testCziFile2Images.czi")
     cziImage = cziImage.getImageAtIndex(0)
-    # cziImage.grayscaleHistogram()
-    print(cziImage.getPixelsOfIntensityGrayImage(1250))
-    colorArray = np.ones((5, 5, 3), dtype=np.float32)
-    colorArray[0][0][1] = 2
-    colorArray[0][1][1] = 2
-    image = DCCImage(colorArray)
-    print(image.getPixelsOfIntensityColorImageAllChannels(2))
-    print(image.getPixelsOfIntensityColorImageOneChannel(2, 1))
+    cziImage.grayscaleHistogram()
