@@ -20,8 +20,8 @@ class Metadata:
         self.path = path
         self.root = self.createRoot()
 
-        self.channels = []
         self.filters = self.setFilters()
+        self.channels = self.setChannels()
 
         self.microscope = self.setMicroscope()
         self.objective = self.setObjective()
@@ -31,6 +31,7 @@ class Metadata:
 
     def showData(self):
         print(self.filters)
+        print(self.channels)
 
     def createRoot(self):
         cziImageObject = czi.readCziImage(self.path)
@@ -75,24 +76,39 @@ class Metadata:
             lstFilters.append(Filter(data[0], data[1], data[2]))
 
         for filter in lstFilters:
-            filter.setChannelId(self.root)
+            filter.setFilterData(self.root)
         return lstFilters
 
     def setChannels(self):
         lstChannels = []
+        for channel in self.root.find('./Metadata/Information/Image/Dimensions/Channels'):
+            newChannel = Channel(channel.attrib['Id'], channel.attrib['Name'], self.root)
+            newChannel.getDataFromFilters(self.filters)
+            lstChannels.append(newChannel)
+
+        return lstChannels
 
 
 class Filter:
     def __init__(self, filterId, min, max):
         self.filterId = filterId
-        self.filterSetId = None
-        self.channelId = None
-        self.type = None
         self.min = min
         self.max = max
 
+        self.channelId = None
+        self.filterSetId = None
+        self.type = None
+        self.dichroicId = None
+        self.dichroic = None
+
     def __repr__(self):
         return '{};{};{}-{}'.format(self.filterId, self.channelId, self.min, self.max)
+
+    def setFilterData(self, root):
+        self.setChannelId(root)
+        self.setFilterSetId(root)
+        self.setDichroicId(root)
+        self.setDichroic(root)
 
     def setFilterSetId(self, root):
         for filterSet in root.find('./Metadata/Information/Instrument/FilterSets'):
@@ -110,80 +126,151 @@ class Filter:
             if channel.find('FilterSetRef').attrib['Id'] == self.filterSetId:
                 self.channelId = channel.attrib['Id']
 
+    def setDichroicId(self, root):
+        for filterSet in root.find('./Metadata/Information/Instrument/FilterSets'):
+            if filterSet.attrib['Id'] == self.filterSetId:
+                self.dichroicId = filterSet.find('./DichroicRef').attrib['Id']
+                self.setDichroic(root)
+
+    def setDichroic(self, root):
+        for dichroic in root.find('./Metadata/Information/Instrument/Dichroics'):
+            if dichroic.attrib['Id'] == self.dichroicId:
+                self.dichroic = dichroic.find('./Wavelengths/Wavelength').text
+
     def getType(self):
         return self.type
 
     def getChannelId(self):
         return self.channelId
 
+    def getFilter(self):
+        return '{}-{}'.format(self.min, self.max)
+
+    def getDichroic(self):
+        return self.dichroic
+
 
 class Channel:
-    def __init__(self, channelId, root):
+    def __init__(self, channelId, channelName, root):
         self.channelId = channelId
+        self.channelName = channelName
         self.root = root
 
+        # These variables get their data from filter objects.
         self.exWavelengthFilter = None
         self.emWavelengthFilter = None
-
-        self.reflector = None
         self.beamsplitter = None
-        self.contrastMethod = None
-        self.lightSource = None
-        self.lightSourceIntensity = None
-        self.dyeName = None
-        self.channelColor = None
-        self.exWavelength = None
-        self.emWavelength = None
-        self.effectiveNA = None
-        self.imagingDevice = None
-        self.cameraAdapter = None
-        self.exposureTime = None
-        self.depthOfFocuse = None
-        self.binningMode = None
+
+        # These variables get their data from root.
+        self.reflector = self.setReflector()
+        self.contrastMethod = self.setContrastMethod()
+        self.lightSource = self.setLightSource()
+        self.lightSourceIntensity = self.setLightSourceIntensity()
+        self.dyeName = self.setDyeName()
+        self.channelColor = self.setChannelColor()
+        self.exWavelength = self.setExWavelength()
+        self.emWavelength = self.setEmWavelength()
+        self.effectiveNA = self.setEffectiveNA()
+        self.imagingDevice = self.setImagingDevice()
+        self.cameraAdapter = self.setCameraAdapter()
+        self.exposureTime = self.setExposureTime()
+        self.depthOfFocus = None
+        self.binningMode = self.setBinningMode()
+
+    def __repr__(self):
+        reprLine = '{} {} {} {} {}\n'.format(self.channelId, self.channelName, self.exWavelengthFilter,
+                                             self.emWavelengthFilter, self.reflector)
+        reprLine += '{} {} {} {} {}\n'.format(self.beamsplitter, self.contrastMethod, self.lightSource,
+                                              self.lightSourceIntensity, self.dyeName)
+        reprLine += '{} {} {} {} {}\n'.format(self.channelColor, self.exWavelength, self.emWavelength, self.effectiveNA,
+                                              self.imagingDevice)
+        reprLine += '{} {} {}'.format(self.cameraAdapter, self.exposureTime, self.binningMode)
+        return reprLine
+
+    def getDataFromFilters(self, filters):
+        self.setExWavelengthFilter(filters)
+        self.setEmWavelengthFilter(filters)
+        self.setBeamsplitter(filters)
 
     def setExWavelengthFilter(self, filters):
         for filter in filters:
-            if filter.getType() == 'Excitation' and self.channelId == filter.getType():
-                self.exWavelengthFilter = 'a'
+            if filter.getType() == 'Excitation' and self.channelId == filter.getChannelId():
+                self.exWavelengthFilter = filter.getFilter()
+
+    def setEmWavelengthFilter(self, filters):
+        for filter in filters:
+            if filter.getType() == 'Emission' and self.channelId == filter.getChannelId():
+                self.emWavelengthFilter = filter.getFilter()
+
+    def setBeamsplitter(self, filters):
+        for filter in filters:
+            if self.channelId == filter.getChannelId():
+                self.beamsplitter = filter.getDichroic()
+
+    def setReflector(self):
+        for channel in self.root.find('./Metadata/Information/Image/Dimensions/Channels'):
+            if channel.attrib['Id'] == self.channelId:
+                return channel.find('./Reflector').text
+
+    def setContrastMethod(self):
+        for channel in self.root.find('./Metadata/Information/Image/Dimensions/Channels'):
+            if channel.attrib['Id'] == self.channelId:
+                return channel.find('./ContrastMethod').text
+
+    def setLightSource(self):
+        lightId = ''
+        for channel in self.root.find('./Metadata/Information/Image/Dimensions/Channels'):
+            if channel.attrib['Id'] == self.channelId:
+                lightId = channel.find('./LightSourcesSettings/LightSourceSettings/LightSource').attrib['Id']
+
+        for lightSource in self.root.find('./Metadata/Information/Instrument/LightSources'):
+            if lightSource.attrib['Id'] == lightId:
+                return lightSource.attrib['Name']
+
+    def setLightSourceIntensity(self):
+        for channel in self.root.find('./Metadata/Information/Image/Dimensions/Channels'):
+            if channel.attrib['Id'] == self.channelId:
+                return channel.find('./LightSourcesSettings/LightSourceSettings/Intensity').text
+
+    def setDyeName(self):
+        for channel in self.root.find('./Metadata/DisplaySetting/Channels'):
+            if channel.attrib['Id'] == self.channelId:
+                return channel.find('./DyeName').text
+
+    def setChannelColor(self):
+        for channel in self.root.find('./Metadata/Information/Image/Dimensions/Channels'):
+            if channel.attrib['Id'] == self.channelId:
+                return channel.find('./Color').text
+
+    def setExWavelength(self):
+        for channel in self.root.find('./Metadata/Information/Image/Dimensions/Channels'):
+            if channel.attrib['Id'] == self.channelId:
+                return channel.find('./ExcitationWavelength').text
+
+    def setEmWavelength(self):
+        for channel in self.root.find('./Metadata/Information/Image/Dimensions/Channels'):
+            if channel.attrib['Id'] == self.channelId:
+                return channel.find('./EmissionWavelength').text
+
+    def setExposureTime(self):
+        for channel in self.root.find('./Metadata/Information/Image/Dimensions/Channels'):
+            if channel.attrib['Id'] == self.channelId:
+                return channel.find('./ExposureTime').text
+
+    def setEffectiveNA(self):
+        return self.root.find('./Metadata/Information/Instrument/Objectives/Objective/LensNA').text
+
+    def setImagingDevice(self):
+        return self.root.find('./Metadata/Information/Instrument/Detectors/Detector').attrib['Name']
+
+    def setCameraAdapter(self):
+        return self.root.find('./Metadata/Information/Instrument/Detectors/Detector/Adapter/Manufacturer/Model').text
+
+    def setBinningMode(self):
+        return self.root.find('./Metadata/Information/Image/Dimensions/Channels/Channel/DetectorSettings/Binning').text
 
 
 if __name__ == '__main__':
-    '''
-    # We create a temporary XML file to use with iterparse.
-    # Going directly through a string didn't work.
-    cziImageObject = czi.readCziImage('testCziFile.czi')
-    stringXML = czi.extractMetadataFromCziFileObject(cziImageObject, 'temp_full')
-
-    root = ET.fromstring(stringXML)
-
-    lstData = []
-
-    # Finding all the channels, their id and name.
-    # Then we check for the info we want in those channels.
-    tags = ['ExcitationWavelength', 'EmissionWavelength', 'DyeId', 'Color', 'Fluor', 'ExposureTime', 'Reflector',
-            'IlluminationType']
-    for channel in root.find('./Metadata/Information/Image/Dimensions/Channels'):
-        lstChannel = [[channel.attrib['Id'], channel.attrib['Name']]]
-        # Finding all of the relevant channel infos.
-        for channelData in channel:
-            if channelData.tag in tags:
-                lstChannel.append([channelData.tag, channelData.text])
-            if channelData.tag == 'LightSourcesSettings':
-                intensity = channelData.find('LightSourceSettings/Intensity')
-                lstChannel.append([intensity.tag, intensity.text])
-        lstData.append(lstChannel)
-
-    # Finding informations relevant to the Dichroic.
-    for dichroic in root.find('./Metadata/Information/Instrument/Dichroics'):
-        lstDichroic = [dichroic.attrib['Id']]
-        for wavelength in dichroic.find('./Wavelengths'):
-            lstDichroic.append(wavelength.text)
-        lstData.append(lstDichroic)
-
-    for entry in lstData:
-        print(entry)
-    '''
-
     mdata = Metadata('testCziFile.czi')
     mdata.showData()
 
