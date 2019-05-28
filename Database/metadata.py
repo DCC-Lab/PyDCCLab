@@ -21,13 +21,16 @@ class Metadata:
         self.root = self.createRoot()
 
         self.channels = []
-        self.filters = []
+        self.filters = self.setFilters()
 
         self.microscope = self.setMicroscope()
         self.objective = self.setObjective()
         self.xScale, self.yScale = self.setXYScale()
         self.xSize, self.ySize = self.setXYSize()
         self.xScaled, self.yScaled = self.setXYScaled()
+
+    def showData(self):
+        print(self.filters)
 
     def createRoot(self):
         cziImageObject = czi.readCziImage(self.path)
@@ -63,16 +66,60 @@ class Metadata:
         yScaled = float(self.ySize) * float(self.yScale)
         return xScaled, yScaled
 
+    def setFilters(self):
+        lstFilters = []
+        for filter in self.root.find('./Metadata/Information/Instrument/Filters'):
+            data = [filter.attrib['Id']]
+            for cut in filter.find('./TransmittanceRange'):
+                data.append(cut.text)
+            lstFilters.append(Filter(data[0], data[1], data[2]))
+
+        for filter in lstFilters:
+            filter.setChannelId(self.root)
+        return lstFilters
+
+    def setChannels(self):
+        lstChannels = []
+
 
 class Filter:
-    def __init__(self, min, max):
+    def __init__(self, filterId, min, max):
+        self.filterId = filterId
+        self.filterSetId = None
+        self.channelId = None
+        self.type = None
         self.min = min
         self.max = max
 
+    def __repr__(self):
+        return '{};{};{}-{}'.format(self.filterId, self.channelId, self.min, self.max)
+
+    def setFilterSetId(self, root):
+        for filterSet in root.find('./Metadata/Information/Instrument/FilterSets'):
+            if self.filterId == filterSet.find('./EmissionFilters/EmissionFilterRef').attrib['Id']:
+                self.filterSetId = filterSet.attrib['Id']
+                self.type = 'Emission'
+            elif self.filterId == filterSet.find('./ExcitationFilters/ExcitationFilterRef').attrib['Id']:
+                self.filterSetId = filterSet.attrib['Id']
+                self.type = 'Excitation'
+
+    def setChannelId(self, root):
+        self.setFilterSetId(root)
+
+        for channel in root.find('./Metadata/Information/Image/Dimensions/Channels'):
+            if channel.find('FilterSetRef').attrib['Id'] == self.filterSetId:
+                self.channelId = channel.attrib['Id']
+
+    def getType(self):
+        return self.type
+
+    def getChannelId(self):
+        return self.channelId
+
 
 class Channel:
-    def __init__(self, name, root):
-        self.name = name
+    def __init__(self, channelId, root):
+        self.channelId = channelId
         self.root = root
 
         self.exWavelengthFilter = None
@@ -93,6 +140,12 @@ class Channel:
         self.exposureTime = None
         self.depthOfFocuse = None
         self.binningMode = None
+
+    def setExWavelengthFilter(self, filters):
+        for filter in filters:
+            if filter.getType() == 'Excitation' and self.channelId == filter.getType():
+                self.exWavelengthFilter = 'a'
+
 
 
 if __name__ == '__main__':
@@ -121,13 +174,6 @@ if __name__ == '__main__':
                 lstChannel.append([intensity.tag, intensity.text])
         lstData.append(lstChannel)
 
-    # Finding all of the filters CutIn and CutOut.
-    for filter in root.find('./Metadata/Information/Instrument/Filters'):
-        lstFilter = []
-        for cut in filter.find('./TransmittanceRange'):
-            lstFilter.append([cut.tag, cut.text])
-        lstData.append(lstFilter)
-
     # Finding informations relevant to the Dichroic.
     for dichroic in root.find('./Metadata/Information/Instrument/Dichroics'):
         lstDichroic = [dichroic.attrib['Id']]
@@ -140,4 +186,5 @@ if __name__ == '__main__':
     '''
 
     mdata = Metadata('testCziFile.czi')
+    mdata.showData()
 
