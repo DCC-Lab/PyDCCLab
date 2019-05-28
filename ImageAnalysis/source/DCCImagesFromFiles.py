@@ -3,6 +3,7 @@ import cziUtil as cziUtil
 import tifffile
 from DCCImage import *
 
+
 class DCCImagesFromCZIFile(DCCImageCollection):
 
     def __init__(self, path: str):

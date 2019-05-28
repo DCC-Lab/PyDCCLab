@@ -1,13 +1,17 @@
-import numpy as np
-import typing
-from skimage import color, filters, measure, morphology
-from skimage.filters.rank import entropy
-import PIL.Image
-from scipy.signal import convolve2d
-from scipy.ndimage import measurements, filters
-from skimage.filters import gaussian
-from DCCImagesExceptions import *
-import matplotlib.pyplot as plt
+try:
+    import numpy as np
+    import typing
+    from skimage import color, filters, measure, morphology
+    from skimage.filters.rank import entropy
+    import PIL.Image
+    from scipy.signal import convolve2d
+    from scipy.ndimage import measurements, filters
+    from skimage.filters import gaussian
+    from DCCImagesExceptions import *
+    import matplotlib.pyplot as plt
+    import warnings
+except ImportError:
+    print("Please install the required libraries.")
 
 
 class DCCImage:
@@ -24,18 +28,18 @@ class DCCImage:
     def __eq__(self, other) -> bool:
         if not isinstance(other, DCCImage):
             raise InvalidEqualityTest(type(other))
-        return np.array_equal(self.__pixelArray, other.getDCCImageAsArray())
+        return np.array_equal(self.__pixelArray, other.getArray())
 
-    def getDCCImageAsArray(self) -> np.ndarray:
+    def getArray(self) -> np.ndarray:
         return self.__pixelArray
 
-    def getDCCImageWidth(self) -> int:
+    def getWidth(self) -> int:
         return int(self.__shape[0])
 
-    def getDCCImageLength(self) -> int:
+    def getLength(self) -> int:
         return int(self.__shape[1])
 
-    def getDCCImageNumberOfChannels(self) -> int:
+    def getNumberOfChannel(self) -> int:
         if self.__dimensions == 3:
             nbChannels = self.__shape[2]
         else:
@@ -43,7 +47,7 @@ class DCCImage:
         return int(nbChannels)
 
     def getNumberOfPixels(self) -> int:
-        return self.getDCCImageLength() * self.getDCCImageWidth()
+        return self.getLength() * self.getWidth()
 
     def toPILImage(self) -> PIL.Image.Image:
         return PIL.Image.fromarray(self.__pixelArray)
@@ -52,9 +56,10 @@ class DCCImage:
         copyArray = np.copy(self.__pixelArray)
         return DCCImage(copyArray)
 
-    def showImage(self) -> None:
+    def showImage(self):
         plt.imshow(self.__pixelArray)
         plt.show()
+        return self
 
     def saveToTIFF(self, name: str):
         unacceptedChars = ["?", "/", "\\", "*", "<", ">", "|", "."]
@@ -72,18 +77,28 @@ class DCCImage:
         return newMetadata
 
     # Now, interesting part:
-    def grayscaleConversion(self):
+    def getGrayscaleConversion(self):
         # todo test unitaire
-        if self.getDCCImageNumberOfChannels() == 1:
-            grayConversion = self.getDCCImageAsArray()
+        if self.getNumberOfChannel() == 1:
+            grayConversion = self.getArray()
         else:
             # raises ValueError if not 3 or 4
-            grayConversion = color.rgb2gray(self.getDCCImageAsArray())
+            grayConversion = color.rgb2gray(self.getArray())
         return DCCImage(grayConversion.astype("float32"))
 
     def grayscaleHistogram(self, normed=False):
         # todo faire en sorte d'avoir un histogramme et être capable de le normaliser + trouver le bon nombre de bins
-        pass
+        array = self.getGrayscaleConversion().getArray()
+        if not np.alltrue(np.mod(array, 1) == 0):
+            warnings.warn("Conversion to 16-bits unsigned integers may cause loss of precision.")
+        array = array.astype(np.uint16)
+        array = array.flatten()
+        print(array)
+        nbBins = len(np.bincount(array))
+        normalize = self.getNumberOfPixels() if normed else 1
+        yValues, xValues = np.histogram(array, bins=nbBins)
+        plt.hist(array, nbBins)
+        plt.show()
 
     def RGBHistogram(self, normed=False):
         # todo faire en sorte d'avoir un histogramme et être capable de le normaliser + trouver le bon nombre de bins
@@ -101,42 +116,78 @@ class DCCImage:
             convolvedImage = convolve2d(inputImage, matrix, mode="same", boundary="symm")
         return convolvedImage.astype("float32")
 
-    def DCCImageXAxisDerivative(self):
+    def getXAxisDerivative(self):
         dxFilter = [[-1, 0, 1]]
-        dxImage = self.__convolution2D(self.grayscaleConversion().getDCCImageAsArray(), dxFilter)
+        dxImage = self.__convolution2D(self.getGrayscaleConversion().getArray(), dxFilter)
         return DCCImage(dxImage)
 
-    def DCCImageYAxisDerivative(self):
+    def getYAxisDerivative(self):
         dyFilter = [[-1], [0], [1]]
-        dyImage = self.__convolution2D(self.grayscaleConversion().getDCCImageAsArray(), dyFilter)
+        dyImage = self.__convolution2D(self.getGrayscaleConversion().getArray(), dyFilter)
         return DCCImage(dyImage)
 
-    def DCCImageAverage(self) -> typing.List[float]:
+    def getAverageValueOfImage(self) -> typing.List[float]:
         averageList = []
-        if self.getDCCImageNumberOfChannels() == 1:
-            averageList.append(measurements.mean(self.getDCCImageAsArray()))
+        if self.getNumberOfChannel() == 1:
+            averageList.append(measurements.mean(self.getArray()))
         else:
-            for channel in range(self.getDCCImageNumberOfChannels()):
-                averageList.append(measurements.mean(self.getDCCImageAsArray()[..., channel]))
+            for channel in range(self.getNumberOfChannel()):
+                averageList.append(measurements.mean(self.getArray()[..., channel]))
         return averageList
 
-    def DCCImageStandardDeviation(self):
+    def getStadardDeviationValueOfImage(self):
         stanDevList = []
-        if self.getDCCImageNumberOfChannels() == 1:
-            stanDevList.append(measurements.standard_deviation(self.getDCCImageAsArray()))
+        if self.getNumberOfChannel() == 1:
+            stanDevList.append(measurements.standard_deviation(self.getArray()))
         else:
-            for channel in range(self.getDCCImageNumberOfChannels()):
-                stanDevList.append(measurements.standard_deviation(self.getDCCImageAsArray()[..., channel]))
+            for channel in range(self.getNumberOfChannel()):
+                stanDevList.append(measurements.standard_deviation(self.getArray()[..., channel]))
         return stanDevList
 
-    def DCCImageShannonEntropy(self, base=2) -> float:
-        grayscaleImage = self.grayscaleConversion().getDCCImageAsArray()
+    def getShannonEntropyOfImage(self, base=2) -> float:
+        grayscaleImage = self.getGrayscaleConversion().getArray()
         return measure.shannon_entropy(grayscaleImage, base)
 
-    def __getDCCImageExtremaOfIntensity(self) -> typing.List[typing.Tuple[float]]:
-        pass
+    def getExtremaValuesOfPixels(self) -> typing.List[tuple]:
+        extrema = []
+        if self.getNumberOfChannel() == 1:
+            extrema.append((np.min(self.__pixelArray), np.max(self.__pixelArray)))
+        else:
+            for channel in range(self.getNumberOfChannel()):
+                extrema.append((np.min(self.__pixelArray[..., channel]), np.max(self.__pixelArray[..., channel])))
+        return extrema
 
-    def minimumIntensityPixelsPositionPerChannel(self) -> typing.Union[
+    def getPixelsOfIntensityGrayImage(self, intensity: float) -> typing.List[tuple]:
+        coordsList = []
+        array = self.getGrayscaleConversion().getArray()
+        coordsTemp = np.where(array[:, :] == intensity)
+        coords = list(zip(coordsTemp[0], coordsTemp[1])) if len(coordsTemp[0]) != 0 else None
+        coordsList.append(coords)
+        coordsList = coordsList[0]
+        return coordsList
+
+    def getPixelsOfIntensityColorImageAllChannels(self, intensity: float) -> typing.List[typing.List[tuple]]:
+        channels = self.getNumberOfChannel()
+        array = self.getArray()
+        coordsListPerChannel = []
+        for channel in range(channels):
+            coordsTemp = np.where(array[..., channel] == intensity)
+            coords = list(zip(coordsTemp[0], coordsTemp[1])) if len(coordsTemp[0]) != 0 else None
+            coordsListPerChannel.append(coords)
+        return coordsListPerChannel
+
+    def getPixelsOfIntensityColorImageOneChannel(self, intensity: float, channel: int) -> typing.List[tuple]:
+        coordsList = []
+        array = self.getArray()
+        if channel >= self.getNumberOfChannel():
+            raise ValueError("The specified channel must be in the interval [0, {}[".format(self.getNumberOfChannel()))
+        coordsTemp = np.where(array[..., channel] == intensity)
+        coords = list(zip(coordsTemp[0], coordsTemp[1])) if len(coordsTemp[0]) != 0 else None
+        coordsList.append(coords)
+        # coordsList = coordsList
+        return coordsList
+
+    def getMinimumIntensityPixels(self) -> typing.Union[
         typing.List[typing.Tuple[int, int]], typing.List[typing.List[typing.Tuple[int, int]]]]:
         """
         Function that returns a list of tuples representing the (x, y) position of the minimum intensity pixels
@@ -145,22 +196,17 @@ class DCCImage:
         :return: List of tuples or a list of lists of tuples
         """
         minimumsCoordsList = []
-        image = self.getDCCImageAsArray()
-        if image.ndim == 2:
-            minimum = np.min(image)
-            minimumCoordTemp = np.where(image[:, :] == minimum)
-            minimumCoord = list(zip(minimumCoordTemp[0], minimumCoordTemp[1]))
-            minimumsCoordsList.append(minimumCoord)
-            minimumsCoordsList = minimumsCoordsList[0]
+        image = self.getArray()
+        if self.getNumberOfChannel() == 1:
+            minimum = self.getExtremaValuesOfPixels()[0][0]
+            minimumsCoordsList = self.getPixelsOfIntensityGrayImage(minimum)
         else:
-            for channel in range(image.shape[-1]):
-                minimum = np.min(image[..., channel])
-                minimumCoordTemp = np.where(image[..., channel] == minimum)
-                minimumCoord = list(zip(minimumCoordTemp[0], minimumCoordTemp[1]))
-                minimumsCoordsList.append(minimumCoord)
+            for channel in range(self.getNumberOfChannel()):
+                minimum = self.getExtremaValuesOfPixels()[channel][0]
+                minimumsCoordsList.append(self.getPixelsOfIntensityColorImageOneChannel(minimum, channel)[0])
         return minimumsCoordsList
 
-    def maximumIntensityPixelsPositionPerChannel(self) -> typing.Union[
+    def getMaximumIntensityPixels(self) -> typing.Union[
         typing.List[typing.Tuple[int, int]], typing.List[typing.List[typing.Tuple[int, int]]]]:
         """
         Function that returns a list of tuples representing the (x, y) position of the maximum intensity pixels
@@ -169,36 +215,34 @@ class DCCImage:
         :return: List of tuples or a list of lists of tuples
         """
         maximumsCoordsList = []
-        image = self.getDCCImageAsArray()
-        if image.ndim == 2:
-            maximum = np.max(image)
-            maximumCoordTemp = np.where(image[:, :] == maximum)
-            maximumCoord = list(zip(maximumCoordTemp[0], maximumCoordTemp[1]))
-            maximumsCoordsList.append(maximumCoord)
-            maximumsCoordsList = maximumsCoordsList[0]
+        image = self.getArray()
+        if self.getNumberOfChannel() == 1:
+            maximum = self.getExtremaValuesOfPixels()[0][1]
+            maximumsCoordsList = self.getPixelsOfIntensityGrayImage(maximum)
         else:
-            for channel in range(image.shape[-1]):
-                maximum = np.max(image[..., channel])
-                maximumCoordTemp = np.where(image[..., channel] == maximum)
-                maximumCoord = list(zip(maximumCoordTemp[0], maximumCoordTemp[1]))
-                maximumsCoordsList.append(maximumCoord)
+            for channel in range(self.getNumberOfChannel()):
+                maximum = self.getExtremaValuesOfPixels()[channel][1]
+                maximumsCoordsList.append(self.getPixelsOfIntensityColorImageOneChannel(maximum, channel)[0])
         return maximumsCoordsList
 
-    def DCCImageWithEntropyFilter(self, filterSize: int):
-        image = self.grayscaleConversion().getDCCImageAsArray()
+    def getEntropyFiltering(self, filterSize: int):
+        image = self.getGrayscaleConversion().getArray()
         # I have to cast as 16-bits unsigned integer because the entropy filter only works in uint8 or uint16
         image = image.astype(np.uint16)
         entropyFiltered = entropy(image, morphology.selem.square(filterSize, dtype=np.float32))
         return DCCImage(entropyFiltered.astype(np.float32))
 
-    def DCCImageWithStandardDeviationFilter_MK1(self, filterSize: int):
+    def getStandardDeviationFilteringSlow(self, filterSize: int):
+        message = "This filtering method is very slow with big images. " \
+                  "Use getStandardDeviationFiltering for faster results."
+        warnings.warn(message)
         # VERY SLOW WITH BIG IMAGES
-        image = self.grayscaleConversion().getDCCImageAsArray()
+        image = self.getGrayscaleConversion().getArray()
         stdFiltered = filters.generic_filter(image, np.std, size=filterSize, mode="nearest")
         return DCCImage(stdFiltered.astype(np.float32))
 
-    def DCCImageWithStandardDeviationFilter_MK2(self, filterSize: int):
-        image = self.grayscaleConversion().getDCCImageAsArray()
+    def getStandardDeviationFiltering(self, filterSize: int):
+        image = self.getGrayscaleConversion().getArray()
         # We must add a small random number because otherwise some numbers become too small
         # and NaN appear throughout the resulting image.
         image += np.random.rand(image.shape[0], image.shape[1]) * 1e-6
@@ -207,14 +251,29 @@ class DCCImage:
         stdFiltered = np.sqrt(stdFilterPart2 - stdFilterPart1 * stdFilterPart1)
         return DCCImage(stdFiltered.astype(np.float32))
 
-    def DCCImageWithGaussianFilterGray(self, sigma: float):
-        image = self.grayscaleConversion().getDCCImageAsArray()
+    def getGrayGaussianFiltering(self, sigma: float):
+        image = self.getGrayscaleConversion().getArray()
         gaussianFiltered = gaussian(image, sigma, mode="nearest", multichannel=False, preserve_range=True)
         return DCCImage(gaussianFiltered.astype(np.float32))
 
-    def DCCImageWithGaussianFilterColors(self, sigma: float):
-        image = self.getDCCImageAsArray()
+    def getColorGaussianFiltering(self, sigma: float):
+        image = self.getArray()
         gaussianFiltered = gaussian(image, sigma, mode="nearest", multichannel=True, preserve_range=True)
         return DCCImage(gaussianFiltered.astype(np.float32))
 
 
+if __name__ == '__main__':
+    array = np.arange(25).reshape((5, 5)).astype(np.float32)
+    import DCCImagesFromFiles
+
+    cziImage = DCCImagesFromFiles.DCCImagesFromCZIFile(
+        r"C:\Users\goubi\PycharmProjects\BigData-ImageAnalysis\ImageAnalysis\unitTesting\testCziFile2Images.czi")
+    cziImage = cziImage.getImageAtIndex(0)
+    # cziImage.grayscaleHistogram()
+    print(cziImage.getPixelsOfIntensityGrayImage(1250))
+    colorArray = np.ones((5, 5, 3), dtype=np.float32)
+    colorArray[0][0][1] = 2
+    colorArray[0][1][1] = 2
+    image = DCCImage(colorArray)
+    print(image.getPixelsOfIntensityColorImageAllChannels(2))
+    print(image.getPixelsOfIntensityColorImageOneChannel(2, 1))

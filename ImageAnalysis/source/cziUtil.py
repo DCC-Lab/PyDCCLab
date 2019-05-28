@@ -13,11 +13,14 @@ Hope it works correctly!
 """
 First, let's import the useful stuff
 """
-import czifile
-import numpy as np
-import matplotlib.pyplot as plt
-import tifffile
-import xml.etree.ElementTree as ET
+try:
+    import czifile
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import tifffile
+    import xml.etree.ElementTree as ET
+except ImportError:
+    print("Please install the required libraries.")
 
 
 def readCziImage(filename):

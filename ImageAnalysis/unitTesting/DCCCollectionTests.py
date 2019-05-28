@@ -1,9 +1,12 @@
-import unittest
-import DCCImage
-import DCCImagesExceptions as DCCExcep
-import numpy as np
-from DCCImageCollection import DCCImageCollection
-from unittest.mock import Mock, patch
+try:
+    import unittest
+    import DCCImage
+    import DCCImagesExceptions as DCCExcep
+    import numpy as np
+    from DCCImageCollection import DCCImageCollection
+    from unittest.mock import Mock, patch
+except ImportError:
+    print("Please install the required libraries.")
 
 
 class TestDCCImageStackConstructor(unittest.TestCase):
