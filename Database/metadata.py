@@ -147,7 +147,6 @@ class Channel:
                 self.exWavelengthFilter = 'a'
 
 
-
 if __name__ == '__main__':
     '''
     # We create a temporary XML file to use with iterparse.
