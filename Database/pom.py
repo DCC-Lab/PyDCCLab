@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 import os
 import fnmatch
-import ImageAnalysis.cziUtil as czi
+import ImageAnalysis.source.cziUtil as czi
 '''
 Important informations concerning the .czi file seems to be contained in :
 <ImageDocument><Metadata><Information>

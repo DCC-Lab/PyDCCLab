@@ -8,7 +8,7 @@ import PIL.Image
 from scipy.signal import convolve2d
 from scipy.ndimage import measurements, filters
 from skimage.filters import gaussian
-from ImageAnalysis.source.DCCImagesExceptions import *
+from DCCImagesExceptions import *
 import matplotlib.pyplot as plt
 
 
@@ -205,8 +205,8 @@ class DCCImage:
         # and NaN appear throughout the resulting image.
         image += np.random.rand(image.shape[0], image.shape[1]) * 1e-6
         stdFilterPart1 = filters.uniform_filter(image, filterSize, mode="nearest")
-        stdFilterPart2 = filters.uniform_filter(np.float_power(image, 2), filterSize, mode="nearest")
-        stdFiltered = np.sqrt(stdFilterPart2, np.float_power(stdFilterPart1, 2))
+        stdFilterPart2 = filters.uniform_filter(image * image, filterSize, mode="nearest")
+        stdFiltered = np.sqrt(stdFilterPart2 - stdFilterPart1 * stdFilterPart1)
         return DCCImage(stdFiltered.astype(np.float32))
 
     def DCCImageWithGaussianFilterGray(self, sigma: float):
@@ -375,39 +375,3 @@ class DCCImagesFromTiffFile(DCCImageStack):
 
     def getPath(self) -> str:
         return self.__path
-
-
-if __name__ == '__main__':
-    path = "C:\\Users\\goubi\\PycharmProjects\\BigData-ImageAnalysis\\ImageAnalysis\\unitTesting\\testCziFile2Images.czi"
-    path2 = "C:\\Users\\goubi\\PycharmProjects\\BigData-ImageAnalysis\\ImageAnalysis\\unitTesting\\testNotCziFile.jpg"
-    size = 3
-    array = np.zeros((5, 5), dtype=np.float32)
-    output = np.zeros_like(array)
-    for i in range(1, 4):
-        for j in range(1, 4):
-            array[i][j] = 1
-    image = DCCImage(array)
-    stdImage = image.DCCImageWithStandardDeviationFilter_MK1(size)
-    print(stdImage.getDCCImageAsArray())
-    testArray = [[0] * 3, [0] * 3, [0, 0, 1]]
-    testArray2 = [[0] * 3, [0] * 3, [0, 1, 1]]
-    testArray3 = [[0] * 3, [0] * 3, [1, 1, 1]]
-    testArray9 = [[1] * 3, [1] * 3, [1, 1, 1]]
-    testArray6 = [[0] * 3, [1] * 3, [1, 1, 1]]
-    testArray4 = [[0] * 3, [0, 0, 1], [1, 1, 1]]
-    arrays = [testArray, testArray2, testArray3, testArray2, testArray, testArray2, testArray4, testArray6, testArray4,
-              testArray2, testArray3, testArray6, testArray9, testArray6, testArray2, testArray4, testArray6,
-              testArray2,
-              testArray, testArray2, testArray3, testArray2, testArray, testArray6,
-              testArray9]
-    images = []
-    #print(len(arrays))
-    for Array in arrays:
-        images.append(DCCImage(np.array(Array, dtype=np.float32)))
-    resultArray = [x.DCCImageStandardDeviation() for x in images]
-    #print(resultArray)
-    resultArray = np.array(resultArray, dtype=np.float32).reshape((5, 5))
-    print(resultArray)
-    testArray = np.array(testArray, dtype=np.float32)
-    testImage = DCCImage(testArray).DCCImageStandardDeviation()
-    print(testImage)
