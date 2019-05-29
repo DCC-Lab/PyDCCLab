@@ -4,6 +4,7 @@ try:
     from unittest.mock import Mock, patch
     import DCCImage
     import DCCImagesExceptions as DCCExcep
+    import warnings
 except ImportError:
     print("Please install the required libraries.")
 
@@ -155,7 +156,6 @@ class TestDCCImageMethods(unittest.TestCase):
         self.assertTrue(grayScale.getNumberOfChannel() == 1)
 
     def testDCCImageGetGrayHistogramValuesWarning(self):
-        import warnings
         with warnings.catch_warnings(record=True):
             warnings.simplefilter("error")
             with self.assertRaises(UserWarning):
@@ -179,7 +179,6 @@ class TestDCCImageMethods(unittest.TestCase):
 
     def testDCCImageGetColorHistogramValuesWarning(self):
         image = DCCImage.DCCImage(np.ones((199, 201, 3), dtype=np.float32) * 1.23)
-        import warnings
         with warnings.catch_warnings(record=True):
             warnings.simplefilter("error")
             with self.assertRaises(UserWarning):
@@ -199,7 +198,6 @@ class TestDCCImageMethods(unittest.TestCase):
         self.assertTrue(np.allclose(allSums, 1, atol=1e-9, rtol=1e-9))
 
     def testDCCDisplayImageGrayHistogramWarning(self):
-        import warnings
         with warnings.catch_warnings(record=True):
             warnings.simplefilter("error")
             with self.assertRaises(UserWarning):
@@ -224,7 +222,6 @@ class TestDCCImageMethods(unittest.TestCase):
 
     def testDCCImageDisplayColorHistogramWarning(self):
         image = DCCImage.DCCImage(np.ones((5000, 5000, 3), dtype=np.float32) * 0.01)
-        import warnings
         with warnings.catch_warnings(record=True):
             warnings.simplefilter("error")
             with self.assertRaises(UserWarning):
@@ -491,25 +488,21 @@ class TestDCCImageMethods(unittest.TestCase):
                              dtype=np.float32)))
         # Compute the standard deviation of the smaller arrays
         resultArray = np.array([image.getStadardDeviationValueOfImage() for image in listOfImages],
-                               dtype=np.float32).reshape(
-            (5, 5))
+                               dtype=np.float32).reshape((5, 5))
 
-        stdDevImageAsArray = DCCImage.DCCImage(array).getStandardDeviationFilteringSlow(
-            filterSize=3).getArray()
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', category=Warning)
+            stdDevImageAsArray = DCCImage.DCCImage(array).getStandardDeviationFilteringSlow(
+                filterSize=3).getArray()
         self.assertTrue(np.allclose(resultArray, stdDevImageAsArray))
 
     def testDCCImageWithStandardDeviationFilter_MK1Warning(self):
-        import warnings
         with warnings.catch_warnings(record=True):
             warnings.simplefilter("error")
             with self.assertRaises(UserWarning):
                 self.image.getStandardDeviationFilteringSlow(3)
 
     def testDCCImageWithStandardDeviationFilter_MK2(self):
-        # Due to some weird stuff happening (memory problems/rounding/casting in my opinion) this test fails.
-        # Changing the tolerance in the final assertion can make it succeed.
-        # By looking at the arrays, we can see that they are really close (for example, 6.2853920e-01 vs 0.6285394)
-        # What confuses me is that sometimes it works with the default tolerance.
         array = np.zeros((5, 5), dtype=np.float32)
         # Padded array (internally happens when computing convolution with another matrix)
         paddedArray = np.zeros((7, 7), dtype=np.float32)
@@ -526,12 +519,12 @@ class TestDCCImageMethods(unittest.TestCase):
                              dtype=np.float32)))
         # Compute the standard deviation of the smaller arrays
         resultArray = np.array([image.getStadardDeviationValueOfImage() for image in listOfImages],
-                               dtype=np.float32).reshape(
-            (5, 5))
+                               dtype=np.float32).reshape((5, 5))
 
         stdDevImageAsArray = DCCImage.DCCImage(array).getStandardDeviationFiltering(
             filterSize=3).getArray()
         self.assertTrue(np.allclose(resultArray, stdDevImageAsArray, rtol=1e-4, atol=1e-4))
+
 
     def testDCCImageSTDDevFilterMK1AndMK2Equality(self):
         array = np.arange(16).reshape((4, 4)).astype(np.float32)
