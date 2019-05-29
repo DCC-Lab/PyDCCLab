@@ -1943,8 +1943,6 @@
         <UserName>POM</UserName>
       </Document>
       <Image>
-        <SizeX>1936</SizeX>
-        <SizeY>1460</SizeY>
         <SizeB>1</SizeB>
         <OriginalCompressionMethod>Uncompressed</OriginalCompressionMethod>
         <OriginalEncodingQuality>100</OriginalEncodingQuality>
@@ -1954,60 +1952,6 @@
         <PixelType>Gray16</PixelType>
         <Dimensions>
           <Channels>
-            <Channel Id="Channel:0" Name="EGFP">
-              <ExcitationWavelength>488</ExcitationWavelength>
-              <EmissionWavelength>509</EmissionWavelength>
-              <DyeId>McNamara-Boswell-0828</DyeId>
-              <DyeDatabaseId>66071726-cbd4-4c41-b371-0a6eee4ae9c5</DyeDatabaseId>
-              <Color>#FF00FF5B</Color>
-              <Fluor>EGFP</Fluor>
-              <ExposureTime>950000000</ExposureTime>
-              <Reflector>38 HE Green Fluorescent Prot</Reflector>
-              <IlluminationType>Epifluorescence</IlluminationType>
-              <ContrastMethod>Fluorescence</ContrastMethod>
-              <PixelType>Gray16</PixelType>
-              <ComponentBitCount>14</ComponentBitCount>
-              <AcquisitionMode>WideField</AcquisitionMode>
-              <DetectionWavelength />
-              <DetectorSettings>
-                <Binning>1,1</Binning>
-                <Detector Id="Detector:Axiocam 503" />
-              </DetectorSettings>
-              <LightSourcesSettings>
-                <LightSourceSettings>
-                  <Intensity>58.32 %</Intensity>
-                  <LightSource Id="LightSource:1" />
-                </LightSourceSettings>
-              </LightSourcesSettings>
-              <FilterSetRef Id="FilterSet:1" />
-            </Channel>
-            <Channel Id="Channel:1" Name="DAPI">
-              <ExcitationWavelength>353</ExcitationWavelength>
-              <EmissionWavelength>465</EmissionWavelength>
-              <DyeId>McNamara-Boswell-0434</DyeId>
-              <DyeDatabaseId>66071726-cbd4-4c41-b371-0a6eee4ae9c5</DyeDatabaseId>
-              <Color>#FF00A0FF</Color>
-              <Fluor>DAPI</Fluor>
-              <ExposureTime>150000000</ExposureTime>
-              <Reflector>49 DAPI</Reflector>
-              <IlluminationType>Epifluorescence</IlluminationType>
-              <ContrastMethod>Fluorescence</ContrastMethod>
-              <PixelType>Gray16</PixelType>
-              <ComponentBitCount>14</ComponentBitCount>
-              <AcquisitionMode>WideField</AcquisitionMode>
-              <DetectionWavelength />
-              <DetectorSettings>
-                <Binning>1,1</Binning>
-                <Detector Id="Detector:Axiocam 503" />
-              </DetectorSettings>
-              <LightSourcesSettings>
-                <LightSourceSettings>
-                  <Intensity>58.32 %</Intensity>
-                  <LightSource Id="LightSource:2" />
-                </LightSourceSettings>
-              </LightSourcesSettings>
-              <FilterSetRef Id="FilterSet:2" />
-            </Channel>
           </Channels>
           <Tracks>
             <Track Id="Track:1">
@@ -2045,9 +1989,6 @@
       </Image>
       <Instrument>
         <Microscopes>
-          <Microscope Id="Microscope:1">
-            <Type>Inverted</Type>
-          </Microscope>
         </Microscopes>
         <LightSources>
           <LightSource Id="LightSource:1" Name="HXP 120 V">
@@ -2078,17 +2019,6 @@
           </Detector>
         </Detectors>
         <Objectives>
-          <Objective Id="Objective:1" Name="LD A-Plan 5x/0.15 Ph1">
-            <LensNA>0.15</LensNA>
-            <NominalMagnification>5</NominalMagnification>
-            <WorkingDistance>11720</WorkingDistance>
-            <PupilGeometry>PhaseRing1</PupilGeometry>
-            <ImmersionRefractiveIndex>1.000293</ImmersionRefractiveIndex>
-            <Immersion>Air</Immersion>
-            <Manufacturer>
-              <Model>LD A-Plan 5x/0.15 Ph1</Model>
-            </Manufacturer>
-          </Objective>
         </Objectives>
         <FilterSets>
           <FilterSet Id="FilterSet:1">
@@ -2120,7 +2050,6 @@
           <Filter Id="Filter:2">
             <TransmittanceRange>
               <CutIn>500</CutIn>
-              <CutOut>550</CutOut>
             </TransmittanceRange>
           </Filter>
           <Filter Id="Filter:3">
@@ -2165,11 +2094,9 @@
       </AutoScaling>
       <Items>
         <Distance Id="X">
-          <Value>9.08E-07</Value>
           <DefaultUnitFormat>µm</DefaultUnitFormat>
         </Distance>
         <Distance Id="Y">
-          <Value>9.08E-07</Value>
           <DefaultUnitFormat>µm</DefaultUnitFormat>
         </Distance>
       </Items>
