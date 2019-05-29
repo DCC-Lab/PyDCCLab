@@ -46,11 +46,11 @@ class testDCCImagesFromCZIFileMethods(unittest.TestCase):
             self.imagesFromCzi.saveMetadata("/*")
 
     def testSaveMetadataValidName(self):
+        import os
         self.imagesFromCzi.saveMetadata("testSaveMetaDCCImagesTest")
         isSaved = True
         try:
-            fileTest = open("testSaveMetaDCCImagesTest.xml", "r", encoding="utf-8")
-            fileTest.close()
+            os.remove("testSaveMetaDCCImagesTest.xml")
         except FileNotFoundError:
             isSaved = False
         self.assertTrue(isSaved)
@@ -125,11 +125,11 @@ class TestDCCImagesFromTiffFileMethods(unittest.TestCase):
             self.images.saveMetadata("meta.data")
 
     def testSaveMetadata(self):
+        import os
         self.images.saveMetadata("testSaveMetaDCCImagesTest_fromTiff")
         isSaved = True
         try:
-            fileTest = open("testSaveMetaDCCImagesTest_fromTiff.xml", "r", encoding="utf-8")
-            fileTest.close()
+            os.remove("testSaveMetaDCCImagesTest_fromTiff.xml")
         except FileNotFoundError:
             isSaved = False
         self.assertTrue(isSaved)

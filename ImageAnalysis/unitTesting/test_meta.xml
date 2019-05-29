@@ -1317,7 +1317,7 @@
         <LiveImageFrame.Max Status="Valid" IsReadOnly="true">0,0,1936,1460</LiveImageFrame.Max>
         <TheoreticalTotalMagnification Status="Valid" IsActivated="true" IsReadOnly="true">5</TheoreticalTotalMagnification>
         <TotalMagnification Status="Valid" IsActivated="true" IsReadOnly="true">5</TotalMagnification>
-        <DefaultScalingUnit Status="Valid" IsActivated="true" IsReadOnly="true">µm</DefaultScalingUnit>
+        <DefaultScalingUnit Status="Valid" IsActivated="true" IsReadOnly="true">Âµm</DefaultScalingUnit>
         <RoiCenterOffsetX Status="Valid" IsActivated="true" IsReadOnly="true">0</RoiCenterOffsetX>
         <RoiCenterOffsetY Status="Valid" IsActivated="true" IsReadOnly="true">0</RoiCenterOffsetY>
         <TotalAperture Status="Valid" IsActivated="true" IsReadOnly="true">0.15</TotalAperture>
@@ -1326,14 +1326,14 @@
         <TheoreticalTotalMagnification Status="Valid">5</TheoreticalTotalMagnification>
         <TotalAperture Status="Valid">0.15</TotalAperture>
         <TotalMagnification Status="Valid">5</TotalMagnification>
-        <DefaultScalingUnit Status="Valid">µm</DefaultScalingUnit>
+        <DefaultScalingUnit Status="Valid">Âµm</DefaultScalingUnit>
       </ParameterCollection>
       <ParameterCollection Id="MTBEyePiece">
         <TheoreticalTotalMagnification Status="Valid">50</TheoreticalTotalMagnification>
         <TotalAperture Status="Valid">0.15</TotalAperture>
       </ParameterCollection>
       <ParameterCollection Id="MTBFocus">
-        <Position Status="Valid" Unit="µm">-2137.418</Position>
+        <Position Status="Valid" Unit="Âµm">-2137.418</Position>
         <MeasurementPosition Status="Valid">-2137.418</MeasurementPosition>
         <IsPrecise Status="Valid">false</IsPrecise>
         <AxisSetPositionMode Status="SuperValid">Default</AxisSetPositionMode>
@@ -1368,7 +1368,7 @@
         <PositionName Status="Valid">Aquila.SideportElement_100%L</PositionName>
       </ParameterCollection>
       <ParameterCollection Id="MTBStageAxisX">
-        <Position Status="Valid" Unit="µm">-14685.761</Position>
+        <Position Status="Valid" Unit="Âµm">-14685.761</Position>
         <MeasurementPosition Status="Valid">-14685.761</MeasurementPosition>
         <IsPrecise Status="Valid">false</IsPrecise>
         <AxisSetPositionMode Status="Valid">Default</AxisSetPositionMode>
@@ -1383,7 +1383,7 @@
         <AxisCalibrationMode Status="Valid">NotCalibrated</AxisCalibrationMode>
       </ParameterCollection>
       <ParameterCollection Id="MTBStageAxisY">
-        <Position Status="Valid" Unit="µm">29805.042</Position>
+        <Position Status="Valid" Unit="Âµm">29805.042</Position>
         <MeasurementPosition Status="Valid">29805.042</MeasurementPosition>
         <IsPrecise Status="Valid">false</IsPrecise>
         <AxisSetPositionMode Status="Valid">Default</AxisSetPositionMode>
@@ -1546,10 +1546,10 @@
           <MaxDeviation>0.005</MaxDeviation>
           <TypicalDeviation>0.005</TypicalDeviation>
           <StepWidth>0.01</StepWidth>
-          <PositionUnit>µm</PositionUnit>
-          <SupportedUnits>µm|nm|</SupportedUnits>
+          <PositionUnit>Âµm</PositionUnit>
+          <SupportedUnits>Âµm|nm|</SupportedUnits>
           <PositionRanges>
-            <Range Unit="µm">
+            <Range Unit="Âµm">
               <Minimum>-14000</Minimum>
               <Maximum>14000</Maximum>
             </Range>
@@ -1560,16 +1560,16 @@
           </PositionRanges>
           <MinMoveSpeed>0.062</MinMoveSpeed>
           <MaxMoveSpeed>6000</MaxMoveSpeed>
-          <SpeedUnit>µm/s</SpeedUnit>
+          <SpeedUnit>Âµm/s</SpeedUnit>
           <HasContinualSpeed>true</HasContinualSpeed>
           <HasContinualStartSpeed>false</HasContinualStartSpeed>
           <HasContinualAcceleration>true</HasContinualAcceleration>
           <MinContinualSpeed>0.062</MinContinualSpeed>
           <MaxContinualSpeed>6000</MaxContinualSpeed>
-          <ContinualSpeedUnit>µm/s</ContinualSpeedUnit>
+          <ContinualSpeedUnit>Âµm/s</ContinualSpeedUnit>
           <MinContinualAcceleration>0</MinContinualAcceleration>
           <MaxContinualAcceleration>10000</MaxContinualAcceleration>
-          <ContinualAccelerationUnit>µm/s²</ContinualAccelerationUnit>
+          <ContinualAccelerationUnit>Âµm/sÂ²</ContinualAccelerationUnit>
           <CoordinateDirection>1</CoordinateDirection>
           <HasLoadWork>true</HasLoadWork>
           <HasLowerSWLimit>true</HasLowerSWLimit>
@@ -1743,26 +1743,26 @@
               <MaxDeviation>4.875</MaxDeviation>
               <TypicalDeviation>1.875</TypicalDeviation>
               <StepWidth>0.25</StepWidth>
-              <PositionUnit>µm</PositionUnit>
-              <SupportedUnits>µm|</SupportedUnits>
+              <PositionUnit>Âµm</PositionUnit>
+              <SupportedUnits>Âµm|</SupportedUnits>
               <PositionRanges>
-                <Range Unit="µm">
+                <Range Unit="Âµm">
                   <Minimum>-350000</Minimum>
                   <Maximum>350000</Maximum>
                 </Range>
               </PositionRanges>
               <MinMoveSpeed>0.001</MinMoveSpeed>
               <MaxMoveSpeed>25000</MaxMoveSpeed>
-              <SpeedUnit>µm/s</SpeedUnit>
+              <SpeedUnit>Âµm/s</SpeedUnit>
               <HasContinualSpeed>true</HasContinualSpeed>
               <HasContinualStartSpeed>false</HasContinualStartSpeed>
               <HasContinualAcceleration>true</HasContinualAcceleration>
               <MinContinualSpeed>0</MinContinualSpeed>
               <MaxContinualSpeed>25000</MaxContinualSpeed>
-              <ContinualSpeedUnit>µm/s</ContinualSpeedUnit>
+              <ContinualSpeedUnit>Âµm/s</ContinualSpeedUnit>
               <MinContinualAcceleration>0</MinContinualAcceleration>
               <MaxContinualAcceleration>500000</MaxContinualAcceleration>
-              <ContinualAccelerationUnit>µm/s2</ContinualAccelerationUnit>
+              <ContinualAccelerationUnit>Âµm/s2</ContinualAccelerationUnit>
               <CoordinateDirection>1</CoordinateDirection>
               <HasLoadWork>false</HasLoadWork>
               <HasLowerSWLimit>true</HasLowerSWLimit>
@@ -1777,26 +1777,26 @@
               <MaxDeviation>4.875</MaxDeviation>
               <TypicalDeviation>1.875</TypicalDeviation>
               <StepWidth>0.25</StepWidth>
-              <PositionUnit>µm</PositionUnit>
-              <SupportedUnits>µm|</SupportedUnits>
+              <PositionUnit>Âµm</PositionUnit>
+              <SupportedUnits>Âµm|</SupportedUnits>
               <PositionRanges>
-                <Range Unit="µm">
+                <Range Unit="Âµm">
                   <Minimum>-350000</Minimum>
                   <Maximum>350000</Maximum>
                 </Range>
               </PositionRanges>
               <MinMoveSpeed>0.001</MinMoveSpeed>
               <MaxMoveSpeed>25000</MaxMoveSpeed>
-              <SpeedUnit>µm/s</SpeedUnit>
+              <SpeedUnit>Âµm/s</SpeedUnit>
               <HasContinualSpeed>true</HasContinualSpeed>
               <HasContinualStartSpeed>false</HasContinualStartSpeed>
               <HasContinualAcceleration>true</HasContinualAcceleration>
               <MinContinualSpeed>0</MinContinualSpeed>
               <MaxContinualSpeed>25000</MaxContinualSpeed>
-              <ContinualSpeedUnit>µm/s</ContinualSpeedUnit>
+              <ContinualSpeedUnit>Âµm/s</ContinualSpeedUnit>
               <MinContinualAcceleration>0</MinContinualAcceleration>
               <MaxContinualAcceleration>500000</MaxContinualAcceleration>
-              <ContinualAccelerationUnit>µm/s2</ContinualAccelerationUnit>
+              <ContinualAccelerationUnit>Âµm/s2</ContinualAccelerationUnit>
               <CoordinateDirection>1</CoordinateDirection>
               <HasLoadWork>false</HasLoadWork>
               <HasLowerSWLimit>true</HasLowerSWLimit>
@@ -1813,26 +1813,26 @@
           <MaxDeviation>4.875</MaxDeviation>
           <TypicalDeviation>1.875</TypicalDeviation>
           <StepWidth>0.25</StepWidth>
-          <PositionUnit>µm</PositionUnit>
-          <SupportedUnits>µm|</SupportedUnits>
+          <PositionUnit>Âµm</PositionUnit>
+          <SupportedUnits>Âµm|</SupportedUnits>
           <PositionRanges>
-            <Range Unit="µm">
+            <Range Unit="Âµm">
               <Minimum>-350000</Minimum>
               <Maximum>350000</Maximum>
             </Range>
           </PositionRanges>
           <MinMoveSpeed>0.001</MinMoveSpeed>
           <MaxMoveSpeed>25000</MaxMoveSpeed>
-          <SpeedUnit>µm/s</SpeedUnit>
+          <SpeedUnit>Âµm/s</SpeedUnit>
           <HasContinualSpeed>true</HasContinualSpeed>
           <HasContinualStartSpeed>false</HasContinualStartSpeed>
           <HasContinualAcceleration>true</HasContinualAcceleration>
           <MinContinualSpeed>0</MinContinualSpeed>
           <MaxContinualSpeed>25000</MaxContinualSpeed>
-          <ContinualSpeedUnit>µm/s</ContinualSpeedUnit>
+          <ContinualSpeedUnit>Âµm/s</ContinualSpeedUnit>
           <MinContinualAcceleration>0</MinContinualAcceleration>
           <MaxContinualAcceleration>500000</MaxContinualAcceleration>
-          <ContinualAccelerationUnit>µm/s2</ContinualAccelerationUnit>
+          <ContinualAccelerationUnit>Âµm/s2</ContinualAccelerationUnit>
           <CoordinateDirection>1</CoordinateDirection>
           <HasLoadWork>false</HasLoadWork>
           <HasLowerSWLimit>true</HasLowerSWLimit>
@@ -1847,26 +1847,26 @@
           <MaxDeviation>4.875</MaxDeviation>
           <TypicalDeviation>1.875</TypicalDeviation>
           <StepWidth>0.25</StepWidth>
-          <PositionUnit>µm</PositionUnit>
-          <SupportedUnits>µm|</SupportedUnits>
+          <PositionUnit>Âµm</PositionUnit>
+          <SupportedUnits>Âµm|</SupportedUnits>
           <PositionRanges>
-            <Range Unit="µm">
+            <Range Unit="Âµm">
               <Minimum>-350000</Minimum>
               <Maximum>350000</Maximum>
             </Range>
           </PositionRanges>
           <MinMoveSpeed>0.001</MinMoveSpeed>
           <MaxMoveSpeed>25000</MaxMoveSpeed>
-          <SpeedUnit>µm/s</SpeedUnit>
+          <SpeedUnit>Âµm/s</SpeedUnit>
           <HasContinualSpeed>true</HasContinualSpeed>
           <HasContinualStartSpeed>false</HasContinualStartSpeed>
           <HasContinualAcceleration>true</HasContinualAcceleration>
           <MinContinualSpeed>0</MinContinualSpeed>
           <MaxContinualSpeed>25000</MaxContinualSpeed>
-          <ContinualSpeedUnit>µm/s</ContinualSpeedUnit>
+          <ContinualSpeedUnit>Âµm/s</ContinualSpeedUnit>
           <MinContinualAcceleration>0</MinContinualAcceleration>
           <MaxContinualAcceleration>500000</MaxContinualAcceleration>
-          <ContinualAccelerationUnit>µm/s2</ContinualAccelerationUnit>
+          <ContinualAccelerationUnit>Âµm/s2</ContinualAccelerationUnit>
           <CoordinateDirection>1</CoordinateDirection>
           <HasLoadWork>false</HasLoadWork>
           <HasLowerSWLimit>true</HasLowerSWLimit>
@@ -2166,11 +2166,11 @@
       <Items>
         <Distance Id="X">
           <Value>9.08E-07</Value>
-          <DefaultUnitFormat>µm</DefaultUnitFormat>
+          <DefaultUnitFormat>Âµm</DefaultUnitFormat>
         </Distance>
         <Distance Id="Y">
           <Value>9.08E-07</Value>
-          <DefaultUnitFormat>µm</DefaultUnitFormat>
+          <DefaultUnitFormat>Âµm</DefaultUnitFormat>
         </Distance>
       </Items>
     </Scaling>

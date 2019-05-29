@@ -107,7 +107,6 @@ class DCCImage:
     def getRGBHistogramValues(self, normed=False) -> typing.Tuple[typing.List[np.ndarray], typing.List[np.ndarray]]:
         histPerChannel = []
         binsPerChannel = []
-        colors = ["red", "green", "blue"]
         if self.getNumberOfChannel() != 3:
             raise ImageDimensionsException(self.getArray().ndim)
         array = self.getArray()
@@ -267,18 +266,21 @@ class DCCImage:
         warnings.warn(message)
         # VERY SLOW WITH BIG IMAGES
         image = self.getGrayscaleConversion().getArray()
-        stdFiltered = filters.generic_filter(image, np.std, size=filterSize, mode="nearest")
-        return DCCImage(stdFiltered.astype(np.float32))
+        stdFiltered = filters.generic_filter(image, np.std, size=filterSize, mode="nearest").astype(np.float32)
+        if np.any(np.isnan(stdFiltered)):
+            warnings.warn("Nan values encountered! Replacing them with 0.", category=RuntimeWarning)
+            stdFiltered = np.nan_to_num(stdFiltered)
+        return DCCImage(stdFiltered)
 
     def getStandardDeviationFiltering(self, filterSize: int):
         image = self.getGrayscaleConversion().getArray()
-        # We must add a small random number because otherwise some numbers become too small
-        # and NaN appear throughout the resulting image.
-        image += np.random.rand(image.shape[0], image.shape[1]) * 1e-6
         stdFilterPart1 = filters.uniform_filter(image, filterSize, mode="nearest")
         stdFilterPart2 = filters.uniform_filter(image * image, filterSize, mode="nearest")
-        stdFiltered = np.sqrt(stdFilterPart2 - stdFilterPart1 * stdFilterPart1)
-        return DCCImage(stdFiltered.astype(np.float32))
+        stdFiltered = np.sqrt(stdFilterPart2 - stdFilterPart1 * stdFilterPart1).astype(np.float32)
+        if np.any(np.isnan(stdFiltered)):
+            warnings.warn("Nan values encountered! Replacing them with 0.", category=RuntimeWarning)
+            stdFiltered = np.nan_to_num(stdFiltered)
+        return DCCImage(stdFiltered)
 
     def getGrayGaussianFiltering(self, sigma: float):
         image = self.getGrayscaleConversion().getArray()
@@ -307,7 +309,7 @@ class DCCImage:
 
 
 if __name__ == '__main__':
-    array = np.ones((5, 5, 3), dtype=np.float32)
+    array = np.ones((5, 5), dtype=np.float32)
     import DCCImagesFromFiles
 
     cziImage = DCCImagesFromFiles.DCCImagesFromCZIFile(
@@ -316,4 +318,7 @@ if __name__ == '__main__':
         r"C:\Users\goubi\PycharmProjects\BigData-ImageAnalysis\ImageAnalysis\unitTesting\testNotCziFile.jpg")
     cziImage = cziImage.getImageAtIndex(0)
     # hist, bins = cziImage.getGrayscaleHistogram()
-    jpeg.displayRGBHistogram(True)
+    cziImage.getStandardDeviationFiltering(3).showImage()
+    cziImage.showImage()
+    array[0][0] = np.nan
+    image = DCCImage(array)

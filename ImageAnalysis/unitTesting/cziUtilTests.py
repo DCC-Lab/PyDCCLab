@@ -84,15 +84,14 @@ class TestCziUtil(unittest.TestCase):
         self.assertTrue(isSaved)
 
     def testSaveImagesToTIFFFilesExist(self):
+        import os
         czi = cziUtil.readCziImage("testCziFile2Images.czi")
         images = cziUtil.getImagesFromCziFileObject(czi)
         cziUtil.saveImagesToTIFF(images, "testSaveTIFF")
         filesExist = True
         try:
-            file1 = open("testSaveTIFF_1.tif", "r")
-            file2 = open("testSaveTIFF_2.tif", "r")
-            file1.close()
-            file2.close()
+            os.remove("testSaveTIFF_1.tif")
+            os.remove("testSaveTIFF_2.tif")
         except FileNotFoundError:
             filesExist = False
         self.assertTrue(filesExist)
