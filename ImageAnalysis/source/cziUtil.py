@@ -19,8 +19,19 @@ try:
     import matplotlib.pyplot as plt
     import tifffile
     import xml.etree.ElementTree as ET
+    import os
+    import fnmatch
 except ImportError:
     print("Please install the required libraries.")
+
+
+def findAllCziFiles(directory):
+    allCZIs = []
+    for root, directories, files in os.walk(os.path.normpath(directory)):
+        for file in files:
+            if fnmatch.fnmatch(file, '*.czi'):
+                allCZIs.append([file, os.path.join(root, file)])
+    return allCZIs
 
 
 def readCziImage(filename):

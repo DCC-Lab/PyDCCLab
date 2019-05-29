@@ -1,8 +1,8 @@
 class Filter:
-    def __init__(self, filterId, min, max):
+    def __init__(self, filterId, cutIn, cutOut):
         self.filterId = filterId
-        self.min = min
-        self.max = max
+        self.cutIn = cutIn
+        self.cutOut = cutOut
 
         self.channelId = None
         self.filterSetId = None
@@ -11,7 +11,10 @@ class Filter:
         self.dichroic = None
 
     def __repr__(self):  # TODO This might need to be modified. Currently only for testing purpose.
-        return '{};{};{}-{}'.format(self.filterId, self.channelId, self.min, self.max)
+        return '{};{};{};{}-{}'.format(self.filterId, self.channelId, self.dichroic, self.cutIn, self.cutOut)
+
+    def __eq__(self, other):
+        return repr(self) == repr(other)
 
     def setFilterData(self, root):
         self.setChannelId(root)
@@ -53,7 +56,7 @@ class Filter:
         return self.channelId
 
     def getFilter(self):
-        return '{}-{}'.format(self.min, self.max)
+        return '{}-{}'.format(self.cutIn, self.cutOut)
 
     def getDichroic(self):
         return self.dichroic
