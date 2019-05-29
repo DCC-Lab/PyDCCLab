@@ -116,12 +116,12 @@ class TestDCCImageMethods(unittest.TestCase):
             self.image.saveToTIFF(name)
 
     def testSaveToTIFF(self):
+        import os
         name = "testSaveToTiff"
         self.image.saveToTIFF(name)
         isSaved = True
         try:
-            file = open("{}.tif".format(name), "r")
-            file.close()
+            os.remove("{}.tif".format(name))
         except FileNotFoundError:
             isSaved = False
         self.assertTrue(isSaved)
@@ -170,7 +170,9 @@ class TestDCCImageMethods(unittest.TestCase):
             image.getGrayscaleHistogramValues()[-1] == bins))
 
     def testDCCImageGetGrayHistogramValuesNormalized(self):
-        hist, bins = self.image.getGrayscaleHistogramValues(True)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=UserWarning)
+            hist, bins = self.image.getGrayscaleHistogramValues(True)
         self.assertAlmostEqual(sum(hist), 1, delta=1e-9)
 
     def testDCCImageGetColorHistogramVsluesNoColorImage(self):
@@ -205,15 +207,19 @@ class TestDCCImageMethods(unittest.TestCase):
 
     @patch("matplotlib.pyplot.show", new=Mock)
     def testDCCImageDisplayGrayHistogramNotNormalized(self):
-        histogramFromGetValues, binsFromGetValues = self.image.getGrayscaleHistogramValues()
-        histogramFromDisplay, binsFromDisplay = self.image.displayGrayscaleHistogram()
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", UserWarning)
+            histogramFromGetValues, binsFromGetValues = self.image.getGrayscaleHistogramValues()
+            histogramFromDisplay, binsFromDisplay = self.image.displayGrayscaleHistogram()
         self.assertTrue(
             np.alltrue(np.equal(histogramFromDisplay, histogramFromGetValues)) and np.alltrue(
                 np.equal(binsFromDisplay, binsFromGetValues)))
 
     @patch("matplotlib.pyplot.show", new=Mock)
     def testDCCImageDisplayGrayHistogramNormalized(self):
-        hist, bins = self.image.displayGrayscaleHistogram(True)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", UserWarning)
+            hist, bins = self.image.displayGrayscaleHistogram(True)
         self.assertAlmostEqual(sum(hist), 1, delta=1e-9)
 
     def testDCCImageDisplayColorHistogramNoColorImage(self):
@@ -230,8 +236,8 @@ class TestDCCImageMethods(unittest.TestCase):
     @patch("matplotlib.pyplot.show", new=Mock)
     def testDCCImageDisplayColorHistogramNotNormalized(self):
         image = DCCImage.DCCImage(np.ones((5000, 5000, 3), dtype=np.float32))
-        histogramFromGetValues, binsFromGetValues = image.getGrayscaleHistogramValues()
-        histogramFromDisplay, binsFromDisplay = image.displayGrayscaleHistogram()
+        histogramFromGetValues, binsFromGetValues = image.getRGBHistogramValues()
+        histogramFromDisplay, binsFromDisplay = image.displayRGBHistogram()
         self.assertTrue(
             np.alltrue(np.equal(histogramFromDisplay, histogramFromGetValues)) and np.alltrue(
                 np.equal(binsFromDisplay, binsFromGetValues)))
@@ -491,7 +497,7 @@ class TestDCCImageMethods(unittest.TestCase):
                                dtype=np.float32).reshape((5, 5))
 
         with warnings.catch_warnings():
-            warnings.simplefilter('ignore', category=Warning)
+            warnings.simplefilter('ignore', category=UserWarning)
             stdDevImageAsArray = DCCImage.DCCImage(array).getStandardDeviationFilteringSlow(
                 filterSize=3).getArray()
         self.assertTrue(np.allclose(resultArray, stdDevImageAsArray))
@@ -525,11 +531,12 @@ class TestDCCImageMethods(unittest.TestCase):
             filterSize=3).getArray()
         self.assertTrue(np.allclose(resultArray, stdDevImageAsArray, rtol=1e-4, atol=1e-4))
 
-
     def testDCCImageSTDDevFilterMK1AndMK2Equality(self):
         array = np.arange(16).reshape((4, 4)).astype(np.float32)
         image = DCCImage.DCCImage(array)
-        mk1 = image.getStandardDeviationFilteringSlow(3).getArray()
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=UserWarning)
+            mk1 = image.getStandardDeviationFilteringSlow(3).getArray()
         mk2 = image.getStandardDeviationFiltering(3).getArray()
         self.assertTrue(np.allclose(mk1, mk2))
 
@@ -538,12 +545,16 @@ class TestDCCImageMethods(unittest.TestCase):
         array = np.arange(50000).reshape((500, 100)).astype(np.float32)
         image = DCCImage.DCCImage(array)
         beforeMK1 = time.clock()
-        image.getStandardDeviationFilteringSlow(3).getArray()
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=UserWarning)
+            image.getStandardDeviationFilteringSlow(3).getArray()
         afterMK1 = time.clock()
         beforeMK2 = time.clock()
         image.getStandardDeviationFiltering(3).getArray()
         afterMK2 = time.clock()
         self.assertTrue((afterMK1 - beforeMK1) >= (afterMK2 - beforeMK2))
+
+    # def test
 
 
 if __name__ == '__main__':

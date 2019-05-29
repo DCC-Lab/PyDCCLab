@@ -107,7 +107,6 @@ class DCCImage:
     def getRGBHistogramValues(self, normed=False) -> typing.Tuple[typing.List[np.ndarray], typing.List[np.ndarray]]:
         histPerChannel = []
         binsPerChannel = []
-        colors = ["red", "green", "blue"]
         if self.getNumberOfChannel() != 3:
             raise ImageDimensionsException(self.getArray().ndim)
         array = self.getArray()
@@ -269,7 +268,7 @@ class DCCImage:
         image = self.getGrayscaleConversion().getArray()
         stdFiltered = filters.generic_filter(image, np.std, size=filterSize, mode="nearest").astype(np.float32)
         if np.any(np.isnan(stdFiltered)):
-            warnings.warn("Nan values encountered! Replacing them with 0.")
+            warnings.warn("Nan values encountered! Replacing them with 0.", category=RuntimeWarning)
             stdFiltered = np.nan_to_num(stdFiltered)
         return DCCImage(stdFiltered)
 
@@ -279,7 +278,7 @@ class DCCImage:
         stdFilterPart2 = filters.uniform_filter(image * image, filterSize, mode="nearest")
         stdFiltered = np.sqrt(stdFilterPart2 - stdFilterPart1 * stdFilterPart1).astype(np.float32)
         if np.any(np.isnan(stdFiltered)):
-            warnings.warn("Nan values encountered! Replacing them with 0.")
+            warnings.warn("Nan values encountered! Replacing them with 0.", category=RuntimeWarning)
             stdFiltered = np.nan_to_num(stdFiltered)
         return DCCImage(stdFiltered)
 
