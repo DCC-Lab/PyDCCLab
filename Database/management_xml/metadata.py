@@ -145,12 +145,23 @@ class Metadata:
         except Exception as error:
             raise error
 
+    def findChannelsEntriesInXml(self):  # TODO Big problem here...
+        try:
+            channels = []
+            print(self.root.find('./Metadata/Information/Image/Dimensions/Channels'))
+            #for channel in self.root.find('./Metadata/Information/Image/Dimensions/Channels'):
+            #    channels.append(Channel(channel.attrib['Id'], channel.attrib['Name'], self.root))
+            #return channels
+        except AttributeError as error:
+            raise error
+        except KeyError as error:
+            raise error
+
     def setChannels(self):
-        lstChannels = []
-        for channel in self.root.find('./Metadata/Information/Image/Dimensions/Channels'):
-            newChannel = Channel(channel.attrib['Id'], channel.attrib['Name'], self.root)
-            newChannel.getDataFromFilters(self.filters)
-            lstChannels.append(newChannel)
-
-        return lstChannels
-
+        try:
+            channels = self.findChannelsEntriesInXml()
+            for channel in channels:
+                channel.getDataFromFilters(self.filters)
+            return channels
+        except Exception as error:
+            raise error

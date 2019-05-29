@@ -10,7 +10,7 @@ class Filter:
         self.dichroicId = None
         self.dichroic = None
 
-    def __repr__(self):  # TODO This might need to be modified. Currently only for testing purpose.
+    def __repr__(self):
         return '{};{};{};{}-{}'.format(self.filterId, self.channelId, self.dichroic, self.cutIn, self.cutOut)
 
     def __eq__(self, other):
