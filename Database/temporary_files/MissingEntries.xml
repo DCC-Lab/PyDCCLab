@@ -1943,8 +1943,6 @@
         <UserName>POM</UserName>
       </Document>
       <Image>
-        <SizeX>1936</SizeX>
-        <SizeY>1460</SizeY>
         <SizeB>1</SizeB>
         <OriginalCompressionMethod>Uncompressed</OriginalCompressionMethod>
         <OriginalEncodingQuality>100</OriginalEncodingQuality>
@@ -2045,9 +2043,6 @@
       </Image>
       <Instrument>
         <Microscopes>
-          <Microscope Id="Microscope:1">
-            <Type>Inverted</Type>
-          </Microscope>
         </Microscopes>
         <LightSources>
           <LightSource Id="LightSource:1" Name="HXP 120 V">
@@ -2078,17 +2073,6 @@
           </Detector>
         </Detectors>
         <Objectives>
-          <Objective Id="Objective:1" Name="LD A-Plan 5x/0.15 Ph1">
-            <LensNA>0.15</LensNA>
-            <NominalMagnification>5</NominalMagnification>
-            <WorkingDistance>11720</WorkingDistance>
-            <PupilGeometry>PhaseRing1</PupilGeometry>
-            <ImmersionRefractiveIndex>1.000293</ImmersionRefractiveIndex>
-            <Immersion>Air</Immersion>
-            <Manufacturer>
-              <Model>LD A-Plan 5x/0.15 Ph1</Model>
-            </Manufacturer>
-          </Objective>
         </Objectives>
         <FilterSets>
           <FilterSet Id="FilterSet:1">
@@ -2120,7 +2104,6 @@
           <Filter Id="Filter:2">
             <TransmittanceRange>
               <CutIn>500</CutIn>
-              <CutOut>550</CutOut>
             </TransmittanceRange>
           </Filter>
           <Filter Id="Filter:3">
@@ -2165,11 +2148,9 @@
       </AutoScaling>
       <Items>
         <Distance Id="X">
-          <Value>9.08E-07</Value>
           <DefaultUnitFormat>µm</DefaultUnitFormat>
         </Distance>
         <Distance Id="Y">
-          <Value>9.08E-07</Value>
           <DefaultUnitFormat>µm</DefaultUnitFormat>
         </Distance>
       </Items>

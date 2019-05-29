@@ -2078,7 +2078,7 @@
           </Detector>
         </Detectors>
         <Objectives>
-          <Objective Id="Objective:1" Name="LD A-Plan 5x/0.15 Ph1">
+          <Objective Id="Objective:1">
             <LensNA>0.15</LensNA>
             <NominalMagnification>5</NominalMagnification>
             <WorkingDistance>11720</WorkingDistance>
@@ -2123,7 +2123,7 @@
               <CutOut>550</CutOut>
             </TransmittanceRange>
           </Filter>
-          <Filter Id="Filter:3">
+          <Filter>
             <TransmittanceRange>
               <CutIn>335</CutIn>
               <CutOut>383</CutOut>
@@ -2164,11 +2164,11 @@
         <CreationDateTime>04/18/2017 14:36:50</CreationDateTime>
       </AutoScaling>
       <Items>
-        <Distance Id="X">
+        <Distance>
           <Value>9.08E-07</Value>
           <DefaultUnitFormat>µm</DefaultUnitFormat>
         </Distance>
-        <Distance Id="Y">
+        <Distance>
           <Value>9.08E-07</Value>
           <DefaultUnitFormat>µm</DefaultUnitFormat>
         </Distance>
