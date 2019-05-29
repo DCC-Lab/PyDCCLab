@@ -154,7 +154,97 @@ class TestDCCImageMethods(unittest.TestCase):
         grayScale = dccImage.getGrayscaleConversion()
         self.assertTrue(grayScale.getNumberOfChannel() == 1)
 
-    # todo Faire tests unitaires des méthodes d'histogrammes
+    def testDCCImageGetGrayHistogramValuesWarning(self):
+        import warnings
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter("error")
+            with self.assertRaises(UserWarning):
+                self.image.getGrayscaleHistogramValues()
+
+    def testDCCImageGetGrayHistogramValuesNotNormalized(self):
+        array = np.ones((5, 5), dtype=np.float32)
+        image = DCCImage.DCCImage(array)
+        hist = [0, 25]
+        bins = [0, 1, 2]
+        self.assertTrue(np.alltrue(image.getGrayscaleHistogramValues()[0] == hist) and np.alltrue(
+            image.getGrayscaleHistogramValues()[-1] == bins))
+
+    def testDCCImageGetGrayHistogramValuesNormalized(self):
+        hist, bins = self.image.getGrayscaleHistogramValues(True)
+        self.assertAlmostEqual(sum(hist), 1, delta=1e-9)
+
+    def testDCCImageGetColorHistogramVsluesNoColorImage(self):
+        with self.assertRaises(DCCExcep.ImageDimensionsException):
+            self.image.getRGBHistogramValues()
+
+    def testDCCImageGetColorHistogramValuesWarning(self):
+        image = DCCImage.DCCImage(np.ones((199, 201, 3), dtype=np.float32) * 1.23)
+        import warnings
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter("error")
+            with self.assertRaises(UserWarning):
+                image.getGrayscaleHistogramValues()
+
+    def testDCCImageGetColorHistogramValuesNotNormalized(self):
+        image = DCCImage.DCCImage(np.ones((5, 5, 3), dtype=np.float32))
+        allHists = [[0, 25]] * 3
+        allBins = [[0, 1, 2]] * 3
+        self.assertTrue(np.alltrue(np.equal(image.getRGBHistogramValues()[0], allHists)) and np.alltrue(
+            np.equal(image.getRGBHistogramValues()[1], allBins)))
+
+    def testDCCImageGetColorHistogramValuesNormalized(self):
+        image = DCCImage.DCCImage(np.ones((1000, 1000, 3), dtype=np.float32))
+        allHist, allBins = image.getRGBHistogramValues(True)
+        allSums = [sum(allHist[x]) for x in range(3)]
+        self.assertTrue(np.allclose(allSums, 1, atol=1e-9, rtol=1e-9))
+
+    def testDCCDisplayImageGrayHistogramWarning(self):
+        import warnings
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter("error")
+            with self.assertRaises(UserWarning):
+                self.image.displayGrayscaleHistogram()
+
+    @patch("matplotlib.pyplot.show", new=Mock)
+    def testDCCImageDisplayGrayHistogramNotNormalized(self):
+        histogramFromGetValues, binsFromGetValues = self.image.getGrayscaleHistogramValues()
+        histogramFromDisplay, binsFromDisplay = self.image.displayGrayscaleHistogram()
+        self.assertTrue(
+            np.alltrue(np.equal(histogramFromDisplay, histogramFromGetValues)) and np.alltrue(
+                np.equal(binsFromDisplay, binsFromGetValues)))
+
+    @patch("matplotlib.pyplot.show", new=Mock)
+    def testDCCImageDisplayGrayHistogramNormalized(self):
+        hist, bins = self.image.displayGrayscaleHistogram(True)
+        self.assertAlmostEqual(sum(hist), 1, delta=1e-9)
+
+    def testDCCImageDisplayColorHistogramNoColorImage(self):
+        with self.assertRaises(DCCExcep.ImageDimensionsException):
+            self.image.displayRGBHistogram()
+
+    def testDCCImageDisplayColorHistogramWarning(self):
+        image = DCCImage.DCCImage(np.ones((5000, 5000, 3), dtype=np.float32) * 0.01)
+        import warnings
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter("error")
+            with self.assertRaises(UserWarning):
+                image.displayRGBHistogram()
+
+    @patch("matplotlib.pyplot.show", new=Mock)
+    def testDCCImageDisplayColorHistogramNotNormalized(self):
+        image = DCCImage.DCCImage(np.ones((5000, 5000, 3), dtype=np.float32))
+        histogramFromGetValues, binsFromGetValues = image.getGrayscaleHistogramValues()
+        histogramFromDisplay, binsFromDisplay = image.displayGrayscaleHistogram()
+        self.assertTrue(
+            np.alltrue(np.equal(histogramFromDisplay, histogramFromGetValues)) and np.alltrue(
+                np.equal(binsFromDisplay, binsFromGetValues)))
+
+    @patch("matplotlib.pyplot.show", new=Mock)
+    def testDCCImageDisplayColorHistogramNormalized(self):
+        image = DCCImage.DCCImage(np.ones((5000, 5000, 3), dtype=np.float32))
+        allHists, allBins = image.displayRGBHistogram(True)
+        allSums = [sum(allHists[x]) for x in range(3)]
+        self.assertTrue(np.allclose(allSums, 1, atol=1e-9, rtol=1e-9))
 
     def testDCCImageXDerivativeZerosOutput(self):
         array = np.ones((5, 5), dtype=np.float32)
@@ -228,6 +318,68 @@ class TestDCCImageMethods(unittest.TestCase):
         entropy = -np.sum(
             counts / self.image.getNumberOfPixels() * np.log(counts / self.image.getNumberOfPixels()) / np.log(base))
         self.assertAlmostEqual(entropy, self.image.getShannonEntropyOfImage(base))
+
+    def testDCCImageGetPixelsOfIntensityGray(self):
+        intensity = 100
+        position = [(100, 100)]
+        self.assertTrue(self.image.getPixelsOfIntensityGrayImage(intensity) == position)
+
+    def testDCCImageGetPixelsOfIntensityGrayNoPixels(self):
+        intensity = 100.01
+        self.assertIsNone(self.image.getPixelsOfIntensityGrayImage(intensity))
+
+    def testDCCImageGetPixelsOfIntensityGrayMoreThanOne(self):
+        array = np.ones((5, 5), dtype=np.float32)
+        image = DCCImage.DCCImage(array)
+        coords = []
+        for i in range(5):
+            for j in range(5):
+                coords.append((i, j))
+        self.assertTrue(image.getPixelsOfIntensityGrayImage(1) == coords)
+
+    def testDCCImageGetPixelsOfIntensityColorAllChannels(self):
+        array = np.ones((5, 5, 3), dtype=np.float32)
+        array[0][0][0] = 0
+        coords = [[(0, 0)], None, None]
+        image = DCCImage.DCCImage(array)
+        self.assertTrue(image.getPixelsOfIntensityColorImageAllChannels(0) == coords)
+
+    def testDCCImageGetPixelsOfIntensityColorAllChannelsAllNone(self):
+        nones = [None, None, None]
+        image = DCCImage.DCCImage(np.zeros((1000, 1000, 3), dtype=np.float32))
+        supposed = image.getPixelsOfIntensityColorImageAllChannels(125)
+        self.assertTrue(supposed == nones)
+
+    def testDCCImageGetPixelsOfIntensityColorAllChannelsMultiplePixels(self):
+        listCoordsChannel0 = []
+        listCoordsChannel2 = []
+        array = np.ones((1000, 1000, 3), dtype=np.float32)
+        for i in range(235, 754):
+            for j in range(296, 407):
+                array[i][j][0] = 12.56
+                listCoordsChannel0.append((i, j))
+                if i / (j + 1) >= 1.05:
+                    array[i][j][2] = 12.56
+                    listCoordsChannel2.append((i, j))
+        listCoords = [listCoordsChannel0, None, listCoordsChannel2]
+        image = DCCImage.DCCImage(array)
+        self.assertTrue(image.getPixelsOfIntensityColorImageAllChannels(12.56) == listCoords)
+
+    def testDCCImageGetPixelsOfIntensityColorOneChannel(self):
+        listCoordsChannel0 = []
+        array = np.ones((1000, 1000, 3), dtype=np.float32)
+        for i in range(235, 754):
+            for j in range(296, 407):
+                array[i][j][0] = 12.56
+                listCoordsChannel0.append((i, j))
+        image = DCCImage.DCCImage(array)
+        self.assertTrue(listCoordsChannel0 == image.getPixelsOfIntensityColorImageOneChannel(12.56, 0))
+
+    def testDCCImageGetPixelsOfIntensityColorOneChannelOutOfBound(self):
+        with self.assertRaises(ValueError):
+            array = np.ones((1000, 1000, 3), dtype=np.float32)
+            image = DCCImage.DCCImage(array)
+            image.getPixelsOfIntensityColorImageOneChannel(1, 3)
 
     def testDCCImageMinimumIntensityPixels(self):
         minimumPosition = (0, 0)
@@ -399,52 +551,6 @@ class TestDCCImageMethods(unittest.TestCase):
         image.getStandardDeviationFiltering(3).getArray()
         afterMK2 = time.clock()
         self.assertTrue((afterMK1 - beforeMK1) >= (afterMK2 - beforeMK2))
-
-    def testDCCImageGetPixelsOfIntensityGray(self):
-        intensity = 100
-        position = [(100, 100)]
-        self.assertTrue(self.image.getPixelsOfIntensityGrayImage(intensity) == position)
-
-    def testDCCImageGetPixelsOfIntensityGrayNoPixels(self):
-        intensity = 100.01
-        self.assertIsNone(self.image.getPixelsOfIntensityGrayImage(intensity))
-
-    def testDCCImageGetPixelsOfIntensityGrayMoreThanOne(self):
-        array = np.ones((5, 5), dtype=np.float32)
-        image = DCCImage.DCCImage(array)
-        coords = []
-        for i in range(5):
-            for j in range(5):
-                coords.append((i, j))
-        self.assertTrue(image.getPixelsOfIntensityGrayImage(1) == coords)
-
-    def testDCCImageGetPixelsOfIntensityColorAllChannels(self):
-        array = np.ones((5, 5, 3), dtype=np.float32)
-        array[0][0][0] = 0
-        coords = [[(0, 0)], None, None]
-        image = DCCImage.DCCImage(array)
-        self.assertTrue(image.getPixelsOfIntensityColorImageAllChannels(0) == coords)
-
-    def testDCCImageGetPixelsOfIntensityColorAllChannelsAllNone(self):
-        nones = [None, None, None]
-        image = DCCImage.DCCImage(np.zeros((1000, 1000, 3), dtype=np.float32))
-        supposed = image.getPixelsOfIntensityColorImageAllChannels(125)
-        self.assertTrue(supposed == nones)
-
-    def testDCCImageGetPixelsOfIntensityColorAllChannelsMultiplePixels(self):
-        listCoordsChannel0 = []
-        listCoordsChannel2 = []
-        array = np.ones((1000, 1000, 3), dtype=np.float32)
-        for i in range(235, 754):
-            for j in range(296, 407):
-                array[i][j][0] = 12.56
-                listCoordsChannel0.append((i, j))
-                if i / (j + 1) >= 1.05:
-                    array[i][j][2] = 12.56
-                    listCoordsChannel2.append((i, j))
-        listCoords = [listCoordsChannel0, None, listCoordsChannel2]
-        image = DCCImage.DCCImage(array)
-        self.assertTrue(image.getPixelsOfIntensityColorImageAllChannels(12.56) == listCoords)
 
 
 if __name__ == '__main__':
