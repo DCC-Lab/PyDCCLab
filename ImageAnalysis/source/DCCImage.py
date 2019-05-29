@@ -86,22 +86,57 @@ class DCCImage:
             grayConversion = color.rgb2gray(self.getArray())
         return DCCImage(grayConversion.astype("float32"))
 
-    def grayscaleHistogram(self, normed=False):
-        array = self.getGrayscaleConversion().getArray()
+    @staticmethod
+    def __convertToUInt16Array(array) -> np.ndarray:
         if not np.alltrue(np.mod(array, 1) == 0):
             warnings.warn("Conversion to 16-bits unsigned integers may cause loss of precision.")
-        arrayUint = array.astype(np.uint16)
-        arrayRaveled = arrayUint.ravel()
+        return array.astype(np.uint16)
+
+    @staticmethod
+    def __ravelArray(array) -> np.ndarray:
+        return array.ravel()
+
+    def getGrayscaleHistogramValues(self, normed=False) -> typing.Tuple[np.ndarray, np.ndarray]:
+        array = self.getGrayscaleConversion().getArray()
+        arrayUint = self.__convertToUInt16Array(array)
+        arrayRaveled = self.__ravelArray(arrayUint)
         nbBins = len(np.bincount(arrayRaveled))
-        hist, bins, patches = plt.hist(arrayRaveled, nbBins, [0, nbBins], density=normed)
-        print(np.sum(hist))
+        hist, bins = np.histogram(arrayRaveled, nbBins, [0, nbBins], density=normed)
+        return hist, bins
+
+    def getRGBHistogramValues(self, normed=False) -> typing.Tuple[typing.List[np.ndarray], typing.List[np.ndarray]]:
+        histPerChannel = []
+        binsPerChannel = []
+        colors = ["red", "green", "blue"]
+        if self.getNumberOfChannel() != 3:
+            raise ImageDimensionsException(self.getArray().ndim)
+        array = self.getArray()
+        arrayUint = self.__convertToUInt16Array(array)
+        for channel in range(self.getNumberOfChannel()):
+            arrayRaveled = self.__ravelArray(arrayUint[..., channel])
+            nbBins = len(np.bincount(arrayRaveled))
+            hist, bins = np.histogram(arrayRaveled, nbBins, [0, nbBins], density=normed)
+            histPerChannel.append(hist)
+            binsPerChannel.append(bins)
+        return histPerChannel, binsPerChannel
+
+    def displayGrayscaleHistogram(self, normed=False) -> typing.Tuple[np.ndarray, np.ndarray]:
+        histogram, bins = self.getGrayscaleHistogramValues(normed)
+        plt.bar(bins[:-1], histogram, width=np.diff(bins), ec="k", align="edge", color="black", alpha=0.5)
         plt.show()
+        return histogram, bins
 
-    def RGBHistogram(self, normed=False):
-        # todo faire en sorte d'avoir un histogramme et être capable de le normaliser + trouver le bon nombre de bins
-        pass
+    def displayRGBHistogram(self, normed=False) -> typing.Tuple[typing.List[np.ndarray], typing.List[np.ndarray]]:
+        allHistograms, allBins = self.getRGBHistogramValues(normed)
+        colors = ["red", "green", "blue"]
+        for element in zip(allHistograms, allBins, colors):
+            bins = list(element)[1]
+            histogram = list(element)[0]
+            color = list(element)[2]
+            plt.bar(bins[:-1], histogram, width=np.diff(bins), ec="k", align="edge", color=color, alpha=0.5)
+        plt.show()
+        return allHistograms, allBins
 
-    # Garder private ou mettre public?
     @staticmethod
     def __convolution2D(inputImage: np.ndarray, matrix: typing.Union[np.ndarray, list]):
         convolvedImage = np.zeros_like(inputImage)
@@ -181,7 +216,7 @@ class DCCImage:
         coordsTemp = np.where(array[..., channel] == intensity)
         coords = list(zip(coordsTemp[0], coordsTemp[1])) if len(coordsTemp[0]) != 0 else None
         coordsList.append(coords)
-        return coordsList
+        return coordsList[0]
 
     def getMinimumIntensityPixels(self) -> typing.Union[
         typing.List[typing.Tuple[int, int]], typing.List[typing.List[typing.Tuple[int, int]]]]:
@@ -192,14 +227,13 @@ class DCCImage:
         :return: List of tuples or a list of lists of tuples
         """
         minimumsCoordsList = []
-        image = self.getArray()
         if self.getNumberOfChannel() == 1:
             minimum = self.getExtremaValuesOfPixels()[0][0]
             minimumsCoordsList = self.getPixelsOfIntensityGrayImage(minimum)
         else:
             for channel in range(self.getNumberOfChannel()):
                 minimum = self.getExtremaValuesOfPixels()[channel][0]
-                minimumsCoordsList.append(self.getPixelsOfIntensityColorImageOneChannel(minimum, channel)[0])
+                minimumsCoordsList.append(self.getPixelsOfIntensityColorImageOneChannel(minimum, channel))
         return minimumsCoordsList
 
     def getMaximumIntensityPixels(self) -> typing.Union[
@@ -211,14 +245,13 @@ class DCCImage:
         :return: List of tuples or a list of lists of tuples
         """
         maximumsCoordsList = []
-        image = self.getArray()
         if self.getNumberOfChannel() == 1:
             maximum = self.getExtremaValuesOfPixels()[0][1]
             maximumsCoordsList = self.getPixelsOfIntensityGrayImage(maximum)
         else:
             for channel in range(self.getNumberOfChannel()):
                 maximum = self.getExtremaValuesOfPixels()[channel][1]
-                maximumsCoordsList.append(self.getPixelsOfIntensityColorImageOneChannel(maximum, channel)[0])
+                maximumsCoordsList.append(self.getPixelsOfIntensityColorImageOneChannel(maximum, channel))
         return maximumsCoordsList
 
     def getEntropyFiltering(self, filterSize: int):
@@ -257,12 +290,30 @@ class DCCImage:
         gaussianFiltered = gaussian(image, sigma, mode="nearest", multichannel=True, preserve_range=True)
         return DCCImage(gaussianFiltered.astype(np.float32))
 
+    def getHorizontalSobelFiltering(self):
+        array = self.getGrayscaleConversion().getArray()
+        sobelH = filters.sobel_h(array)
+        return DCCImage(sobelH.astype(np.float32))
+
+    def getVerticalSobelFiltering(self):
+        array = self.getGrayscaleConversion().getArray()
+        sobelV = filters.sobel_v(array)
+        return DCCImage(sobelV.astype(np.float32))
+
+    def getBothDirectionsSobelFiltering(self):
+        array = self.getGrayscaleConversion().getArray()
+        sobel = filters.sobel(array)
+        return DCCImage(sobel.astype(np.float32))
+
 
 if __name__ == '__main__':
-    array = np.arange(25).reshape((5, 5)).astype(np.float32)
+    array = np.ones((5, 5, 3), dtype=np.float32)
     import DCCImagesFromFiles
 
     cziImage = DCCImagesFromFiles.DCCImagesFromCZIFile(
         r"C:\Users\goubi\PycharmProjects\BigData-ImageAnalysis\ImageAnalysis\unitTesting\testCziFile2Images.czi")
+    jpeg = DCCImagesFromFiles.DCCImageFromNormalFile(
+        r"C:\Users\goubi\PycharmProjects\BigData-ImageAnalysis\ImageAnalysis\unitTesting\testNotCziFile.jpg")
     cziImage = cziImage.getImageAtIndex(0)
-    cziImage.grayscaleHistogram()
+    # hist, bins = cziImage.getGrayscaleHistogram()
+    jpeg.displayRGBHistogram(True)
