@@ -12,7 +12,7 @@ class Database:
         self.curs = None
 
     def createConnection(self, mode='ro'):
-        if self.checkConnection() is False:
+        if self.checkIfIsConnected() is False:
             path = pathToURI(self.path, mode)
             try:
                 self.conn = lite.connect(path, uri=True)
@@ -23,22 +23,29 @@ class Database:
             raise Exception('Already connected to a database : ' + self.name + " : " + self.path)
 
     def closeConnection(self):
-        if self.checkConnection():
-            self.closeCursor()
+        if self.checkIfIsConnected() is True and self.checkIfCursorExists() is False:
             self.conn.close()
             self.conn = None
             return 'disconnected'
+        if self.checkIfIsConnected() is True and self.checkIfCursorExists() is True:
+            raise Exception('A cursor exists and has to be closed first.')
         else:
             raise Exception('Connection does not exist.')
 
-    def checkConnection(self):
+    def checkIfIsConnected(self):
         if self.conn is not None:
             return True
         else:
             return False
 
+    def checkIfCursorExists(self):
+        if self.curs is not None:
+            return True
+        else:
+            return False
+
     def changeConnectionMode(self, mode):
-        if self.checkConnection():
+        if self.checkIfIsConnected():
             self.closeConnection()
             try:
                 self.createConnection(mode)
@@ -49,18 +56,16 @@ class Database:
             return False
 
     def createCursor(self):
-        if self.checkConnection():
-            try:
-                self.closeCursor()
-                self.curs = self.conn.cursor()
-                return True
-            except lite.OperationalError as error:
-                raise error
-        else:
+        if self.checkIfIsConnected() is True and self.checkIfCursorExists() is False:
+            self.curs = self.conn.cursor()
+            return True
+        elif self.checkIfIsConnected() is False:
             raise Exception('Connection does not exist.')
+        elif self.checkIfIsConnected() is True and self.checkIfCursorExists() is True:
+            raise Exception('A cursor already exists.')
 
     def closeCursor(self):
-        if self.curs is not None:
+        if self.checkIfCursorExists():
             self.curs.close()
             self.curs = None
             return True
@@ -68,14 +73,16 @@ class Database:
             return False
 
     def commit(self):
-        if self.checkConnection() and self.curs is not None:
+        if self.checkIfIsConnected() is False:
+            raise Exception('Connection does not exist.')
+        elif self.checkIfCursorExists() is False:
+            raise Exception('Cursor does not exist.')
+        else:
             try:
                 self.conn.commit()
                 return True
             except lite.OperationalError as error:
                 raise error
-        else:
-            raise Exception('Connection/cursor does not exist.')
 
 # TODO Below is stuff to do eventually.
 '''

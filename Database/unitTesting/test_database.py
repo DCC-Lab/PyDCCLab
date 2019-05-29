@@ -1,12 +1,20 @@
-import Database.database as db
+import Database.management_database.database as db
 import sqlite3 as lite
 import unittest
 import os
 
 
 class TestDatabase(unittest.TestCase):
-    def test_createConnection(self):
-        directory = os.path.dirname(__file__)
+    def test_createConnection_connected(self):
+        directory = os.path.dirname(os.path.dirname(__file__))
+        fileName = os.path.join(directory, 'data', 'test.db')
+
+        database = db.Database(fileName, 'test.db')
+        self.assertEqual(database.createConnection(), 'connected')
+        database.closeConnection()
+
+    def test_createConnection_AlreadyConnected(self):
+        directory = os.path.dirname(os.path.dirname(__file__))
         fileName = os.path.join(directory, 'data', 'test.db')
 
         database = db.Database(fileName, 'test.db')
@@ -17,84 +25,167 @@ class TestDatabase(unittest.TestCase):
         database.createConnection()
         with self.assertRaises(Exception): database.createConnection()
 
+    def test_createConnection_CantConnect(self):
+        directory = os.path.dirname(os.path.dirname(__file__))
         fileName = os.path.join(directory, 'data', 'tst.db')
         database = db.Database(fileName, 'test.db')
         with self.assertRaises(lite.OperationalError): database.createConnection()
 
-    def test_closeConnection(self):
-        directory = os.path.dirname(__file__)
+    def test_closeConnection_disconnected(self):
+        directory = os.path.dirname(os.path.dirname(__file__))
         fileName = os.path.join(directory, 'data', 'test.db')
         database = db.Database(fileName, 'test.db')
         database.createConnection()
         self.assertEqual(database.closeConnection(), 'disconnected')
 
+    def test_cloeConnection_NoConnection(self):
+        directory = os.path.dirname(os.path.dirname(__file__))
+        fileName = os.path.join(directory, 'data', 'test.db')
+        database = db.Database(fileName, 'test.db')
+
         with self.assertRaises(Exception): database.closeConnection()
 
-    def test_checkConnection(self):
-        directory = os.path.dirname(__file__)
+    def test_closeConnection_CantDisconnect(self):
+        directory = os.path.dirname(os.path.dirname(__file__))
+        fileName = os.path.join(directory, 'data', 'tst.db')
+        database = db.Database(fileName, 'test.db')
+
+        with self.assertRaises(Exception): database.closeConnection()
+
+    def test_closeConnection_CursorExists(self):
+        directory = os.path.dirname(os.path.dirname(__file__))
         fileName = os.path.join(directory, 'data', 'test.db')
         database = db.Database(fileName, 'test.db')
         database.createConnection()
-        self.assertTrue(database.checkConnection())
+        database.createCursor()
+        with self.assertRaises(Exception): database.closeConnection()
 
+    def test_checkIfIsConnected_IsConnected(self):
+        directory = os.path.dirname(os.path.dirname(__file__))
+        fileName = os.path.join(directory, 'data', 'test.db')
+        database = db.Database(fileName, 'test.db')
+        database.createConnection()
+        self.assertTrue(database.checkIfIsConnected())
+
+    def test_checkIfIsConnected_IsNotConnected(self):
+        directory = os.path.dirname(os.path.dirname(__file__))
+        fileName = os.path.join(directory, 'data', 'test.db')
+        database = db.Database(fileName, 'test.db')
+        database.createConnection()
         database.closeConnection()
-        self.assertFalse(database.checkConnection())
 
-    def test_changeConnectionMode(self):
-        directory = os.path.dirname(__file__)
+        self.assertFalse(database.checkIfIsConnected())
+
+    def test_changeConnectionMode_NoConnection(self):
+        directory = os.path.dirname(os.path.dirname(__file__))
         fileName = os.path.join(directory, 'data', 'test.db')
         database = db.Database(fileName, 'test.db')
 
         self.assertFalse(database.changeConnectionMode('rw'))
 
+    def test_changeConnectionMode_ModeChanged(self):
+        directory = os.path.dirname(os.path.dirname(__file__))
+        fileName = os.path.join(directory, 'data', 'test.db')
+        database = db.Database(fileName, 'test.db')
+
         database.createConnection()
         self.assertTrue(database.changeConnectionMode('rw'))
 
+    def test_changeConnectionMode_InvalidMode(self):
+        directory = os.path.dirname(os.path.dirname(__file__))
+        fileName = os.path.join(directory, 'data', 'test.db')
+        database = db.Database(fileName, 'test.db')
+        database.createConnection()
+
         with self.assertRaises(lite.OperationalError): database.changeConnectionMode('abcd')
 
-    def test_pathToURI(self):
+    def test_pathToURI_ReadOnlyMode(self):
         self.assertEqual(db.pathToURI('test.db'), 'file:test.db?mode=ro')
+
+    def test_pathToURI_ReadOrWrite(self):
         self.assertEqual(db.pathToURI('test.db', 'rw'), 'file:test.db?mode=rw')
+
+    def test_pathToURI_AbsoluteReadOnlyMode(self):
         self.assertEqual(db.pathToURI(r'C:\sqlite3\Database\test.db'), 'file:C:/sqlite3/Database/test.db?mode=ro')
+
+    def test_pathToURI_AbsoluteReadOrWrite(self):
         self.assertEqual(db.pathToURI(r'C:\sqlite3\Database\test.db', 'rw'), 'file:C:/sqlite3/Database/test.db?mode=rw')
 
     def test_findingOS(self):
         # Only for windows for now.
         self.assertEqual(db.findingOS(), 'Windows')
 
-    def test_createCursor(self):
-        directory = os.path.dirname(__file__)
+    def test_createCursor_NoConnection(self):
+        directory = os.path.dirname(os.path.dirname(__file__))
         fileName = os.path.join(directory, 'data', 'test.db')
         database = db.Database(fileName, 'test.db')
 
         with self.assertRaises(Exception): database.createCursor()
 
-        database.createConnection()
-        self.assertTrue(database.createCursor())
-        # How to test OperationalError?
-
-    def test_closeCursor(self):
-        directory = os.path.dirname(__file__)
+    def test_createCursor_Connected(self):
+        directory = os.path.dirname(os.path.dirname(__file__))
         fileName = os.path.join(directory, 'data', 'test.db')
         database = db.Database(fileName, 'test.db')
+        database.createConnection()
+        self.assertTrue(database.createCursor())
 
-        self.assertFalse(database.closeCursor())
+    def test_createCursor_CursorAlreadyExist(self):
+        directory = os.path.dirname(os.path.dirname(__file__))
+        fileName = os.path.join(directory, 'data', 'test.db')
+        database = db.Database(fileName, 'test.db')
+        database.createConnection()
+        database.createCursor()
+        with self.assertRaises(Exception): database.createCursor()
 
+    def test_checkIfCursorExists_DoesExist(self):
+        directory = os.path.dirname(os.path.dirname(__file__))
+        fileName = os.path.join(directory, 'data', 'test.db')
+        database = db.Database(fileName, 'test.db')
+        database.createConnection()
+        database.createCursor()
+        self.assertTrue(database.checkIfCursorExists())
+
+    def test_checkIfCursorExists_DoesNotExist(self):
+        directory = os.path.dirname(os.path.dirname(__file__))
+        fileName = os.path.join(directory, 'data', 'test.db')
+        database = db.Database(fileName, 'test.db')
+        database.createConnection()
+        self.assertFalse(database.checkIfCursorExists())
+
+    def test_closeCursor_closed(self):
+        directory = os.path.dirname(os.path.dirname(__file__))
+        fileName = os.path.join(directory, 'data', 'test.db')
+        database = db.Database(fileName, 'test.db')
         database.createConnection()
         database.createCursor()
         self.assertTrue(database.closeCursor())
 
-    def test_commit(self):
-        directory = os.path.dirname(__file__)
+    def test_closeCursor_cantClose(self):
+        directory = os.path.dirname(os.path.dirname(__file__))
         fileName = os.path.join(directory, 'data', 'test.db')
         database = db.Database(fileName, 'test.db')
+        self.assertFalse(database.closeCursor())
 
+    def test_commit_notConnected(self):
+        directory = os.path.dirname(os.path.dirname(__file__))
+        fileName = os.path.join(directory, 'data', 'test.db')
+        database = db.Database(fileName, 'test.db')
         with self.assertRaises(Exception): database.commit()
 
+    def test_commit_noCursor(self):
+        directory = os.path.dirname(os.path.dirname(__file__))
+        fileName = os.path.join(directory, 'data', 'test.db')
+        database = db.Database(fileName, 'test.db')
+        database.createConnection()
+        with self.assertRaises(Exception): database.commit()
+
+    def test_commit_canCommit(self):
+        directory = os.path.dirname(os.path.dirname(__file__))
+        fileName = os.path.join(directory, 'data', 'test.db')
+        database = db.Database(fileName, 'test.db')
         database.createConnection()
         database.createCursor()
         self.assertTrue(database.commit())
-        # How to test OperationalError?
 
     '''
     def test_CreateTable(self):
