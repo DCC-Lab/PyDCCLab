@@ -290,6 +290,21 @@ class DCCImage:
         gaussianFiltered = gaussian(image, sigma, mode="nearest", multichannel=True, preserve_range=True)
         return DCCImage(gaussianFiltered.astype(np.float32))
 
+    def getHorizontalSobelFiltering(self):
+        array = self.getGrayscaleConversion().getArray()
+        sobelH = filters.sobel_h(array)
+        return DCCImage(sobelH.astype(np.float32))
+
+    def getVerticalSobelFiltering(self):
+        array = self.getGrayscaleConversion().getArray()
+        sobelV = filters.sobel_v(array)
+        return DCCImage(sobelV.astype(np.float32))
+
+    def getBothDirectionsSobelFiltering(self):
+        array = self.getGrayscaleConversion().getArray()
+        sobel = filters.sobel(array)
+        return DCCImage(sobel.astype(np.float32))
+
 
 if __name__ == '__main__':
     array = np.ones((5, 5, 3), dtype=np.float32)

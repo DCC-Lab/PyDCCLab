@@ -154,7 +154,6 @@ class TestDCCImageMethods(unittest.TestCase):
         grayScale = dccImage.getGrayscaleConversion()
         self.assertTrue(grayScale.getNumberOfChannel() == 1)
 
-    # todo Faire tests unitaires des méthodes d'histogrammes
     def testDCCImageGetGrayHistogramValuesWarning(self):
         import warnings
         with warnings.catch_warnings(record=True):
@@ -167,8 +166,37 @@ class TestDCCImageMethods(unittest.TestCase):
         image = DCCImage.DCCImage(array)
         hist = [0, 25]
         bins = [0, 1, 2]
-        self.assertTrue(all(image.getGrayscaleHistogramValues()[0] == hist) and all(
+        self.assertTrue(np.alltrue(image.getGrayscaleHistogramValues()[0] == hist) and np.alltrue(
             image.getGrayscaleHistogramValues()[-1] == bins))
+
+    def testDCCImageGetGrayHistogramValuesNormalized(self):
+        hist, bins = self.image.getGrayscaleHistogramValues(True)
+        self.assertAlmostEqual(sum(hist), 1, delta=1e-9)
+
+    def testDCCImageGetColorHistogramVsluesNoColorImage(self):
+        with self.assertRaises(DCCExcep.ImageDimensionsException):
+            self.image.getRGBHistogramValues()
+
+    def testDCCImageGetColorHistogramValuesWarning(self):
+        image = DCCImage.DCCImage(np.ones((199, 201, 3), dtype=np.float32) * 1.23)
+        import warnings
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter("error")
+            with self.assertRaises(UserWarning):
+                image.getGrayscaleHistogramValues()
+
+    def testDCCImageGetColorHistogramValuesNotNormalized(self):
+        image = DCCImage.DCCImage(np.ones((5, 5, 3), dtype=np.float32))
+        allHists = [[0, 25]] * 3
+        allBins = [[0, 1, 2]] * 3
+        self.assertTrue(np.alltrue(np.equal(image.getRGBHistogramValues()[0], allHists)) and np.alltrue(
+            np.equal(image.getRGBHistogramValues()[1], allBins)))
+
+    def testDCCImageGetColorHistogramValuesNormalized(self):
+        image = DCCImage.DCCImage(np.ones((1000, 1000, 3), dtype=np.float32))
+        allHist, allBins = image.getRGBHistogramValues(True)
+        allSums = [sum(allHist[x]) for x in range(3)]
+        self.assertTrue(np.allclose(allSums, 1, atol=1e-9, rtol=1e-9))
 
     def testDCCDisplayImageGrayHistogramWarning(self):
         import warnings
@@ -182,13 +210,41 @@ class TestDCCImageMethods(unittest.TestCase):
         histogramFromGetValues, binsFromGetValues = self.image.getGrayscaleHistogramValues()
         histogramFromDisplay, binsFromDisplay = self.image.displayGrayscaleHistogram()
         self.assertTrue(
-            all(np.equal(histogramFromDisplay, histogramFromGetValues)) and all(
+            np.alltrue(np.equal(histogramFromDisplay, histogramFromGetValues)) and np.alltrue(
                 np.equal(binsFromDisplay, binsFromGetValues)))
 
     @patch("matplotlib.pyplot.show", new=Mock)
     def testDCCImageDisplayGrayHistogramNormalized(self):
         hist, bins = self.image.displayGrayscaleHistogram(True)
         self.assertAlmostEqual(sum(hist), 1, delta=1e-9)
+
+    def testDCCImageDisplayColorHistogramNoColorImage(self):
+        with self.assertRaises(DCCExcep.ImageDimensionsException):
+            self.image.displayRGBHistogram()
+
+    def testDCCImageDisplayColorHistogramWarning(self):
+        image = DCCImage.DCCImage(np.ones((5000, 5000, 3), dtype=np.float32) * 0.01)
+        import warnings
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter("error")
+            with self.assertRaises(UserWarning):
+                image.displayRGBHistogram()
+
+    @patch("matplotlib.pyplot.show", new=Mock)
+    def testDCCImageDisplayColorHistogramNotNormalized(self):
+        image = DCCImage.DCCImage(np.ones((5000, 5000, 3), dtype=np.float32))
+        histogramFromGetValues, binsFromGetValues = image.getGrayscaleHistogramValues()
+        histogramFromDisplay, binsFromDisplay = image.displayGrayscaleHistogram()
+        self.assertTrue(
+            np.alltrue(np.equal(histogramFromDisplay, histogramFromGetValues)) and np.alltrue(
+                np.equal(binsFromDisplay, binsFromGetValues)))
+
+    @patch("matplotlib.pyplot.show", new=Mock)
+    def testDCCImageDisplayColorHistogramNormalized(self):
+        image = DCCImage.DCCImage(np.ones((5000, 5000, 3), dtype=np.float32))
+        allHists, allBins = image.displayRGBHistogram(True)
+        allSums = [sum(allHists[x]) for x in range(3)]
+        self.assertTrue(np.allclose(allSums, 1, atol=1e-9, rtol=1e-9))
 
     def testDCCImageXDerivativeZerosOutput(self):
         array = np.ones((5, 5), dtype=np.float32)
