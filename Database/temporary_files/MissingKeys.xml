@@ -1981,7 +1981,7 @@
               </LightSourcesSettings>
               <FilterSetRef Id="FilterSet:1" />
             </Channel>
-            <Channel Id="Channel:1" Name="DAPI">
+            <Channel Name="DAPI">
               <ExcitationWavelength>353</ExcitationWavelength>
               <EmissionWavelength>465</EmissionWavelength>
               <DyeId>McNamara-Boswell-0434</DyeId>

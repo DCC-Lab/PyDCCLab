@@ -1,5 +1,6 @@
 import Database.management_xml.metadata as metadata
 import Database.management_xml.filter as fltr
+import Database.management_xml.channel as chnnl
 import czifile as czi
 import xml.etree.ElementTree as ET
 import unittest
@@ -263,6 +264,33 @@ class TestMetadata(unittest.TestCase):
         mdata.root = mdata.createElementTreeRoot()
 
         self.assertNotEqual(mdata.findFiltersEntriesInXml(), mdata.setFiltersData())
+
+    def test_findChannelsEntriesInXml_returnsListOfChannels(self):
+        directory = os.path.dirname(os.path.dirname(__file__))
+        filepath = os.path.join(directory, 'temporary_files', 'testCziFile.czi')
+        mdata = metadata.Metadata(filepath)
+        mdata.root = mdata.createElementTreeRoot()
+
+        for channel in mdata.findChannelsEntriesInXml():
+            self.assertIs(type(channel), chnnl.Channel)
+
+    def test_findChannelsEntriesInXml_missingEntries(self):  # TODO This doesn't work for now.
+        directory = os.path.dirname(os.path.dirname(__file__))
+        filepath = os.path.join(directory, 'temporary_files', 'MissingEntries.xml')
+        tree = ET.parse(filepath)
+        mdata = metadata.Metadata(filepath)
+        mdata.root = tree.getroot()
+        mdata.findChannelsEntriesInXml()
+        #with self.assertRaises(ValueError): mdata.findChannelsEntriesInXml()
+
+    def test_findChannelsEntriesInXml_noId(self):
+        directory = os.path.dirname(os.path.dirname(__file__))
+        filepath = os.path.join(directory, 'temporary_files', 'MissingKeys.xml')
+        tree = ET.parse(filepath)
+        mdata = metadata.Metadata(filepath)
+        mdata.root = tree.getroot()
+
+        with self.assertRaises(KeyError): mdata.findChannelsEntriesInXml()
 
 
 if __name__ == '__main__':
