@@ -1,18 +1,10 @@
-import numpy as np
+'''
+THIS FILE IS OBSOLETE.
+SOME OF THE CODE MIGHT BE USEFUL LATER SO THE FILE IS KEPT FOR NOW.
+ONCE THERE IS NO MORE USE FOR THE CODE, IT SHOULD BE DELETED.
+'''
 import sqlite3 as lite
-import os
 import csv
-
-
-def UpdateDBTable(database, table):
-    pass
-
-
-def FindEntryInDB(cursor):
-    pass
-    # Find in DB
-    # Return line in DB
-    # or Return Not Found
 
 
 def ExportTableToCSV(table):

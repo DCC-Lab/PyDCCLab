@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 import ImageAnalysis.source.cziUtil as czi
-from Database.xml_management.filter import Filter
-from Database.xml_management.channel import Channel
+from Database.management_xml.filter import Filter
+from Database.management_xml.channel import Channel
 import os
 import fnmatch
 
@@ -94,7 +94,7 @@ class Metadata:
 # For testing purpose. To be removed.
 if __name__ == '__main__':
     directory = os.path.dirname(os.path.dirname(__file__))
-    filepath = os.path.join(directory, 'testCziFile.czi')
+    filepath = os.path.join(directory, 'temporary_files', 'testCziFile.czi')
 
     mdata = Metadata(filepath)
     mdata.showData()
