@@ -39,12 +39,12 @@ class Channel:
     def setExWavelengthFilter(self, filters):
         for filter in filters:
             if filter.getType() == 'Excitation' and self.channelId == filter.getChannelId():
-                self.exWavelengthFilter = filter.getFilter()
+                self.exWavelengthFilter = filter.getFilterRange()
 
     def setEmWavelengthFilter(self, filters):
         for filter in filters:
             if filter.getType() == 'Emission' and self.channelId == filter.getChannelId():
-                self.emWavelengthFilter = filter.getFilter()
+                self.emWavelengthFilter = filter.getFilterRange()
 
     def setBeamsplitter(self, filters):
         for filter in filters:

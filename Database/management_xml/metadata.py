@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 import ImageAnalysis.source.cziUtil as czi
-from Database.management_xml.filter import Filter
-from Database.management_xml.channel import Channel
+from channel import Channel
+from filter import Filter
 
 
 class Metadata:

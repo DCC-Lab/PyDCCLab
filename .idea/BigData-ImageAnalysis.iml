@@ -3,6 +3,8 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/ImageAnalysis/source" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Database/management_database" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Database/management_xml" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
