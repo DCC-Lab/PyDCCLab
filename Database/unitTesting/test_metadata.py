@@ -1,6 +1,6 @@
-import Database.management_xml.metadata as metadata
-import Database.management_xml.filter as fltr
-import Database.management_xml.channel as chnnl
+import metadata as mtdt
+import filter as fltr
+import channel as chnnl
 import czifile as czi
 import xml.etree.ElementTree as ET
 import unittest
@@ -8,192 +8,154 @@ import os
 
 
 class TestMetadata(unittest.TestCase):
+    def setUp(self):
+        self.directory = os.path.dirname(os.path.dirname(__file__))
+        self.testPath = os.path.join(self.directory, 'temporary_files', 'testCziFile.czi')
+        self.wrongFilePath = os.path.join(self.directory, 'temporary_files', 'wrongfilename.czi')
+        self.wrongFileType = os.path.join(self.directory, 'temporary_files', 'wrongFile.txt')
+        self.missingEntriesPath = os.path.join(self.directory, 'temporary_files', 'MissingEntries.xml')
+        self.missingKeysPath = os.path.join(self.directory, 'temporary_files', 'MissingKeys.xml')
+
     def test_cziFileToCziImageObject_isCziImageObject(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'testCziFile.czi')
-        mdata = metadata.Metadata(filepath)
+        mdata = mtdt.Metadata(self.testPath)
 
         self.assertIs(type(mdata.cziFileToCziImageObject()), czi.CziFile)
 
     def test_cziFileToCziImageObject_FileNotFoundError(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'wrongfilename.czi')
-        mdata = metadata.Metadata(filepath)
+        mdata = mtdt.Metadata(self.wrongFilePath)
 
         with self.assertRaises(FileNotFoundError): mdata.cziFileToCziImageObject()
 
     def test_cziFileToCziImageObject_ValueError(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'wrongFile.txt')
-        mdata = metadata.Metadata(filepath)
+        mdata = mtdt.Metadata(self.wrongFileType)
 
         with self.assertRaises(ValueError): mdata.cziFileToCziImageObject()
 
     def test_extractXmlAsStringFromCziImageObject_returnsString(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'testCziFile.czi')
-        mdata = metadata.Metadata(filepath)
+        mdata = mtdt.Metadata(self.testPath)
         cziImageObject = mdata.cziFileToCziImageObject()
 
         self.assertIs(type(mdata.extractXmlAsStringFromCziImageObject(cziImageObject)), str)
 
     def test_extractXmlAsStringFromCziImageObject_wrongTypeOfObject(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'testCziFile.czi')
-        mdata = metadata.Metadata(filepath)
+        mdata = mtdt.Metadata(self.testPath)
         cziImageObject = 'WrongTypeOfObject'
 
         with self.assertRaises(AttributeError): mdata.extractXmlAsStringFromCziImageObject(cziImageObject)
 
     def test_createElementTreeRoot_returnsElement(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'testCziFile.czi')
-        mdata = metadata.Metadata(filepath)
+        mdata = mtdt.Metadata(self.testPath)
 
         self.assertIs(type(mdata.createElementTreeRoot()), ET.Element)
 
     def test_setMicroscope_isEqual(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'testCziFile.czi')
-        mdata = metadata.Metadata(filepath)
+        mdata = mtdt.Metadata(self.testPath)
         mdata.root = mdata.createElementTreeRoot()
 
         self.assertEqual(mdata.setMicroscope(), 'Axio Observer.Z1 / 7')
 
     def test_setMicroscope_noId(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'MissingKeys.xml')
-        tree = ET.parse(filepath)
-        mdata = metadata.Metadata(filepath)
+        tree = ET.parse(self.missingKeysPath)
+        mdata = mtdt.Metadata(self.missingKeysPath)
         mdata.root = tree.getroot()
 
         with self.assertRaises(KeyError): mdata.setMicroscope()
 
     def test_setMicroscope_noEntry(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'MissingEntries.xml')
-        tree = ET.parse(filepath)
-        mdata = metadata.Metadata(filepath)
+        tree = ET.parse(self.missingEntriesPath)
+        mdata = mtdt.Metadata(self.missingEntriesPath)
         mdata.root = tree.getroot()
 
         with self.assertRaises(AttributeError): mdata.setMicroscope()
 
     def test_setObjective_isEqual(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'testCziFile.czi')
-        mdata = metadata.Metadata(filepath)
+        mdata = mtdt.Metadata(self.testPath)
         mdata.root = mdata.createElementTreeRoot()
 
         self.assertEqual(mdata.setObjective(), 'LD A-Plan 5x/0.15 Ph1')
 
     def test_setObjective_noId(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'MissingKeys.xml')
-        tree = ET.parse(filepath)
-        mdata = metadata.Metadata(filepath)
+        tree = ET.parse(self.missingKeysPath)
+        mdata = mtdt.Metadata(self.missingKeysPath)
         mdata.root = tree.getroot()
 
         with self.assertRaises(KeyError): mdata.setObjective()
 
     def test_setObjective_noEntry(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'MissingEntries.xml')
-        tree = ET.parse(filepath)
-        mdata = metadata.Metadata(filepath)
+        tree = ET.parse(self.missingEntriesPath)
+        mdata = mtdt.Metadata(self.missingEntriesPath)
         mdata.root = tree.getroot()
 
         with self.assertRaises(AttributeError): mdata.setObjective()
 
     def test_setXScale_isEqual(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'testCziFile.czi')
-        mdata = metadata.Metadata(filepath)
+        mdata = mtdt.Metadata(self.testPath)
         mdata.root = mdata.createElementTreeRoot()
 
         self.assertEqual(mdata.setXScale(), '9.08E-07')
 
     def test_setXScale_noId(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'MissingKeys.xml')
-        tree = ET.parse(filepath)
-        mdata = metadata.Metadata(filepath)
+        tree = ET.parse(self.missingKeysPath)
+        mdata = mtdt.Metadata(self.missingKeysPath)
         mdata.root = tree.getroot()
 
         with self.assertRaises(AttributeError): mdata.setXScale()
 
     def test_setXScale_noEntry(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'MissingEntries.xml')
-        tree = ET.parse(filepath)
-        mdata = metadata.Metadata(filepath)
+        tree = ET.parse(self.missingEntriesPath)
+        mdata = mtdt.Metadata(self.missingEntriesPath)
         mdata.root = tree.getroot()
 
         with self.assertRaises(AttributeError): mdata.setXScale()
 
     def test_setYScale_isEqual(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'testCziFile.czi')
-        mdata = metadata.Metadata(filepath)
+        mdata = mtdt.Metadata(self.testPath)
         mdata.root = mdata.createElementTreeRoot()
 
         self.assertEqual(mdata.setYScale(), '9.08E-07')
 
     def test_setYScale_noId(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'MissingKeys.xml')
-        tree = ET.parse(filepath)
-        mdata = metadata.Metadata(filepath)
+        tree = ET.parse(self.missingKeysPath)
+        mdata = mtdt.Metadata(self.missingKeysPath)
         mdata.root = tree.getroot()
 
         with self.assertRaises(AttributeError): mdata.setYScale()
 
     def test_setYScale_noEntry(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'MissingEntries.xml')
-        tree = ET.parse(filepath)
-        mdata = metadata.Metadata(filepath)
+        tree = ET.parse(self.missingEntriesPath)
+        mdata = mtdt.Metadata(self.missingEntriesPath)
         mdata.root = tree.getroot()
 
         with self.assertRaises(AttributeError): mdata.setYScale()
 
     def test_setXSize_isEqual(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'testCziFile.czi')
-        mdata = metadata.Metadata(filepath)
+        mdata = mtdt.Metadata(self.testPath)
         mdata.root = mdata.createElementTreeRoot()
 
         self.assertEqual(mdata.setXSize(), '1936')
 
     def test_setXSize_noEntry(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'MissingEntries.xml')
-        tree = ET.parse(filepath)
-        mdata = metadata.Metadata(filepath)
+        tree = ET.parse(self.missingEntriesPath)
+        mdata = mtdt.Metadata(self.missingEntriesPath)
         mdata.root = tree.getroot()
 
         with self.assertRaises(AttributeError): mdata.setXSize()
 
     def test_setYSize_isEqual(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'testCziFile.czi')
-        mdata = metadata.Metadata(filepath)
+        mdata = mtdt.Metadata(self.testPath)
         mdata.root = mdata.createElementTreeRoot()
 
         self.assertEqual(mdata.setYSize(), '1460')
 
     def test_setYSize_noEntry(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'MissingEntries.xml')
-        tree = ET.parse(filepath)
-        mdata = metadata.Metadata(filepath)
+        tree = ET.parse(self.missingEntriesPath)
+        mdata = mtdt.Metadata(self.missingEntriesPath)
         mdata.root = tree.getroot()
 
         with self.assertRaises(AttributeError): mdata.setYSize()
 
     def test_setXScaled_isEqual(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'testCziFile.czi')
-        mdata = metadata.Metadata(filepath)
+        mdata = mtdt.Metadata(self.testPath)
         mdata.root = mdata.createElementTreeRoot()
         mdata.xSize = mdata.setXSize()
         mdata.xScale = mdata.setXScale()
@@ -201,9 +163,7 @@ class TestMetadata(unittest.TestCase):
         self.assertEqual(mdata.setXScaled(), 0.001757888)
 
     def test_setXScaled_wrongValue(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'testCziFile.czi')
-        mdata = metadata.Metadata(filepath)
+        mdata = mtdt.Metadata(self.testPath)
         mdata.root = mdata.createElementTreeRoot()
         mdata.xSize = mdata.setXSize()
         mdata.xScale = 'abcd'
@@ -211,9 +171,7 @@ class TestMetadata(unittest.TestCase):
         with self.assertRaises(ValueError): mdata.setXScaled()
 
     def test_setYScaled_isEqual(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'testCziFile.czi')
-        mdata = metadata.Metadata(filepath)
+        mdata = mtdt.Metadata(self.testPath)
         mdata.root = mdata.createElementTreeRoot()
         mdata.ySize = mdata.setYSize()
         mdata.yScale = mdata.setYScale()
@@ -221,9 +179,7 @@ class TestMetadata(unittest.TestCase):
         self.assertEqual(mdata.setYScaled(), 0.00132568)
 
     def test_setYScaled_wrongValue(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'testCziFile.czi')
-        mdata = metadata.Metadata(filepath)
+        mdata = mtdt.Metadata(self.testPath)
         mdata.root = mdata.createElementTreeRoot()
         mdata.ySize = mdata.setYSize()
         mdata.yScale = 'abcd'
@@ -231,137 +187,107 @@ class TestMetadata(unittest.TestCase):
         with self.assertRaises(ValueError): mdata.setYScaled()
 
     def test_findFiltersEntriesInXml_returnsListOfFilters(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'testCziFile.czi')
-        mdata = metadata.Metadata(filepath)
+        mdata = mtdt.Metadata(self.testPath)
         mdata.root = mdata.createElementTreeRoot()
 
         for filter in mdata.findFiltersEntriesInXml():
             self.assertIs(type(filter), fltr.Filter)
 
     def test_findFiltersEntriesInXml_missingEntries(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'MissingEntries.xml')
-        tree = ET.parse(filepath)
-        mdata = metadata.Metadata(filepath)
+        tree = ET.parse(self.missingEntriesPath)
+        mdata = mtdt.Metadata(self.missingEntriesPath)
         mdata.root = tree.getroot()
 
         with self.assertRaises(AttributeError): mdata.findFiltersEntriesInXml()
 
     def test_findFiltersEntriesInXml_noId(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'MissingKeys.xml')
-        tree = ET.parse(filepath)
-        mdata = metadata.Metadata(filepath)
+        tree = ET.parse(self.missingKeysPath)
+        mdata = mtdt.Metadata(self.missingKeysPath)
         mdata.root = tree.getroot()
 
         with self.assertRaises(KeyError): mdata.findFiltersEntriesInXml()
 
     def test_setFiltersData_isEqual(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'testCziFile.czi')
-        mdata_1 = metadata.Metadata(filepath)
+        mdata_1 = mtdt.Metadata(self.testPath)
         mdata_1.root = mdata_1.createElementTreeRoot()
 
-        mdata_2 = metadata.Metadata(filepath)
+        mdata_2 = mtdt.Metadata(self.testPath)
         mdata_2.root = mdata_2.createElementTreeRoot()
 
         self.assertEqual(mdata_1.setFiltersData(), mdata_2.setFiltersData())
 
     def test_setFiltersData_isNotEqual(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'testCziFile.czi')
-        mdata = metadata.Metadata(filepath)
+        mdata = mtdt.Metadata(self.testPath)
         mdata.root = mdata.createElementTreeRoot()
 
         self.assertNotEqual(mdata.findFiltersEntriesInXml(), mdata.setFiltersData())
 
     def test_findChannelsEntriesInXml_returnsListOfChannels(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'testCziFile.czi')
-        mdata = metadata.Metadata(filepath)
+        mdata = mtdt.Metadata(self.testPath)
         mdata.root = mdata.createElementTreeRoot()
 
         for channel in mdata.findChannelsEntriesInXml():
             self.assertIs(type(channel), chnnl.Channel)
 
     def test_findChannelsEntriesInXml_missingEntries(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'MissingEntries.xml')
-        tree = ET.parse(filepath)
-        mdata = metadata.Metadata(filepath)
+        tree = ET.parse(self.missingEntriesPath)
+        mdata = mtdt.Metadata(self.missingEntriesPath)
         mdata.root = tree.getroot()
 
         with self.assertRaises(AttributeError): mdata.findChannelsEntriesInXml()
 
     def test_findChannelsEntriesInXml_noId(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'MissingKeys.xml')
-        tree = ET.parse(filepath)
-        mdata = metadata.Metadata(filepath)
+        tree = ET.parse(self.missingKeysPath)
+        mdata = mtdt.Metadata(self.missingKeysPath)
         mdata.root = tree.getroot()
 
         with self.assertRaises(KeyError): mdata.findChannelsEntriesInXml()
 
     def test_setChannelsData_isEqual(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'testCziFile.czi')
-        mdata_1 = metadata.Metadata(filepath)
+        mdata_1 = mtdt.Metadata(self.testPath)
         mdata_1.root = mdata_1.createElementTreeRoot()
         mdata_1.filters = mdata_1.setFiltersData()
 
-        mdata_2 = metadata.Metadata(filepath)
+        mdata_2 = mtdt.Metadata(self.testPath)
         mdata_2.root = mdata_2.createElementTreeRoot()
         mdata_2.filters = mdata_2.setFiltersData()
 
         self.assertEqual(mdata_1.setChannelsData(), mdata_2.setChannelsData())
 
     def test_setChannelsData_isNotEqual(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'testCziFile.czi')
-        mdata = metadata.Metadata(filepath)
+        mdata = mtdt.Metadata(self.testPath)
         mdata.root = mdata.createElementTreeRoot()
         mdata.filters = mdata.setFiltersData()
 
         self.assertNotEqual(mdata.findChannelsEntriesInXml(), mdata.setChannelsData())
 
     def test_checkIfElementHasChildren_hasChildren(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'testCziFile.czi')
-        mdata = metadata.Metadata(filepath)
+        mdata = mtdt.Metadata(self.testPath)
         mdata.root = mdata.createElementTreeRoot()
         root = mdata.root.find('./Metadata/Information/Image/Dimensions/Channels')
 
         self.assertTrue(mdata.checkIfElementHasChildren(root))
 
     def test_checkIfElementHasChildren_hasNoChildren(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'MissingEntries.xml')
-        tree = ET.parse(filepath)
-        mdata = metadata.Metadata(filepath)
+        tree = ET.parse(self.missingEntriesPath)
+        mdata = mtdt.Metadata(self.missingEntriesPath)
         mdata.root = tree.getroot()
         root = mdata.root.find('./Metadata/Information/Image/Dimensions/Channels')
 
         with self.assertRaises(AttributeError): mdata.checkIfElementHasChildren(root)
 
     def test_setAttributeFromXml_isEqual(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'testCziFile.czi')
-
-        mdata_1 = metadata.Metadata(filepath)
+        mdata_1 = mtdt.Metadata(self.testPath)
         mdata_1.setAttributesFromXml()
-        mdata_2 = metadata.Metadata(filepath)
+        mdata_2 = mtdt.Metadata(self.testPath)
         mdata_2.setAttributesFromXml()
 
         self.assertEqual(mdata_1, mdata_2)
 
     def test_setAttributeFromXml_isNotEqual(self):
-        directory = os.path.dirname(os.path.dirname(__file__))
-        filepath = os.path.join(directory, 'temporary_files', 'testCziFile.czi')
-
-        mdata_1 = metadata.Metadata(filepath)
+        mdata_1 = mtdt.Metadata(self.testPath)
         mdata_1.setAttributesFromXml()
-        mdata_2 = metadata.Metadata(filepath)
+        mdata_2 = mtdt.Metadata(self.testPath)
 
         self.assertNotEqual(mdata_1, mdata_2)
 

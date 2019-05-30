@@ -1979,7 +1979,7 @@
                   <LightSource Id="LightSource:1" />
                 </LightSourceSettings>
               </LightSourcesSettings>
-              <FilterSetRef Id="FilterSet:1" />
+              <FilterSetRef/>
             </Channel>
             <Channel Name="DAPI">
               <ExcitationWavelength>353</ExcitationWavelength>
@@ -2092,15 +2092,15 @@
         </Objectives>
         <FilterSets>
           <FilterSet Id="FilterSet:1">
-            <DichroicRef Id="Dichroic:1" />
+            <DichroicRef/>
             <EmissionFilters>
               <EmissionFilterRef Id="Filter:2" />
             </EmissionFilters>
             <ExcitationFilters>
-              <ExcitationFilterRef Id="Filter:1" />
+              <ExcitationFilterRef/>
             </ExcitationFilters>
           </FilterSet>
-          <FilterSet Id="FilterSet:2">
+          <FilterSet>
             <DichroicRef Id="Dichroic:2" />
             <EmissionFilters>
               <EmissionFilterRef Id="Filter:4" />
@@ -2137,7 +2137,7 @@
           </Filter>
         </Filters>
         <Dichroics>
-          <Dichroic Id="Dichroic:1">
+          <Dichroic>
             <Wavelengths>
               <Wavelength>495</Wavelength>
             </Wavelengths>

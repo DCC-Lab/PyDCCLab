@@ -2022,22 +2022,6 @@
         </Objectives>
         <FilterSets>
           <FilterSet Id="FilterSet:1">
-            <DichroicRef Id="Dichroic:1" />
-            <EmissionFilters>
-              <EmissionFilterRef Id="Filter:2" />
-            </EmissionFilters>
-            <ExcitationFilters>
-              <ExcitationFilterRef Id="Filter:1" />
-            </ExcitationFilters>
-          </FilterSet>
-          <FilterSet Id="FilterSet:2">
-            <DichroicRef Id="Dichroic:2" />
-            <EmissionFilters>
-              <EmissionFilterRef Id="Filter:4" />
-            </EmissionFilters>
-            <ExcitationFilters>
-              <ExcitationFilterRef Id="Filter:3" />
-            </ExcitationFilters>
           </FilterSet>
         </FilterSets>
         <Filters>
@@ -2068,7 +2052,6 @@
         <Dichroics>
           <Dichroic Id="Dichroic:1">
             <Wavelengths>
-              <Wavelength>495</Wavelength>
             </Wavelengths>
           </Dichroic>
           <Dichroic Id="Dichroic:2">

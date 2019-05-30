@@ -6,7 +6,7 @@ class Filter:
 
         self.channelId = None
         self.filterSetId = None
-        self.type = None
+        self.filterType = None
         self.dichroicId = None
         self.dichroic = None
 
@@ -18,44 +18,57 @@ class Filter:
 
     def setFilterData(self, root):
         self.setChannelId(root)
-        self.setFilterSetId(root)
-        self.setDichroicId(root)
         self.setDichroic(root)
 
     def setFilterSetId(self, root):
-        for filterSet in root.find('./Metadata/Information/Instrument/FilterSets'):
-            if self.filterId == filterSet.find('./EmissionFilters/EmissionFilterRef').attrib['Id']:
-                self.filterSetId = filterSet.attrib['Id']
-                self.type = 'Emission'
-            elif self.filterId == filterSet.find('./ExcitationFilters/ExcitationFilterRef').attrib['Id']:
-                self.filterSetId = filterSet.attrib['Id']
-                self.type = 'Excitation'
+        try:
+            for filterSet in root.find('./Metadata/Information/Instrument/FilterSets'):
+                if self.filterId == filterSet.find('./EmissionFilters/EmissionFilterRef').attrib['Id']:
+                    self.filterSetId = filterSet.attrib['Id']
+                    self.filterType = 'Emission'
+                elif self.filterId == filterSet.find('./ExcitationFilters/ExcitationFilterRef').attrib['Id']:
+                    self.filterSetId = filterSet.attrib['Id']
+                    self.filterType = 'Excitation'
+        except KeyError as error:
+            raise error
+        except AttributeError as error:
+            raise error
 
     def setChannelId(self, root):
         self.setFilterSetId(root)
-
-        for channel in root.find('./Metadata/Information/Image/Dimensions/Channels'):
-            if channel.find('FilterSetRef').attrib['Id'] == self.filterSetId:
-                self.channelId = channel.attrib['Id']
+        try:
+            for channel in root.find('./Metadata/Information/Image/Dimensions/Channels'):
+                if channel.find('FilterSetRef').attrib['Id'] == self.filterSetId:
+                    self.channelId = channel.attrib['Id']
+        except KeyError as error:
+            raise error
+        except AttributeError as error:
+            raise error
 
     def setDichroicId(self, root):
-        for filterSet in root.find('./Metadata/Information/Instrument/FilterSets'):
-            if filterSet.attrib['Id'] == self.filterSetId:
-                self.dichroicId = filterSet.find('./DichroicRef').attrib['Id']
-                self.setDichroic(root)
+        try:
+            self.dichroicId = root.find('./Metadata/Information/Instrument/FilterSets/FilterSet[@Id="{}"]/DichroicRef'.format(self.filterSetId)).attrib['Id']
+        except KeyError as error:
+            raise error
+        except AttributeError as error:
+            raise error
 
     def setDichroic(self, root):
-        for dichroic in root.find('./Metadata/Information/Instrument/Dichroics'):
-            if dichroic.attrib['Id'] == self.dichroicId:
-                self.dichroic = dichroic.find('./Wavelengths/Wavelength').text
+        self.setDichroicId(root)
+        try:
+            self.dichroic = root.find('./Metadata/Information/Instrument/Dichroics/Dichroic[@Id="{}"]/Wavelengths/Wavelength'.format(self.dichroicId)).text
+        except AttributeError as error:
+            raise error
+        except KeyError as error:
+            raise error
 
     def getType(self):
-        return self.type
+        return self.filterType
 
     def getChannelId(self):
         return self.channelId
 
-    def getFilter(self):
+    def getFilterRange(self):
         return '{}-{}'.format(self.cutIn, self.cutOut)
 
     def getDichroic(self):
