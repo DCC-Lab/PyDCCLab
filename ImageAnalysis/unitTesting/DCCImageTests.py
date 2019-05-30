@@ -54,6 +54,9 @@ class TestDCCImageMethods(unittest.TestCase):
         equality = np.array_equal(testArray, getArray)
         self.assertTrue(equality)
 
+    def testDCCImageRepresentation(self):
+        self.assertTrue(np.array_equal(self.image.__repr__(), self.image.getArray()))
+
     def testGetDCCImageWidth(self):
         width = 1250
         self.assertEqual(self.image.getWidth(), width)
@@ -227,7 +230,7 @@ class TestDCCImageMethods(unittest.TestCase):
             self.image.displayRGBHistogram()
 
     def testDCCImageDisplayColorHistogramWarning(self):
-        image = DCCImage.DCCImage(np.ones((5000, 5000, 3), dtype=np.float32) * 0.01)
+        image = DCCImage.DCCImage(np.ones((1200, 1452, 3), dtype=np.float32) * 0.01)
         with warnings.catch_warnings(record=True):
             warnings.simplefilter("error")
             with self.assertRaises(UserWarning):
@@ -235,7 +238,7 @@ class TestDCCImageMethods(unittest.TestCase):
 
     @patch("matplotlib.pyplot.show", new=Mock)
     def testDCCImageDisplayColorHistogramNotNormalized(self):
-        image = DCCImage.DCCImage(np.ones((5000, 5000, 3), dtype=np.float32))
+        image = DCCImage.DCCImage(np.ones((1250, 1300, 3), dtype=np.float32))
         histogramFromGetValues, binsFromGetValues = image.getRGBHistogramValues()
         histogramFromDisplay, binsFromDisplay = image.displayRGBHistogram()
         self.assertTrue(
@@ -244,7 +247,7 @@ class TestDCCImageMethods(unittest.TestCase):
 
     @patch("matplotlib.pyplot.show", new=Mock)
     def testDCCImageDisplayColorHistogramNormalized(self):
-        image = DCCImage.DCCImage(np.ones((5000, 5000, 3), dtype=np.float32))
+        image = DCCImage.DCCImage(np.ones((1010, 1500, 3), dtype=np.float32))
         allHists, allBins = image.displayRGBHistogram(True)
         allSums = [sum(allHists[x]) for x in range(3)]
         self.assertTrue(np.allclose(allSums, 1, atol=1e-9, rtol=1e-9))
@@ -554,7 +557,60 @@ class TestDCCImageMethods(unittest.TestCase):
         afterMK2 = time.clock()
         self.assertTrue((afterMK1 - beforeMK1) >= (afterMK2 - beforeMK2))
 
-    # def test
+    def testDCCImageSTDDevMk2NanWarning(self):
+        array = np.ones((5, 5, 3), dtype=np.float32)
+        array[0][0][0] = np.nan
+        image = DCCImage.DCCImage(array)
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter("error")
+            with self.assertRaises(RuntimeWarning):
+                image.getStandardDeviationFiltering(3)
+
+    def testDCCImageGetHorizontalSobelFilter(self):
+        array = np.zeros((5, 5), dtype=np.float32)
+        for i in range(1, 4):
+            for j in range(1, 4):
+                array[i][j] = 1
+        image = DCCImage.DCCImage(array)
+        sobelResult = np.array([[0.25, 0.75, 1, 0.75, 0.25], [0.25, 0.75, 1, 0.75, 0.25], [0, 0, 0, 0, 0],
+                                [-0.25, -0.75, -1, -0.75, -0.25], [-0.25, -0.75, -1, -0.75, -0.25]])
+        # Remove false edges:
+        sobelResult[0, :] = 0
+        sobelResult[-1, :] = 0
+        sobelResult[:, 0] = 0
+        sobelResult[:, -1] = 0
+        self.assertTrue(np.array_equal(image.getHorizontalSobelFiltering().getArray(), sobelResult))
+
+    def testDCCImageGetVerticalSobelFilter(self):
+        array = np.zeros((5, 5), dtype=np.float32)
+        for i in range(1, 4):
+            for j in range(1, 4):
+                array[i][j] = 1
+        image = DCCImage.DCCImage(array)
+        sobelResult = np.array([[0.25, 0.75, 1, 0.75, 0.25], [0.25, 0.75, 1, 0.75, 0.25], [0, 0, 0, 0, 0],
+                                [-0.25, -0.75, -1, -0.75, -0.25], [-0.25, -0.75, -1, -0.75, -0.25]]).T
+        # Remove false edges:
+        sobelResult[0, :] = 0
+        sobelResult[-1, :] = 0
+        sobelResult[:, 0] = 0
+        sobelResult[:, -1] = 0
+        self.assertTrue(np.array_equal(image.getVerticalSobelFiltering().getArray(), sobelResult))
+
+    def testDCCImageGetHorizontalAndVerticalSobelFilter(self):
+        array = np.zeros((5, 5), dtype=np.float32)
+        for i in range(1, 4):
+            for j in range(1, 4):
+                array[i][j] = 1
+        image = DCCImage.DCCImage(array)
+        sobelResultHorizontal = np.array([[0.25, 0.75, 1, 0.75, 0.25], [0.25, 0.75, 1, 0.75, 0.25], [0, 0, 0, 0, 0],
+                                          [-0.25, -0.75, -1, -0.75, -0.25], [-0.25, -0.75, -1, -0.75, -0.25]])
+        sobelResultHorizontal[0, :] = 0
+        sobelResultHorizontal[-1, :] = 0
+        sobelResultHorizontal[:, 0] = 0
+        sobelResultHorizontal[:, -1] = 0
+        sobelResultVertical = sobelResultHorizontal.T
+        sobelResult = np.sqrt(sobelResultHorizontal ** 2 + sobelResultVertical ** 2) / np.sqrt(2)
+        self.assertTrue(np.allclose(image.getBothDirectionsSobelFiltering().getArray(), sobelResult))
 
 
 if __name__ == '__main__':

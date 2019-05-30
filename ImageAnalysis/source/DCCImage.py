@@ -6,7 +6,7 @@ try:
     import PIL.Image
     from scipy.signal import convolve2d
     from scipy.ndimage import measurements, filters
-    from skimage.filters import gaussian
+    from skimage.filters import *
     from DCCImagesExceptions import *
     import matplotlib.pyplot as plt
     import warnings
@@ -24,6 +24,9 @@ class DCCImage:
         self.__dimensions = imageAsArray.ndim
         self.__shape = imageAsArray.shape
         self.__metadata = metadata
+
+    def __repr__(self):
+        return str(self.getArray())
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, DCCImage):
@@ -219,12 +222,6 @@ class DCCImage:
 
     def getMinimumIntensityPixels(self) -> typing.Union[
         typing.List[typing.Tuple[int, int]], typing.List[typing.List[typing.Tuple[int, int]]]]:
-        """
-        Function that returns a list of tuples representing the (x, y) position of the minimum intensity pixels
-        of the DCCImage. If the image is in grayscale, the returning list only contains the tuples, but if the image is
-        in color, the returning list contains a list of tuples for each color channel.
-        :return: List of tuples or a list of lists of tuples
-        """
         minimumsCoordsList = []
         if self.getNumberOfChannel() == 1:
             minimum = self.getExtremaValuesOfPixels()[0][0]
@@ -237,12 +234,6 @@ class DCCImage:
 
     def getMaximumIntensityPixels(self) -> typing.Union[
         typing.List[typing.Tuple[int, int]], typing.List[typing.List[typing.Tuple[int, int]]]]:
-        """
-        Function that returns a list of tuples representing the (x, y) position of the maximum intensity pixels
-        of the DCCImage. If the image is in grayscale, the returning list only contains the tuples, but if the image is
-        in color, the returning list contains a list of tuples for each color channel.
-        :return: List of tuples or a list of lists of tuples
-        """
         maximumsCoordsList = []
         if self.getNumberOfChannel() == 1:
             maximum = self.getExtremaValuesOfPixels()[0][1]
@@ -267,9 +258,6 @@ class DCCImage:
         # VERY SLOW WITH BIG IMAGES
         image = self.getGrayscaleConversion().getArray()
         stdFiltered = filters.generic_filter(image, np.std, size=filterSize, mode="nearest").astype(np.float32)
-        if np.any(np.isnan(stdFiltered)):
-            warnings.warn("Nan values encountered! Replacing them with 0.", category=RuntimeWarning)
-            stdFiltered = np.nan_to_num(stdFiltered)
         return DCCImage(stdFiltered)
 
     def getStandardDeviationFiltering(self, filterSize: int):
@@ -294,22 +282,50 @@ class DCCImage:
 
     def getHorizontalSobelFiltering(self):
         array = self.getGrayscaleConversion().getArray()
-        sobelH = filters.sobel_h(array)
+        sobelH = sobel_h(array)
         return DCCImage(sobelH.astype(np.float32))
 
     def getVerticalSobelFiltering(self):
         array = self.getGrayscaleConversion().getArray()
-        sobelV = filters.sobel_v(array)
+        sobelV = sobel_v(array)
         return DCCImage(sobelV.astype(np.float32))
 
     def getBothDirectionsSobelFiltering(self):
         array = self.getGrayscaleConversion().getArray()
-        sobel = filters.sobel(array)
-        return DCCImage(sobel.astype(np.float32))
+        sobelHV = sobel(array)
+        return DCCImage(sobelHV.astype(np.float32))
+
+    def getIsodataThresholding(self):
+        inputArray = self.__convertToUInt16Array(self.getArray())
+        threshArray = inputArray >= threshold_isodata(inputArray)
+        return DCCImage(threshArray.astype(np.float32))
+
+    def getOtsuThresholding(self):
+        inputArray = self.__convertToUInt16Array(self.getArray())
+        threshArray = inputArray >= threshold_otsu(inputArray)
+        return DCCImage(threshArray.astype(np.float32))
+
+    def getAdaptiveThresholdingGaussian(self, blockSize=3):
+        inputArray = self.getArray()
+        threshArray = threshold_local(inputArray, blockSize, mode="nearest")
+        return DCCImage(threshArray.astype(np.float32))
+
+    def getAdaptiveThresholdingMean(self, blockSize=3):
+        inputArray = self.getArray()
+        threshArray = threshold_local(inputArray, blockSize, mode="nearest", method="mean")
+        return DCCImage(threshArray.astype(np.float32))
+
+    def getAdaptiveThresholdingMedian(self, blockSize=3):
+        inputArray = self.getArray()
+        threshArray = threshold_local(inputArray, blockSize, mode="nearest", method="median")
+        return DCCImage(threshArray.astype(np.float32))
+
+    def getWatershedSegmentation(self):
+        pass
 
 
 if __name__ == '__main__':
-    array = np.ones((5, 5), dtype=np.float32)
+    array = np.zeros((5, 5), dtype=np.float32)
     import DCCImagesFromFiles
 
     cziImage = DCCImagesFromFiles.DCCImagesFromCZIFile(
@@ -318,7 +334,16 @@ if __name__ == '__main__':
         r"C:\Users\goubi\PycharmProjects\BigData-ImageAnalysis\ImageAnalysis\unitTesting\testNotCziFile.jpg")
     cziImage = cziImage.getImageAtIndex(0)
     # hist, bins = cziImage.getGrayscaleHistogram()
-    cziImage.getStandardDeviationFiltering(3).showImage()
-    cziImage.showImage()
-    array[0][0] = np.nan
+    # cziImage.getStandardDeviationFiltering(3).showImage()
+    # cziImage.showImage()
+    for i in range(1, 4):
+        for j in range(1, 4):
+            array[i][j] = 1
     image = DCCImage(array)
+    #cziImage.showImage()
+    blurred = cziImage.getGrayGaussianFiltering(3)
+    #edges = blurred.getBothDirectionsSobelFiltering()
+    otsuThresh = blurred.getIsodataThresholding()
+    #otsuThresh = edges.getIsodataThresholding()
+    print(otsuThresh == cziImage)
+    otsuThresh.showImage()
