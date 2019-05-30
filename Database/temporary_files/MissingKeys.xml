@@ -2097,10 +2097,10 @@
               <EmissionFilterRef Id="Filter:2" />
             </EmissionFilters>
             <ExcitationFilters>
-              <ExcitationFilterRef Id="Filter:1" />
+              <ExcitationFilterRef/>
             </ExcitationFilters>
           </FilterSet>
-          <FilterSet Id="FilterSet:2">
+          <FilterSet>
             <DichroicRef Id="Dichroic:2" />
             <EmissionFilters>
               <EmissionFilterRef Id="Filter:4" />
