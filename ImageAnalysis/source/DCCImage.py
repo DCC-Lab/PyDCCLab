@@ -46,7 +46,7 @@ class DCCImage:
         if self.isImageInGray():
             nbChannels = 1
         else:
-            nbChannels = self.getArray().shape[-1]
+            nbChannels = self.__shape[-1]
         return int(nbChannels)
 
     def getNumberOfPixels(self) -> int:
@@ -114,7 +114,7 @@ class DCCImage:
         histPerChannel = []
         binsPerChannel = []
         if self.getNumberOfChannel() != 3:
-            raise ImageDimensionsException(self.getArray().ndim)
+            raise ImageDimensionsException(self.__dimensions)
         array = self.getArray()
         arrayUint = self.__convertToUInt16Array(array)
         for channel in range(self.getNumberOfChannel()):
@@ -368,7 +368,7 @@ class DCCImage:
         return np.alltrue(np.logical_or(self.getArray() == 0, self.getArray() == 1)) and self.isImageInGray()
 
     def isImageInGray(self) -> bool:
-        return self.getArray().ndim == 2
+        return self.__dimensions == 2
 
 
 if __name__ == '__main__':
@@ -395,5 +395,3 @@ if __name__ == '__main__':
     stuff[0].showImage(False)
     #   cziImage.getOtsuThresholding().getWatershedSegmentation().showImage()
     #   cziImage.get().showImage()
-    blobs = cziImage.getGrayGaussianFiltering(2.5).getOtsuThresholding().getBlobs()
-    cziImage.showBlobs(blobs)
