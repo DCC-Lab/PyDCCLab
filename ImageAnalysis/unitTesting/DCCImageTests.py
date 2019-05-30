@@ -81,8 +81,8 @@ class TestDCCImageMethods(unittest.TestCase):
         image = DCCImage.DCCImage(array)
         self.assertTrue(image.isImageInBinary())
 
-    def testDCCImageRepresentation(self):
-        self.assertTrue(np.array_equal(self.image.__repr__(), str(self.image.getArray())))
+    def testDCCImageStringRepresentation(self):
+        self.assertTrue(np.array_equal(str(self.image), str(self.image.getArray())))
 
     def testGetDCCImageWidth(self):
         width = 1250

@@ -25,7 +25,7 @@ class DCCImage:
         self.__shape = imageAsArray.shape
         self.__metadata = metadata
 
-    def __repr__(self):
+    def __str__(self):
         return str(self.getArray())
 
     def __eq__(self, other) -> bool:
