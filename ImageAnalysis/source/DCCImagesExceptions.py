@@ -18,7 +18,7 @@ class PixelTypeException(Exception):
         Exception.__init__(self, "Pixels type must be 32 bits float.")
 
 
-class InvalidEqualityTest(Exception):
+class InvalidEqualityTestException(Exception):
     def __init__(self, otherType):
         Exception.__init__(self, "Can't compare equality of a DCCImage instance and {}.".format(otherType))
 
@@ -28,22 +28,21 @@ class NotDCCImageException(Exception):
         Exception.__init__(self, "Attribute must be a DCCImage instance.")
 
 
-class InvalidImageName(Exception):
+class InvalidImageNameException(Exception):
     def __init__(self):
         Exception.__init__(self, "The given name/filename is invalid.")
 
 
-class InvalidMetadataFileName(Exception):
+class InvalidMetadataFileNameException(Exception):
     def __init__(self):
         Exception.__init__(self, "The given filename is invalid.")
 
 
-class InvalidFileFormat(Exception):
+class InvalidFileFormatException(Exception):
     def __init__(self, message: str):
         Exception.__init__(self, message)
 
 
-# Voir si on pourrait pas merge avec invalid dimension image exception
-class MatrixDimensionException(Exception):
-    def __init__(self, reqDim, givenDim):
-        Exception.__init__(self, "Image must be of dim {} not {}.".format(reqDim, givenDim))
+class NotBinaryImageException(Exception):
+    def __init__(self):
+        Exception.__init__(self, "The image must be in binary format (only black and white pixels).")

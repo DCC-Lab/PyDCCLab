@@ -42,7 +42,7 @@ class testDCCImagesFromCZIFileMethods(unittest.TestCase):
             self.imagesFromCzi.setMetadata(123432)
 
     def testSaveMetadataInvalidName(self):
-        with self.assertRaises(DCCExcep.InvalidMetadataFileName):
+        with self.assertRaises(DCCExcep.InvalidMetadataFileNameException):
             self.imagesFromCzi.saveMetadata("/*")
 
     def testSaveMetadataValidName(self):
@@ -68,12 +68,12 @@ class TestDCCImageFromNormalFileConstructor(unittest.TestCase):
 
     def testInvalidConstructorTIFFFile(self):
         file = "testTiff3Images.tiff"
-        with self.assertRaises(DCCExcep.InvalidFileFormat):
+        with self.assertRaises(DCCExcep.InvalidFileFormatException):
             DCCImageFromNormalFile(file)
 
     def testInvalidConstructorCZIFile(self):
         file = "testCziFile2Images.czi"
-        with self.assertRaises(DCCExcep.InvalidFileFormat):
+        with self.assertRaises(DCCExcep.InvalidFileFormatException):
             DCCImageFromNormalFile(file)
 
     def testValidConstructor(self):
@@ -94,7 +94,7 @@ class TestDCCImageFromNormalFileMethods(unittest.TestCase):
 class TestDCCImagesFromTiffFileConstructor(unittest.TestCase):
 
     def testInvalidConstructorNotSupportedFile(self):
-        with self.assertRaises(DCCExcep.InvalidFileFormat):
+        with self.assertRaises(DCCExcep.InvalidFileFormatException):
             DCCImagesFromTiffFile("testNotCziFile.jpg")
 
     def testValidConstructor(self):
@@ -121,7 +121,7 @@ class TestDCCImagesFromTiffFileMethods(unittest.TestCase):
         self.assertTrue(self.images.getMetadata() == "Hello")
 
     def testSaveMetadataInvalidName(self):
-        with self.assertRaises(DCCExcep.InvalidMetadataFileName):
+        with self.assertRaises(DCCExcep.InvalidMetadataFileNameException):
             self.images.saveMetadata("meta.data")
 
     def testSaveMetadata(self):

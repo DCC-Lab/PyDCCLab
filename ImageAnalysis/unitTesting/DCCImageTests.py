@@ -45,7 +45,7 @@ class TestDCCImageMethods(unittest.TestCase):
 
     def testInvalidEquality(self):
         testArray = np.copy(self.array)
-        with self.assertRaises(DCCExcep.InvalidEqualityTest):
+        with self.assertRaises(DCCExcep.InvalidEqualityTestException):
             self.image == testArray
 
     def testGetDCCImageAsNumpyArray(self):
@@ -54,8 +54,35 @@ class TestDCCImageMethods(unittest.TestCase):
         equality = np.array_equal(testArray, getArray)
         self.assertTrue(equality)
 
+    def testDCCImageIsImageGrayFalse(self):
+        array = np.zeros((10, 10, 3), dtype=np.float32)
+        image = DCCImage.DCCImage(array)
+        self.assertFalse(image.isImageInGray())
+
+    def testDCCImageIsImageInGrayTrue(self):
+        self.assertTrue(self.image.isImageInGray())
+
+    def testDCCImageIsImageBinaryFalse(self):
+        self.assertFalse(self.image.isImageInBinary())
+
+    def testDCCImageIsImageBinaryFalse3Channels(self):
+        array = np.ones((10, 10, 3), dtype=np.float32)
+        image = DCCImage.DCCImage(array)
+        self.assertFalse(image.isImageInBinary())
+
+    def testDCCImageIsImageBinaryFalseFloatValues(self):
+        array = np.ones((1000, 1000), dtype=np.float32)
+        array[10][674] = 0.001
+        image = DCCImage.DCCImage(array)
+        self.assertFalse(image.isImageInBinary())
+
+    def testDCCImageIsImageInBinaryTrue(self):
+        array = np.ones((1000, 1000), dtype=np.float32)
+        image = DCCImage.DCCImage(array)
+        self.assertTrue(image.isImageInBinary())
+
     def testDCCImageRepresentation(self):
-        self.assertTrue(np.array_equal(self.image.__repr__(), self.image.getArray()))
+        self.assertTrue(np.array_equal(self.image.__repr__(), str(self.image.getArray())))
 
     def testGetDCCImageWidth(self):
         width = 1250
@@ -110,12 +137,12 @@ class TestDCCImageMethods(unittest.TestCase):
 
     def testSaveToTIFFInvalidEmptyName(self):
         name = ""
-        with self.assertRaises(DCCExcep.InvalidImageName):
+        with self.assertRaises(DCCExcep.InvalidImageNameException):
             self.image.saveToTIFF(name)
 
     def testSaveToTIFFInvalidCharacterName(self):
         name = "test?"
-        with self.assertRaises(DCCExcep.InvalidImageName):
+        with self.assertRaises(DCCExcep.InvalidImageNameException):
             self.image.saveToTIFF(name)
 
     def testSaveToTIFF(self):
