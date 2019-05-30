@@ -2,15 +2,6 @@ import xml.etree.ElementTree as ET
 import ImageAnalysis.source.cziUtil as czi
 from Database.management_xml.filter import Filter
 from Database.management_xml.channel import Channel
-'''
-def findAllCziFiles(path):
-    allCZIs = []
-    for root, directories, files in os.walk(os.path.normpath(path)):
-        for file in files:
-            if fnmatch.fnmatch(file, '*.czi'):
-                allCZIs.append([file, os.path.join(root, file)])
-    return allCZIs
-'''
 
 
 class Metadata:
@@ -31,9 +22,11 @@ class Metadata:
         self.xScaled = 0
         self.yScaled = 0
 
-    def showData(self):  # TODO This might need to be modified. Currently only for testing purpose.
-        print(self.filters)
-        print(self.channels)
+    def __repr__(self):
+        return '{};{};{}'.format(self.path, self.filters, self.channels)
+
+    def __eq__(self, other):
+        return repr(self) == repr(other)
 
     def cziFileToCziImageObject(self):
         try:
@@ -58,7 +51,7 @@ class Metadata:
         self.root = self.createElementTreeRoot()
 
         self.filters = self.setFiltersData()
-        self.channels = self.setChannels()
+        self.channels = self.setChannelsData()
 
         self.microscope = self.setMicroscope()
         self.objective = self.setObjective()
@@ -68,6 +61,15 @@ class Metadata:
         self.ySize = self.setYSize()
         self.xScaled = self.setXScaled()
         self.yScaled = self.setYScaled()
+
+    def checkIfElementHasChildren(self, element):
+        try:
+            if not element.getchildren():
+                raise AttributeError
+            else:
+                return True
+        except Exception as error:
+            raise error
 
     def setMicroscope(self):
         try:
@@ -122,9 +124,12 @@ class Metadata:
             raise error
 
     def findFiltersEntriesInXml(self):
+        filters = []
         try:
-            filters = []
-            for filter in self.root.find('./Metadata/Information/Instrument/Filters'):
+            root = self.root.find('./Metadata/Information/Instrument/Filters')
+            self.checkIfElementHasChildren(root)
+
+            for filter in root:
                 filterId = filter.attrib['Id']
                 cutIn = filter.find('./TransmittanceRange/CutIn').text
                 cutOut = filter.find('./TransmittanceRange/CutOut').text
@@ -145,19 +150,21 @@ class Metadata:
         except Exception as error:
             raise error
 
-    def findChannelsEntriesInXml(self):  # TODO Big problem here...
+    def findChannelsEntriesInXml(self):
+        channels = []
         try:
-            channels = []
-            print(self.root.find('./Metadata/Information/Image/Dimensions/Channels'))
-            #for channel in self.root.find('./Metadata/Information/Image/Dimensions/Channels'):
-            #    channels.append(Channel(channel.attrib['Id'], channel.attrib['Name'], self.root))
-            #return channels
+            root = self.root.find('./Metadata/Information/Image/Dimensions/Channels')
+            self.checkIfElementHasChildren(root)
+
+            for channel in root:
+                channels.append(Channel(channel.attrib['Id'], channel.attrib['Name'], self.root))
+            return channels
         except AttributeError as error:
             raise error
         except KeyError as error:
             raise error
 
-    def setChannels(self):
+    def setChannelsData(self):
         try:
             channels = self.findChannelsEntriesInXml()
             for channel in channels:
