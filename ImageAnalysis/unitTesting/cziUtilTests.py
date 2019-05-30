@@ -45,17 +45,6 @@ class TestCziUtil(unittest.TestCase):
 
         self.assertTrue(ok)
 
-    def testExtractArray(self):
-        czi = cziUtil.readCziImage("testCziFile2Images.czi")
-        array = cziUtil.getArrayFromCziFileObject(czi)
-        cziUtil.closeCziFileObject(czi)
-        self.assertIsInstance(array, np.ndarray)
-
-    def testExtractArrayShape(self):
-        czi = cziUtil.readCziImage("testCziFile2Images.czi")
-        array = cziUtil.getArrayFromCziFileObject(czi)
-        cziUtil.closeCziFileObject(czi)
-        self.assertEqual(array.shape, (1, 2, 1460, 1936, 1))
 
     def testExtractImages(self):
         czi = cziUtil.readCziImage("testCziFile2Images.czi")
