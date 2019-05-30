@@ -25,15 +25,11 @@ class Channel:
         self.depthOfFocus = None  # Couldn't find the data. Seems to be an internal formula in the microscope software.
         self.binningMode = self.setBinningMode()
 
-    def __repr__(self):  # TODO This might need to be modified. Currently only for testing purpose.
-        reprLine = '{} {} {} {} {}\n'.format(self.channelId, self.channelName, self.exWavelengthFilter,
-                                             self.emWavelengthFilter, self.reflector)
-        reprLine += '{} {} {} {} {}\n'.format(self.beamsplitter, self.contrastMethod, self.lightSource,
-                                              self.lightSourceIntensity, self.dyeName)
-        reprLine += '{} {} {} {} {}\n'.format(self.channelColor, self.exWavelength, self.emWavelength, self.effectiveNA,
-                                              self.imagingDevice)
-        reprLine += '{} {} {}'.format(self.cameraAdapter, self.exposureTime, self.binningMode)
-        return reprLine
+    def __repr__(self):
+        return '{};{};{};{}'.format(self.channelId, self.channelName, self.exWavelengthFilter, self.emWavelengthFilter)
+
+    def __eq__(self, other):
+        return repr(self) == repr(other)
 
     def getDataFromFilters(self, filters):
         self.setExWavelengthFilter(filters)

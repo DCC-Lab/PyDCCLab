@@ -257,6 +257,17 @@ class TestMetadata(unittest.TestCase):
 
         with self.assertRaises(KeyError): mdata.findFiltersEntriesInXml()
 
+    def test_setFiltersData_isEqual(self):
+        directory = os.path.dirname(os.path.dirname(__file__))
+        filepath = os.path.join(directory, 'temporary_files', 'testCziFile.czi')
+        mdata_1 = metadata.Metadata(filepath)
+        mdata_1.root = mdata_1.createElementTreeRoot()
+
+        mdata_2 = metadata.Metadata(filepath)
+        mdata_2.root = mdata_2.createElementTreeRoot()
+
+        self.assertEqual(mdata_1.setFiltersData(), mdata_2.setFiltersData())
+
     def test_setFiltersData_isNotEqual(self):
         directory = os.path.dirname(os.path.dirname(__file__))
         filepath = os.path.join(directory, 'temporary_files', 'testCziFile.czi')
@@ -274,14 +285,14 @@ class TestMetadata(unittest.TestCase):
         for channel in mdata.findChannelsEntriesInXml():
             self.assertIs(type(channel), chnnl.Channel)
 
-    def test_findChannelsEntriesInXml_missingEntries(self):  # TODO This doesn't work for now.
+    def test_findChannelsEntriesInXml_missingEntries(self):
         directory = os.path.dirname(os.path.dirname(__file__))
         filepath = os.path.join(directory, 'temporary_files', 'MissingEntries.xml')
         tree = ET.parse(filepath)
         mdata = metadata.Metadata(filepath)
         mdata.root = tree.getroot()
-        mdata.findChannelsEntriesInXml()
-        #with self.assertRaises(ValueError): mdata.findChannelsEntriesInXml()
+
+        with self.assertRaises(AttributeError): mdata.findChannelsEntriesInXml()
 
     def test_findChannelsEntriesInXml_noId(self):
         directory = os.path.dirname(os.path.dirname(__file__))
@@ -291,6 +302,68 @@ class TestMetadata(unittest.TestCase):
         mdata.root = tree.getroot()
 
         with self.assertRaises(KeyError): mdata.findChannelsEntriesInXml()
+
+    def test_setChannelsData_isEqual(self):
+        directory = os.path.dirname(os.path.dirname(__file__))
+        filepath = os.path.join(directory, 'temporary_files', 'testCziFile.czi')
+        mdata_1 = metadata.Metadata(filepath)
+        mdata_1.root = mdata_1.createElementTreeRoot()
+        mdata_1.filters = mdata_1.setFiltersData()
+
+        mdata_2 = metadata.Metadata(filepath)
+        mdata_2.root = mdata_2.createElementTreeRoot()
+        mdata_2.filters = mdata_2.setFiltersData()
+
+        self.assertEqual(mdata_1.setChannelsData(), mdata_2.setChannelsData())
+
+    def test_setChannelsData_isNotEqual(self):
+        directory = os.path.dirname(os.path.dirname(__file__))
+        filepath = os.path.join(directory, 'temporary_files', 'testCziFile.czi')
+        mdata = metadata.Metadata(filepath)
+        mdata.root = mdata.createElementTreeRoot()
+        mdata.filters = mdata.setFiltersData()
+
+        self.assertNotEqual(mdata.findChannelsEntriesInXml(), mdata.setChannelsData())
+
+    def test_checkIfElementHasChildren_hasChildren(self):
+        directory = os.path.dirname(os.path.dirname(__file__))
+        filepath = os.path.join(directory, 'temporary_files', 'testCziFile.czi')
+        mdata = metadata.Metadata(filepath)
+        mdata.root = mdata.createElementTreeRoot()
+        root = mdata.root.find('./Metadata/Information/Image/Dimensions/Channels')
+
+        self.assertTrue(mdata.checkIfElementHasChildren(root))
+
+    def test_checkIfElementHasChildren_hasNoChildren(self):
+        directory = os.path.dirname(os.path.dirname(__file__))
+        filepath = os.path.join(directory, 'temporary_files', 'MissingEntries.xml')
+        tree = ET.parse(filepath)
+        mdata = metadata.Metadata(filepath)
+        mdata.root = tree.getroot()
+        root = mdata.root.find('./Metadata/Information/Image/Dimensions/Channels')
+
+        with self.assertRaises(AttributeError): mdata.checkIfElementHasChildren(root)
+
+    def test_setAttributeFromXml_isEqual(self):
+        directory = os.path.dirname(os.path.dirname(__file__))
+        filepath = os.path.join(directory, 'temporary_files', 'testCziFile.czi')
+
+        mdata_1 = metadata.Metadata(filepath)
+        mdata_1.setAttributesFromXml()
+        mdata_2 = metadata.Metadata(filepath)
+        mdata_2.setAttributesFromXml()
+
+        self.assertEqual(mdata_1, mdata_2)
+
+    def test_setAttributeFromXml_isNotEqual(self):
+        directory = os.path.dirname(os.path.dirname(__file__))
+        filepath = os.path.join(directory, 'temporary_files', 'testCziFile.czi')
+
+        mdata_1 = metadata.Metadata(filepath)
+        mdata_1.setAttributesFromXml()
+        mdata_2 = metadata.Metadata(filepath)
+
+        self.assertNotEqual(mdata_1, mdata_2)
 
 
 if __name__ == '__main__':
