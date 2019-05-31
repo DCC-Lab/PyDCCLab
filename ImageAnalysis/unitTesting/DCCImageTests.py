@@ -81,6 +81,19 @@ class TestDCCImageMethods(unittest.TestCase):
         image = DCCImage.DCCImage(array)
         self.assertTrue(image.isImageInBinary())
 
+    def testDCCImageSeparatedChannelsGray(self):
+        with self.assertRaises(DCCExcep.ImageDimensionsException):
+            self.image.splitChannels()
+
+    def testDCCImageSeparatedChannels(self):
+        array = np.ones((1000, 1000, 3), dtype=np.float32)
+        array[:, :, 0] = 100.25
+        array[:, :, 1] = 205.78
+        array[:, :, 2] = 137.96
+        splitterList = [array[:, :, 0], array[:, :, 1], array[:, :, 2]]
+        image = DCCImage.DCCImage(array)
+        self.assertTrue(np.array_equal(np.array(image.splitChannels()), np.array(splitterList)))
+
     def testDCCImageStringRepresentation(self):
         self.assertTrue(np.array_equal(str(self.image), str(self.image.getArray())))
 
@@ -184,6 +197,22 @@ class TestDCCImageMethods(unittest.TestCase):
         dccImage = DCCImage.DCCImage(image)
         grayScale = dccImage.getGrayscaleConversion()
         self.assertTrue(grayScale.getNumberOfChannel() == 1)
+
+    def testGrayScaleConversionCompute(self):
+        # Y = 0.2125 R + 0.7154 G + 0.0721 B
+        array = np.ones((10, 10, 3), dtype=np.float32)
+        array[:, :, 0] = 100.25
+        array[:, :, 1] = 205.78
+        array[:, :, 2] = 137.96
+        weights = [0.2125, 0.7154, 0.0721]
+        arrayGray = np.zeros((10, 10), dtype=np.float32)
+        for i in range(10):
+            for j in range(10):
+                for weight in range(len(weights)):
+                    arrayGray[i][j] += array[i][j][weight] * weights[weight]
+        print(arrayGray)
+        print(DCCImage.DCCImage(array).getGrayscaleConversion().getArray())
+        self.assertTrue(np.allclose(arrayGray, DCCImage.DCCImage(array).getGrayscaleConversion().getArray()))
 
     def testDCCImageGetGrayHistogramValuesWarning(self):
         with warnings.catch_warnings(record=True):

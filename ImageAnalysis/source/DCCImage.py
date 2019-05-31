@@ -61,9 +61,8 @@ class DCCImage:
 
     def showImage(self, showInGray: bool = True):
         if self.isImageInGray() and showInGray:
-            plt.imshow(self.__pixelArray, cmap="gray")
-        else:
-            plt.imshow(self.__pixelArray)
+            plt.gray()
+        plt.imshow(self.__pixelArray)
         plt.show()
         return self
 
@@ -82,6 +81,14 @@ class DCCImage:
         self.__metadata = newMetadata
         return newMetadata
 
+    def splitChannels(self) -> typing.List[np.ndarray]:
+        if self.isImageInGray():
+            raise ImageDimensionsException(self.__dimensions)
+        pixelsPerChannel = []
+        for channel in range(self.getNumberOfChannel()):
+            pixelsPerChannel.append(self.getArray()[..., channel])
+        return pixelsPerChannel
+
     # Now, interesting part:
     def getGrayscaleConversion(self):
         # todo test unitaire
@@ -90,6 +97,7 @@ class DCCImage:
         else:
             grayConversion = color.rgb2gray(self.getArray())
         return DCCImage(grayConversion.astype("float32"))
+
 
     @staticmethod
     def __convertToUInt16Array(array: np.ndarray) -> np.ndarray:
@@ -428,5 +436,5 @@ if __name__ == '__main__':
         r"C:\Users\goubi\PycharmProjects\BigData-ImageAnalysis\ImageAnalysis\unitTesting\testCziFile2Images.czi")
     jpeg = DCCImagesFromFiles.DCCImageFromNormalFile(
         r"C:\Users\goubi\PycharmProjects\BigData-ImageAnalysis\ImageAnalysis\unitTesting\testNotCziFile.jpg")
-    cziImage = cziImage.getImageAtIndex(0)
-
+    cziImage.showImagesOneByOne()
+    cziImage.showImages()

@@ -167,7 +167,7 @@ class TesDCCImageCollectionMethods(unittest.TestCase):
 
     @patch("matplotlib.pyplot.show", new=Mock)
     def testShowImages(self):
-        nbOfImagesShown = self.collection.showImages()
+        nbOfImagesShown = self.collection.showImagesOneByOne()
         self.assertEqual(nbOfImagesShown, 5)
 
     def testIndexingOutOfBound(self):

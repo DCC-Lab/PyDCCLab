@@ -12,7 +12,6 @@ class DCCImageCollection:
     def __getitem__(self, item):
         return self.getImageAtIndex(item)
 
-
     def __knowIfImageInListAndPosition(self, image: DCCImage) -> tuple:
         if not isinstance(image, DCCImage):
             raise NotDCCImageException
@@ -71,9 +70,24 @@ class DCCImageCollection:
         self.__numberOfImages = 0
         print(self.__imageCollection)
 
-    def showImages(self) -> int:
+    def showImagesOneByOne(self) -> int:
         imagesShown = 0
         for image in self.__imageCollection:
             image.showImage()
             imagesShown += 1
+        return imagesShown
+
+    def showImages(self, showInGray: bool = True) -> int:
+        nbOfImages = self.__numberOfImages
+        if nbOfImages == 0:
+            raise EmptyDCCImageCollectionException
+        imagesShown = 0
+        plt.figure()
+        for i in range(nbOfImages):
+            plt.subplot((nbOfImages // 3) + 1, nbOfImages if nbOfImages // 3 == 0 else 3, i + 1)
+            if showInGray:
+                plt.gray()
+            plt.imshow(self.__imageCollection[i].getArray())
+            imagesShown += 1
+        plt.show()
         return imagesShown
