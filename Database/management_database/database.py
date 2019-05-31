@@ -17,10 +17,10 @@ class Database:
             try:
                 self.conn = lite.connect(path, uri=True)
                 return 'connected'
-            except lite.OperationalError as error:
-                raise error
+            except lite.OperationalError:
+                raise
         else:
-            raise Exception('Already connected to a database : ' + self.name + " : " + self.path)
+            raise ConnectionError('Already connected to a database : ' + self.name + " : " + self.path)
 
     def closeConnection(self):
         if self.checkIfIsConnected() is True and self.checkIfCursorExists() is False:
@@ -28,9 +28,9 @@ class Database:
             self.conn = None
             return 'disconnected'
         if self.checkIfIsConnected() is True and self.checkIfCursorExists() is True:
-            raise Exception('A cursor exists and has to be closed first.')
+            raise AttributeError('A cursor exists and has to be closed first.')
         else:
-            raise Exception('Connection does not exist.')
+            raise ConnectionError('Connection does not exist.')
 
     def checkIfIsConnected(self):
         if self.conn is not None:
@@ -60,9 +60,9 @@ class Database:
             self.curs = self.conn.cursor()
             return True
         elif self.checkIfIsConnected() is False:
-            raise Exception('Connection does not exist.')
+            raise ConnectionError('Connection does not exist.')
         elif self.checkIfIsConnected() is True and self.checkIfCursorExists() is True:
-            raise Exception('A cursor already exists.')
+            raise AttributeError('A cursor already exists.')
 
     def closeCursor(self):
         if self.checkIfCursorExists():
@@ -74,14 +74,15 @@ class Database:
 
     def commit(self):
         if self.checkIfIsConnected() is False:
-            raise Exception('Connection does not exist.')
+            raise ConnectionError('Connection does not exist.')
         elif self.checkIfCursorExists() is False:
-            raise Exception('Cursor does not exist.')
+            raise AttributeError('Cursor does not exist.')
         else:
             try:
                 self.conn.commit()
                 return True
             except lite.OperationalError as error:
+
                 raise error
 
 # TODO Below is stuff to do eventually.
@@ -153,10 +154,14 @@ def ListAllTables(cursor):
 '''
 
 
-def pathToURI(path, mode='ro'):
+def pathToURI(path, mode='ro'):  # TODO MacOS and Linux will have to be added eventually.
     path = pathlib.Path(path)
     if findingOS() == 'Windows':
         return 'file:' + parse.quote(path.as_posix(), safe=':/') + '?mode=' + mode
+    if findingOS() == 'Darwin':
+        pass
+    if findingOS() == 'Linux':
+        pass
     if path.is_absolute():
         return path.as_uri() + '?mode=' + mode
 
