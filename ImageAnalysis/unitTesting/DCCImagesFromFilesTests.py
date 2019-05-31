@@ -122,7 +122,7 @@ class TestDCCImagesFromTiffFileMethods(unittest.TestCase):
 
     def testSaveMetadataInvalidName(self):
         with self.assertRaises(DCCExcep.InvalidMetadataFileNameException):
-            self.images.saveMetadata("meta.data")
+            self.images.saveMetadata("meta.testData")
 
     def testSaveMetadata(self):
         import os

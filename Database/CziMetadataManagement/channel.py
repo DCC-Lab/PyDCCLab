@@ -4,12 +4,12 @@ class Channel:
         self.channelName = channelName
         self.root = root
 
-        # These variables get their data from filter objects.
+        # These variables get their testData from filter objects.
         self.exWavelengthFilter = None
         self.emWavelengthFilter = None
         self.beamsplitter = None
 
-        # These variables get their data from root.
+        # These variables get their testData from root.
         self.reflector = self.setReflector()
         self.contrastMethod = self.setContrastMethod()
         self.lightSource = self.setLightSource()
@@ -22,7 +22,7 @@ class Channel:
         self.imagingDevice = self.setImagingDevice()
         self.cameraAdapter = self.setCameraAdapter()
         self.exposureTime = self.setExposureTime()
-        self.depthOfFocus = None  # Couldn't find the data. Seems to be an internal formula in the microscope software.
+        self.depthOfFocus = None  # Couldn't find the testData. Seems to be an internal formula in the microscope software.
         self.binningMode = self.setBinningMode()
 
     def __repr__(self):

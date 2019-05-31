@@ -8,9 +8,9 @@ import os
 class TestChannel(unittest.TestCase):
     def setUp(self):
         self.directory = os.path.dirname(os.path.dirname(__file__))
-        self.testPath = os.path.join(self.directory, 'temporary_files', 'testCziFile.czi')
-        self.missingEntriesPath = os.path.join(self.directory, 'temporary_files', 'MissingEntries.xml')
-        self.missingKeysPath = os.path.join(self.directory, 'temporary_files', 'MissingKeys.xml')
+        self.testPath = os.path.join(self.directory, 'testData', 'testCziFile.czi')
+        self.missingEntriesPath = os.path.join(self.directory, 'testData', 'MissingEntries.xml')
+        self.missingKeysPath = os.path.join(self.directory, 'testData', 'MissingKeys.xml')
 
         self.meta = mtdt(self.testPath)
         self.meta.setAttributesFromXml()
