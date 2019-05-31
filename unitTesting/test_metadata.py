@@ -10,11 +10,11 @@ import os
 class TestMetadata(unittest.TestCase):
     def setUp(self):
         self.directory = os.path.dirname(os.path.dirname(__file__))
-        self.testPath = os.path.join(self.directory, 'temporary_files', 'testCziFile.czi')
-        self.wrongFilePath = os.path.join(self.directory, 'temporary_files', 'wrongfilename.czi')
-        self.wrongFileType = os.path.join(self.directory, 'temporary_files', 'wrongFile.txt')
-        self.missingEntriesPath = os.path.join(self.directory, 'temporary_files', 'MissingEntries.xml')
-        self.missingKeysPath = os.path.join(self.directory, 'temporary_files', 'MissingKeys.xml')
+        self.testPath = os.path.join(self.directory, 'testData', 'testCziFile.czi')
+        self.wrongFilePath = os.path.join(self.directory, 'testData', 'wrongfilename.czi')
+        self.wrongFileType = os.path.join(self.directory, 'testData', 'wrongFile.txt')
+        self.missingEntriesPath = os.path.join(self.directory, 'testData', 'MissingEntries.xml')
+        self.missingKeysPath = os.path.join(self.directory, 'testData', 'MissingKeys.xml')
 
     def test_cziFileToCziImageObject_isCziImageObject(self):
         mdata = mtdt.Metadata(self.testPath)

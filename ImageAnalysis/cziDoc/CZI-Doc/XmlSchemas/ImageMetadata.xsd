@@ -13,7 +13,7 @@
   <xs:include schemaLocation="Layers.xsd"></xs:include>
   <xs:include schemaLocation="Scaling.xsd"></xs:include>
 
-  <!-- this schema is used for physiology-related data (stored under Appliances) -->
+  <!-- this schema is used for physiology-related testData (stored under Appliances) -->
   <xs:include schemaLocation="PhysiologySetting.xsd"></xs:include>
 
   <!-- ELEMENT : ImageDocument -->
@@ -263,7 +263,7 @@
   </xs:complexType>
 
   <!-- ELEMENT : HermesAnalysisResult -->
-  <!-- further information about this data and discussion can be found at http://adefue01sapp30/Sites/ZIS/ZISFramework/SitePages/Hermes-ZEN-interop.aspx -->
+  <!-- further information about this testData and discussion can be found at http://adefue01sapp30/Sites/ZIS/ZISFramework/SitePages/Hermes-ZEN-interop.aspx -->
   <xs:element name="HermesAnalysisResult" type="HermesAnalysisResult">
   </xs:element>
 

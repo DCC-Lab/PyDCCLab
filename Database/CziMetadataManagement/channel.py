@@ -4,12 +4,12 @@ class Channel:
         self.channelName = channelName
         self.root = root
 
-        # These variables get their data from filter objects.
+        # These variables get their testData from filter objects.
         self.exWavelengthFilter = None
         self.emWavelengthFilter = None
         self.beamsplitter = None
 
-        # These variables get their data from root.
+        # These variables get their testData from root.
         self.reflector = self.setReflector()
         self.contrastMethod = self.setContrastMethod()
         self.lightSource = self.setLightSource()
@@ -22,7 +22,7 @@ class Channel:
         self.imagingDevice = self.setImagingDevice()
         self.cameraAdapter = self.setCameraAdapter()
         self.exposureTime = self.setExposureTime()
-        self.depthOfFocus = None  # Couldn't find the data. Seems to be an internal formula in the microscope software.
+        self.depthOfFocus = None  # Couldn't find the testData. Seems to be an internal formula in the microscope software.
         self.binningMode = self.setBinningMode()
 
     def __repr__(self):
@@ -35,6 +35,16 @@ class Channel:
         self.setExWavelengthFilter(filters)
         self.setEmWavelengthFilter(filters)
         self.setBeamsplitter(filters)
+
+    def exportDataAsDict(self):  # TODO Tests
+        return {'entry_id': '', 'channel_id': self.channelId, 'channel_name': self.channelName,
+                'ex_wavelength_filter': self.exWavelengthFilter, 'em_wavelength_filter': self.emWavelengthFilter,
+                'beamsplitter': self.beamsplitter, 'reflector': self.reflector, 'contrast_method': self.contrastMethod,
+                'light_source': self.lightSource, 'light_source_intensity': self.lightSourceIntensity,
+                'dye_name': self.dyeName, 'channel_color': self.channelColor, 'ex_wavelength': self.exWavelength,
+                'em_wavelength': self.emWavelength, 'effective_na': self.effectiveNA,
+                'imaging_device': self.imagingDevice, 'camera_adapter': self.cameraAdapter,
+                'exposure_time': self.exposureTime, 'binning_mode': self.binningMode}
 
     def setExWavelengthFilter(self, filters):
         try:

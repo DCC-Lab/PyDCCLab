@@ -612,7 +612,7 @@
         <!-- If we store the complete list of all acquired tiles, including the different channels, T, Z and M,
         the positions list might be very large. E.g. for SizeT = 100, SizeZ = 10, SizeC = 3 and SizeM = 6 we would have
         18000 position entries. Therefore, it might not be feasible to store the complete list in all situations.
-        We may also think of extracting this data to a separate binary attachment. -->
+        We may also think of extracting this testData to a separate binary attachment. -->
         <xs:annotation>
           <xs:documentation>
             The "Positions" define a list of all stage positions for acquired tiles.
