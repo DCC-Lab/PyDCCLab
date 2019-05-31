@@ -1,4 +1,4 @@
-import Database.management_database.database as db
+import Database.DatabaseManagement.database as db
 import sqlite3 as lite
 import unittest
 import os
@@ -7,8 +7,8 @@ import os
 class TestDatabase(unittest.TestCase):
     def setUp(self):
         self.directory = os.path.dirname(os.path.dirname(__file__))
-        self.filePath = os.path.join(self.directory, 'data', 'test.db')
-        self.wrongFile = os.path.join(self.directory, 'data', 'tst.db')
+        self.filePath = os.path.join(self.directory, 'testData', 'test.db')
+        self.wrongFile = os.path.join(self.directory, 'testData', 'tst.db')
 
     def test_createConnection_connected(self):
         database = db.Database(self.filePath, 'test.db')
@@ -146,7 +146,7 @@ class TestDatabase(unittest.TestCase):
         # This is one of the more complex test.
         # Would very much like to simplify it.
         directory = os.path.dirname(__file__)
-        fileName = os.path.join(directory, 'data', 'test.db')
+        fileName = os.path.join(directory, 'testData', 'test.db')
         database = db.Database(fileName, 'test.db')
 
         #database.createConnection()

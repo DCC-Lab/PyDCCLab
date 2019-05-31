@@ -27,7 +27,7 @@ if __name__ == '__main__':
                 mouse = re.match(r'^\w\d{3}', n).group()
         print(name, vectors, mouse)
         
-        # Small function to print export all of the channel's data.
+        # Small function to print export all of the channel's testData.
         '''
         for c in m.getChannels():
             print(c.exportDataAsDict())
