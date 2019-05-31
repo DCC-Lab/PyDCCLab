@@ -47,7 +47,8 @@ class Filter:
 
     def setDichroicId(self, root):
         try:
-            self.dichroicId = root.find('./Metadata/Information/Instrument/FilterSets/FilterSet[@Id="{}"]/DichroicRef'.format(self.filterSetId)).attrib['Id']
+            self.dichroicId = root.find('./Metadata/Information/Instrument/FilterSets/FilterSet[@Id="{}"]'
+                                        '/DichroicRef'.format(self.filterSetId)).attrib['Id']
         except KeyError:
             raise
         except AttributeError:
@@ -56,7 +57,8 @@ class Filter:
     def setDichroic(self, root):
         self.setDichroicId(root)
         try:
-            self.dichroic = root.find('./Metadata/Information/Instrument/Dichroics/Dichroic[@Id="{}"]/Wavelengths/Wavelength'.format(self.dichroicId)).text
+            self.dichroic = root.find('./Metadata/Information/Instrument/Dichroics/Dichroic[@Id="{}"]/Wavelengths'
+                                      '/Wavelength'.format(self.dichroicId)).text
         except AttributeError:
             raise
         except KeyError:
