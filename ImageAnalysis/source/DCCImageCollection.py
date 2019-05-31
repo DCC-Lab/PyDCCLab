@@ -9,6 +9,10 @@ class DCCImageCollection:
         self.__imageCollection = DCCImageArray
         self.__numberOfImages = len(DCCImageArray)
 
+    def __getitem__(self, item):
+        return self.getImageAtIndex(item)
+
+
     def __knowIfImageInListAndPosition(self, image: DCCImage) -> tuple:
         if not isinstance(image, DCCImage):
             raise NotDCCImageException
