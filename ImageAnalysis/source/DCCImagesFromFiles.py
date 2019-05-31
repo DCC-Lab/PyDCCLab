@@ -15,7 +15,7 @@ class DCCImagesFromCZIFile(DCCImageCollection):
         cziUtil.closeCziFileObject(cziObject)
         for image in arrayOfImages:
             listOfImages.append(
-                DCCImage(image, metadata=self.__metadata))  # Voir si pertinent que DCCImage ait un attribut metadata
+                DCCImage(image, metadata=self.__metadata))
         DCCImageCollection.__init__(self, listOfImages)
 
     def getMetadata(self) -> str:

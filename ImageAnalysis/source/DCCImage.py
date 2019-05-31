@@ -61,9 +61,8 @@ class DCCImage:
 
     def showImage(self, showInGray: bool = True):
         if self.isImageInGray() and showInGray:
-            plt.imshow(self.__pixelArray, cmap="gray")
-        else:
-            plt.imshow(self.__pixelArray)
+            plt.gray()
+        plt.imshow(self.__pixelArray)
         plt.show()
         return self
 
@@ -82,6 +81,14 @@ class DCCImage:
         self.__metadata = newMetadata
         return newMetadata
 
+    def splitChannels(self) -> typing.List[np.ndarray]:
+        if self.isImageInGray():
+            raise ImageDimensionsException(self.__dimensions)
+        pixelsPerChannel = []
+        for channel in range(self.getNumberOfChannel()):
+            pixelsPerChannel.append(self.getArray()[..., channel])
+        return pixelsPerChannel
+
     # Now, interesting part:
     def getGrayscaleConversion(self):
         # todo test unitaire
@@ -90,6 +97,7 @@ class DCCImage:
         else:
             grayConversion = color.rgb2gray(self.getArray())
         return DCCImage(grayConversion.astype("float32"))
+
 
     @staticmethod
     def __convertToUInt16Array(array: np.ndarray) -> np.ndarray:
@@ -300,28 +308,77 @@ class DCCImage:
         return DCCImage(sobelHV.astype(np.float32))
 
     def getIsodataThresholding(self):
-        inputArray = self.__convertToUInt16Array(self.getArray())
-        threshArray = inputArray >= threshold_isodata(inputArray)
+        """
+        Adapted from skimage's isodata thresholding method.
+        Their version was not behaving properly with our image format (different than uint8).
+        :return: The thresholded DCCImage instance according to isodata method.
+        """
+        # We ignore warnings related to division by 0 since they give nan and we treat nan later.
+        warnings.catch_warnings()
+        warnings.simplefilter("ignore", category=RuntimeWarning)
+        inputArray = self.getGrayscaleConversion().getArray()
+        hist, bins = self.getGrayscaleHistogramValues()
+
+        hist = np.array(hist, dtype=np.float32)
+        bins = np.array(bins)
+        binsCenters = np.array([(i + i + 1) / 2 for i in range(len(bins) - 1)])
+        pixelProbabilityThresholdOne = np.cumsum(hist)
+        pixelProbabilityThresholdTwo = np.cumsum(hist[::-1])[::-1] - hist
+        intensitySum = hist * binsCenters
+        pixelProbabilityThresholdTwo[-1] = 1
+        low = np.cumsum(intensitySum) / pixelProbabilityThresholdOne
+        high = (np.cumsum(intensitySum[::-1])[::-1] - intensitySum) / pixelProbabilityThresholdTwo
+        allMean = (low + high) / 2
+        binWidth = binsCenters[1] - binsCenters[0]
+        distances = allMean - binsCenters
+        thresh = 0
+        for i in range(len(distances)):
+            if distances[i] is not None and 0 <= distances[i] < binWidth:
+                thresh = binsCenters[i]
+        threshArray = inputArray >= thresh
         return DCCImage(threshArray.astype(np.float32))
 
     def getOtsuThresholding(self):
-        inputArray = self.__convertToUInt16Array(self.getArray())
-        threshArray = inputArray >= threshold_otsu(inputArray)
+        """
+        Adapted from skimage's Otsu thresholding method.
+        Their version was not behaving properly with our image format (different than uint8).
+        :return: The thresholded DCCImage instance according to Otsu's method.
+        """
+        # We ignore warnings related to division by 0 since they give nan and we treat nan later.
+        warnings.catch_warnings()
+        warnings.simplefilter("ignore", category=RuntimeWarning)
+        inputArray = self.getGrayscaleConversion().getArray()
+        if np.max(inputArray) == np.min(inputArray):
+            raise ValueError(
+                "This method only works for image with more than one \"color\" (i.e. more than one pixel value).")
+        hist, bins = self.getGrayscaleHistogramValues()
+        hist = np.array(hist, dtype=np.float32)
+        bins = np.array(bins)
+        binsCenters = np.array([(i + i + 1) / 2 for i in range(len(bins) - 1)])
+        pixelProbabilityGroupOne = np.cumsum(hist)
+        pixelProbabilityGroupTwo = np.cumsum(hist[::-1])[::-1]
+        pixelIntensityGroupOneMean = np.cumsum(hist * binsCenters) / pixelProbabilityGroupOne
+        pixelIntensityGroupTwoMean = (np.cumsum((hist * binsCenters)[::-1]) / pixelProbabilityGroupTwo[::-1])[::-1]
+        varianceTwoGroups = pixelProbabilityGroupOne[:-1] * pixelProbabilityGroupTwo[1:] * (
+                pixelIntensityGroupOneMean[:-1] - pixelIntensityGroupTwoMean[1:]) ** 2
+        index = np.nanargmax(varianceTwoGroups)
+        thresh = binsCenters[index]
+        threshArray = inputArray >= thresh
         return DCCImage(threshArray.astype(np.float32))
 
-    def getAdaptiveThresholdingGaussian(self, blockSize: int = 3):
+    def getAdaptiveThresholdingGaussian(self, blockSize: int = 3, sigma: float = None):
         inputArray = self.getArray()
-        threshArray = threshold_local(inputArray, blockSize, mode="nearest")
+        threshArray = inputArray >= threshold_local(inputArray, blockSize, mode="nearest", param=sigma)
         return DCCImage(threshArray.astype(np.float32))
 
     def getAdaptiveThresholdingMean(self, blockSize: int = 3):
         inputArray = self.getArray()
-        threshArray = threshold_local(inputArray, blockSize, mode="nearest", method="mean")
+        threshArray = inputArray >= threshold_local(inputArray, blockSize, mode="nearest", method="mean")
         return DCCImage(threshArray.astype(np.float32))
 
     def getAdaptiveThresholdingMedian(self, blockSize: int = 3):
         inputArray = self.getArray()
-        threshArray = threshold_local(inputArray, blockSize, mode="nearest", method="median")
+        threshArray = inputArray >= threshold_local(inputArray, blockSize, mode="nearest", method="median")
         return DCCImage(threshArray.astype(np.float32))
 
     def getWatershedSegmentation(self):
@@ -332,28 +389,28 @@ class DCCImage:
         labels = morphology.watershed(-distance, markers, mask=inputArray).astype(np.float32)
         return DCCImage(labels)
 
-    def getClosing(self):
+    def getClosing(self, windowSize: int = 3):
         inputArrayGray = self.getGrayscaleConversion().getArray()
-        closed = morphology.closing(inputArrayGray)
+        closed = morphology.closing(inputArrayGray, np.ones((windowSize, windowSize)))
         return DCCImage(closed)
 
-    def getBinaryClosing(self):
+    def getBinaryClosing(self, windowSize: int = 3):
         inputArray = self.getArray()
         if not self.isImageInBinary():
             raise NotBinaryImageException
-        binaryClosed = morphology.binary_closing(inputArray).astype(np.float32)
+        binaryClosed = morphology.binary_closing(inputArray, np.ones((windowSize, windowSize))).astype(np.float32)
         return DCCImage(binaryClosed)
 
-    def getOpening(self):
+    def getOpening(self, windowSize: int = 3):
         inputArrayGray = self.getGrayscaleConversion().getArray()
-        opened = morphology.opening(inputArrayGray)
+        opened = morphology.opening(inputArrayGray, np.ones((windowSize, windowSize)))
         return DCCImage(opened)
 
-    def getBinaryOpening(self):
+    def getBinaryOpening(self, windowSize: int = 3):
         inputArray = self.getArray()
         if not self.isImageInBinary():
             raise NotBinaryImageException
-        binaryOpened = morphology.binary_opening(inputArray).astype(np.float32)
+        binaryOpened = morphology.binary_opening(inputArray, np.ones((windowSize, windowSize))).astype(np.float32)
         return DCCImage(binaryOpened)
 
     def getConnectedComponents(self):
@@ -379,19 +436,5 @@ if __name__ == '__main__':
         r"C:\Users\goubi\PycharmProjects\BigData-ImageAnalysis\ImageAnalysis\unitTesting\testCziFile2Images.czi")
     jpeg = DCCImagesFromFiles.DCCImageFromNormalFile(
         r"C:\Users\goubi\PycharmProjects\BigData-ImageAnalysis\ImageAnalysis\unitTesting\testNotCziFile.jpg")
-    cziImage = cziImage.getImageAtIndex(0)
-    # hist, bins = cziImage.getGrayscaleHistogram()
-    # cziImage.getStandardDeviationFiltering(3).showImage()
-    # cziImage.showImage()
-    for i in range(1, 4):
-        for j in range(1, 4):
-            array[i][j] = 1
-    image = DCCImage(array)
-    # cziImage.getWatershedSegmentation().showImage()
-    cziImage.showImage()
-    cziImage.getOpening().showImage()
-    cziImage.getOtsuThresholding().showImage()
-    stuff = cziImage.getGrayGaussianFiltering(1.5).getOtsuThresholding().getBinaryOpening().getConnectedComponents()
-    stuff[0].showImage(False)
-    #   cziImage.getOtsuThresholding().getWatershedSegmentation().showImage()
-    #   cziImage.get().showImage()
+    cziImage.showImagesOneByOne()
+    cziImage.showImages()

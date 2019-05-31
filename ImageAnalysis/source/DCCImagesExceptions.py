@@ -46,3 +46,7 @@ class InvalidFileFormatException(Exception):
 class NotBinaryImageException(Exception):
     def __init__(self):
         Exception.__init__(self, "The image must be in binary format (only black and white pixels).")
+
+class EmptyDCCImageCollectionException(Exception):
+    def __init__(self):
+        Exception.__init__(self, "There are no images in the collection.")

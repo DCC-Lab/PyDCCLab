@@ -9,7 +9,7 @@ except ImportError:
     print("Please install the required libraries.")
 
 
-class TestDCCImageStackConstructor(unittest.TestCase):
+class TestDCCImageCollecionConstructor(unittest.TestCase):
 
     def testValidConstructorEmpty(self):
 
@@ -54,7 +54,7 @@ class TestDCCImageStackConstructor(unittest.TestCase):
             DCCImageCollection(imageList)
 
 
-class TesDCCImageStackMethods(unittest.TestCase):
+class TesDCCImageCollectionMethods(unittest.TestCase):
 
     def setUp(self) -> None:
         self.imageList = []
@@ -65,36 +65,36 @@ class TesDCCImageStackMethods(unittest.TestCase):
             self.imageList.append(image)
         self.collection = DCCImageCollection(self.imageList)
 
-    def testImageInStackInvalidImage(self):
+    def testImageInCollectionInvalidImage(self):
         invalidImage = np.ones((1250, 1251), dtype=np.float32)
         with self.assertRaises(DCCExcep.NotDCCImageException):
             self.collection.isImageInCollection(invalidImage)
 
-    def testImageNotInStack(self):
-        arrayNotInStack = np.ones((1250, 1251), dtype=np.float32)
-        arrayNotInStack[0][0] = 0.00001
-        imageNotInStack = DCCImage.DCCImage(arrayNotInStack)
-        self.assertFalse(self.collection.isImageInCollection(imageNotInStack))
+    def testImageNotInCollection(self):
+        arrayNotInCollection = np.ones((1250, 1251), dtype=np.float32)
+        arrayNotInCollection[0][0] = 0.00001
+        imageNotInCollection = DCCImage.DCCImage(arrayNotInCollection)
+        self.assertFalse(self.collection.isImageInCollection(imageNotInCollection))
 
-    def testImageInStack(self):
-        imageInStack = self.imageList[-1].copyDCCImage()
-        self.assertTrue(self.collection.isImageInCollection(imageInStack))
+    def testImageInCollection(self):
+        imageInCollection = self.imageList[-1].copyDCCImage()
+        self.assertTrue(self.collection.isImageInCollection(imageInCollection))
 
     def testGetIndexOfInvalidImage(self):
         invalidImage = np.ones((1250, 1251), dtype=np.float32)
         with self.assertRaises(DCCExcep.NotDCCImageException):
             self.collection.getIndexOfImage(invalidImage)
 
-    def testGetIndexOfImageNotInStack(self):
-        arrayNotInStack = np.ones((1250, 1251), dtype=np.float32)
-        arrayNotInStack[0][0] = 0.00001
-        imageNotInStack = DCCImage.DCCImage(arrayNotInStack)
+    def testGetIndexOfImageNotInCollection(self):
+        arrayNotInCollection = np.ones((1250, 1251), dtype=np.float32)
+        arrayNotInCollection[0][0] = 0.00001
+        imageNotInCollection = DCCImage.DCCImage(arrayNotInCollection)
         with self.assertRaises(DCCExcep.ImageNotInCollectionException):
-            self.collection.getIndexOfImage(imageNotInStack)
+            self.collection.getIndexOfImage(imageNotInCollection)
 
-    def testGetIndexImageInStack(self):
-        imageInStack = self.imageList[2].copyDCCImage()
-        self.assertEqual(self.collection.getIndexOfImage(imageInStack), 2)
+    def testGetIndexImageInCollection(self):
+        imageInCollection = self.imageList[2].copyDCCImage()
+        self.assertEqual(self.collection.getIndexOfImage(imageInCollection), 2)
 
     def testAddInvalidImage(self):
         invalidImage = np.ones((1250, 1251), dtype=np.float32)
@@ -125,7 +125,7 @@ class TesDCCImageStackMethods(unittest.TestCase):
         with self.assertRaises(DCCExcep.NotDCCImageException):
             self.collection.removeDCCImage(invalidImage)
 
-    def testRemoveImageWithImageNotInStack(self):
+    def testRemoveImageWithImageNotInCollection(self):
         arrayNotInStack = np.ones((1250, 1251), dtype=np.float32)
         arrayNotInStack[0][0] = 0.00001
         imageNotInStack = DCCImage.DCCImage(arrayNotInStack)
@@ -137,7 +137,7 @@ class TesDCCImageStackMethods(unittest.TestCase):
         indexOfRemovedImage = self.collection.removeDCCImage(imageInStack)
         self.assertEqual(indexOfRemovedImage, 0)
 
-    def testDetNumberOfImages(self):
+    def testGetNumberOfImages(self):
         numberOfImages = len(self.imageList)
         self.assertEqual(self.collection.getNumberOfImages(), numberOfImages)
 
@@ -152,23 +152,34 @@ class TesDCCImageStackMethods(unittest.TestCase):
         self.collection.removeAtIndex(0)
         self.assertEqual(self.collection.getNumberOfImages(), numberOfImages - 1)
 
-    def testImageStackAsNumpyArray(self):
+    def testImageCollectionAsNumpyArray(self):
         imageArray = np.array(self.imageList)
-        arrayFromStack = self.collection.asNumpyArray()
-        self.assertTrue(np.array_equal(imageArray, arrayFromStack))
+        arrayFromCollection = self.collection.asNumpyArray()
+        self.assertTrue(np.array_equal(imageArray, arrayFromCollection))
 
-    def testImageStackAsList(self):
-        listFromStack = self.collection.asList()
-        self.assertTrue(listFromStack == self.imageList)
+    def testImageCollectionAsList(self):
+        listFromCollection = self.collection.asList()
+        self.assertTrue(listFromCollection == self.imageList)
 
-    def testClearStack(self):
+    def testClearCollection(self):
         self.collection.clearAll()
         self.assertTrue(len(self.collection) == 0)
 
     @patch("matplotlib.pyplot.show", new=Mock)
     def testShowImages(self):
-        nbOfImagesShown = self.collection.showImages()
+        nbOfImagesShown = self.collection.showImagesOneByOne()
         self.assertEqual(nbOfImagesShown, 5)
+
+    def testIndexingOutOfBound(self):
+        image = DCCImage.DCCImage(np.ones((5, 5), dtype=np.float32))
+        listOfImage = DCCImageCollection([image])
+        with self.assertRaises(IndexError):
+            listOfImage[2]
+
+    def testIndexing(self):
+        image = DCCImage.DCCImage(np.ones((5, 5), dtype=np.float32))
+        listOfImage = DCCImageCollection([image])
+        self.assertTrue(listOfImage[0] == image)
 
 
 if __name__ == '__main__':
