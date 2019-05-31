@@ -639,6 +639,60 @@ class TestDCCImageMethods(unittest.TestCase):
         sobelResult = np.sqrt(sobelResultHorizontal ** 2 + sobelResultVertical ** 2) / np.sqrt(2)
         self.assertTrue(np.allclose(image.getBothDirectionsSobelFiltering().getArray(), sobelResult))
 
+    def testDCCImageIsodataThresholding(self):
+        # Calculation by hand
+        thresholding = 0.5
+        array = np.zeros((5, 5), dtype=np.float32)
+        for i in range(1, 4):
+            for j in range(1, 4):
+                array[i][j] = 1
+        image = DCCImage.DCCImage(array)
+        handCalculatedThresholdedImage = DCCImage.DCCImage((array >= thresholding).astype(np.float32))
+        self.assertTrue(image.getIsodataThresholding() == handCalculatedThresholdedImage)
+
+    def testDCCImageOtsuThresholding(self):
+        # Calcultation by hand
+        thresholding = 0.5
+        array = np.zeros((5, 5), dtype=np.float32)
+        for i in range(1, 4):
+            for j in range(1, 4):
+                array[i][j] = 1
+        image = DCCImage.DCCImage(array)
+        handCalculatedThresholdedImage = DCCImage.DCCImage((array >= thresholding).astype(np.float32))
+        self.assertTrue(image.getOtsuThresholding() == handCalculatedThresholdedImage)
+
+    def testDCCImageAdaptiveThreshGaussian(self):
+        # The threshold array to compare to is just the result of applying a gaussian filter to the input image.
+        threshArray = self.image.getGrayGaussianFiltering(1).getArray()
+        array = self.image.getArray()
+        resultOfThresholding = array >= threshArray
+        resultOfThresholdingImage = DCCImage.DCCImage(resultOfThresholding.astype(np.float32))
+        self.assertTrue(self.image.getAdaptiveThresholdingGaussian(sigma=1) == resultOfThresholdingImage)
+
+    def testDCCImageAdaptiveThreshMean(self):
+        array = np.zeros((5, 5), dtype=np.float32)
+        for i in range(1, 4):
+            for j in range(1, 4):
+                array[i][j] = 1
+        image = DCCImage.DCCImage(array)
+        # Hand calculated
+        threshArray = np.array([[1, 2, 3, 2, 1], [2, 4, 6, 4, 2], [3, 6, 9, 6, 3], [2, 4, 6, 4, 2], [1, 2, 3, 2, 1]],
+                               dtype=np.float32) / 9
+        threshImage = DCCImage.DCCImage((array >= threshArray).astype(np.float32))
+        self.assertTrue(image.getAdaptiveThresholdingMean(3) == threshImage)
+
+    def testDCCImageAdaptiveThreshMedian(self):
+        array = np.zeros((5, 5), dtype=np.float32)
+        for i in range(1, 4):
+            for j in range(1, 4):
+                array[i][j] = 1
+        image = DCCImage.DCCImage(array)
+        # Hand calculated
+        threshArray = np.array([[0, 0, 0, 0, 0], [0, 0, 1, 0, 0], [0, 1, 1, 1, 0], [0, 0, 1, 0, 0], [0, 0, 0, 0, 0]],
+                               dtype=np.float32)
+        threshImage = DCCImage.DCCImage((array >= threshArray).astype(np.float32))
+        self.assertTrue(image.getAdaptiveThresholdingMedian(3) == threshImage)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,5 +1,3 @@
-
-
 try:
     import numpy as np
     import typing
@@ -302,28 +300,78 @@ class DCCImage:
         return DCCImage(sobelHV.astype(np.float32))
 
     def getIsodataThresholding(self):
-        inputArray = self.__convertToUInt16Array(self.getArray())
-        threshArray = inputArray >= threshold_isodata(inputArray)
+        """
+        Adapted from skimage's isodata thresholding method.
+        Their version was not behaving properly with our image format (different than uint8).
+        :return: The thresholded DCCImage instance according to isodata method.
+        """
+        # We ignore warnings related to division by 0 since they give nan and we treat nan later.
+        warnings.catch_warnings()
+        warnings.simplefilter("ignore", category=RuntimeWarning)
+        inputArray = self.getGrayscaleConversion().getArray()
+        hist, bins = self.getGrayscaleHistogramValues()
+
+        hist = np.array(hist, dtype=np.float32)
+        bins = np.array(bins)
+        binsCenters = np.array([(i + i + 1) / 2 for i in range(len(bins) - 1)])
+        pixelProbabilityThresholdOne = np.cumsum(hist)
+        pixelProbabilityThresholdTwo = np.cumsum(hist[::-1])[::-1] - hist
+        intensitySum = hist * binsCenters
+        pixelProbabilityThresholdTwo[-1] = 1
+        low = np.cumsum(intensitySum) / pixelProbabilityThresholdOne
+        high = (np.cumsum(intensitySum[::-1])[::-1] - intensitySum) / pixelProbabilityThresholdTwo
+        allMean = (low + high) / 2
+        binWidth = binsCenters[1] - binsCenters[0]
+        distances = allMean - binsCenters
+        thresh = 0
+        for i in range(len(distances)):
+            if distances[i] is not None and 0 <= distances[i] < binWidth:
+                thresh = binsCenters[i]
+        threshArray = inputArray >= thresh
         return DCCImage(threshArray.astype(np.float32))
 
     def getOtsuThresholding(self):
-        inputArray = self.__convertToUInt16Array(self.getArray())
-        threshArray = inputArray >= threshold_otsu(inputArray)
+        """
+        Adapted from skimage's Otsu thresholding method.
+        Their version was not behaving properly with our image format (different than uint8).
+        :return: The thresholded DCCImage instance according to Otsu's method.
+        """
+        # We ignore warnings related to division by 0 since they give nan and we treat nan later.
+        warnings.catch_warnings()
+        warnings.simplefilter("ignore", category=RuntimeWarning)
+        inputArray = self.getGrayscaleConversion().getArray()
+        if np.max(inputArray) == np.min(inputArray):
+            raise ValueError(
+                "This method only works for image with more than one \"color\" (i.e. more than one pixel value).")
+        hist, bins = self.getGrayscaleHistogramValues()
+        hist = np.array(hist, dtype=np.float32)
+        bins = np.array(bins)
+        binsCenters = np.array([(i + i + 1) / 2 for i in range(len(bins) - 1)])
+        pixelProbabilityGroupOne = np.cumsum(hist)
+        pixelProbabilityGroupTwo = np.cumsum(hist[::-1])[::-1]
+        pixelIntensityGroupOneMean = np.cumsum(hist * binsCenters) / pixelProbabilityGroupOne
+        pixelIntensityGroupTwoMean = (np.cumsum((hist * binsCenters)[::-1]) / pixelProbabilityGroupTwo[::-1])[::-1]
+        varianceTwoGroups = pixelProbabilityGroupOne[:-1] * pixelProbabilityGroupTwo[1:] * (
+                pixelIntensityGroupOneMean[:-1] - pixelIntensityGroupTwoMean[1:]) ** 2
+        index = np.nanargmax(varianceTwoGroups)
+        thresh = binsCenters[index]
+        threshArray = inputArray >= thresh
+        print(thresh)
         return DCCImage(threshArray.astype(np.float32))
 
-    def getAdaptiveThresholdingGaussian(self, blockSize: int = 3):
+    def getAdaptiveThresholdingGaussian(self, blockSize: int = 3, sigma: float = None):
         inputArray = self.getArray()
-        threshArray = threshold_local(inputArray, blockSize, mode="nearest")
+        threshArray = inputArray >= threshold_local(inputArray, blockSize, mode="nearest", param=sigma)
         return DCCImage(threshArray.astype(np.float32))
 
     def getAdaptiveThresholdingMean(self, blockSize: int = 3):
         inputArray = self.getArray()
-        threshArray = threshold_local(inputArray, blockSize, mode="nearest", method="mean")
+        threshArray = inputArray >= threshold_local(inputArray, blockSize, mode="nearest", method="mean")
         return DCCImage(threshArray.astype(np.float32))
 
     def getAdaptiveThresholdingMedian(self, blockSize: int = 3):
         inputArray = self.getArray()
-        threshArray = threshold_local(inputArray, blockSize, mode="nearest", method="median")
+        threshArray = inputArray >= threshold_local(inputArray, blockSize, mode="nearest", method="median")
         return DCCImage(threshArray.astype(np.float32))
 
     def getWatershedSegmentation(self):
@@ -381,7 +429,7 @@ if __name__ == '__main__':
         r"C:\Users\goubi\PycharmProjects\BigData-ImageAnalysis\ImageAnalysis\unitTesting\testCziFile2Images.czi")
     jpeg = DCCImagesFromFiles.DCCImageFromNormalFile(
         r"C:\Users\goubi\PycharmProjects\BigData-ImageAnalysis\ImageAnalysis\unitTesting\testNotCziFile.jpg")
-    cziImage = cziImage.getImageAtIndex(0)
+    cziImage = cziImage.getImageAtIndex(-1)
     # hist, bins = cziImage.getGrayscaleHistogram()
     # cziImage.getStandardDeviationFiltering(3).showImage()
     # cziImage.showImage()
@@ -392,8 +440,8 @@ if __name__ == '__main__':
     # cziImage.getWatershedSegmentation().showImage()
     cziImage.showImage()
     cziImage.getOpening().showImage()
+    hist, bins = cziImage.displayGrayscaleHistogram()
     cziImage.getOtsuThresholding().showImage()
-    stuff = cziImage.getGrayGaussianFiltering(1.5).getOtsuThresholding().getBinaryOpening().getConnectedComponents()
-    stuff[0].showImage(False)
-    #   cziImage.getOtsuThresholding().getWatershedSegmentation().showImage()
-    #   cziImage.get().showImage()
+    cziImage.getAdaptiveThresholdingMean(blockSize=69).showImage()
+    array = [[0, 0, 0], [0, 1, 1], [0, 1, 1]]
+    print(np.median(array))
