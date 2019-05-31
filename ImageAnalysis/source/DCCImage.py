@@ -356,7 +356,6 @@ class DCCImage:
         index = np.nanargmax(varianceTwoGroups)
         thresh = binsCenters[index]
         threshArray = inputArray >= thresh
-        print(thresh)
         return DCCImage(threshArray.astype(np.float32))
 
     def getAdaptiveThresholdingGaussian(self, blockSize: int = 3, sigma: float = None):
@@ -382,28 +381,28 @@ class DCCImage:
         labels = morphology.watershed(-distance, markers, mask=inputArray).astype(np.float32)
         return DCCImage(labels)
 
-    def getClosing(self):
+    def getClosing(self, windowSize: int = 3):
         inputArrayGray = self.getGrayscaleConversion().getArray()
-        closed = morphology.closing(inputArrayGray)
+        closed = morphology.closing(inputArrayGray, np.ones((windowSize, windowSize)))
         return DCCImage(closed)
 
-    def getBinaryClosing(self):
+    def getBinaryClosing(self, windowSize: int = 3):
         inputArray = self.getArray()
         if not self.isImageInBinary():
             raise NotBinaryImageException
-        binaryClosed = morphology.binary_closing(inputArray).astype(np.float32)
+        binaryClosed = morphology.binary_closing(inputArray, np.ones((windowSize, windowSize))).astype(np.float32)
         return DCCImage(binaryClosed)
 
-    def getOpening(self):
+    def getOpening(self, windowSize: int = 3):
         inputArrayGray = self.getGrayscaleConversion().getArray()
-        opened = morphology.opening(inputArrayGray)
+        opened = morphology.opening(inputArrayGray, np.ones((windowSize, windowSize)))
         return DCCImage(opened)
 
-    def getBinaryOpening(self):
+    def getBinaryOpening(self, windowSize: int = 3):
         inputArray = self.getArray()
         if not self.isImageInBinary():
             raise NotBinaryImageException
-        binaryOpened = morphology.binary_opening(inputArray).astype(np.float32)
+        binaryOpened = morphology.binary_opening(inputArray, np.ones((windowSize, windowSize))).astype(np.float32)
         return DCCImage(binaryOpened)
 
     def getConnectedComponents(self):
@@ -429,19 +428,5 @@ if __name__ == '__main__':
         r"C:\Users\goubi\PycharmProjects\BigData-ImageAnalysis\ImageAnalysis\unitTesting\testCziFile2Images.czi")
     jpeg = DCCImagesFromFiles.DCCImageFromNormalFile(
         r"C:\Users\goubi\PycharmProjects\BigData-ImageAnalysis\ImageAnalysis\unitTesting\testNotCziFile.jpg")
-    cziImage = cziImage.getImageAtIndex(-1)
-    # hist, bins = cziImage.getGrayscaleHistogram()
-    # cziImage.getStandardDeviationFiltering(3).showImage()
-    # cziImage.showImage()
-    for i in range(1, 4):
-        for j in range(1, 4):
-            array[i][j] = 1
-    image = DCCImage(array)
-    # cziImage.getWatershedSegmentation().showImage()
-    cziImage.showImage()
-    cziImage.getOpening().showImage()
-    hist, bins = cziImage.displayGrayscaleHistogram()
-    cziImage.getOtsuThresholding().showImage()
-    cziImage.getAdaptiveThresholdingMean(blockSize=69).showImage()
-    array = [[0, 0, 0], [0, 1, 1], [0, 1, 1]]
-    print(np.median(array))
+    cziImage = cziImage.getImageAtIndex(0)
+
