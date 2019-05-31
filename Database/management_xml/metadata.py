@@ -5,7 +5,8 @@ from filter import Filter
 
 
 class Metadata:
-    def __init__(self, path):
+    def __init__(self, path, name=None):
+        self.name = name
         self.path = path
         self.root = None
 
@@ -61,6 +62,17 @@ class Metadata:
         self.ySize = self.setYSize()
         self.xScaled = self.setXScaled()
         self.yScaled = self.setYScaled()
+
+    def exportDataAsDict(self):  # TODO Tests
+        return {'name': self.name, 'path': self.path, 'microscope': self.microscope, 'objective': self.objective,
+                'x_size': self.xSize, 'y_size': self.ySize, 'x_scale': self.xScale, 'y_scale': self.yScale,
+                'x_scaled': self.xScaled, 'y_scaled': self.yScaled}
+
+    def getChannels(self):  # TODO Tests
+        return self.channels
+
+    def getName(self):  # TODO Tests
+        return self.name
 
     def checkIfElementHasChildren(self, element):
         try:

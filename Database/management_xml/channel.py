@@ -36,6 +36,16 @@ class Channel:
         self.setEmWavelengthFilter(filters)
         self.setBeamsplitter(filters)
 
+    def exportDataAsDict(self):  # TODO Tests
+        return {'entry_id': '', 'channel_id': self.channelId, 'channel_name': self.channelName,
+                'ex_wavelength_filter': self.exWavelengthFilter, 'em_wavelength_filter': self.emWavelengthFilter,
+                'beamsplitter': self.beamsplitter, 'reflector': self.reflector, 'contrast_method': self.contrastMethod,
+                'light_source': self.lightSource, 'light_source_intensity': self.lightSourceIntensity,
+                'dye_name': self.dyeName, 'channel_color': self.channelColor, 'ex_wavelength': self.exWavelength,
+                'em_wavelength': self.emWavelength, 'effective_na': self.effectiveNA,
+                'imaging_device': self.imagingDevice, 'camera_adapter': self.cameraAdapter,
+                'exposure_time': self.exposureTime, 'binning_mode': self.binningMode}
+
     def setExWavelengthFilter(self, filters):
         try:
             for filter in filters:

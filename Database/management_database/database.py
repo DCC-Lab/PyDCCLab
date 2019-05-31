@@ -50,8 +50,8 @@ class Database:
             try:
                 self.createConnection(mode)
                 return True
-            except lite.OperationalError as error:
-                raise error
+            except lite.OperationalError:
+                raise
         else:
             return False
 
@@ -81,9 +81,8 @@ class Database:
             try:
                 self.conn.commit()
                 return True
-            except lite.OperationalError as error:
-
-                raise error
+            except lite.OperationalError:
+                raise
 
 # TODO Below is stuff to do eventually.
 '''
