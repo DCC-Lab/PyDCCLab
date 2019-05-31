@@ -37,78 +37,118 @@ class Channel:
         self.setBeamsplitter(filters)
 
     def setExWavelengthFilter(self, filters):
-        for filter in filters:
-            if filter.getType() == 'Excitation' and self.channelId == filter.getChannelId():
-                self.exWavelengthFilter = filter.getFilterRange()
+        try:
+            for filter in filters:
+                if filter.getType() == 'Excitation' and self.channelId == filter.getChannelId():
+                    self.exWavelengthFilter = filter.getFilterRange()
+        except Exception:
+            raise
 
     def setEmWavelengthFilter(self, filters):
-        for filter in filters:
-            if filter.getType() == 'Emission' and self.channelId == filter.getChannelId():
-                self.emWavelengthFilter = filter.getFilterRange()
+        try:
+            for filter in filters:
+                if filter.getType() == 'Emission' and self.channelId == filter.getChannelId():
+                    self.emWavelengthFilter = filter.getFilterRange()
+        except Exception:
+            raise
 
     def setBeamsplitter(self, filters):
-        for filter in filters:
-            if self.channelId == filter.getChannelId():
-                self.beamsplitter = filter.getDichroic()
+        try:
+            for filter in filters:
+                if self.channelId == filter.getChannelId():
+                    self.beamsplitter = filter.getDichroic()
+        except Exception:
+            raise
 
     def setReflector(self):
-        for channel in self.root.find('./Metadata/Information/Image/Dimensions/Channels'):
-            if channel.attrib['Id'] == self.channelId:
-                return channel.find('./Reflector').text
+        try:
+            return self.root.find('./Metadata/Information/Image/Dimensions/Channels/Channel[@Id="{}"]'
+                                  '/Reflector'.format(self.channelId)).text
+        except AttributeError:
+            raise
 
     def setContrastMethod(self):
-        for channel in self.root.find('./Metadata/Information/Image/Dimensions/Channels'):
-            if channel.attrib['Id'] == self.channelId:
-                return channel.find('./ContrastMethod').text
+        try:
+            return self.root.find('./Metadata/Information/Image/Dimensions/Channels/Channel[@Id="{}"]'
+                                  '/ContrastMethod'.format(self.channelId)).text
+        except AttributeError:
+            raise
 
     def setLightSource(self):
-        lightId = ''
-        for channel in self.root.find('./Metadata/Information/Image/Dimensions/Channels'):
-            if channel.attrib['Id'] == self.channelId:
-                lightId = channel.find('./LightSourcesSettings/LightSourceSettings/LightSource').attrib['Id']
-
-        for lightSource in self.root.find('./Metadata/Information/Instrument/LightSources'):
-            if lightSource.attrib['Id'] == lightId:
-                return lightSource.attrib['Name']
+        try:
+            lightId = self.root.find('./Metadata/Information/Image/Dimensions/Channels/Channel[@Id="{}"]'
+                                     '/LightSourcesSettings/LightSourceSettings/LightSource'.format(self.channelId)).attrib['Id']
+            return self.root.find('./Metadata/Information/Instrument/LightSources'
+                                  '/LightSource[@Id="{}"]'.format(lightId)).attrib['Name']
+        except AttributeError:
+            raise
+        except KeyError:
+            raise
 
     def setLightSourceIntensity(self):
-        for channel in self.root.find('./Metadata/Information/Image/Dimensions/Channels'):
-            if channel.attrib['Id'] == self.channelId:
-                return channel.find('./LightSourcesSettings/LightSourceSettings/Intensity').text
+        try:
+            return self.root.find('./Metadata/Information/Image/Dimensions/Channels/Channel[@Id="{}"]'
+                                  '/LightSourcesSettings/LightSourceSettings/Intensity'.format(self.channelId)).text
+        except AttributeError:
+            raise
 
     def setDyeName(self):
-        for channel in self.root.find('./Metadata/DisplaySetting/Channels'):
-            if channel.attrib['Id'] == self.channelId:
-                return channel.find('./DyeName').text
+        try:
+            return self.root.find('./Metadata/DisplaySetting/Channels/Channel[@Id="{}"]'
+                                  '/DyeName'.format(self.channelId)).text
+        except AttributeError:
+            raise
 
     def setChannelColor(self):
-        for channel in self.root.find('./Metadata/Information/Image/Dimensions/Channels'):
-            if channel.attrib['Id'] == self.channelId:
-                return channel.find('./Color').text
+        try:
+            return self.root.find('./Metadata/Information/Image/Dimensions/Channels/Channel[@Id="{}"]'
+                                  '/Color'.format(self.channelId)).text
+        except AttributeError:
+            raise
 
     def setExWavelength(self):
-        for channel in self.root.find('./Metadata/Information/Image/Dimensions/Channels'):
-            if channel.attrib['Id'] == self.channelId:
-                return channel.find('./ExcitationWavelength').text
+        try:
+            return self.root.find('./Metadata/Information/Image/Dimensions/Channels/Channel[@Id="{}"]'
+                                  '/ExcitationWavelength'.format(self.channelId)).text
+        except AttributeError:
+            raise
 
     def setEmWavelength(self):
-        for channel in self.root.find('./Metadata/Information/Image/Dimensions/Channels'):
-            if channel.attrib['Id'] == self.channelId:
-                return channel.find('./EmissionWavelength').text
+        try:
+            return self.root.find('./Metadata/Information/Image/Dimensions/Channels/Channel[@Id="{}"]'
+                                  '/EmissionWavelength'.format(self.channelId)).text
+        except AttributeError:
+            raise
 
     def setExposureTime(self):
-        for channel in self.root.find('./Metadata/Information/Image/Dimensions/Channels'):
-            if channel.attrib['Id'] == self.channelId:
-                return channel.find('./ExposureTime').text
+        try:
+            return self.root.find('./Metadata/Information/Image/Dimensions/Channels/Channel[@Id="{}"]'
+                                  '/ExposureTime'.format(self.channelId)).text
+        except AttributeError:
+            raise
 
     def setEffectiveNA(self):
-        return self.root.find('./Metadata/Information/Instrument/Objectives/Objective/LensNA').text
+        try:
+            return self.root.find('./Metadata/Information/Instrument/Objectives/Objective/LensNA').text
+        except AttributeError:
+            raise
 
     def setImagingDevice(self):
-        return self.root.find('./Metadata/Information/Instrument/Detectors/Detector').attrib['Name']
+        try:
+            return self.root.find('./Metadata/Information/Instrument/Detectors/Detector').attrib['Name']
+        except KeyError:
+            raise
+        except AttributeError:
+            raise
 
     def setCameraAdapter(self):
-        return self.root.find('./Metadata/Information/Instrument/Detectors/Detector/Adapter/Manufacturer/Model').text
+        try:
+            return self.root.find('./Metadata/Information/Instrument/Detectors/Detector/Adapter/Manufacturer/Model').text
+        except AttributeError:
+            raise
 
     def setBinningMode(self):
-        return self.root.find('./Metadata/Information/Image/Dimensions/Channels/Channel/DetectorSettings/Binning').text
+        try:
+            return self.root.find('./Metadata/Information/Image/Dimensions/Channels/Channel/DetectorSettings/Binning').text
+        except AttributeError:
+            raise

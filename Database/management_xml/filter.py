@@ -40,27 +40,27 @@ class Filter:
             for channel in root.find('./Metadata/Information/Image/Dimensions/Channels'):
                 if channel.find('FilterSetRef').attrib['Id'] == self.filterSetId:
                     self.channelId = channel.attrib['Id']
-        except KeyError as error:
-            raise error
-        except AttributeError as error:
-            raise error
+        except KeyError:
+            raise
+        except AttributeError:
+            raise
 
     def setDichroicId(self, root):
         try:
             self.dichroicId = root.find('./Metadata/Information/Instrument/FilterSets/FilterSet[@Id="{}"]/DichroicRef'.format(self.filterSetId)).attrib['Id']
-        except KeyError as error:
-            raise error
-        except AttributeError as error:
-            raise error
+        except KeyError:
+            raise
+        except AttributeError:
+            raise
 
     def setDichroic(self, root):
         self.setDichroicId(root)
         try:
             self.dichroic = root.find('./Metadata/Information/Instrument/Dichroics/Dichroic[@Id="{}"]/Wavelengths/Wavelength'.format(self.dichroicId)).text
-        except AttributeError as error:
-            raise error
-        except KeyError as error:
-            raise error
+        except AttributeError:
+            raise
+        except KeyError:
+            raise
 
     def getType(self):
         return self.filterType

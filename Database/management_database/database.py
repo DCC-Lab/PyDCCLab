@@ -17,8 +17,8 @@ class Database:
             try:
                 self.conn = lite.connect(path, uri=True)
                 return 'connected'
-            except lite.OperationalError as error:
-                raise error
+            except lite.OperationalError:
+                raise
         else:
             raise Exception('Already connected to a database : ' + self.name + " : " + self.path)
 
@@ -82,6 +82,7 @@ class Database:
                 self.conn.commit()
                 return True
             except lite.OperationalError as error:
+
                 raise error
 
 # TODO Below is stuff to do eventually.
