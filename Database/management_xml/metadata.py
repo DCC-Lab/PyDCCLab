@@ -31,16 +31,16 @@ class Metadata:
     def cziFileToCziImageObject(self):
         try:
             return czi.readCziImage(self.path)
-        except FileNotFoundError as error:
-            raise error
-        except ValueError as error:
-            raise error
+        except FileNotFoundError:
+            raise
+        except ValueError:
+            raise
 
     def extractXmlAsStringFromCziImageObject(self, cziImageObject):
         try:
             return czi.extractMetadataFromCziFileObject(cziImageObject)
-        except AttributeError as error:
-            raise error
+        except AttributeError:
+            raise
 
     def createElementTreeRoot(self):
         cziImageObject = self.cziFileToCziImageObject()
@@ -65,63 +65,63 @@ class Metadata:
     def checkIfElementHasChildren(self, element):
         try:
             if not element.getchildren():
-                raise AttributeError
+                raise AttributeError('No children were found in the element.')
             else:
                 return True
-        except Exception as error:
-            raise error
+        except Exception:
+            raise
 
     def setMicroscope(self):
         try:
             return self.root.find('./Metadata/Information/Instrument/Microscopes/Microscope').attrib['Name']
-        except KeyError as error:
-            raise error
-        except AttributeError as error:
-            raise error
+        except KeyError:
+            raise
+        except AttributeError:
+            raise
 
     def setObjective(self):
         try:
             return self.root.find('./Metadata/Information/Instrument/Objectives/Objective').attrib['Name']
-        except KeyError as error:
-            raise error
-        except AttributeError as error:
-            raise error
+        except KeyError:
+            raise
+        except AttributeError:
+            raise
 
     def setXScale(self):
         try:
             return self.root.find('./Metadata/Scaling/Items/Distance[@Id="X"]/Value').text
-        except AttributeError as error:
-            raise error
+        except AttributeError:
+            raise
 
     def setYScale(self):
         try:
             return self.root.find('./Metadata/Scaling/Items/Distance[@Id="Y"]/Value').text
-        except AttributeError as error:
-            raise error
+        except AttributeError:
+            raise
 
     def setXSize(self):
         try:
             return self.root.find('./Metadata/Information/Image/SizeX').text
-        except AttributeError as error:
-            raise error
+        except AttributeError:
+            raise
 
     def setYSize(self):
         try:
             return self.root.find('./Metadata/Information/Image/SizeY').text
-        except AttributeError as error:
-            raise error
+        except AttributeError:
+            raise
 
     def setXScaled(self):
         try:
             return float(self.xSize) * float(self.xScale)
-        except ValueError as error:
-            raise error
+        except ValueError:
+            raise
 
     def setYScaled(self):
         try:
             return float(self.ySize) * float(self.yScale)
-        except ValueError as error:
-            raise error
+        except ValueError:
+            raise
 
     def findFiltersEntriesInXml(self):
         filters = []
@@ -136,10 +136,10 @@ class Metadata:
 
                 filters.append(Filter(filterId, cutIn, cutOut))
             return filters
-        except AttributeError as error:
-            raise error
-        except KeyError as error:
-            raise error
+        except AttributeError:
+            raise
+        except KeyError:
+            raise
 
     def setFiltersData(self):
         try:
@@ -147,8 +147,8 @@ class Metadata:
             for filter in filters:
                 filter.setFilterData(self.root)
             return filters
-        except Exception as error:
-            raise error
+        except Exception:
+            raise
 
     def findChannelsEntriesInXml(self):
         channels = []
@@ -159,10 +159,10 @@ class Metadata:
             for channel in root:
                 channels.append(Channel(channel.attrib['Id'], channel.attrib['Name'], self.root))
             return channels
-        except AttributeError as error:
-            raise error
-        except KeyError as error:
-            raise error
+        except AttributeError:
+            raise
+        except KeyError:
+            raise
 
     def setChannelsData(self):
         try:
@@ -170,5 +170,5 @@ class Metadata:
             for channel in channels:
                 channel.getDataFromFilters(self.filters)
             return channels
-        except Exception as error:
-            raise error
+        except Exception:
+            raise

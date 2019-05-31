@@ -2007,16 +2007,6 @@
           </LightSource>
         </LightSources>
         <Detectors>
-          <Detector Id="Detector:Axiocam 503" Name="Axiocam 503">
-            <Manufacturer>
-              <Model>Axiocam503m</Model>
-            </Manufacturer>
-            <Adapter>
-              <Manufacturer>
-                <Model>1x Camera Adapter</Model>
-              </Manufacturer>
-            </Adapter>
-          </Detector>
         </Detectors>
         <Objectives>
         </Objectives>
@@ -2092,7 +2082,6 @@
           <Gamma>0.86960841732472</Gamma>
           <BitCountRange>14</BitCountRange>
           <PixelType>Gray16</PixelType>
-          <DyeName>EGFP</DyeName>
           <ShortName>EGFP</ShortName>
           <IlluminationType>Fluorescence</IlluminationType>
           <DyeMaxEmission>509</DyeMaxEmission>

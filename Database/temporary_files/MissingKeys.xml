@@ -2066,7 +2066,7 @@
           </LightSource>
         </LightSources>
         <Detectors>
-          <Detector Id="Detector:Axiocam 503" Name="Axiocam 503">
+          <Detector Id="Detector:Axiocam 503">
             <Manufacturer>
               <Model>Axiocam503m</Model>
             </Manufacturer>
