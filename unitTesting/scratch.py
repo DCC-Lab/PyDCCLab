@@ -15,7 +15,6 @@ if __name__ == '__main__':
         mdata.append(newMData)
 
     # Small function to print all of the files name, find matching components and print them.
-    """
     for m in mdata:
         name = str(m.getName()).split('_')
         vectors = []
@@ -28,8 +27,6 @@ if __name__ == '__main__':
         print(name, vectors, mouse)
         
         # Small function to print export all of the channel's testData.
-        '''
         for c in m.getChannels():
             print(c.exportDataAsDict())
-        '''
-    """
+
