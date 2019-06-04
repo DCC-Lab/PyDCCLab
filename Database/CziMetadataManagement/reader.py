@@ -1,6 +1,25 @@
+from metadata import Metadata as mtdt
 import cziUtil as czi
-import metadata as mtdt
 import re
+
+
+def getMetadataFromCzis(path):
+    cziFiles = czi.findAllCziFiles(path)
+    metadata = getMetadataFromFiles(cziFiles)
+    return metadata
+
+
+def getMetadataFromFiles(cziFiles):
+    metadataObjects = []
+    for cziFile in cziFiles:
+        newMetadata = mtdt(cziFile[1], cziFile[0])
+        newMetadata.setAttributesFromXml()
+
+        metadataObjects.append(newMetadata)
+    return metadataObjects
+
+def getMetadataFromFilesName(metadata):
+    pass
 
 
 if __name__ == '__main__':
@@ -10,7 +29,7 @@ if __name__ == '__main__':
     # We extract the metadata from the files and create a list of objects containing that metadata.
     mdata = []
     for cziFile in allCziFiles:
-        newMData = mtdt.Metadata(cziFile[1], cziFile[0])
+        newMData = mtdt(cziFile[1], cziFile[0])
         newMData.setAttributesFromXml()
         mdata.append(newMData)
 
@@ -27,7 +46,7 @@ if __name__ == '__main__':
         m.setMouseId(mouseId)
         m.setVectors(vectors)
         print('-Metadata : ', m.exportDataAsDict())
-        
+
         # Small function to print export all of the channel's testData.
         for c in m.getChannels():
             print('---Channel in Metdata : ', c.exportDataAsDict())

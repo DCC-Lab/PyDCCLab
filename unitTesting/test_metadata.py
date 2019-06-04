@@ -291,6 +291,43 @@ class TestMetadata(unittest.TestCase):
 
         self.assertNotEqual(mdata_1, mdata_2)
 
+    def test_exportDataAsDict_isEqual(self):
+        mdata = mtdt.Metadata(self.testPath)
+        mdata.setAttributesFromXml()
+
+        expectedValue = {'name': None, 'mouse_id': None,
+                         'path': 'C:\\Users\\MathieuLaptop\\Documents\\Ulaval\\ProgPython\\Projets\\BigData-ImageAnalysis\\testData\\testCziFile.czi',
+                         'microscope': 'Axio Observer.Z1 / 7', 'objective': 'LD A-Plan 5x/0.15 Ph1', 'x_size': '1936',
+                         'y_size': '1460', 'x_scale': '9.08E-07', 'y_scale': '9.08E-07', 'x_scaled': 0.001757888,
+                         'y_scaled': 0.00132568, 'vectors': None}
+        self.assertEqual(mdata.exportDataAsDict(), expectedValue)
+
+    def test_getChannels_isEqual(self):
+        mdata = mtdt.Metadata(self.testPath)
+        mdata.setAttributesFromXml()
+
+        expectedValue = []
+        for channel in mdata.channels:
+            expectedValue.append(channel)
+        self.assertEqual(mdata.getChannels(), expectedValue)
+
+    def test_getName_isEqual(self):
+        mdata = mtdt.Metadata(self.testPath, 'testName')
+
+        self.assertEqual(mdata.getName(), 'testName')
+
+    def test_setMouseId_isEqual(self):
+        mdata = mtdt.Metadata(self.testPath)
+        mdata.setMouseId('123')
+
+        self.assertEqual(mdata.mouseId, '123')
+
+    def test_setVectors_isEqual(self):
+        mdata = mtdt.Metadata(self.testPath)
+        mdata.setVectors('abc123')
+
+        self.assertEqual(mdata.vectors, 'abc123')
+
 
 if __name__ == '__main__':
     unittest.main()
