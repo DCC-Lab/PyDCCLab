@@ -259,9 +259,9 @@ class DCCImage:
 
     def getStandardDeviationFiltering(self, filterSize: int):
         image = self.getGrayscaleConversion().getArray()
-        stdFilterPart1 = filters.uniform_filter(image, filterSize, mode="nearest")
-        stdFilterPart2 = filters.uniform_filter(image * image, filterSize, mode="nearest")
-        stdFiltered = np.sqrt(stdFilterPart2 - stdFilterPart1 * stdFilterPart1).astype(np.float32)
+        stdDevFilter1 = filters.uniform_filter(image, filterSize, mode="nearest")
+        stdDevFilter2 = filters.uniform_filter(image * image, filterSize, mode="nearest")
+        stdFiltered = np.sqrt(stdDevFilter2 - stdDevFilter1 * stdDevFilter1).astype(np.float32)
         if np.any(np.isnan(stdFiltered)):
             warnings.warn("Nan values encountered! Replacing them with 0.", category=RuntimeWarning)
             stdFiltered = np.nan_to_num(stdFiltered)
