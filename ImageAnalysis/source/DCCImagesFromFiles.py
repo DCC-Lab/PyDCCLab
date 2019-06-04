@@ -1,40 +1,35 @@
-from DCCImageCollection import *
+from DCCImageCollection import DCCImageCollection as parent
 import cziUtil as cziUtil
 import tifffile
-from DCCImage import *
+from DCCImage import DCCImage
+import numpy as np
+from DCCImagesExceptions import *
+import PIL.Image
+import Database.CziMetadataManagement.metadata as meta
 
 
-class DCCImagesFromCZIFile(DCCImageCollection):
+class DCCImagesFromCZIFile(parent):
 
-    def __init__(self, path: str):
+    def __init__(self, path: str, numberOfImagesToRead: int = None):
         self.__path = path
+        self.__metadata = meta.Metadata(path)
         cziObject = cziUtil.readCziImage(path)
-        arrayOfImages = cziUtil.getImagesFromCziFileObject(cziObject).astype(np.float32)
-        listOfImages = []
-        self.__metadata = cziUtil.extractMetadataFromCziFileObject(cziObject)
+        arrayOfImages = cziUtil.getImagesFromCziFileObject(cziObject)
+        # arrayOfImages = arrayOfImages.astype(np.float32)
         cziUtil.closeCziFileObject(cziObject)
-        for image in arrayOfImages:
-            listOfImages.append(
-                DCCImage(image, metadata=self.__metadata))
-        DCCImageCollection.__init__(self, listOfImages)
+        listOfImages = []
+        self.__metadata = meta.Metadata(path)
+        if numberOfImagesToRead is None:
+            for image in arrayOfImages:
+                listOfImages.append(DCCImage(image.astype(np.float32)))
+        else:
+            for index in range(numberOfImagesToRead):
+                print(index)
+                listOfImages.append(DCCImage(arrayOfImages[index].astype(np.float32)))
+        parent.__init__(self, listOfImages)
 
-    def getMetadata(self) -> str:
+    def getMetadata(self) -> meta.Metadata:
         return self.__metadata
-
-    def setMetadata(self, newMetadata: str) -> None:
-        if not isinstance(newMetadata, str):
-            raise TypeError("Metadata must be a string object")
-        self.__metadata = newMetadata
-        for image in self.asList():
-            image.setMetadata(self.__metadata)
-
-    def saveMetadata(self, filename: str) -> None:
-        unacceptedChars = ["?", "/", "\\", "*", "<", ">", "|", ".", ","]
-        filename = filename.strip()
-        if len(filename) == 0 or filename.isspace() or any(char in filename for char in unacceptedChars):
-            raise InvalidMetadataFileNameException
-        with open("{}.xml".format(filename), "w", encoding="utf-8") as file:
-            file.write(self.__metadata)
 
     def getPath(self) -> str:
         return self.__path
@@ -55,7 +50,7 @@ class DCCImageFromNormalFile(DCCImage):
         return self.__path
 
 
-class DCCImagesFromTiffFile(DCCImageCollection):
+class DCCImagesFromTiffFile(parent):
     def __init__(self, path: str):
         self.__path = path
         if not (path.lower().__contains__(".tiff") or path.lower().__contains__(".tif")):
@@ -65,24 +60,11 @@ class DCCImagesFromTiffFile(DCCImageCollection):
         self.__metadata = tiffFileObject.ome_metadata
         imageList = []
         for i in range(imageAsArray.shape[0]):
-            imageList.append(DCCImage(imageAsArray[i], metadata=self.__metadata))
-        DCCImageCollection.__init__(self, imageList)
+            imageList.append(DCCImage(imageAsArray[i]))
+        parent.__init__(self, imageList)
 
     def getMetadata(self) -> str:
         return self.__metadata
-
-    def setMetadata(self, newMetadata: str) -> None:
-        if not isinstance(newMetadata, str):
-            raise TypeError("Metadata must be a string object")
-        self.__metadata = newMetadata
-
-    def saveMetadata(self, filename: str) -> None:
-        unacceptedChars = ["?", "/", "\\", "*", "<", ">", "|", ".", ","]
-        filename = filename.strip()
-        if len(filename) == 0 or filename.isspace() or any(char in filename for char in unacceptedChars):
-            raise InvalidMetadataFileNameException
-        with open("{}.xml".format(filename), "w") as file:
-            file.write(self.__metadata)
 
     def getPath(self) -> str:
         return self.__path

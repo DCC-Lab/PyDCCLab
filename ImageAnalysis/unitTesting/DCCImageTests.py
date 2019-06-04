@@ -1,12 +1,9 @@
-try:
-    import unittest
-    import numpy as np
-    from unittest.mock import Mock, patch
-    import DCCImage
-    import DCCImagesExceptions as DCCExcep
-    import warnings
-except ImportError:
-    print("Please install the required libraries.")
+import unittest
+import numpy as np
+from unittest.mock import Mock, patch
+import DCCImage
+import DCCImagesExceptions as DCCExcep
+import warnings
 
 
 class TestDCCImageConstructor(unittest.TestCase):
@@ -120,10 +117,7 @@ class TestDCCImageMethods(unittest.TestCase):
         self.assertEqual(self.image.getNumberOfPixels(), nbPixels)
 
     def testToPILImage(self):
-        try:
-            import PIL.Image
-        except ImportError:
-            print("Please install the required library.")
+        import PIL.Image
         pilImage = PIL.Image.fromarray(np.copy(self.array))
         getPilImage = self.image.toPILImage()
         self.assertTrue(pilImage == getPilImage)
@@ -169,23 +163,6 @@ class TestDCCImageMethods(unittest.TestCase):
             isSaved = False
         self.assertTrue(isSaved)
 
-    def testGetMetadataNone(self):
-        self.assertIsNone(self.image.getMetadata())
-
-    def testGetMetadataNotNone(self):
-        array = np.ones((1250, 1250), dtype=np.float32)
-        metadata = "This is a metadata test"
-        image = DCCImage.DCCImage(array, metadata)
-        self.assertTrue(image.getMetadata() == metadata)
-
-    def testSetMetadata(self):
-        self.image.setMetadata("Hello world")
-        self.assertTrue(self.image.getMetadata() == "Hello world")
-
-    def testSetMetadataReturn(self):
-        newMeta = self.image.setMetadata("Yo")
-        self.assertTrue(newMeta == "Yo")
-
     def testGrayScaleConversionImageAlreadyGray(self):
         grayScale = self.image.getGrayscaleConversion()
         self.assertTrue(grayScale == self.image)
@@ -210,8 +187,6 @@ class TestDCCImageMethods(unittest.TestCase):
             for j in range(10):
                 for weight in range(len(weights)):
                     arrayGray[i][j] += array[i][j][weight] * weights[weight]
-        print(arrayGray)
-        print(DCCImage.DCCImage(array).getGrayscaleConversion().getArray())
         self.assertTrue(np.allclose(arrayGray, DCCImage.DCCImage(array).getGrayscaleConversion().getArray()))
 
     def testDCCImageGetGrayHistogramValuesWarning(self):
@@ -720,7 +695,61 @@ class TestDCCImageMethods(unittest.TestCase):
         threshArray = np.array([[0, 0, 0, 0, 0], [0, 0, 1, 0, 0], [0, 1, 1, 1, 0], [0, 0, 1, 0, 0], [0, 0, 0, 0, 0]],
                                dtype=np.float32)
         threshImage = DCCImage.DCCImage((array >= threshArray).astype(np.float32))
-        self.assertTrue(image.getAdaptiveThresholdingMedian(3) == threshImage)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=UserWarning)
+            self.assertTrue(image.getAdaptiveThresholdingMedian(3) == threshImage)
+
+    # todo faire test watershed
+
+    def testDCCImageBinaryOpening(self):
+        array = np.zeros((20, 20), dtype=np.float32)
+        arrayOpened = np.zeros_like(array)
+        for i in range(6, 6 + 2):
+            for j in range(6, 6 + 2):
+                array[i][j] = 1
+        for i in range(12, 20):
+            for j in range(12, 20):
+                array[i][j] = 1
+                arrayOpened[i][j] = 1
+        image = DCCImage.DCCImage(array)
+        imageOpened = DCCImage.DCCImage(arrayOpened)
+        self.assertTrue(image.getBinaryOpening(3) == imageOpened)
+
+    def testDCCImageBinaryOpeningColorException(self):
+        array = np.ones((1000, 1000, 3), dtype=np.float32)
+        image = DCCImage.DCCImage(array)
+        with self.assertRaises(DCCExcep.NotBinaryImageException):
+            image.getBinaryOpening()
+
+    def testDCCImageOpening(self):
+        array = np.zeros((20, 20, 3), dtype=np.float32)
+        arrayOpened = np.zeros_like(array)
+        for i in range(6, 6 + 2):
+            for j in range(6, 6 + 2):
+                array[i][j][:] = 1
+        for i in range(12, 20):
+            for j in range(12, 20):
+                array[i][j][:] = 1
+                arrayOpened[i][j][:] = 1
+        image = DCCImage.DCCImage(array)
+        imageOpened = DCCImage.DCCImage(arrayOpened).getGrayscaleConversion()
+        self.assertTrue(image.getOpening(3) == imageOpened)
+
+    def testDCCImageBinaryClosing(self):
+        array = np.ones((20, 20), dtype=np.float32)
+        array[1][1] = 0
+        windowSize = 3
+        array[10: 10 + windowSize, 1:1 + windowSize] = 0
+        array[3:3 + windowSize - 1, 6:6 + windowSize - 1] = 0
+        array[15:15 + windowSize, 17:17 + windowSize - 1] = 0
+        array[2:2 + windowSize, 15:15 + windowSize + 1] = 0
+        arrayClosed = np.ones_like(array)
+        # Regions of the original array where the "hole" is too big to close
+        arrayClosed[2:2 + windowSize, 15:15 + windowSize + 1] = 0
+        arrayClosed[10: 10 + windowSize, 1:1 + windowSize] = 0
+        image = DCCImage.DCCImage(array)
+        imageClosed = DCCImage.DCCImage(arrayClosed)
+        self.assertTrue(image.getBinaryClosing(windowSize) == imageClosed)
 
 
 if __name__ == '__main__':

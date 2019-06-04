@@ -13,16 +13,15 @@ Hope it works correctly!
 """
 First, let's import the useful stuff
 """
-try:
-    import czifile
-    import numpy as np
-    import matplotlib.pyplot as plt
-    import tifffile
-    import xml.etree.ElementTree as ET
-    import os
-    import fnmatch
-except ImportError:
-    print("Please install the required libraries.")
+
+import czifile
+import numpy as np
+import matplotlib.pyplot as plt
+import tifffile
+import xml.etree.ElementTree as ET
+import os
+import fnmatch
+
 
 
 def findAllCziFiles(directory):
