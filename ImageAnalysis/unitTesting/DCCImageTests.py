@@ -751,6 +751,26 @@ class TestDCCImageMethods(unittest.TestCase):
         imageClosed = DCCImage.DCCImage(arrayClosed)
         self.assertTrue(image.getBinaryClosing(windowSize) == imageClosed)
 
+    def testDCCImageBinaryClosingException(self):
+        array = np.ones((1000, 1000, 3), dtype=np.float32)
+        image = DCCImage.DCCImage(array)
+        with self.assertRaises(DCCExcep.NotBinaryImageException):
+            image.getBinaryClosing(10)
+
+    def testDCCImageClosing(self):
+        array = np.ones((20, 20, 3), dtype=np.float32)
+        arrayClosed = np.ones_like(array)
+        windowSize = 3
+        array[0:5, 0:5, 1] = 0
+        array[3:5, 2:5, 0] = 0
+
+        array[15:16, 13:14, :] = 0
+        #array[]
+
+        image = DCCImage.DCCImage(array)
+        image.showImage()
+        print(array)
+
 
 if __name__ == '__main__':
     unittest.main()
