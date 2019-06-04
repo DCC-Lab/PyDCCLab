@@ -56,7 +56,7 @@ class DCCImage:
         return DCCImage(copyArray)
 
     def showImage(self, showInGray: bool = True):
-        if self.isImageInGray() and showInGray:
+        if showInGray:
             plt.gray()
         plt.imshow(self.__pixelArray)
         plt.show()

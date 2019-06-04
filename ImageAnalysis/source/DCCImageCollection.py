@@ -84,16 +84,15 @@ class DCCImageCollection:
         return imagesShown
 
     def showImages(self, showInGray: bool = True) -> int:
+        colorMap = "gray" if showInGray else None
         nbOfImages = self.__numberOfImages
         if nbOfImages == 0:
             raise EmptyDCCImageCollectionException
         imagesShown = 0
-        plt.figure()
+        fig = plt.figure()
         for i in range(nbOfImages):
             plt.subplot((nbOfImages // 3) + 1, nbOfImages if nbOfImages // 3 == 0 else 3, i + 1)
-            if showInGray:
-                plt.gray()
-            plt.imshow(self.__imageCollection[i].getArray())
+            plt.imshow(self.__imageCollection[i].getArray(), cmap=colorMap)
             imagesShown += 1
         plt.show()
         return imagesShown
