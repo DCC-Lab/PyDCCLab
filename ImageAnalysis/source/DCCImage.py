@@ -58,7 +58,6 @@ class DCCImage:
     def showImage(self, showInGray: bool = True):
         if self.isImageInGray() and showInGray:
             plt.gray()
-            print("Toto")
         plt.imshow(self.__pixelArray)
         plt.show()
         return self

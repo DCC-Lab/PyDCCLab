@@ -10,17 +10,22 @@ import Database.CziMetadataManagement.metadata as meta
 
 class DCCImagesFromCZIFile(parent):
 
-    def __init__(self, path: str):
+    def __init__(self, path: str, numberOfImagesToRead: int = None):
         self.__path = path
         self.__metadata = meta.Metadata(path)
         cziObject = cziUtil.readCziImage(path)
-        arrayOfImages = cziUtil.getImagesFromCziFileObject(cziObject).astype(np.float32)
+        arrayOfImages = cziUtil.getImagesFromCziFileObject(cziObject)
+        # arrayOfImages = arrayOfImages.astype(np.float32)
         cziUtil.closeCziFileObject(cziObject)
         listOfImages = []
         self.__metadata = meta.Metadata(path)
-        cziUtil.closeCziFileObject(cziObject)
-        for image in arrayOfImages:
-            listOfImages.append(DCCImage(image))
+        if numberOfImagesToRead is None:
+            for image in arrayOfImages:
+                listOfImages.append(DCCImage(image.astype(np.float32)))
+        else:
+            for index in range(numberOfImagesToRead):
+                print(index)
+                listOfImages.append(DCCImage(arrayOfImages[index].astype(np.float32)))
         parent.__init__(self, listOfImages)
 
     def getMetadata(self) -> meta.Metadata:
@@ -60,7 +65,6 @@ class DCCImagesFromTiffFile(parent):
 
     def getMetadata(self) -> str:
         return self.__metadata
-
 
     def getPath(self) -> str:
         return self.__path
