@@ -18,15 +18,16 @@ if __name__ == '__main__':
     for m in mdata:
         name = str(m.getName()).split('_')
         vectors = []
-        mouse = ''
+        mouseId = ''
         for n in name:
             if re.match(r'^\w{3}\d{3}', n):
                 vectors.append(re.match(r'^\w{3}\d{3}', n).group())
             if re.match(r'^\w\d{3}', n):
-                mouse = re.match(r'^\w\d{3}', n).group()
-        print(name, vectors, mouse)
+                mouseId = re.match(r'^\w\d{3}', n).group()[1:]
+        m.setMouseId(mouseId)
+        m.setVectors(vectors)
+        print('-Metadata : ', m.exportDataAsDict())
         
         # Small function to print export all of the channel's testData.
         for c in m.getChannels():
-            print(c.exportDataAsDict())
-
+            print('---Channel in Metdata : ', c.exportDataAsDict())
