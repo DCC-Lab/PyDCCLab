@@ -6,6 +6,7 @@ from filter import Filter
 
 class Metadata:
     def __init__(self, path, name=None):
+        self.mouseId = None
         self.name = name
         self.path = path
         self.root = None
@@ -22,6 +23,8 @@ class Metadata:
         self.ySize = 0
         self.xScaled = 0
         self.yScaled = 0
+
+        self.vectors = None
 
     def __repr__(self):
         return '{};{};{}'.format(self.path, self.filters, self.channels)
@@ -63,16 +66,22 @@ class Metadata:
         self.xScaled = self.setXScaled()
         self.yScaled = self.setYScaled()
 
-    def exportDataAsDict(self):  # TODO Tests
-        return {'name': self.name, 'path': self.path, 'microscope': self.microscope, 'objective': self.objective,
-                'x_size': self.xSize, 'y_size': self.ySize, 'x_scale': self.xScale, 'y_scale': self.yScale,
-                'x_scaled': self.xScaled, 'y_scaled': self.yScaled}
+    def exportDataAsDict(self):
+        return {'name': self.name, 'mouse_id': self.mouseId, 'path': self.path, 'microscope': self.microscope,
+                'objective': self.objective, 'x_size': self.xSize, 'y_size': self.ySize, 'x_scale': self.xScale,
+                'y_scale': self.yScale, 'x_scaled': self.xScaled, 'y_scaled': self.yScaled, 'vectors': self.vectors}
 
-    def getChannels(self):  # TODO Tests
+    def getChannels(self):
         return self.channels
 
-    def getName(self):  # TODO Tests
+    def getName(self):
         return self.name
+
+    def setMouseId(self, mouseId):
+        self.mouseId = mouseId
+
+    def setVectors(self, vectors):
+        self.vectors = vectors
 
     def checkIfElementHasChildren(self, element):
         try:
