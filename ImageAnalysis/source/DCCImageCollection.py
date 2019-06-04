@@ -1,12 +1,18 @@
-from DCCImage import *
+from DCCImage import DCCImage
 from DCCImagesExceptions import *
+import numpy as np
+import matplotlib.pyplot as plt
+import typing
 
 
 class DCCImageCollection:
-    def __init__(self, DCCImageArray: typing.List[DCCImage]):
-        if not all(isinstance(image, DCCImage) for image in DCCImageArray):
-            raise NotDCCImageException
-        self.__imageCollection = DCCImageArray
+    def __init__(self, DCCImageArray: typing.List[DCCImage] = None):
+        if DCCImageArray is not None:
+            if not all(isinstance(image, DCCImage) for image in DCCImageArray):
+                raise NotDCCImageException
+            self.__imageCollection = DCCImageArray
+        else:
+            self.__imageCollection = []
         self.__numberOfImages = len(DCCImageArray)
 
     def __getitem__(self, item):
@@ -70,10 +76,10 @@ class DCCImageCollection:
         self.__numberOfImages = 0
         print(self.__imageCollection)
 
-    def showImagesOneByOne(self) -> int:
+    def showImagesOneByOne(self, showInGray: object = True) -> object:
         imagesShown = 0
         for image in self.__imageCollection:
-            image.showImage()
+            image.showImage(showInGray)
             imagesShown += 1
         return imagesShown
 

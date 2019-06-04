@@ -1,21 +1,18 @@
-try:
-    import numpy as np
-    import typing
-    from skimage import color, measure, morphology, feature
-    from skimage.filters.rank import entropy
-    import PIL.Image
-    from scipy.signal import convolve2d
-    from scipy.ndimage import label, sum, measurements, distance_transform_edt, filters
-    from skimage.filters import *
-    from DCCImagesExceptions import *
-    import matplotlib.pyplot as plt
-    import warnings
-except ImportError:
-    print("Please install the required libraries.")
+import numpy as np
+import typing
+from skimage import color, measure, morphology, feature
+from skimage.filters.rank import entropy
+import PIL.Image
+from scipy.signal import convolve2d
+from scipy.ndimage import label, sum, measurements, distance_transform_edt, filters
+from skimage.filters import *
+from DCCImagesExceptions import *
+import matplotlib.pyplot as plt
+import warnings
 
 
 class DCCImage:
-    def __init__(self, imageAsArray: np.ndarray, metadata: str = None):
+    def __init__(self, imageAsArray: np.ndarray):
         if not imageAsArray.dtype == np.float32:
             raise PixelTypeException
         if not (1 < imageAsArray.ndim <= 3):
@@ -23,7 +20,6 @@ class DCCImage:
         self.__pixelArray = imageAsArray
         self.__dimensions = imageAsArray.ndim
         self.__shape = imageAsArray.shape
-        self.__metadata = metadata
 
     def __str__(self):
         return str(self.getArray())
@@ -74,13 +70,6 @@ class DCCImage:
         image = self.toPILImage()
         image.save("{}.tif".format(name))
 
-    def getMetadata(self) -> str:
-        return self.__metadata
-
-    def setMetadata(self, newMetadata: str) -> str:
-        self.__metadata = newMetadata
-        return newMetadata
-
     def splitChannels(self) -> typing.List[np.ndarray]:
         if self.isImageInGray():
             raise ImageDimensionsException(self.__dimensions)
@@ -97,7 +86,6 @@ class DCCImage:
         else:
             grayConversion = color.rgb2gray(self.getArray())
         return DCCImage(grayConversion.astype("float32"))
-
 
     @staticmethod
     def __convertToUInt16Array(array: np.ndarray) -> np.ndarray:
@@ -151,26 +139,23 @@ class DCCImage:
         plt.show()
         return allHistograms, allBins
 
-    @staticmethod
-    def __convolution2D(inputImage: np.ndarray, matrix: typing.Union[np.ndarray, list]) -> np.ndarray:
-        convolvedImage = np.zeros_like(inputImage)
-        if inputImage.ndim > 2:
-            for channel in range(inputImage.shape[-1]):
-                convolvedImage[..., channel] = convolve2d(inputImage[..., channel], matrix, mode="same",
-                                                          boundary="symm")
+    def getConvolvedImage(self, matrix: typing.Union[np.ndarray, list]):
+        convolvedArray = np.zeros_like(self.getArray())
+        if self.isImageInGray():
+            convolvedArray = convolve2d(self.getArray(), matrix, mode="same", boundary="symm")
         else:
-            convolvedImage = convolve2d(inputImage, matrix, mode="same", boundary="symm")
-        return convolvedImage.astype("float32")
+            for channel in range(self.getNumberOfChannel()):
+                convolvedArray[..., channel] = convolve2d(self.getArray()[..., channel], matrix, mode="same",
+                                                          boundary="symm")
+        return DCCImage(convolvedArray.astype(np.float32))
 
     def getXAxisDerivative(self):
         dxFilter = [[-1, 0, 1]]
-        dxImage = self.__convolution2D(self.getGrayscaleConversion().getArray(), dxFilter)
-        return DCCImage(dxImage)
+        return self.getConvolvedImage(dxFilter)
 
     def getYAxisDerivative(self):
         dyFilter = [[-1], [0], [1]]
-        dyImage = self.__convolution2D(self.getGrayscaleConversion().getArray(), dyFilter)
-        return DCCImage(dyImage)
+        return self.getConvolvedImage(dyFilter)
 
     def getAverageValueOfImage(self) -> typing.List[float]:
         averageList = []
@@ -377,6 +362,7 @@ class DCCImage:
         return DCCImage(threshArray.astype(np.float32))
 
     def getAdaptiveThresholdingMedian(self, blockSize: int = 3):
+        warnings.warn("This thresholding method can be very slow.")
         inputArray = self.getArray()
         threshArray = inputArray >= threshold_local(inputArray, blockSize, mode="nearest", method="median")
         return DCCImage(threshArray.astype(np.float32))
@@ -389,18 +375,6 @@ class DCCImage:
         labels = morphology.watershed(-distance, markers, mask=inputArray).astype(np.float32)
         return DCCImage(labels)
 
-    def getClosing(self, windowSize: int = 3):
-        inputArrayGray = self.getGrayscaleConversion().getArray()
-        closed = morphology.closing(inputArrayGray, np.ones((windowSize, windowSize)))
-        return DCCImage(closed)
-
-    def getBinaryClosing(self, windowSize: int = 3):
-        inputArray = self.getArray()
-        if not self.isImageInBinary():
-            raise NotBinaryImageException
-        binaryClosed = morphology.binary_closing(inputArray, np.ones((windowSize, windowSize))).astype(np.float32)
-        return DCCImage(binaryClosed)
-
     def getOpening(self, windowSize: int = 3):
         inputArrayGray = self.getGrayscaleConversion().getArray()
         opened = morphology.opening(inputArrayGray, np.ones((windowSize, windowSize)))
@@ -412,6 +386,18 @@ class DCCImage:
             raise NotBinaryImageException
         binaryOpened = morphology.binary_opening(inputArray, np.ones((windowSize, windowSize))).astype(np.float32)
         return DCCImage(binaryOpened)
+
+    def getClosing(self, windowSize: int = 3):
+        inputArrayGray = self.getGrayscaleConversion().getArray()
+        closed = morphology.closing(inputArrayGray, np.ones((windowSize, windowSize)))
+        return DCCImage(closed)
+
+    def getBinaryClosing(self, windowSize: int = 3):
+        inputArray = self.getArray()
+        if not self.isImageInBinary():
+            raise NotBinaryImageException
+        binaryClosed = morphology.binary_closing(inputArray, np.ones((windowSize, windowSize))).astype(np.float32)
+        return DCCImage(binaryClosed)
 
     def getConnectedComponents(self):
         inputArray = self.getArray()
@@ -431,6 +417,7 @@ class DCCImage:
 if __name__ == '__main__':
     array = np.zeros((5, 5), dtype=np.float32)
     import DCCImagesFromFiles
+    import DCCImageCollection
 
     cziImage = DCCImagesFromFiles.DCCImagesFromCZIFile(
         r"C:\Users\goubi\PycharmProjects\BigData-ImageAnalysis\ImageAnalysis\unitTesting\testCziFile2Images.czi")
@@ -438,3 +425,25 @@ if __name__ == '__main__':
         r"C:\Users\goubi\PycharmProjects\BigData-ImageAnalysis\ImageAnalysis\unitTesting\testNotCziFile.jpg")
     cziImage.showImagesOneByOne()
     cziImage.showImages()
+    image = cziImage[0]
+    i1 = image.getOtsuThresholding()
+    i2 = image.getIsodataThresholding()
+    print(image.getLength())
+    import time
+
+    # print(time.clock())
+    # i3 = image.getAdaptiveThresholdingMedian(9)
+    i4 = image.getOpening(14).getAdaptiveThresholdingMean(167)
+    liste = [i1, i2, i4]
+    coll = DCCImageCollection.DCCImageCollection(liste)
+    # coll.showImages()
+    image_open = np.ones((20, 20), dtype=np.float32)
+    image_open[1][1] = 0
+    windowSize = 3
+    image_open[10: 10 + windowSize, 1:1 + windowSize] = 0
+    image_open[3:3 + windowSize - 1, 6:6 + windowSize - 1] = 0
+    image_open[15:15 + windowSize, 17:17 + windowSize - 1] = 0
+    image_open[2:2 + windowSize, 15:15 + windowSize + 1] = 0
+    print(image_open)
+    image_open = DCCImage(image_open)
+    print(image_open.getBinaryClosing(3))
