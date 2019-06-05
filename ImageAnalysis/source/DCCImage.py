@@ -1,6 +1,6 @@
 import numpy as np
 import typing
-from skimage import color, measure, morphology, feature
+from skimage import color, measure, morphology, feature, img_as_ubyte
 from skimage.filters.rank import entropy
 import PIL.Image
 from scipy.signal import convolve2d
@@ -243,7 +243,7 @@ class DCCImage:
     def getEntropyFiltering(self, filterSize: int):
         image = self.getGrayscaleConversion().getArray()
         # I have to cast as 16-bits unsigned integer because the entropy filter only works in uint8 or uint16
-        image = self.__convertToUInt16Array(image)
+        image = img_as_ubyte(self.__convertToUInt16Array(image))
         entropyFiltered = entropy(image, morphology.selem.square(filterSize, dtype=np.float32))
         return DCCImage(entropyFiltered.astype(np.float32))
 
