@@ -1,5 +1,6 @@
 class Channel:
     def __init__(self, channelId, channelName, root):
+        self.fileId = None
         self.channelId = channelId
         self.channelName = channelName
         self.root = root
@@ -36,8 +37,8 @@ class Channel:
         self.setEmWavelengthFilter(filters)
         self.setBeamsplitter(filters)
 
-    def exportDataAsDict(self):  # TODO Tests
-        return {'entry_id': '', 'channel_id': self.channelId, 'channel_name': self.channelName,
+    def exportDataAsDict(self):
+        return {'file_id': self.fileId, 'channel_id': self.channelId, 'channel_name': self.channelName,
                 'ex_wavelength_filter': self.exWavelengthFilter, 'em_wavelength_filter': self.emWavelengthFilter,
                 'beamsplitter': self.beamsplitter, 'reflector': self.reflector, 'contrast_method': self.contrastMethod,
                 'light_source': self.lightSource, 'light_source_intensity': self.lightSourceIntensity,
@@ -162,3 +163,6 @@ class Channel:
             return self.root.find('./Metadata/Information/Image/Dimensions/Channels/Channel/DetectorSettings/Binning').text
         except AttributeError:
             raise
+
+    def setFileId(self, fileId):
+        self.fileId = fileId
