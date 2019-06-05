@@ -5,11 +5,15 @@ This package also offers image processing and analysis tools, like applying filt
 
 The ultimate goal of these Python files is to be able to extract useful and pertinent information about the images taken at the CERVO research center.
 
-To use the present files, you must install the following libraries:
-1. PIL
-2. Scikit-image
-3. Numpy
-4. Scipy
-5. Matplotlib
-6. Tifffile
-7. Czifile
+To use the present files, you must install the following modules:
+
+```shell
+pip install PIL
+pip install Scikit-image
+pip install Numpy
+pip install Scipy
+pip install Matplotlib
+pip install Tifffile
+pip install czifile
+```
+
