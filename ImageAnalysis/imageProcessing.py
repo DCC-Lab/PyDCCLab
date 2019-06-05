@@ -7,6 +7,8 @@ cziImages.showImages()
 image1 = cziImages[0]
 image2 = cziImages[1]
 image3 = cziImages[2]
+image3.getAdaptiveThresholdingMedian().showImage()
+#image3.getEntropyFiltering(3)
 print(image1.getMaximumIntensityPixels())
 isodata = image1.getIsodataThresholding()
 xDeriv = image2.getXAxisDerivative()

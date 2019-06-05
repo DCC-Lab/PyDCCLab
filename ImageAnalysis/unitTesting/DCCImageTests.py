@@ -760,16 +760,22 @@ class TestDCCImageMethods(unittest.TestCase):
     def testDCCImageClosing(self):
         array = np.ones((20, 20, 3), dtype=np.float32)
         arrayClosed = np.ones_like(array)
-        windowSize = 3
+        windowSize = 4
         array[0:5, 0:5, 1] = 0
         array[3:5, 2:5, 0] = 0
-
         array[15:16, 13:14, :] = 0
-        #array[]
-
+        array[10:15, 8:11, 2] = 0
+        array[1:5, 7:12, 0] = 0
         image = DCCImage.DCCImage(array)
-        image.showImage()
-        print(array)
+        # R channel closing:
+        # Hole too big to close
+        arrayClosed[1:5, 7:12, 0] = 0
+        # G channel closing:
+        # Hole too big to close
+        arrayClosed[0:5, 0:5, 1] = 0
+        # B channel closing: all holes are closed
+        closedImage = DCCImage.DCCImage(arrayClosed).getGrayscaleConversion()
+        self.assertTrue(closedImage == image.getClosing(windowSize))
 
 
 if __name__ == '__main__':
