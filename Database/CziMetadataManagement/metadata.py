@@ -85,6 +85,8 @@ class Metadata:
 
     def checkIfElementHasChildren(self, element):
         try:
+            if element is None:
+                raise AttributeError('Element is null.')
             if not element.getchildren():
                 raise AttributeError('No children were found in the element.')
             else:
@@ -190,6 +192,7 @@ class Metadata:
             channels = self.findChannelsEntriesInXml()
             for channel in channels:
                 channel.getDataFromFilters(self.filters)
+                channel.setFileId(self.name)
             return channels
         except Exception:
             raise
