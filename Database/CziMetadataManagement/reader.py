@@ -5,18 +5,25 @@ import re
 
 def getMetadataFromCzis(path):
     cziFiles = czi.findAllCziFiles(path)
-    metadata = getMetadataFromFiles(cziFiles)
-    return metadata
-
-
-def getMetadataFromFiles(cziFiles):
-    metadataObjects = []
+    allMdata = []
     for cziFile in cziFiles:
-        newMetadata = mtdt(cziFile[1], cziFile[0])
-        newMetadata.setAttributesFromXml()
-        getMetadataFromFilesName(newMetadata)
-        metadataObjects.append(newMetadata)
-    return metadataObjects
+        try:
+            print('Proccessing file : {}'.format(cziFile[0]))
+            allMdata.append(createMetadataObjectFromCziFile(cziFile))
+        except Exception as err:
+            print('En error occured. Could not pocess file : {}'.format(cziFile[0]))
+            print(cziFile[1])
+            print('See below : ')
+            print(err)
+            input('Press a key to proceed...')
+    return allMdata
+
+
+def createMetadataObjectFromCziFile(cziFile):
+    newMdata = mtdt(cziFile[1], cziFile[0])
+    newMdata.setAttributesFromXml()
+    getMetadataFromFilesName(newMdata)
+    return newMdata
 
 
 def getMetadataFromFilesName(metadata):
