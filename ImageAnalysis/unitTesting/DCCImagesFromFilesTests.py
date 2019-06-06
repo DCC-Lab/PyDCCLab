@@ -1,6 +1,6 @@
 import unittest
 from DCCImagesFromFiles import *
-import DCCImagesExceptions as DCCExcep
+import DCCExceptions as DCCExcep
 
 
 class TestDCCImagesFromCZIFileConstructor(unittest.TestCase):

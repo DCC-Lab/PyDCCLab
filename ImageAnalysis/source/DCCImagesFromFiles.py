@@ -3,7 +3,7 @@ import cziUtil as cziUtil
 import tifffile
 from DCCImage import DCCImage
 import numpy as np
-from DCCImagesExceptions import *
+from DCCExceptions import *
 import PIL.Image
 import Database.CziMetadataManagement.metadata as meta
 

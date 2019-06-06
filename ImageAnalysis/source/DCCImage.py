@@ -6,7 +6,7 @@ import PIL.Image
 from scipy.signal import convolve2d
 from scipy.ndimage import label, sum, measurements, distance_transform_edt, filters
 from skimage.filters import *
-from DCCImagesExceptions import *
+from DCCExceptions import *
 import matplotlib.pyplot as plt
 import warnings
 
@@ -16,13 +16,13 @@ class DCCImage:
         if not imageAsArray.dtype == np.float32:
             raise PixelTypeException
         if not (1 < imageAsArray.ndim <= 3):
-            raise ImageDimensionsException(imageAsArray.ndim)
+            raise DimensionException(imageAsArray.ndim)
         self.__pixelArray = imageAsArray
         self.__dimensions = imageAsArray.ndim
         self.__shape = imageAsArray.shape
 
     def __str__(self):
-        return str(self.getArray())
+        return str(self.__pixelArray)
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, DCCImage):
@@ -72,7 +72,7 @@ class DCCImage:
 
     def splitChannels(self) -> typing.List[np.ndarray]:
         if self.isImageInGray():
-            raise ImageDimensionsException(self.__dimensions)
+            raise DimensionException(self.__dimensions)
         pixelsPerChannel = []
         for channel in range(self.getNumberOfChannel()):
             pixelsPerChannel.append(self.getArray()[..., channel])
@@ -108,7 +108,7 @@ class DCCImage:
         histPerChannel = []
         binsPerChannel = []
         if self.getNumberOfChannel() != 3:
-            raise ImageDimensionsException(self.__dimensions)
+            raise DimensionException(self.__dimensions)
         array = self.getArray()
         arrayUint = self.__convertToUInt16Array(array)
         for channel in range(self.getNumberOfChannel()):
@@ -156,7 +156,7 @@ class DCCImage:
         dyFilter = [[-1], [0], [1]]
         return self.getConvolvedImage(dyFilter)
 
-    def getAverageValueOfImage(self) -> typing.List[float]:
+    def getAverageValueOfImage(self) -> float:
         averageList = []
         if self.isImageInGray():
             averageList.append(measurements.mean(self.getArray()))
@@ -247,8 +247,6 @@ class DCCImage:
         entropyFiltered = entropy(image, morphology.selem.square(filterSize, dtype=np.float32))
         return DCCImage(entropyFiltered.astype(np.float32))
 
-    def getEntropyFilteringTest(self, filterSize: int):
-        pass
 
     def getStandardDeviationFilteringSlow(self, filterSize: int):
         message = "This filtering method is very slow with big images. " \
@@ -409,6 +407,9 @@ class DCCImage:
         labeled, nbObjects = label(inputArray)
         sizes = sum(inputArray, labeled, range(nbObjects + 1))
         return DCCImage(labeled.astype(np.float32)), nbObjects, sizes
+
+    def getHoughTransform(self):
+        pass
 
     def isImageInBinary(self) -> bool:
         return np.alltrue(np.logical_or(self.getArray() == 0, self.getArray() == 1)) and self.isImageInGray()

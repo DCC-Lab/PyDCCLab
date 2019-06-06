@@ -1,5 +1,5 @@
 from DCCImage import DCCImage
-from DCCImagesExceptions import *
+from DCCExceptions import *
 import numpy as np
 import matplotlib.pyplot as plt
 import typing

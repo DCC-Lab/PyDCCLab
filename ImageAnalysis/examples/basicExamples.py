@@ -52,6 +52,14 @@ print(image02.getAverageValueOfImage())
 print(image03.getShannonEntropyOfImage(base=2))
 
 """
+Image histograms can also be really pertinent when analysing images
+"""
+# Let's display the histogram of the first image:
+image01.displayGrayscaleHistogram(normed=True)
+
+# It is
+
+"""
 We can also apply a filter on the image
 """
 # Apply a gaussian filter of sigma = 1.78
@@ -68,7 +76,7 @@ otsuThresh = image02.getOtsuThresholding()
 isodataThresh = image02.getIsodataThresholding()
 
 """
-It is possible to use morphological techniques to "close" small holes or "open" to remove small objects
+It is possible to use morphological techniques: "close" to fill small holes or "open" to remove small objects
 """
 binOpened = otsuThresh.getBinaryOpening(windowSize=6)
 binClosed = isodataThresh.getBinaryClosing(windowSize=7)
