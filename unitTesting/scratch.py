@@ -1,5 +1,5 @@
 import cziUtil as czi
-import metadata as mtdt
+import cziMetadata as mtdt
 import re
 
 
