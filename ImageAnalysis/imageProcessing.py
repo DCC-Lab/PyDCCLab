@@ -7,10 +7,12 @@ cziImages.showImages()
 image1 = cziImages[0]
 image2 = cziImages[1]
 image3 = cziImages[2]
+#image3.getAdaptiveThresholdingMean(13).showImage()
+image2.getEntropyFiltering(3).showImage(False)
 print(image1.getMaximumIntensityPixels())
 isodata = image1.getIsodataThresholding()
 xDeriv = image2.getXAxisDerivative()
 otsu_connected = image2.getOtsuThresholding().getConnectedComponents()[0]
 DCCImageCollection.DCCImageCollection([image1, isodata]).showImages()
-DCCImageCollection.DCCImageCollection([image2, xDeriv]).showImages()
+DCCImageCollection.DCCImageCollection([image2, image2.getBothDirectionsSobelFiltering()]).showImages(False)
 DCCImageCollection.DCCImageCollection([image2, otsu_connected]).showImages(False)

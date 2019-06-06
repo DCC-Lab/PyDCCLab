@@ -1,6 +1,6 @@
 import numpy as np
 import typing
-from skimage import color, measure, morphology, feature
+from skimage import color, measure, morphology, feature, img_as_ubyte
 from skimage.filters.rank import entropy
 import PIL.Image
 from scipy.signal import convolve2d
@@ -78,9 +78,7 @@ class DCCImage:
             pixelsPerChannel.append(self.getArray()[..., channel])
         return pixelsPerChannel
 
-    # Now, interesting part:
     def getGrayscaleConversion(self):
-        # todo test unitaire
         if self.isImageInGray():
             grayConversion = self.getArray()
         else:
@@ -140,6 +138,7 @@ class DCCImage:
         return allHistograms, allBins
 
     def getConvolvedImage(self, matrix: typing.Union[np.ndarray, list]):
+        # todo test unitaire
         convolvedArray = np.zeros_like(self.getArray())
         if self.isImageInGray():
             convolvedArray = convolve2d(self.getArray(), matrix, mode="same", boundary="symm")
@@ -244,9 +243,12 @@ class DCCImage:
     def getEntropyFiltering(self, filterSize: int):
         image = self.getGrayscaleConversion().getArray()
         # I have to cast as 16-bits unsigned integer because the entropy filter only works in uint8 or uint16
-        image = self.__convertToUInt16Array(image)
+        image = img_as_ubyte(self.__convertToUInt16Array(image))
         entropyFiltered = entropy(image, morphology.selem.square(filterSize, dtype=np.float32))
         return DCCImage(entropyFiltered.astype(np.float32))
+
+    def getEntropyFilteringTest(self, filterSize: int):
+        pass
 
     def getStandardDeviationFilteringSlow(self, filterSize: int):
         message = "This filtering method is very slow with big images. " \
@@ -368,6 +370,7 @@ class DCCImage:
         return DCCImage(threshArray.astype(np.float32))
 
     def getWatershedSegmentation(self):
+        # todo à voir avec matlab
         inputArray = self.getArray()
         distance = distance_transform_edt(inputArray)
         localMaxs = feature.peak_local_max(distance, indices=False, footprint=np.ones((3, 3)), labels=inputArray)
@@ -417,33 +420,8 @@ class DCCImage:
 if __name__ == '__main__':
     array = np.zeros((5, 5), dtype=np.float32)
     import DCCImagesFromFiles
-    import DCCImageCollection
 
     cziImage = DCCImagesFromFiles.DCCImagesFromCZIFile(
         r"C:\Users\goubi\PycharmProjects\BigData-ImageAnalysis\ImageAnalysis\unitTesting\testCziFile2Images.czi")
-    jpeg = DCCImagesFromFiles.DCCImageFromNormalFile(
-        r"C:\Users\goubi\PycharmProjects\BigData-ImageAnalysis\ImageAnalysis\unitTesting\testNotCziFile.jpg")
-    cziImage.showImagesOneByOne()
-    cziImage.showImages()
     image = cziImage[0]
-    i1 = image.getOtsuThresholding()
-    i2 = image.getIsodataThresholding()
-    print(image.getLength())
-    import time
-
-    # print(time.clock())
-    # i3 = image.getAdaptiveThresholdingMedian(9)
-    i4 = image.getOpening(14).getAdaptiveThresholdingMean(167)
-    liste = [i1, i2, i4]
-    coll = DCCImageCollection.DCCImageCollection(liste)
-    # coll.showImages()
-    image_open = np.ones((20, 20), dtype=np.float32)
-    image_open[1][1] = 0
-    windowSize = 3
-    image_open[10: 10 + windowSize, 1:1 + windowSize] = 0
-    image_open[3:3 + windowSize - 1, 6:6 + windowSize - 1] = 0
-    image_open[15:15 + windowSize, 17:17 + windowSize - 1] = 0
-    image_open[2:2 + windowSize, 15:15 + windowSize + 1] = 0
-    print(image_open)
-    image_open = DCCImage(image_open)
-    print(image_open.getBinaryClosing(3))
+    image.getEntropyFilteringTest(3).showImage()

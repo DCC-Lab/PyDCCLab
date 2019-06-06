@@ -9,7 +9,7 @@ if __name__ == '__main__':
     #directory = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
     #path = os.path.join(directory, 'testData')
     #path = 'P:\\injection AAV\\résultats bruts\\2019-01-23'
-    path = 'P:\\'
+    path = 'A:\\'
     metadata = rdr.getMetadataFromCzis(path)
 
     metafile = open('meta.csv', 'w+', encoding='UTF-8')

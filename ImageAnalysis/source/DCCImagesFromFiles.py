@@ -12,13 +12,11 @@ class DCCImagesFromCZIFile(parent):
 
     def __init__(self, path: str, numberOfImagesToRead: int = None):
         self.__path = path
-        self.__metadata = meta.Metadata(path)
         cziObject = cziUtil.readCziImage(path)
         arrayOfImages = cziUtil.getImagesFromCziFileObject(cziObject)
         # arrayOfImages = arrayOfImages.astype(np.float32)
         cziUtil.closeCziFileObject(cziObject)
         listOfImages = []
-        self.__metadata = meta.Metadata(path)
         if numberOfImagesToRead is None:
             for image in arrayOfImages:
                 listOfImages.append(DCCImage(image.astype(np.float32)))
@@ -29,7 +27,7 @@ class DCCImagesFromCZIFile(parent):
         parent.__init__(self, listOfImages)
 
     def getMetadata(self) -> meta.Metadata:
-        return self.__metadata
+        return meta.Metadata(self.__path)
 
     def getPath(self) -> str:
         return self.__path
