@@ -1,6 +1,4 @@
-from metadata import Metadata as mtdt
 import reader as rdr
-import os
 # We want to take a metadata object or list of metadata objects with their attributes.
 # We want to extract all of he relevant information.
 # We want to put it in a csv.file.
