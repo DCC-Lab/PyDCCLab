@@ -30,8 +30,10 @@ import DCCImagesFromFiles
 """
 Then, let's read images from a czi file and display them on screen.
 """
-cziImages = DCCImagesFromFiles.DCCImagesFromCZIFile(r"AAV498-455_S95_C-09.czi")
+cziImages = DCCImagesFromFiles.DCCImagesFromCZIFile(
+    r"A:\injection AAV\résultats bruts\AAV\AAV493AAV498\AAV493AAV498_S51\AAV493AAV498_S51\S51-06.czi", 3)
 cziImages.showImages(showInGray=True)
+
 
 """
 We can access images from the collection by the use of a function or by the use of []

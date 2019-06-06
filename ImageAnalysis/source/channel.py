@@ -1,10 +1,9 @@
 import numpy as np
 import typing
-from skimage import color, measure, morphology, feature, img_as_ubyte
+from skimage import measure, morphology, img_as_ubyte
 from skimage.filters.rank import entropy
-import PIL.Image
 from scipy.signal import convolve2d
-from scipy.ndimage import label, sum, measurements, distance_transform_edt, filters
+from scipy.ndimage import label, sum, filters
 from skimage.filters import *
 from DCCExceptions import *
 import matplotlib.pyplot as plt
@@ -135,3 +134,106 @@ class Channel:
     def getGaussianFiltering(self, sigma: float = 1):
         gaussianFiltered = gaussian(self.__pixels, sigma, mode="nearest", multichannel=False, preserve_range=True)
         return Channel(gaussianFiltered.astype(np.float32))
+
+    def getHorizontalSobelFiltering(self):
+        sobelH = sobel_h(self.__pixels)
+        return Channel(sobelH.astype(np.float32))
+
+    def getVerticalSobelFiltering(self):
+        sobelV = sobel_v(self.__pixels)
+        return Channel(sobelV.astype(np.float32))
+
+    def getBothDirectionsSobelFiltering(self):
+        sobelHV = sobel(self.__pixels)
+        return Channel(sobelHV.astype(np.float32))
+
+    def getIsodataThresholding(self):
+        """
+        Adapted from skimage's isodata thresholding method.
+        Their version was not behaving properly with our image format (different than uint8).
+        :return: The thresholded DCCImage instance according to isodata method.
+        """
+        # We ignore warnings related to division by 0 since they give nan and we treat nan later.
+        warnings.catch_warnings()
+        warnings.simplefilter("ignore", category=RuntimeWarning)
+        hist, bins = self.getHistogramValues()
+
+        hist = np.array(hist, dtype=np.float32)
+        bins = np.array(bins)
+        binsCenters = np.array([(i + i + 1) / 2 for i in range(len(bins) - 1)])
+        pixelProbabilityThresholdOne = np.cumsum(hist)
+        pixelProbabilityThresholdTwo = np.cumsum(hist[::-1])[::-1] - hist
+        intensitySum = hist * binsCenters
+        pixelProbabilityThresholdTwo[-1] = 1
+        low = np.cumsum(intensitySum) / pixelProbabilityThresholdOne
+        high = (np.cumsum(intensitySum[::-1])[::-1] - intensitySum) / pixelProbabilityThresholdTwo
+        allMean = (low + high) / 2
+        binWidth = binsCenters[1] - binsCenters[0]
+        distances = allMean - binsCenters
+        thresh = 0
+        for i in range(len(distances)):
+            if distances[i] is not None and 0 <= distances[i] < binWidth:
+                thresh = binsCenters[i]
+        threshArray = self.__pixels >= thresh
+        return Channel(threshArray.astype(np.float32))
+
+    def getOtsuThresholding(self):
+        """
+        Adapted from skimage's Otsu thresholding method.
+        Their version was not behaving properly with our image format (different than uint8).
+        :return: The thresholded DCCImage instance according to Otsu's method.
+        """
+        # We ignore warnings related to division by 0 since they give nan and we treat nan later.
+        warnings.catch_warnings()
+        warnings.simplefilter("ignore", category=RuntimeWarning)
+        if self.getExtremaValuesOfPixels()[0] == self.getExtremaValuesOfPixels()[1]:
+            raise ValueError(
+                "This method only works for image with more than one \"color\" (i.e. more than one pixel value).")
+        hist, bins = self.getHistogramValues()
+        hist = np.array(hist, dtype=np.float32)
+        bins = np.array(bins)
+        binsCenters = np.array([(i + i + 1) / 2 for i in range(len(bins) - 1)])
+        pixelProbabilityGroupOne = np.cumsum(hist)
+        pixelProbabilityGroupTwo = np.cumsum(hist[::-1])[::-1]
+        pixelIntensityGroupOneMean = np.cumsum(hist * binsCenters) / pixelProbabilityGroupOne
+        pixelIntensityGroupTwoMean = (np.cumsum((hist * binsCenters)[::-1]) / pixelProbabilityGroupTwo[::-1])[::-1]
+        varianceTwoGroups = pixelProbabilityGroupOne[:-1] * pixelProbabilityGroupTwo[1:] * (
+                pixelIntensityGroupOneMean[:-1] - pixelIntensityGroupTwoMean[1:]) ** 2
+        index = np.nanargmax(varianceTwoGroups)
+        thresh = binsCenters[index]
+        threshArray = self.__pixels >= thresh
+        return Channel(threshArray.astype(np.float32))
+
+    def getAdaptiveThreshold(self):
+        # todo voir avec openCV
+        pass
+
+    def getOpening(self, windowSize: int = 3):
+        opened = morphology.opening(self.__pixels, np.ones((windowSize, windowSize)))
+        return Channel(opened)
+
+    def getBinaryOpening(self, windowSize: int = 3):
+        if not self.arePixelsInBinary():
+            raise NotBinaryImageException
+        binaryOpened = morphology.binary_opening(self.__pixels, np.ones((windowSize, windowSize))).astype(np.float32)
+        return Channel(binaryOpened)
+
+    def getClosing(self, windowSize: int = 3):
+        closed = morphology.closing(self.__pixels, np.ones((windowSize, windowSize)))
+        return Channel(closed)
+
+    def getBinaryClosing(self, windowSize: int = 3):
+        if not self.arePixelsInBinary():
+            raise NotBinaryImageException
+        binarClosed = morphology.binary_closing(self.__pixels, np.ones((windowSize, windowSize))).astype(np.float32)
+        return Channel(binarClosed)
+
+    def getConnectedComponents(self) -> tuple:
+        if not self.arePixelsInBinary():
+            raise NotBinaryImageException
+        labeled, nbObjects = label(self.__pixels)
+        sizes = sum(self.__pixels, labeled, range(nbObjects + 1))
+        return Channel(labeled.astype(np.float32)), nbObjects, sizes
+
+    def arePixelsInBinary(self) -> bool:
+        return np.alltrue(np.logical_or(self.__pixels == 0, self.__pixels) == 1)

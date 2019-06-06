@@ -78,8 +78,12 @@ def getImagesFromCziFileObject(cziObject):
     """
     arrayReturn = []
     subblocksIters = cziObject.subblocks()
+    i = 0
     for iterator in subblocksIters:
         arrayReturn.append(np.squeeze(iterator.data()))
+        i += 1
+        if i == 3:
+            break
     return np.array(arrayReturn)
 
 

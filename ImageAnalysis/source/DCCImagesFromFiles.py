@@ -5,16 +5,16 @@ from DCCImage import DCCImage
 import numpy as np
 from DCCExceptions import *
 import PIL.Image
-import Database.MetadataFromCzi.cziMetadata as meta
+import matplotlib.pyplot as plt
 
 
 class DCCImagesFromCZIFile(parent):
 
-    def __init__(self, path: str, numberOfImagesToRead: int = None):
+    def __init__(self, path: str):
         self.__path = path
         cziObject = cziUtil.readCziImage(path)
         arrayOfImages = cziUtil.getImagesFromCziFileObject(cziObject)
-        # arrayOfImages = arrayOfImages.astype(np.float32)
+        arrayOfImages = arrayOfImages.astype(np.float32)
         cziUtil.closeCziFileObject(cziObject)
         listOfImages = []
         if numberOfImagesToRead is None:
@@ -25,9 +25,6 @@ class DCCImagesFromCZIFile(parent):
                 print(index)
                 listOfImages.append(DCCImage(arrayOfImages[index].astype(np.float32)))
         parent.__init__(self, listOfImages)
-
-    def getMetadata(self) -> meta.Metadata:
-        return meta.Metadata(self.__path)
 
     def getPath(self) -> str:
         return self.__path
