@@ -76,3 +76,5 @@ if __name__ == '__main__':
     channelfile.close()
     #os.remove('meta.csv')
     #os.remove('channel.csv')
+
+    print('Finished')
