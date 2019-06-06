@@ -1,6 +1,6 @@
-import metadata as mtdt
-import filter as fltr
-import channel as chnnl
+import cziMetadata as mtdt
+import cziFilter as fltr
+import cziChannel as chnnl
 import czifile as czi
 import xml.etree.ElementTree as ET
 import unittest

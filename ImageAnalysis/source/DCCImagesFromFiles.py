@@ -5,7 +5,7 @@ from DCCImage import DCCImage
 import numpy as np
 from DCCExceptions import *
 import PIL.Image
-import Database.CziMetadataManagement.metadata as meta
+import Database.MetadataFromCzi.cziMetadata as meta
 
 
 class DCCImagesFromCZIFile(parent):

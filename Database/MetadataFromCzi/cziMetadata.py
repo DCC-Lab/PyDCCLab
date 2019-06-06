@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 import ImageAnalysis.source.cziUtil as czi
-from channel import Channel
-from filter import Filter
+from cziChannel import Channel
+from cziFilter import Filter
 
 
 class Metadata:
@@ -84,89 +84,97 @@ class Metadata:
         self.vectors = vectors
 
     def checkIfElementHasChildren(self, element):
+        if element is None:
+            return False
         try:
-            if element is None:
-                raise AttributeError('Element is null.')
-            if not element.getchildren():
-                raise AttributeError('No children were found in the element.')
-            else:
-                return True
+            if not list(element):
+                return False
+            return True
         except Exception:
-            raise
+            return False
 
     def setMicroscope(self):
         try:
             return self.root.find('./Metadata/Information/Instrument/Microscopes/Microscope').attrib['Name']
-        except KeyError:
-            raise
+        except KeyError as err:
+
+            print('Attribute "Name" not found for Microscope.')
+            return 'Attribute "Name" not found for Microscope.'
         except AttributeError:
-            raise
+            print('Microscope field is empty.')
+            return 'Microscope field is empty.'
+        except Exception as err:
+            print(err)
+            return 'Other Exception'
 
     def setObjective(self):
         try:
             return self.root.find('./Metadata/Information/Instrument/Objectives/Objective').attrib['Name']
         except KeyError:
-            raise
+            return 'Attribute "Name" not found for Objective.'
         except AttributeError:
-            raise
+            return 'Objective field is empty.'
 
     def setXScale(self):
         try:
             return self.root.find('./Metadata/Scaling/Items/Distance[@Id="X"]/Value').text
         except AttributeError:
-            raise
+            return 'Either the id "X" could not be found or the field is empty for xScale.'
 
     def setYScale(self):
         try:
             return self.root.find('./Metadata/Scaling/Items/Distance[@Id="Y"]/Value').text
         except AttributeError:
-            raise
+            return 'Either the id "Y" could not be found or the field is empty for yScale.'
 
     def setXSize(self):
         try:
             return self.root.find('./Metadata/Information/Image/SizeX').text
         except AttributeError:
-            raise
+            return 'SizeX field is empty.'
 
     def setYSize(self):
         try:
             return self.root.find('./Metadata/Information/Image/SizeY').text
         except AttributeError:
-            raise
+            return 'SizeY field is empty.'
 
     def setXScaled(self):
         try:
             return float(self.xSize) * float(self.xScale)
         except ValueError:
-            raise
+            return 0
 
     def setYScaled(self):
         try:
             return float(self.ySize) * float(self.yScale)
         except ValueError:
-            raise
+            return 0
 
     def findFiltersEntriesInXml(self):
         filters = []
         try:
             root = self.root.find('./Metadata/Information/Instrument/Filters')
-            self.checkIfElementHasChildren(root)
+            if self.checkIfElementHasChildren(root):
+                for filter in root:
+                    filterId = filter.attrib['Id']
+                    cutIn = filter.find('./TransmittanceRange/CutIn').text
+                    cutOut = filter.find('./TransmittanceRange/CutOut').text
 
-            for filter in root:
-                filterId = filter.attrib['Id']
-                cutIn = filter.find('./TransmittanceRange/CutIn').text
-                cutOut = filter.find('./TransmittanceRange/CutOut').text
-
-                filters.append(Filter(filterId, cutIn, cutOut))
+                    filters.append(Filter(filterId, cutIn, cutOut))
             return filters
         except AttributeError:
+            print('Filter attribute error')
             raise
         except KeyError:
+            print('Filter Key Error')
             raise
 
     def setFiltersData(self):
         try:
             filters = self.findFiltersEntriesInXml()
+            if len(filters) == 0:
+                return filters
             for filter in filters:
                 filter.setFilterData(self.root)
             return filters
@@ -177,19 +185,22 @@ class Metadata:
         channels = []
         try:
             root = self.root.find('./Metadata/Information/Image/Dimensions/Channels')
-            self.checkIfElementHasChildren(root)
-
-            for channel in root:
-                channels.append(Channel(channel.attrib['Id'], channel.attrib['Name'], self.root))
+            if self.checkIfElementHasChildren(root):
+                for channel in root:
+                    channels.append(Channel(channel.attrib['Id'], channel.attrib['Name'], self.root))
             return channels
         except AttributeError:
+            print('Channel attribute error.')
             raise
         except KeyError:
+            print('Channel key error.')
             raise
 
     def setChannelsData(self):
         try:
             channels = self.findChannelsEntriesInXml()
+            if len(channels) == 0:
+                return channels
             for channel in channels:
                 channel.getDataFromFilters(self.filters)
                 channel.setFileId(self.name)

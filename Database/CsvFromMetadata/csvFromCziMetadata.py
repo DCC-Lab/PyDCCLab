@@ -1,6 +1,4 @@
-from metadata import Metadata as mtdt
-import reader as rdr
-import os
+import cziReader as rdr
 # We want to take a metadata object or list of metadata objects with their attributes.
 # We want to extract all of he relevant information.
 # We want to put it in a csv.file.
@@ -11,7 +9,7 @@ if __name__ == '__main__':
     #directory = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
     #path = os.path.join(directory, 'testData')
     #path = 'P:\\injection AAV\\résultats bruts\\2019-01-23'
-    path = 'A:\\'
+    path = 'P:\\'
     metadata = rdr.getMetadataFromCzis(path)
 
     metafile = open('meta.csv', 'w+', encoding='UTF-8')
@@ -78,3 +76,5 @@ if __name__ == '__main__':
     channelfile.close()
     #os.remove('meta.csv')
     #os.remove('channel.csv')
+
+    print('Finished')

@@ -1,5 +1,5 @@
-from filter import Filter as fltr
-from metadata import Metadata as mtdt
+from cziFilter import Filter as fltr
+from cziMetadata import Metadata as mtdt
 import xml.etree.ElementTree as ET
 import unittest
 import os

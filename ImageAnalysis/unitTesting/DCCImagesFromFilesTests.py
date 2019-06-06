@@ -26,7 +26,7 @@ class testDCCImagesFromCZIFileMethods(unittest.TestCase):
         self.metadata = cziUtil.extractMetadataFromCziFileObject(cziUtil.readCziImage("testCziFile2Images.czi"))
 
     def testGetMetadata(self):
-        import metadata as meta
+        import cziMetadata as meta
         self.assertTrue(self.imagesFromCzi.getMetadata() == meta.Metadata(self.imagesFromCzi.getPath()))
 
     def testGetPath(self):
