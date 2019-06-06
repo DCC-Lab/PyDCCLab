@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 from unittest.mock import Mock, patch
 import DCCImage
-import DCCImagesExceptions as DCCExcep
+import DCCExceptions as DCCExcep
 import warnings
 
 
@@ -13,7 +13,7 @@ class TestDCCImageConstructor(unittest.TestCase):
         self.assertIsInstance(image, DCCImage.DCCImage)
 
     def testInvalidDimensionsConstructor(self):
-        with self.assertRaises(DCCExcep.ImageDimensionsException):
+        with self.assertRaises(DCCExcep.DimensionException):
             DCCImage.DCCImage(np.zeros(12, dtype=np.float32))
 
     def testInvalidTypeConstructor(self):
@@ -79,7 +79,7 @@ class TestDCCImageMethods(unittest.TestCase):
         self.assertTrue(image.isImageInBinary())
 
     def testDCCImageSeparatedChannelsGray(self):
-        with self.assertRaises(DCCExcep.ImageDimensionsException):
+        with self.assertRaises(DCCExcep.DimensionException):
             self.image.splitChannels()
 
     def testDCCImageSeparatedChannels(self):
@@ -210,7 +210,7 @@ class TestDCCImageMethods(unittest.TestCase):
         self.assertAlmostEqual(sum(hist), 1, delta=1e-9)
 
     def testDCCImageGetColorHistogramVsluesNoColorImage(self):
-        with self.assertRaises(DCCExcep.ImageDimensionsException):
+        with self.assertRaises(DCCExcep.DimensionException):
             self.image.getRGBHistogramValues()
 
     def testDCCImageGetColorHistogramValuesWarning(self):
@@ -257,7 +257,7 @@ class TestDCCImageMethods(unittest.TestCase):
         self.assertAlmostEqual(sum(hist), 1, delta=1e-9)
 
     def testDCCImageDisplayColorHistogramNoColorImage(self):
-        with self.assertRaises(DCCExcep.ImageDimensionsException):
+        with self.assertRaises(DCCExcep.DimensionException):
             self.image.displayRGBHistogram()
 
     def testDCCImageDisplayColorHistogramWarning(self):

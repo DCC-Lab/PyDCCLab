@@ -8,7 +8,7 @@ class ImageAlreadyInCollectionException(Exception):
         Exception.__init__(self, "The image is already in the collection.")
 
 
-class ImageDimensionsException(Exception):
+class DimensionException(Exception):
     def __init__(self, dimensions):
         Exception.__init__(self, "Cannot accept {} dimensions arrays.".format(dimensions))
 
