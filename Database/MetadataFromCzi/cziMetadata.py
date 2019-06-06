@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 import ImageAnalysis.source.cziUtil as czi
-from channel import Channel
-from filter import Filter
+from cziChannel import Channel
+from cziFilter import Filter
 
 
 class Metadata:
@@ -96,7 +96,8 @@ class Metadata:
     def setMicroscope(self):
         try:
             return self.root.find('./Metadata/Information/Instrument/Microscopes/Microscope').attrib['Name']
-        except KeyError:
+        except KeyError as err:
+
             print('Attribute "Name" not found for Microscope.')
             return 'Attribute "Name" not found for Microscope.'
         except AttributeError:
