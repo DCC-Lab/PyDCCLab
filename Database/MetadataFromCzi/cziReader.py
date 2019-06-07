@@ -27,7 +27,7 @@ def createMetadataObjectFromCziFile(cziFile):
 
 
 def getMetadataFromFilesName(metadata):
-    name = metadata.getName().__split('_')
+    name = metadata.getName().__splitListOfImages('_')
     vectors = []
     mouseId = ''
     for cell in name:
