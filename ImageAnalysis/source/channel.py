@@ -8,6 +8,10 @@ from skimage.filters import *
 from DCCExceptions import *
 import matplotlib.pyplot as plt
 import warnings
+try:
+    from deprecated import deprecated
+except:
+    exit("need module: pip install deprecated")
 
 
 class Channel:
@@ -18,23 +22,53 @@ class Channel:
         if pixels.ndim > 2:
             raise DimensionException(pixels.ndim)
         self.__pixels = pixels
-        self.__dimensions = pixels.ndim
-        self.__shape = pixels.shape
+
+    @property
+    def pixels(self):
+        return self.__pixels
+
+    @property
+    def dimension(self):
+        return self.__pixels.ndim
+
+    @property
+    def shape(self):
+        return self.__pixels.shape
+
+    @property
+    def width(self) -> int:
+        return int(self.shape[0])
+
+    @property
+    def height(self) -> int:
+        return int(self.shape[1])
+
+    @property
+    def length(self) -> int:
+        return self.height
+
+    @property
+    def numberOfPixels(self) -> int:
+        return self.width() * self.height()
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, Channel):
             raise InvalidEqualityTestException(type(other))
         return np.array_equal(self.__pixels, other.getPixels())
 
+    @deprecated(reason="Renamed as a @property pixels")    
     def getPixels(self) -> np.ndarray:
         return self.__pixels
 
+    @deprecated(reason="Renamed as a @property width")    
     def getWidth(self) -> int:
-        return int(self.__shape[0])
+        return self.width
 
+    @deprecated(reason="Renamed as a @property height")    
     def getLength(self) -> int:
-        return int(self.__shape[1])
+        return self.height
 
+    @deprecated(reason="Renamed as a @property numberOfPixels")    
     def getNumberOfPixels(self) -> int:
         return self.getLength() * self.getWidth()
 
