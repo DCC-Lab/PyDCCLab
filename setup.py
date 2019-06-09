@@ -11,7 +11,7 @@ rm dist/*; python setup.py sdist bdist_wheel; python -m twine upload dist/*
 """
 
 setuptools.setup(
-    name="dcclab",
+    name="cervolib",
     version="0.9.0",
     url="https://github.com/DCC-Lab/dcclab.py",
     author="Daniel Cote",
@@ -34,7 +34,6 @@ setuptools.setup(
         # Indicate who your project is intended for
         'Intended Audience :: Science/Research',
         'Intended Audience :: Education',
-        'Topic :: Scientific/Engineering :: Physics',
         'Topic :: Scientific/Engineering :: Visualization',
         'Topic :: Education',
 

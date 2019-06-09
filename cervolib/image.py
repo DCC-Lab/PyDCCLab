@@ -1,8 +1,10 @@
 from .channel import *
-import cziUtil
-import re
+
+from .cziUtil import *
 import tifffile
 import PIL
+
+import re
 
 class Image:
 

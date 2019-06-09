@@ -4,11 +4,14 @@ import typing
 
 from skimage import measure, morphology, img_as_ubyte
 from skimage.filters.rank import entropy
+from skimage.filters import *
+
 from scipy.signal import convolve2d
 from scipy.ndimage import label, sum, filters
-from skimage.filters import *
-from DCCExceptions import *
+from .DCCExceptions import *
+
 import matplotlib.pyplot as plt
+
 import warnings
 try:
     from deprecated import deprecated
