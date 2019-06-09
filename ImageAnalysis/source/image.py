@@ -49,7 +49,7 @@ class Image:
 
 
 if __name__ == '__main__':
-#    path = r"A:\injection AAV\résultats bruts\AAV\AAV498AAV455\AAV498AAV455_S95\AAV498-455_S95_C-07.czi"
+    path = r"A:\injection AAV\résultats bruts\AAV\AAV498AAV455\AAV498AAV455_S95\AAV498-455_S95_C-07.czi"
     im = Image(path)
     # im = Image(r"/tmp/test.tiff")
     # im2 = Image(r"/tmp/test.png")
