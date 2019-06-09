@@ -1,11 +1,6 @@
 import numpy as np
 from typing import List
-try:
-    import typing
-    from abc import ABCMeta, abstractmethod, abstractproperty
-    from typing_extensions import Protocol
-except:
-    exit("need 'typing_extensions' module: pip install typing-extensions")
+import typing
 
 from skimage import measure, morphology, img_as_ubyte
 from skimage.filters.rank import entropy
