@@ -16,8 +16,8 @@ class Image:
         return self.__channels
 
     def display(self, colorMap=None):
-        channelsPixels = list(map( lambda c: np.expand_dims(c.pixels,axis=2), self.channels))
-        imageData = np.concatenate(channelsPixels, axis=2)
+        channelsPixels = list(map( lambda c: c.pixels, self.channels))
+        imageData = np.dstack(channelsPixels)
         plt.imshow(imageData, cmap=colorMap)
         plt.show()
 
