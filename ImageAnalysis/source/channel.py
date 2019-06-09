@@ -15,9 +15,76 @@ try:
 except:
     exit("need 'deprecated' module: pip install deprecated")
 
-class ChannelDisplay:
+class Channel:
 
-    def displayChannel(self, colorMap=None):
+    def __init__(self, pixels: np.ndarray):
+        if not pixels.dtype == np.float32:
+            raise PixelTypeException
+        if pixels.ndim > 2:
+            raise DimensionException(pixels.ndim)
+        self.__pixels = pixels
+
+    @property
+    def pixels(self):
+        return self.__pixels
+
+    @property
+    def dimension(self):
+        return self.pixels.ndim
+
+    @property
+    def shape(self):
+        return self.pixels.shape
+
+    @property
+    def width(self) -> int:
+        return int(self.shape[0])
+
+    @property
+    def height(self) -> int:
+        return int(self.shape[1])
+
+    @property
+    def length(self) -> int:
+        return self.height
+
+    @property
+    def numberOfPixels(self) -> int:
+        return self.width() * self.height()
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, Channel):
+            raise InvalidEqualityTestException(type(other))
+        return np.array_equal(self.pixels, other.pixels())
+
+    @deprecated(reason="Renamed as a @property pixels")    
+    def getPixels(self) -> np.ndarray:
+        return self.pixels
+
+    @deprecated(reason="Renamed as a @property width")    
+    def getWidth(self) -> int:
+        return self.width
+
+    @deprecated(reason="Renamed as a @property height")    
+    def getLength(self) -> int:
+        return self.height
+
+    @deprecated(reason="Renamed as a @property numberOfPixels")    
+    def getNumberOfPixels(self) -> int:
+        return self.getLength() * self.getWidth()
+
+    def copy(self) -> np.ndarray:
+        return np.copy(self.pixels)
+
+    @deprecated(reason="Renamed as a @property isBinary")    
+    def arePixelsInBinary(self) -> bool:
+        return self.isBinary
+
+    @property
+    def isBinary(self) -> bool:
+        return np.alltrue(np.logical_or(self.pixels == 0, self.pixels) == 1)
+
+    def display(self, colorMap=None):
         plt.imshow(self.pixels, cmap=colorMap)
         plt.show()
         return self
@@ -34,8 +101,10 @@ class ChannelDisplay:
         plt.show()
         return histogram, bins
 
+    @deprecated(reason="Renamed as display()")    
+    def displayChannel(self, colorMap=None):
+        return self.display()
 
-class ChannelMath:
     def convolveWith(self, matrix: typing.Union[np.ndarray, list]):
         # todo test unitaire
         convolvedArray = convolve2d(self.pixels, matrix, mode="same", boundary="symm")
@@ -205,72 +274,3 @@ class ChannelMath:
         sizes = sum(self.pixels, labeled, range(nbObjects + 1))
         return Channel(labeled.astype(np.float32)), nbObjects, sizes
 
-
-class Channel(ChannelMath, ChannelDisplay):
-
-    def __init__(self, pixels: np.ndarray):
-        if not pixels.dtype == np.float32:
-            raise PixelTypeException
-        if pixels.ndim > 2:
-            raise DimensionException(pixels.ndim)
-        self.__pixels = pixels
-
-    @property
-    def pixels(self):
-        return self.__pixels
-
-    @property
-    def dimension(self):
-        return self.pixels.ndim
-
-    @property
-    def shape(self):
-        return self.pixels.shape
-
-    @property
-    def width(self) -> int:
-        return int(self.shape[0])
-
-    @property
-    def height(self) -> int:
-        return int(self.shape[1])
-
-    @property
-    def length(self) -> int:
-        return self.height
-
-    @property
-    def numberOfPixels(self) -> int:
-        return self.width() * self.height()
-
-    def __eq__(self, other) -> bool:
-        if not isinstance(other, Channel):
-            raise InvalidEqualityTestException(type(other))
-        return np.array_equal(self.pixels, other.pixels())
-
-    @deprecated(reason="Renamed as a @property pixels")    
-    def getPixels(self) -> np.ndarray:
-        return self.pixels
-
-    @deprecated(reason="Renamed as a @property width")    
-    def getWidth(self) -> int:
-        return self.width
-
-    @deprecated(reason="Renamed as a @property height")    
-    def getLength(self) -> int:
-        return self.height
-
-    @deprecated(reason="Renamed as a @property numberOfPixels")    
-    def getNumberOfPixels(self) -> int:
-        return self.getLength() * self.getWidth()
-
-    def copy(self) -> np.ndarray:
-        return np.copy(self.pixels)
-
-    @deprecated(reason="Renamed as a @property isBinary")    
-    def arePixelsInBinary(self) -> bool:
-        return self.isBinary
-
-    @property
-    def isBinary(self) -> bool:
-        return np.alltrue(np.logical_or(self.pixels == 0, self.pixels) == 1)
