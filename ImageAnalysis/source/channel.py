@@ -246,7 +246,7 @@ class Channel(ChannelMath, ChannelDisplay):
     def __eq__(self, other) -> bool:
         if not isinstance(other, Channel):
             raise InvalidEqualityTestException(type(other))
-        return np.array_equal(self.pixels, other.getPixels())
+        return np.array_equal(self.pixels, other.pixels())
 
     @deprecated(reason="Renamed as a @property pixels")    
     def getPixels(self) -> np.ndarray:
@@ -267,7 +267,7 @@ class Channel(ChannelMath, ChannelDisplay):
     def copy(self) -> np.ndarray:
         return np.copy(self.pixels)
 
-    @deprecated(reason="Renamed as a @property numberOfPixels")    
+    @deprecated(reason="Renamed as a @property isBinary")    
     def arePixelsInBinary(self) -> bool:
         return self.isBinary
 
