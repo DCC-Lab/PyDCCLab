@@ -8,11 +8,11 @@ class Image:
 
     def __init__(self, path: str):
         self.__path = path
-        pixels = self.imageArrayFromPath(path)
-        if pixels.ndim == 2:
-            self.__channels = (Channel(pixels))
-        elif pixels.ndim == 3:
-            self.__channels = (Channel(pix) for pix in np.dsplit(pixels, pixels.shape[2]) )
+        imageData = self.imageArrayFromPath(path)
+        if imageData.ndim == 2:
+            self.__channels = (Channel(imageData))
+        elif imageData.ndim == 3:
+            self.__channels = (Channel(pix) for pix in np.dsplit(imageData, imageData.shape[2]) )
 
     @property
     def channels(self):
@@ -22,30 +22,33 @@ class Image:
         cziPattern = r'\.czi\Z'
         tiffPattern = r"\.ti[f]{1,2}\Z"
         if re.search(cziPattern, path, re.IGNORECASE) is not None:
-            pixels = self.imageArrayFromCZI(path)
+            imageData = self.imageArrayFromCZI(path)
         elif re.search(tiffPattern, path, re.IGNORECASE) is not None:
-            pixels = self.imageArrayFromTIFF(path)
+            imageData = self.imageArrayFromTIFF(path)
         else:
-            pixels = self.imageArrayFromAnyFile(path)
-        return pixels
+            imageData = self.imageArrayFromAnyFile(path)
+        return imageData
 
     def imageArrayFromCZI(self, path):
         cziObj = cziUtil.readCziImage(path)
         imagesDirectory = cziObj.filtered_subblock_directory
         subblocks = cziObj.subblocks()
-        pixels = cziObj.asarray()
+        imageData = cziObj.asarray()
         cziUtil.closeCziFileObject(cziObj)
-        return pixels
+        return imageData
 
     def imageArrayFromTIFF(self, path):
         tiffFileObject = tifffile.TiffFile(path)
-        pixels = tiffFileObject.asarray().astype(dtype="float32")
+        imageData = tiffFileObject.asarray().astype(dtype="float32")
         #self.__metadata = tiffFileObject.ome_metadata
-        return pixels
+        return imageData
 
     def imageArrayFromAnyFile(self, path: str):
         pilImage = PIL.Image.open(path)
-        return np.array(pilImage, dtype=np.float32)
+        if pilImage is not None:
+            return np.array(pilImage, dtype=np.float32)
+        else:
+            return None
 
 
 if __name__ == '__main__':
