@@ -84,6 +84,7 @@ class Channel:
     def isBinary(self) -> bool:
         return np.alltrue(np.logical_or(self.pixels == 0, self.pixels) == 1)
 
+    """ Display-related functions """
     def display(self, colorMap=None):
         plt.imshow(self.pixels, cmap=colorMap)
         plt.show()
@@ -105,6 +106,7 @@ class Channel:
     def displayChannel(self, colorMap=None):
         return self.display()
 
+    """ Manipulation-related functions """
     def convolveWith(self, matrix: typing.Union[np.ndarray, list]):
         # todo test unitaire
         convolvedArray = convolve2d(self.pixels, matrix, mode="same", boundary="symm")
