@@ -1,4 +1,4 @@
-from channel import *
+from .channel import *
 import cziUtil
 import re
 import tifffile
