@@ -8,7 +8,6 @@ class Image:
 
     def __init__(self, path: str):
         self.__path = path
-        self.__channels = ()
         imageData = self.imageArrayFromPath(path)
         self.__channels = self.channelsFromImageData(imageData)
 
@@ -27,8 +26,10 @@ class Image:
             return (Channel(imageData))
         elif imageData.ndim == 3:
             channelsData = np.squeeze(np.dsplit(imageData, imageData.shape[2]))
-            return list(map( lambda pix: Channel(pix), channelsData))
+            channels = list(map( lambda pix: Channel(pix), channelsData))
+            return channels
 
+        return ()
 
     def imageArrayFromPath(self, path: str):
         cziPattern = r'\.czi\Z'
@@ -61,9 +62,9 @@ class Image:
 
 
 if __name__ == '__main__':
-    # path = r"A:\injection AAV\résultats bruts\AAV\AAV498AAV455\AAV498AAV455_S95\AAV498-455_S95_C-07.czi"
-    # im = Image(path)
-    im = Image(r"/tmp/test.tiff")
-    im2 = Image(r"/tmp/test2.png")
-    im2.display()
+    path = r"A:\injection AAV\résultats bruts\AAV\AAV498AAV455\AAV498AAV455_S95\AAV498-455_S95_C-07.czi"
+    im = Image(path)
+    # im = Image(r"/tmp/test.tiff")
+    # im2 = Image(r"/tmp/test2.png")
+    # im2.display()
 
