@@ -8,6 +8,14 @@ class Image:
     def __init__(self, path: str):
         self.__path = path
         self.image = self.__findRightReader(path)
+        if self.image.ndim == 2:
+            self.__channels = (Channel(self.image))
+        elif self.image.ndim == 3:
+            self.__channels = (Channel(pix) for pix in self.image.dsplit())
+
+    @property
+    def channels(self):
+        self.__channels
 
     @staticmethod
     def __findRightReader(path: str):
