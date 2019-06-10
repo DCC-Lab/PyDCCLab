@@ -129,7 +129,6 @@ class CZIMetadata:
             if self.checkIfElementHasChildren(root):
                 for filter in root:
                     filterId = filter.attrib['Id']
-
                     filters.append(CZIFilter(filterId, self.root))
             return filters
         except AttributeError:

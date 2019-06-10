@@ -13,7 +13,6 @@ class TestFilter(unittest.TestCase):
         self.missingKeysPath = os.path.join(self.directory, 'testData', 'MissingKeys.xml')
 
         self.meta = mtdt(self.testPath)
-        self.meta.setAttributesFromXml()
         self.defaultFilter = self.meta.filters[0]
 
         self.testXml = self.meta.extractXmlAsStringFromCziImageObject(self.meta.cziFileToCziImageObject())

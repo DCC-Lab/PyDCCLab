@@ -43,41 +43,56 @@ class CZIChannel:
 
     def setExWavelengthFilter(self, filters):
         try:
+            if not filters:
+                return -1
             for filter in filters:
                 if filter.getType() == 'Excitation' and self.channelId == filter.getChannelId():
                     return filter.getFilterRange()
-        except Exception:
-            return 0
+                else:
+                    return 0
+        except AttributeError:
+            return -1
 
     def setEmWavelengthFilter(self, filters):
         try:
+            if not filters:
+                return -1
             for filter in filters:
+                print(filter.getType())
+                print(self.channelId, filter.getChannelId())
+                print(filter.getFilterRange())
                 if filter.getType() == 'Emission' and self.channelId == filter.getChannelId():
                     return filter.getFilterRange()
-        except Exception:
-            return 0
+                else:
+                    return 0
+        except AttributeError:
+            return -1
 
     def setBeamsplitter(self, filters):
         try:
+            if not filters:
+                return -1
             for filter in filters:
                 if self.channelId == filter.getChannelId():
                     return filter.getDichroic()
-        except Exception:
-            return 0
+                else:
+                    return 0
+        except AttributeError:
+            return -1
 
     def setReflector(self):
         try:
             return self.root.find('./Metadata/Information/Image/Dimensions/Channels/Channel[@Id="{}"]'
                                   '/Reflector'.format(self.channelId)).text
         except AttributeError:
-            return ''
+            return 'Missing attribute or key.'
 
     def setContrastMethod(self):
         try:
             return self.root.find('./Metadata/Information/Image/Dimensions/Channels/Channel[@Id="{}"]'
                                   '/ContrastMethod'.format(self.channelId)).text
         except AttributeError:
-            return ''
+            return 'Missing attribute or key.'
 
     def setLightSource(self):
         try:

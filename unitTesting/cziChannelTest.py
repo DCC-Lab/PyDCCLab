@@ -12,85 +12,91 @@ class TestCziChannel(unittest.TestCase):
         self.missingEntriesPath = os.path.join(self.directory, 'testData', 'MissingEntries.xml')
         self.missingKeysPath = os.path.join(self.directory, 'testData', 'MissingKeys.xml')
 
-        self.meta = mtdt(self.testPath)
-        self.meta.setAttributesFromXml()
+        self.meta = mtdt(self.testPath, 'testCziFile.czi')
 
         self.testXml = self.meta.extractXmlAsStringFromCziImageObject(self.meta.cziFileToCziImageObject())
 
-    def test_setExWavelengthFilter_isEqual(self):
+    def test_setExWavelengthFilter_expectedValue(self):
         root = ET.fromstring(self.testXml)
-        channel = chnnl('Channel:0', 'EGFP', root)
-
-        channel.setExWavelengthFilter(self.meta.filters)
+        channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, root)
         self.assertEqual(channel.exWavelengthFilter, '450-490')
 
-    def test_setEmWavelengthFilter_isEqual(self):
+    def test_setExWavelengthFilter_notFound(self):
         root = ET.fromstring(self.testXml)
-        channel = chnnl('Channel:0', 'EGFP', root)
+        channel = chnnl(['', 'EGFP', 'testCziFile.czi'], self.meta.filters, root)
+        self.assertEqual(channel.exWavelengthFilter, 0)
 
-        channel.setEmWavelengthFilter(self.meta.filters)
+    def test_setExWavelengthFilter_emptyFilterList(self):
+        root = ET.fromstring(self.testXml)
+        channel = chnnl(['', 'EGFP', 'testCziFile.czi'], [], root)
+        self.assertEqual(channel.exWavelengthFilter, -1)
+
+    def test_setExWavelengthFilter_notFilterList(self):
+        root = ET.fromstring(self.testXml)
+        channel = chnnl(['', 'EGFP', 'testCziFile.czi'], [1, 2, 3], root)
+        self.assertEqual(channel.exWavelengthFilter, -1)
+
+    def test_setEmWavelengthFilter_expectedValue(self):
+        root = ET.fromstring(self.testXml)
+        channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, root)
         self.assertEqual(channel.emWavelengthFilter, '500-550')
 
-    def test_setBeamsplitter_isEqual(self):
+    def test_setEmWavelengthFilter_notFound(self):
         root = ET.fromstring(self.testXml)
-        channel = chnnl('Channel:0', 'EGFP', root)
+        channel = chnnl(['', 'EGFP', 'testCziFile.czi'], self.meta.filters, root)
+        self.assertEqual(channel.emWavelengthFilter, 0)
 
-        channel.setBeamsplitter(self.meta.filters)
+    def test_setEmWavelengthFilter_noFilters(self):
+        root = ET.fromstring(self.testXml)
+        channel = chnnl(['', 'EGFP', 'testCziFile.czi'], [], root)
+        self.assertEqual(channel.emWavelengthFilter, -1)
+
+    def test_setBeamsplitter_expectedValue(self):
+        root = ET.fromstring(self.testXml)
+        channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, root)
         self.assertEqual(channel.beamsplitter, '495')
 
-    def test_getDataFromFilters_isEqual(self):
+    def test_setBeamsplitter_notFound(self):
         root = ET.fromstring(self.testXml)
-        channel_1 = chnnl('Channel:0', 'EGFP', root)
-        channel_1.getDataFromFilters(self.meta.filters)
+        channel = chnnl(['', 'EGFP', 'testCziFile.czi'], self.meta.filters, root)
+        self.assertEqual(channel.beamsplitter, 0)
 
-        channel_2 = chnnl('Channel:0', 'EGFP', root)
-        channel_2.getDataFromFilters(self.meta.filters)
-
-        self.assertEqual(channel_1, channel_2)
-
-    def test_setReflector_isEqual(self):
+    def test_setBeamsplitter_noFilters(self):
         root = ET.fromstring(self.testXml)
-        channel = chnnl('Channel:0', 'EGFP', root)
+        channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], [], root)
+        self.assertEqual(channel.beamsplitter, -1)
 
+    def test_setReflector_expectedValue(self):
+        root = ET.fromstring(self.testXml)
+        channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, root)
         self.assertEqual(channel.setReflector(), '38 HE Green Fluorescent Prot')
 
     def test_setReflector_missingKeys(self):
         root = ET.fromstring(self.testXml)
-        channel = chnnl('Channel:0', 'EGFP', root)
-        channel.channelId = ''
-
-        with self.assertRaises(AttributeError): channel.setReflector()
+        channel = chnnl(['', 'EGFP', 'testCziFile.czi'], self.meta.filters, root)
+        self.assertEqual(channel.setReflector(), 'Missing attribute or key.')
 
     def test_setReflector_missingEntries(self):
-        root = ET.fromstring(self.testXml)
-        channel = chnnl('Channel:0', 'EGFP', root)
-
         tree = ET.parse(self.missingEntriesPath)
-        channel.root = tree.getroot()
+        root = tree.getroot()
+        channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, root)
+        self.assertEqual(channel.setReflector(), 'Missing attribute or key.')
 
-        with self.assertRaises(AttributeError): channel.setReflector()
-
-    def test_setContrastMethod_isEqual(self):
+    def test_setContrastMethod_expectedValue(self):
         root = ET.fromstring(self.testXml)
-        channel = chnnl('Channel:0', 'EGFP', root)
-
+        channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, root)
         self.assertEqual(channel.setContrastMethod(), 'Fluorescence')
 
     def test_setContrastMethod_missingKeys(self):
         root = ET.fromstring(self.testXml)
-        channel = chnnl('Channel:0', 'EGFP', root)
-        channel.channelId = ''
-
-        with self.assertRaises(AttributeError): channel.setContrastMethod()
+        channel = chnnl(['', 'EGFP', 'testCziFile.czi'], self.meta.filters, root)
+        self.assertEqual(channel.setContrastMethod(), 'Missing attribute or key.')
 
     def test_setContrastMethod_missingEntries(self):
-        root = ET.fromstring(self.testXml)
-        channel = chnnl('Channel:0', 'EGFP', root)
-
         tree = ET.parse(self.missingEntriesPath)
-        channel.root = tree.getroot()
-
-        with self.assertRaises(AttributeError): channel.setContrastMethod()
+        root = tree.getroot()
+        channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, root)
+        self.assertEqual(channel.setContrastMethod(), 'Missing attribute or key.')
 
     def test_setLightSource_isEqual(self):
         root = ET.fromstring(self.testXml)
