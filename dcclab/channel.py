@@ -25,7 +25,8 @@ class Channel:
             raise PixelTypeException
         if pixels.ndim > 2:
             raise DimensionException(pixels.ndim)
-        self.__pixels = pixels
+        self.__pixels = numpy.copy(pixels)
+        self.__original = self.__pixels
 
     @property
     def pixels(self):
@@ -110,6 +111,63 @@ class Channel:
         return self.display()
 
     """ Manipulation-related functions """
+
+    def saveOriginal(self):
+        if self.original == self.pixels:
+            self.original = np.copy(self.pixels)
+
+    def restoreOriginal(self):
+        self.__pixels = self.original
+
+    def applyConvolution(self, matrix: typing.Union[np.ndarray, list]):
+        self.saveOriginal()
+        result = self.convolveWith(matrix)
+        self.__pixels = result.pixels
+
+    def applyXDerivative(self):
+        self.saveOriginal()
+        result = self.getXAxisDerivative()
+        self.__pixels = result.pixels
+
+    def applyYDerivative(self):
+        self.saveOriginal()
+        result = self.getYAxisDerivative()
+        self.__pixels = result.pixels
+
+    def applyGaussianFilter(self, sigma:float):
+        self.saveOriginal()
+        result = self.getGaussianFiltering(sigma)
+        self.__pixels = result.pixels
+
+    def applyThresholding(self):
+        self.applyIsodataThresholding()
+
+    def applyIsodataThresholding(self):
+        self.saveOriginal()
+        result = self.getIsodataThresholding()
+        self.__pixels = result.pixels
+
+    def applyOtsuThresholding(self):
+        self.saveOriginal()
+        result = self.getOtsuThresholding()
+        self.__pixels = result.pixels
+
+    def applyOpening(self):
+        self.saveOriginal()
+        if self.isBinary:
+            result = self.getBinaryOpening()
+        else:
+            result = self.getOpening()
+        self.__pixels = result.pixels
+
+    def applyClosing(self):
+        self.saveOriginal()
+        if self.isBinary:
+            result = self.getBinaryClosing()
+        else:
+            result = self.getClosing()
+        self.__pixels = result.pixels
+
     def convolveWith(self, matrix: typing.Union[np.ndarray, list]):
         # todo test unitaire
         convolvedArray = convolve2d(self.pixels, matrix, mode="same", boundary="symm")
