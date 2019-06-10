@@ -11,11 +11,14 @@ class Image:
 
     def __init__(self, path: str):
         self.__path = path
-        try:
-            imageData = self.imageDataFromPath(path)
-            self.__channels = self.channelsFromImageData(imageData)
-        except:
-            raise ValueError("Not known format recognized")
+
+        self.fileObject = CZIFile(path)
+        # for type in suppertedTypes:
+        #   self.fileObject = objectFIle
+
+        imageData = self.fileObject.imageDataFromPath()
+        # self.__channels = self.channelsFromImageData(imageData)
+        metaData = self.fileObject.metadata()
 
     @property
     def channels(self):
@@ -44,50 +47,65 @@ class Image:
 
         return ()
 
-    def imageDataFromPath(self, path: str):
-        cziPattern = r'\.czi\Z'
-        tiffPattern = r"\.ti[f]{1,2}\Z"
-        if re.search(cziPattern, path, re.IGNORECASE) is not None:
-            imageData = self.imageDataFromCZI(path)
-        elif re.search(tiffPattern, path, re.IGNORECASE) is not None:
-            imageData = self.imageDataFromTIFF(path)
-        else:
-            imageData = self.imageDataFromAnyFile(path)
-        return imageData.astype(np.float32)
+    # def imageDataFromPath(self, path: str):
+    #     cziPattern = r'\.czi\Z'
+    #     tiffPattern = r"\.ti[f]{1,2}\Z"
+    #     if re.search(cziPattern, path, re.IGNORECASE) is not None:
+    #         imageData = self.imageDataFromCZI(path)
+    #     elif re.search(tiffPattern, path, re.IGNORECASE) is not None:
+    #         imageData = self.imageDataFromTIFF(path)
+    #     else:
+    #         imageData = self.imageDataFromAnyFile(path)
+    #     return imageData.astype(np.float32)
 
-    def imageDataFromCZI(self, path):
-        cziObj = readCziImage(path)
-        imagesDirectory = cziObj.filtered_subblock_directory
-        subblocks = cziObj.subblocks()
-        imageData = cziObj.asarray()
-        closeCziFileObject(cziObj)
-        return imageData.astype(np.float32)
+    # def imageDataFromCZI(self, path):
+    #     cziObj = readCziImage(path)
+    #     imagesDirectory = cziObj.filtered_subblock_directory
+    #     subblocks = cziObj.subblocks()
+    #     imageData = cziObj.asarray()
+    #     closeCziFileObject(cziObj)
+    #     return imageData.astype(np.float32)
 
-    def imageDataFromTIFF(self, path):
-        tiffFileObject = tifffile.TiffFile(path)
-        imageData = tiffFileObject.asarray().astype(dtype="float32")
-        # self.__metadata = tiffFileObject.ome_metadata
-        return imageData.astype(np.float32)
+    # def imageDataFromTIFF(self, path):
+    #     tiffFileObject = tifffile.TiffFile(path)
+    #     imageData = tiffFileObject.asarray().astype(dtype="float32")
+    #     # self.__metadata = tiffFileObject.ome_metadata
+    #     return imageData.astype(np.float32)
 
-    def imageDataFromAnyFile(self, path: str):
-        pilImage = PIL.Image.open(path)
-        return np.array(pilImage, dtype=np.float32)
+    # def imageDataFromAnyFile(self, path: str):
+    #     pilImage = PIL.Image.open(path)
+    #     return np.array(pilImage, dtype=np.float32)
 
-class ImageCZI(Image):
+
+class ImageFile(object):
     def __init__(self, path):
-        Image.__init__(self, path)
+        self.path = path
+        # self.imageDataFromPath()
 
-    def imageDataFromPath(self, path: str):
-        try:
-            cziObj = readCziImage(path)
-            imagesDirectory = cziObj.filtered_subblock_directory
-            subblocks = cziObj.subblocks()
-            imageData = cziObj.asarray()
-            closeCziFileObject(cziObj)
-            return imageData.astype(np.float32)
-        except:
-            pass
+    def imageDataFromPath(self):
+        return
 
+    def metadata(self):
+        return
+
+
+class CZIFile(ImageFile):
+
+    def __init__(self, path: str):
+        ImageFile.__init__(self, path)
+
+    def imageDataFromPath(self):
+        cziObj = readCziImage(self.path)
+        out, tilesWithChannelNumber = decodeImages(cziObj)
+        self.__tiles = [Channel(tile[0], tile[1]) for tile in tilesWithChannelNumber]
+        print(out)
+        cziObj.close()
+
+
+class TIFFFile(ImageFile):
+
+    def imageDataFromPath(self):
+        return
 
 
 if __name__ == '__main__':
