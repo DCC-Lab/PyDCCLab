@@ -1,19 +1,19 @@
 import xml.etree.ElementTree as ET
 import ImageAnalysis.source.cziUtil as czi
-from cziChannel import Channel
-from cziFilter import Filter
-from cziName import Name
+from cziChannel import CZIChannel
+from cziFilter import CZIFilter
+from cziNameAnalysis import CZINameAnalysis
 
 
-class Metadata:
-    def __init__(self, path, name=''):
-        self.name = Name(name)
+class CZIMetadata:
+    def __init__(self, path, fileName=''):
         self.path = path
         self.root = self.createElementTreeRoot()
+        self.fileNameAnalysis = CZINameAnalysis(fileName)
 
         # Filters and channels are lists of objects.
-        self.filters = self.setFiltersData()
-        self.channels = self.setChannelsData()
+        self.filters = self.findFiltersInRoot()
+        self.channels = self.findChannelsInRoot()
 
         self.microscope = self.setMicroscope()
         self.objective = self.setObjective()
@@ -53,7 +53,7 @@ class Metadata:
         dictMeta = {'path': self.path, 'microscope': self.microscope, 'objective': self.objective, 'x_size': self.xSize,
                     'y_size': self.ySize, 'x_scale': self.xScale, 'y_scale': self.yScale, 'x_scaled': self.xScaled,
                     'y_scaled': self.yScaled}
-        dictName = self.name.exportAsDict()
+        dictName = self.fileNameAnalysis.exportAsDict()
         dictReturned = {**dictMeta, **dictName}
         return dictReturned
 
@@ -73,42 +73,42 @@ class Metadata:
     def setMicroscope(self):
         try:
             return self.root.find('./Metadata/Information/Instrument/Microscopes/Microscope').attrib['Name']
-        except KeyError as err:
-            return 'Attribute "Name" not found for Microscope.'
+        except KeyError:
+            return "Name not found."
         except AttributeError:
-            return 'Microscope field is empty.'
+            return "Empty field."
 
     def setObjective(self):
         try:
             return self.root.find('./Metadata/Information/Instrument/Objectives/Objective').attrib['Name']
         except KeyError:
-            return 'Attribute "Name" not found for Objective.'
+            return "Name not found."
         except AttributeError:
-            return 'Objective field is empty.'
+            return 'Empty field.'
 
     def setXScale(self):
         try:
             return self.root.find('./Metadata/Scaling/Items/Distance[@Id="X"]/Value').text
         except AttributeError:
-            return 'Either the id "X" could not be found or the field is empty for xScale.'
+            return 0
 
     def setYScale(self):
         try:
             return self.root.find('./Metadata/Scaling/Items/Distance[@Id="Y"]/Value').text
         except AttributeError:
-            return 'Either the id "Y" could not be found or the field is empty for yScale.'
+            return 0
 
     def setXSize(self):
         try:
             return self.root.find('./Metadata/Information/Image/SizeX').text
         except AttributeError:
-            return 'SizeX field is empty.'
+            return 0
 
     def setYSize(self):
         try:
             return self.root.find('./Metadata/Information/Image/SizeY').text
         except AttributeError:
-            return 'SizeY field is empty.'
+            return 0
 
     def setXScaled(self):
         try:
@@ -122,55 +122,31 @@ class Metadata:
         except ValueError:
             return 0
 
-    def findFiltersEntriesInXml(self):
+    def findFiltersInRoot(self):
         filters = []
         try:
             root = self.root.find('./Metadata/Information/Instrument/Filters')
             if self.checkIfElementHasChildren(root):
                 for filter in root:
                     filterId = filter.attrib['Id']
-                    cutIn = filter.find('./TransmittanceRange/CutIn').text
-                    cutOut = filter.find('./TransmittanceRange/CutOut').text
 
-                    filters.append(Filter(filterId, cutIn, cutOut))
+                    filters.append(CZIFilter(filterId, self.root))
             return filters
         except AttributeError:
-            raise
+            print('Atribute error in findFiltersInRoot')
         except KeyError:
-            raise
+            print('Key error in findFiltersInRoot')
 
-    def setFiltersData(self):
-        try:
-            filters = self.findFiltersEntriesInXml()
-            if len(filters) == 0:
-                return filters
-            for filter in filters:
-                filter.setFilterData(self.root)
-            return filters
-        except Exception:
-            raise
-
-    def findChannelsEntriesInXml(self):
+    def findChannelsInRoot(self):
         channels = []
         try:
             root = self.root.find('./Metadata/Information/Image/Dimensions/Channels')
             if self.checkIfElementHasChildren(root):
                 for channel in root:
-                    channels.append(Channel(channel.attrib['Id'], channel.attrib['Name'], self.root))
+                    channelInformation = [channel.attrib['Id'], channel.attrib['Name'], self.fileNameAnalysis.name]
+                    channels.append(CZIChannel(channelInformation, self.filters, self.root))
             return channels
         except AttributeError:
-            raise
+            print('Attribute error in findChannelsInRoot.')
         except KeyError:
-            raise
-
-    def setChannelsData(self):
-        try:
-            channels = self.findChannelsEntriesInXml()
-            if len(channels) == 0:
-                return channels
-            for channel in channels:
-                channel.getDataFromFilters(self.filters)
-                channel.setFileId(self.name.name)
-            return channels
-        except Exception:
-            raise
+            print('Key error in findChannelsInRoot.')

@@ -1,4 +1,4 @@
-from cziName import Name as nm
+from cziNameAnalysis import CZINameAnalysis as nm
 import unittest
 
 

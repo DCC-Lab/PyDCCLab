@@ -1,5 +1,5 @@
-from cziChannel import Channel as chnnl
-from cziMetadata import Metadata as mtdt
+from cziChannel import CZIChannel as chnnl
+from cziMetadata import CZIMetadata as mtdt
 import xml.etree.ElementTree as ET
 import unittest
 import os
