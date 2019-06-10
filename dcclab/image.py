@@ -10,7 +10,7 @@ class Image:
 
     def __init__(self, path: str):
         self.__path = path
-        imageData = self.imageArrayFromPath(path)
+        imageData = self.imageDataFromPath(path)
         self.__channels = self.channelsFromImageData(imageData)
 
     @property
@@ -33,18 +33,18 @@ class Image:
 
         return ()
 
-    def imageArrayFromPath(self, path: str):
+    def imageDataFromPath(self, path: str):
         cziPattern = r'\.czi\Z'
         tiffPattern = r"\.ti[f]{1,2}\Z"
         if re.search(cziPattern, path, re.IGNORECASE) is not None:
-            imageData = self.imageArrayFromCZI(path)
+            imageData = self.imageDataFromCZI(path)
         elif re.search(tiffPattern, path, re.IGNORECASE) is not None:
-            imageData = self.imageArrayFromTIFF(path)
+            imageData = self.imageDataFromTIFF(path)
         else:
-            imageData = self.imageArrayFromAnyFile(path)
+            imageData = self.imageDataFromAnyFile(path)
         return imageData.astype(np.float32)
 
-    def imageArrayFromCZI(self, path):
+    def imageDataFromCZI(self, path):
         cziObj = cziUtil.readCziImage(path)
         imagesDirectory = cziObj.filtered_subblock_directory
         subblocks = cziObj.subblocks()
@@ -52,13 +52,13 @@ class Image:
         cziUtil.closeCziFileObject(cziObj)
         return imageData.astype(np.float32)
 
-    def imageArrayFromTIFF(self, path):
+    def imageDataFromTIFF(self, path):
         tiffFileObject = tifffile.TiffFile(path)
         imageData = tiffFileObject.asarray().astype(dtype="float32")
         #self.__metadata = tiffFileObject.ome_metadata
         return imageData.astype(np.float32)
 
-    def imageArrayFromAnyFile(self, path: str):
+    def imageDataFromAnyFile(self, path: str):
         pilImage = PIL.Image.open(path)
         return np.array(pilImage, dtype=np.float32)
 
