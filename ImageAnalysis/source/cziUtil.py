@@ -10,6 +10,7 @@ The main object used in this file is the CziFile object from the czifile library
 
 Hope it works correctly!
 """
+
 """
 First, let's import the useful stuff
 """
@@ -18,10 +19,13 @@ import czifile
 import numpy as np
 import matplotlib.pyplot as plt
 import tifffile
+import time
 import xml.etree.ElementTree as ET
 import os
 import fnmatch
-
+import multiprocessing
+import warnings
+from concurrent.futures import ThreadPoolExecutor
 
 
 def findAllCziFiles(directory):
@@ -69,7 +73,6 @@ def extractMetadataFromCziFileObject(cziObject, saveFileName=None):
     return meta
 
 
-
 def getImagesFromCziFileObject(cziObject):
     """
     Function that returns the images from a czi file object, with every channel.
@@ -78,8 +81,12 @@ def getImagesFromCziFileObject(cziObject):
     """
     arrayReturn = []
     subblocksIters = cziObject.subblocks()
+    i = 0
     for iterator in subblocksIters:
         arrayReturn.append(np.squeeze(iterator.data()))
+        i += 1
+        if i == 3:
+            break
     return np.array(arrayReturn)
 
 
@@ -114,6 +121,59 @@ def getFormatedMetadata(metadata):
     except ET.ParseError as exception:
         raise ValueError("Exception with string \"{}\"; {}".format(metadata, exception.msg))
     return returnString
+
+
+def decodeImages(cziObj, max_workers=None):
+    """Return image data from file(s) as numpy array.
+
+    Parameters
+    ----------
+    max_workers : int
+        Maximum number of threads to read and decode subblock data.
+        By default up to half the CPU cores are used.
+
+    This is based on the czifil asarray method except it is modified so the data extraction is only done once.
+    """
+    maxSize = len(cziObj.filtered_subblock_directory)
+    print("Reading the pixel values of {} images. This may take a few minutes.".format(maxSize))
+    imagesQueue = multiprocessing.Queue(maxsize=maxSize)
+    out = tifffile.create_output(None, cziObj.shape, cziObj.dtype)
+
+    if max_workers is None:
+        max_workers = multiprocessing.cpu_count() // 2
+
+    def func(directory_entry, start=cziObj.start, out=out):
+        """Read, decode, and copy subblock data."""
+        subblock = directory_entry.data_segment()
+        tile = subblock.data()
+        tile = subblock.data()
+        imagesQueue.put(tile)
+        index = tuple(slice(i - j, i - j + k) for i, j, k in
+                      zip(directory_entry.start, start, tile.shape))
+        print("{} / {} images read".format(imagesQueue.qsize(), maxSize))
+        try:
+            out[index] = tile
+        except ValueError as e:
+            warnings.warn(str(e))
+
+    before = time.clock()
+    if max_workers > 1:
+        cziObj._fh.lock = True
+        with ThreadPoolExecutor(max_workers) as executor:
+            executor.map(func, cziObj.filtered_subblock_directory)
+        cziObj._fh.lock = None
+    else:
+        for directory_entry in cziObj.filtered_subblock_directory:
+            func(directory_entry)
+    after = time.clock()
+    print("Reading data took {:.2f} seconds".format(after - before))
+    if hasattr(out, 'flush'):
+        out.flush()
+
+    returnList = []
+    while imagesQueue.qsize() != 0:
+        returnList.append(np.squeeze(imagesQueue.get()))
+    return out, returnList
 
 
 def saveImagesToTIFF(imageArray, filename=None):
