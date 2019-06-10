@@ -6,6 +6,17 @@ class TestCziName(unittest.TestCase):
     def setUp(self) -> None:
         pass
 
+    def test_exportAsDict_expectedResult(self):
+        name = nm('AAV400+995_rabv3_s238_SC_anti mCherry_A-02.czi')
+        self.assertEqual(name.exportAsDict(), {'injection_site': '', 'mouse_id': '238',
+                                               'name': 'AAV400+995_rabv3_s238_SC_anti mCherry_A-02.czi',
+                                               'tags': 'antimCherry', 'viral_vectors': 'AAV400;AAV995'})
+
+    def test_exportAsDict_noName(self):
+        name = nm('')
+        self.assertEqual(name.exportAsDict(), {'injection_site': '', 'mouse_id': 0, 'name': '',
+                                               'tags': '', 'viral_vectors': None})
+
     def test_setMouseId_lowerCase(self):
         name = nm('AAV400_AAV995_s238_SC_A-02.czi')
         self.assertEqual(name.setMouseId(), '238')
