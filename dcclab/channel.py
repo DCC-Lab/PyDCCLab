@@ -26,7 +26,7 @@ class Channel:
         if pixels.ndim > 2:
             raise DimensionException(pixels.ndim)
         self.__pixels = np.copy(pixels)
-        self.__original = self.__pixels
+        self.__original = None
 
     @property
     def pixels(self):
@@ -113,11 +113,12 @@ class Channel:
     """ Manipulation-related functions """
 
     def saveOriginal(self):
-        if self.original == self.pixels:
-            self.original = np.copy(self.pixels)
+        if self.__original == None:
+            self.__original = np.copy(self.pixels)
 
     def restoreOriginal(self):
-        self.__pixels = self.original
+        if self.__original is not None:
+            self.__pixels = self.__original
 
     def applyConvolution(self, matrix: typing.Union[np.ndarray, list]):
         self.saveOriginal()
