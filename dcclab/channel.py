@@ -25,7 +25,7 @@ class Channel:
             raise PixelTypeException
         if pixels.ndim > 2:
             raise DimensionException(pixels.ndim)
-        self.__pixels = numpy.copy(pixels)
+        self.__pixels = np.copy(pixels)
         self.__original = self.__pixels
 
     @property
