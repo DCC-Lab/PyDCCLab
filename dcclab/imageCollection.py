@@ -1,10 +1,11 @@
-from .image import Image
+from .image import *
 import numpy as np
 import matplotlib.pyplot as plt
 import typing
 
+
 class ImageCollection:
-    def __init__(self, images: typing.List[Image] = None, pathList = None):
+    def __init__(self, images: typing.List[Image] = None, pathList=None):
         if images is not None:
             if not all(isinstance(image, Image) for image in images):
                 raise NotDCCImageException
@@ -17,7 +18,7 @@ class ImageCollection:
     @property
     def images(self):
         return self.__images
-    
+
     def __getitem__(self, index):
         return self.images[index]
 
@@ -53,7 +54,7 @@ class ImageCollection:
         index = self.indexOf(image)
         del self.images[index]
 
-    def asNumpyArray(self) -> np.ndarray:
+    def asArray(self) -> np.ndarray:
         return np.array(self.images)
 
     def showAllSequentially(self, showInGray: object = True):

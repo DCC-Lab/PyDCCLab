@@ -10,7 +10,6 @@ The main object used in this file is the CziFile object from the czifile library
 
 Hope it works correctly!
 """
-from docutils.nodes import list_item
 
 """
 First, let's import the useful stuff
@@ -133,6 +132,7 @@ def decodeImages(cziObj, max_workers=None):
         Maximum number of threads to read and decode subblock data.
         By default up to half the CPU cores are used.
 
+    This is based on the czifil asarray method except it is modified so the data extraction is only done once.
     """
     maxSize = len(cziObj.filtered_subblock_directory)
     print("Reading the pixel values of {} images. This may take a few minutes.".format(maxSize))
@@ -145,6 +145,7 @@ def decodeImages(cziObj, max_workers=None):
     def func(directory_entry, start=cziObj.start, out=out):
         """Read, decode, and copy subblock data."""
         subblock = directory_entry.data_segment()
+        tile = subblock.data()
         tile = subblock.data()
         imagesQueue.put(tile)
         index = tuple(slice(i - j, i - j + k) for i, j, k in
@@ -171,8 +172,8 @@ def decodeImages(cziObj, max_workers=None):
 
     returnList = []
     while imagesQueue.qsize() != 0:
-        returnList.append(imagesQueue.get())
-    return out, imagesQueue
+        returnList.append(np.squeeze(imagesQueue.get()))
+    return out, returnList
 
 
 def saveImagesToTIFF(imageArray, filename=None):

@@ -1,5 +1,4 @@
 import numpy as np
-from typing import List
 import typing
 
 from skimage import measure, morphology, img_as_ubyte
@@ -13,10 +12,12 @@ from .DCCExceptions import *
 import matplotlib.pyplot as plt
 
 import warnings
+
 try:
     from deprecated import deprecated
 except:
     exit("need 'deprecated' module: pip install deprecated")
+
 
 class Channel:
 
@@ -61,26 +62,26 @@ class Channel:
             raise InvalidEqualityTestException(type(other))
         return np.array_equal(self.pixels, other.pixels())
 
-    @deprecated(reason="Renamed as a @property pixels")    
+    @deprecated(reason="Renamed as a @property pixels")
     def getPixels(self) -> np.ndarray:
         return self.pixels
 
-    @deprecated(reason="Renamed as a @property width")    
+    @deprecated(reason="Renamed as a @property width")
     def getWidth(self) -> int:
         return self.width
 
-    @deprecated(reason="Renamed as a @property height")    
+    @deprecated(reason="Renamed as a @property height")
     def getLength(self) -> int:
         return self.height
 
-    @deprecated(reason="Renamed as a @property numberOfPixels")    
+    @deprecated(reason="Renamed as a @property numberOfPixels")
     def getNumberOfPixels(self) -> int:
         return self.getLength() * self.getWidth()
 
     def copy(self) -> np.ndarray:
         return np.copy(self.pixels)
 
-    @deprecated(reason="Renamed as a @property isBinary")    
+    @deprecated(reason="Renamed as a @property isBinary")
     def arePixelsInBinary(self) -> bool:
         return self.isBinary
 
@@ -89,6 +90,7 @@ class Channel:
         return np.alltrue(np.logical_or(self.pixels == 0, self.pixels) == 1)
 
     """ Display-related functions """
+
     def display(self, colorMap=None):
         plt.imshow(self.pixels, cmap=colorMap)
         plt.show()
@@ -106,7 +108,7 @@ class Channel:
         plt.show()
         return histogram, bins
 
-    @deprecated(reason="Renamed as display()")    
+    @deprecated(reason="Renamed as display()")
     def displayChannel(self, colorMap=None):
         return self.display()
 
@@ -135,9 +137,9 @@ class Channel:
         result = self.getYAxisDerivative()
         self.__pixels = result.pixels
 
-    def applyGaussianFilter(self, sigma:float):
+    def applyGaussianFilter(self, sigma: float):
         self.saveOriginal()
-        result = self.getGaussianFiltering(sigma)
+        result = self.getGaussianFilter(sigma)
         self.__pixels = result.pixels
 
     def applyThresholding(self):
@@ -225,7 +227,7 @@ class Channel:
         stdFiltered = filters.generic_filter(self.pixels, np.std, size=filterSize, mode="nearest")
         return Channel(stdFiltered.astype(np.float32))
 
-    def getStandardDeviationFiltering(self, filterSize: int):
+    def getStandardDeviationFilter(self, filterSize: int):
         stdDevFilter1 = filters.uniform_filter(self.pixels, filterSize, mode="nearest")
         stdDevFilter2 = filters.uniform_filter(self.pixels * self.pixels, filterSize, mode="nearest")
         stdFiltered = np.sqrt(stdDevFilter2 - stdDevFilter1 * stdDevFilter1).astype(np.float32)
@@ -234,19 +236,19 @@ class Channel:
             stdFiltered = np.nan_to_num(stdFiltered)
         return Channel(stdFiltered)
 
-    def getGaussianFiltering(self, sigma: float = 1):
+    def getGaussianFilter(self, sigma: float = 1):
         gaussianFiltered = gaussian(self.pixels, sigma, mode="nearest", multichannel=False, preserve_range=True)
         return Channel(gaussianFiltered.astype(np.float32))
 
-    def getHorizontalSobelFiltering(self):
+    def getHorizontalSobelFilter(self):
         sobelH = sobel_h(self.pixels)
         return Channel(sobelH.astype(np.float32))
 
-    def getVerticalSobelFiltering(self):
+    def getVerticalSobelFilter(self):
         sobelV = sobel_v(self.pixels)
         return Channel(sobelV.astype(np.float32))
 
-    def getBothDirectionsSobelFiltering(self):
+    def getBothDirectionsSobelFilter(self):
         sobelHV = sobel(self.pixels)
         return Channel(sobelHV.astype(np.float32))
 
@@ -337,4 +339,3 @@ class Channel:
         labeled, nbObjects = label(self.pixels)
         sizes = sum(self.pixels, labeled, range(nbObjects + 1))
         return Channel(labeled.astype(np.float32)), nbObjects, sizes
-
