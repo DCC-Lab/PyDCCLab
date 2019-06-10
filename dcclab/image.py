@@ -17,10 +17,17 @@ class Image:
     def channels(self):
         return self.__channels
 
-    def display(self, colorMap=None):
+    def asChannelsArray(self):
         channelsPixels = list(map( lambda c: c.pixels, self.channels))
-        imageData = np.dstack(channelsPixels)
-        plt.imshow(imageData, cmap=colorMap)
+        return channelsPixels        
+
+    def asArray(self):
+        channelArrays = self.asChannelsArray()
+        imageData = np.dstack(channelArrays)
+        return imageData        
+
+    def display(self, colorMap=None):
+        plt.imshow(self.asArray(), cmap=colorMap)
         plt.show()
 
     def channelsFromImageData(self, imageData):
