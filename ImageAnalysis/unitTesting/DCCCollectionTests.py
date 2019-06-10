@@ -1,7 +1,7 @@
 try:
     import unittest
     import DCCImage
-    import DCCImagesExceptions as DCCExcep
+    import DCCExceptions as DCCExcep
     import numpy as np
     from DCCImageCollection import DCCImageCollection
     from unittest.mock import Mock, patch
