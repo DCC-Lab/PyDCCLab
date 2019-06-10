@@ -1,10 +1,11 @@
 from .channel import *
-
+from .DCCExceptions import *
 from .cziUtil import *
 import tifffile
 import PIL
 
 import re
+
 
 class Image:
 
@@ -18,13 +19,13 @@ class Image:
         return self.__channels
 
     def asChannelsArray(self):
-        channelsPixels = list(map( lambda c: c.pixels, self.channels))
-        return channelsPixels        
+        channelsPixels = list(map(lambda c: c.pixels, self.channels))
+        return channelsPixels
 
     def asArray(self):
         channelArrays = self.asChannelsArray()
         imageData = np.dstack(channelArrays)
-        return imageData        
+        return imageData
 
     def display(self, colorMap=None):
         plt.imshow(self.asArray(), cmap=colorMap)
@@ -35,7 +36,7 @@ class Image:
             return (Channel(imageData))
         elif imageData.ndim == 3:
             channelsData = np.squeeze(np.dsplit(imageData, imageData.shape[2]))
-            channels = list(map( lambda pix: Channel(pix), channelsData))
+            channels = list(map(lambda pix: Channel(pix), channelsData))
             return channels
 
         return ()
@@ -52,23 +53,22 @@ class Image:
         return imageData.astype(np.float32)
 
     def imageDataFromCZI(self, path):
-        cziObj = cziUtil.readCziImage(path)
+        cziObj = readCziImage(path)
         imagesDirectory = cziObj.filtered_subblock_directory
         subblocks = cziObj.subblocks()
         imageData = cziObj.asarray()
-        cziUtil.closeCziFileObject(cziObj)
+        closeCziFileObject(cziObj)
         return imageData.astype(np.float32)
 
     def imageDataFromTIFF(self, path):
         tiffFileObject = tifffile.TiffFile(path)
         imageData = tiffFileObject.asarray().astype(dtype="float32")
-        #self.__metadata = tiffFileObject.ome_metadata
+        # self.__metadata = tiffFileObject.ome_metadata
         return imageData.astype(np.float32)
 
     def imageDataFromAnyFile(self, path: str):
         pilImage = PIL.Image.open(path)
         return np.array(pilImage, dtype=np.float32)
-
 
 
 if __name__ == '__main__':
@@ -81,4 +81,3 @@ if __name__ == '__main__':
     # im = Image(r"/tmp/test.tiff")
     # im2 = Image(r"/tmp/test2.png")
     # im2.display()
-
