@@ -300,7 +300,7 @@ class TestMetadata(unittest.TestCase):
                          'microscope': 'Axio Observer.Z1 / 7', 'objective': 'LD A-Plan 5x/0.15 Ph1', 'x_size': '1936',
                          'y_size': '1460', 'x_scale': '9.08E-07', 'y_scale': '9.08E-07', 'x_scaled': 0.001757888,
                          'y_scaled': 0.00132568, 'vectors': None}
-        self.assertEqual(mdata.exportDataAsDict(), expectedValue)
+        self.assertEqual(mdata.exportAsDict(), expectedValue)
 
     def test_getChannels_isEqual(self):
         mdata = mtdt.Metadata(self.testPath)

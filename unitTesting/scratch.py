@@ -26,8 +26,8 @@ if __name__ == '__main__':
                 mouseId = re.match(r'^\w\d{3}', n).group()[1:]
         m.setMouseId(mouseId)
         m.setVectors(vectors)
-        print('-Metadata : ', m.exportDataAsDict())
+        print('-Metadata : ', m.exportAsDict())
         
         # Small function to print export all of the channel's testData.
         for c in m.getChannels():
-            print('---Channel in Metdata : ', c.exportDataAsDict())
+            print('---Channel in Metdata : ', c.exportAsDict())
