@@ -53,7 +53,7 @@ class ImageCollection:
         index = self.indexOf(image)
         del self.images[index]
 
-    def asNumpyArray(self) -> np.ndarray:
+    def asArray(self) -> np.ndarray:
         return np.array(self.images)
 
     def showAllSequentially(self, showInGray: object = True):
