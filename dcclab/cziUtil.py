@@ -1,3 +1,10 @@
+import fnmatch
+import os
+import xml.etree.ElementTree as ET
+import tifffile
+import matplotlib.pyplot as plt
+import numpy as np
+import czifile
 """
 Python script containing utility functions to be used for handling .czi images.
 
@@ -13,15 +20,6 @@ Hope it works correctly!
 """
 First, let's import the useful stuff
 """
-
-import czifile
-import numpy as np
-import matplotlib.pyplot as plt
-import tifffile
-import xml.etree.ElementTree as ET
-import os
-import fnmatch
-
 
 
 def findAllCziFiles(directory):
@@ -67,7 +65,6 @@ def extractMetadataFromCziFileObject(cziObject, saveFileName=None):
         file_xml.write(meta)
         file_xml.close()
     return meta
-
 
 
 def getImagesFromCziFileObject(cziObject):
@@ -116,7 +113,8 @@ def getFormatedMetadata(metadata):
         for iterator in tree.iter():
             returnString += "{} : {}\n".format(iterator.tag, iterator.text)
     except ET.ParseError as exception:
-        raise ValueError("Exception with string \"{}\"; {}".format(metadata, exception.msg))
+        raise ValueError("Exception with string \"{}\"; {}".format(
+            metadata, exception.msg))
     return returnString
 
 
