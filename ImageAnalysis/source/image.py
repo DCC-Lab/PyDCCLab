@@ -1,85 +1,64 @@
 from channel import *
 import cziUtil
 import re
-import os
-import time
-
+import tifffile
+import PIL
 
 class Image:
 
     def __init__(self, path: str):
         self.__path = path
-        self.__image = self.__findRightReader(path)
+        imageData = self.imageArrayFromPath(path)
+        self.__channels = self.channelsFromImageData(imageData)
 
-    @staticmethod
-    def __findRightReader(path: str):
+    @property
+    def channels(self):
+        return self.__channels
+
+    def display(self, colorMap=None):
+        channelsPixels = list(map( lambda c: c.pixels, self.channels))
+        imageData = np.dstack(channelsPixels)
+        plt.imshow(imageData, cmap=colorMap)
+        plt.show()
+
+    def channelsFromImageData(self, imageData):
+        if imageData.ndim == 2:
+            return (Channel(imageData))
+        elif imageData.ndim == 3:
+            channelsData = np.squeeze(np.dsplit(imageData, imageData.shape[2]))
+            channels = list(map( lambda pix: Channel(pix), channelsData))
+            return channels
+
+        return ()
+
+    def imageArrayFromPath(self, path: str):
         cziPattern = r'\.czi\Z'
         tiffPattern = r"\.ti[f]{1,2}\Z"
         if re.search(cziPattern, path, re.IGNORECASE) is not None:
-            image = _ImageFromCZIFile(path)
+            imageData = self.imageArrayFromCZI(path)
         elif re.search(tiffPattern, path, re.IGNORECASE) is not None:
-            image = _ImageFromTIFFFile(path)
+            imageData = self.imageArrayFromTIFF(path)
         else:
-            image = _ImageFromOtherFile(path)
-        return image
+            imageData = self.imageArrayFromAnyFile(path)
+        return imageData.astype(np.float32)
 
-    def getChannel(self, index: int):
-        return self.__image.getChannel(index)
+    def imageArrayFromCZI(self, path):
+        cziObj = cziUtil.readCziImage(path)
+        imagesDirectory = cziObj.filtered_subblock_directory
+        subblocks = cziObj.subblocks()
+        imageData = cziObj.asarray()
+        cziUtil.closeCziFileObject(cziObj)
+        return imageData.astype(np.float32)
 
+    def imageArrayFromTIFF(self, path):
+        tiffFileObject = tifffile.TiffFile(path)
+        imageData = tiffFileObject.asarray().astype(dtype="float32")
+        #self.__metadata = tiffFileObject.ome_metadata
+        return imageData.astype(np.float32)
 
-class _ImageFromCZIFile:
-
-    def __init__(self, path: str):
-        self.__fileOpened = True
-        if os.path.getsize(path) > 1024 * 1024 * 2000:
-            self.__fileOpened = False
-            raise Exception("File too big to load.")
-        self.__cziObj = cziUtil.readCziImage(path)
-        out, self.__channels = cziUtil.decodeImages(self.__cziObj, max_workers=4)
-        self.__fullImageMosaic = np.squeeze(out).astype(np.float32)
-        self.__imageMosaics = self.__fullImageMosaic
-        if self.__fullImageMosaic.ndim == 3:
-            self.__imageMosaics = [Channel(self.__fullImageMosaic[x, :, :]) for x in range(3)]
-
-    def getChannel(self, index: int) -> Channel:
-        return self.__channels[index]
-
-    def getImageMosaicAtChannel(self, channel: int):
-        return self.__imageMosaics[channel]
-
-    def __len__(self) -> int:
-        return len(self.__channels)
-
-    def __getitem__(self, item) -> Channel:
-        return self.getChannel(item)
-
-    def __del__(self):
-        if self.__fileOpened:
-            print("Closing")
-            cziUtil.closeCziFileObject(self.__cziObj)
-
-
-class _ImageFromTIFFFile:
-    import tifffile
-
-    def __init__(self, path: str):
-        tiffFileObject = self.tifffile.TiffFile(path)
-        series = tiffFileObject.series
-        self.__channel = []
-        for iterator in series:
-            self.__channel.append(Channel(iterator.asarray().astype(np.float32)))
-        self.__metadata = tiffFileObject.ome_metadata
-
-    def getChannel(self, index: int) -> Channel:
-        return self.__channel[index]
-
-
-class _ImageFromOtherFile:
-    from PIL import Image
-
-    def __init__(self, path: str):
-        image = self.Image.open(path)
-        imageToArray = np.array(image, dtype=np.float32)
+    def imageArrayFromAnyFile(self, path: str):
+        pilImage = PIL.Image.open(path)
+        return np.array(pilImage, dtype=np.float32)
 
 
 
@@ -90,3 +69,7 @@ if __name__ == '__main__':
     path4 = r"AAV498-455_S95_C-06.czi"
     path5 = r"S51-06.czi"
     im = Image(path)
+    # im = Image(r"/tmp/test.tiff")
+    # im2 = Image(r"/tmp/test2.png")
+    # im2.display()
+
