@@ -5,7 +5,7 @@ import unittest
 import os
 
 
-class TestChannel(unittest.TestCase):
+class TestCziChannel(unittest.TestCase):
     def setUp(self):
         self.directory = os.path.dirname(os.path.dirname(__file__))
         self.testPath = os.path.join(self.directory, 'testData', 'testCziFile.czi')

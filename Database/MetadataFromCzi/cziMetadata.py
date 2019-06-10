@@ -2,29 +2,27 @@ import xml.etree.ElementTree as ET
 import ImageAnalysis.source.cziUtil as czi
 from cziChannel import Channel
 from cziFilter import Filter
+from cziName import Name
 
 
 class Metadata:
-    def __init__(self, path, name=None):
-        self.mouseId = None
-        self.name = name
+    def __init__(self, path, name=''):
+        self.name = Name(name)
         self.path = path
-        self.root = None
+        self.root = self.createElementTreeRoot()
 
         # Filters and channels are lists of objects.
-        self.filters = None
-        self.channels = None
+        self.filters = self.setFiltersData()
+        self.channels = self.setChannelsData()
 
-        self.microscope = None
-        self.objective = None
-        self.xScale = 0
-        self.yScale = 0
-        self.xSize = 0
-        self.ySize = 0
-        self.xScaled = 0
-        self.yScaled = 0
-
-        self.vectors = None
+        self.microscope = self.setMicroscope()
+        self.objective = self.setObjective()
+        self.xScale = self.setXScale()
+        self.yScale = self.setYScale()
+        self.xSize = self.setXSize()
+        self.ySize = self.setYSize()
+        self.xScaled = self.setXScaled()
+        self.yScaled = self.setYScaled()
 
     def __repr__(self):
         return '{};{};{}'.format(self.path, self.filters, self.channels)
@@ -51,37 +49,16 @@ class Metadata:
         stringXML = self.extractXmlAsStringFromCziImageObject(cziImageObject)
         return ET.fromstring(stringXML)
 
-    def setAttributesFromXml(self):
-        self.root = self.createElementTreeRoot()
-
-        self.filters = self.setFiltersData()
-        self.channels = self.setChannelsData()
-
-        self.microscope = self.setMicroscope()
-        self.objective = self.setObjective()
-        self.xScale = self.setXScale()
-        self.yScale = self.setYScale()
-        self.xSize = self.setXSize()
-        self.ySize = self.setYSize()
-        self.xScaled = self.setXScaled()
-        self.yScaled = self.setYScaled()
-
-    def exportDataAsDict(self):
-        return {'name': self.name, 'mouse_id': self.mouseId, 'path': self.path, 'microscope': self.microscope,
-                'objective': self.objective, 'x_size': self.xSize, 'y_size': self.ySize, 'x_scale': self.xScale,
-                'y_scale': self.yScale, 'x_scaled': self.xScaled, 'y_scaled': self.yScaled, 'vectors': self.vectors}
+    def exportAsDict(self):
+        dictMeta = {'path': self.path, 'microscope': self.microscope, 'objective': self.objective, 'x_size': self.xSize,
+                    'y_size': self.ySize, 'x_scale': self.xScale, 'y_scale': self.yScale, 'x_scaled': self.xScaled,
+                    'y_scaled': self.yScaled}
+        dictName = self.name.exportAsDict()
+        dictReturned = {**dictMeta, **dictName}
+        return dictReturned
 
     def getChannels(self):
         return self.channels
-
-    def getName(self):
-        return self.name
-
-    def setMouseId(self, mouseId):
-        self.mouseId = mouseId
-
-    def setVectors(self, vectors):
-        self.vectors = vectors
 
     def checkIfElementHasChildren(self, element):
         if element is None:
@@ -97,15 +74,9 @@ class Metadata:
         try:
             return self.root.find('./Metadata/Information/Instrument/Microscopes/Microscope').attrib['Name']
         except KeyError as err:
-
-            print('Attribute "Name" not found for Microscope.')
             return 'Attribute "Name" not found for Microscope.'
         except AttributeError:
-            print('Microscope field is empty.')
             return 'Microscope field is empty.'
-        except Exception as err:
-            print(err)
-            return 'Other Exception'
 
     def setObjective(self):
         try:
@@ -164,10 +135,8 @@ class Metadata:
                     filters.append(Filter(filterId, cutIn, cutOut))
             return filters
         except AttributeError:
-            print('Filter attribute error')
             raise
         except KeyError:
-            print('Filter Key Error')
             raise
 
     def setFiltersData(self):
@@ -190,10 +159,8 @@ class Metadata:
                     channels.append(Channel(channel.attrib['Id'], channel.attrib['Name'], self.root))
             return channels
         except AttributeError:
-            print('Channel attribute error.')
             raise
         except KeyError:
-            print('Channel key error.')
             raise
 
     def setChannelsData(self):
@@ -203,7 +170,7 @@ class Metadata:
                 return channels
             for channel in channels:
                 channel.getDataFromFilters(self.filters)
-                channel.setFileId(self.name)
+                channel.setFileId(self.name.name)
             return channels
         except Exception:
             raise

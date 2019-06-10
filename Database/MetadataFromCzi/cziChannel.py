@@ -23,7 +23,6 @@ class Channel:
         self.imagingDevice = self.setImagingDevice()
         self.cameraAdapter = self.setCameraAdapter()
         self.exposureTime = self.setExposureTime()
-        self.depthOfFocus = None  # Couldn't find the testData. Seems to be an internal formula in the microscope software.
         self.binningMode = self.setBinningMode()
 
     def __repr__(self):
@@ -37,7 +36,7 @@ class Channel:
         self.setEmWavelengthFilter(filters)
         self.setBeamsplitter(filters)
 
-    def exportDataAsDict(self):
+    def exportAsDict(self):
         return {'file_id': self.fileId, 'channel_id': self.channelId, 'channel_name': self.channelName,
                 'ex_wavelength_filter': self.exWavelengthFilter, 'em_wavelength_filter': self.emWavelengthFilter,
                 'beamsplitter': self.beamsplitter, 'reflector': self.reflector, 'contrast_method': self.contrastMethod,
