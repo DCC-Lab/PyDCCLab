@@ -98,7 +98,6 @@ class CZIFile(ImageFile):
         cziObj = readCziImage(self.path)
         out, tilesWithChannelNumber = decodeImages(cziObj)
         self.__tiles = [Channel(tile[0], tile[1]) for tile in tilesWithChannelNumber]
-        print(out)
         cziObj.close()
 
 
@@ -106,15 +105,3 @@ class TIFFFile(ImageFile):
 
     def imageDataFromPath(self):
         return
-
-
-if __name__ == '__main__':
-    path = r"A:\injection AAV\résultats bruts\AAV\AAV493AAV498\AAV493AAV498_S51\AAV493AAV498_S51\S51-06.czi"
-    path2 = r"A:\injection AAV\résultats bruts\AAV\AAV498AAV455\AAV498AAV455_S95\AAV498-455_S95_C-06.czi"
-    path3 = r"A:\injection AAV\résultats bruts\AAV\AAV343\Jun109_AAV344a.tif"
-    path4 = r"AAV498-455_S95_C-06.czi"
-    path5 = r"S51-06.czi"
-    im = Image(path)
-    # im = Image(r"/tmp/test.tiff")
-    # im2 = Image(r"/tmp/test2.png")
-    # im2.display()
