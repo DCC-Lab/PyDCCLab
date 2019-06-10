@@ -1,80 +1,127 @@
-import cziReader as rdr
-# We want to take a metadata object or list of metadata objects with their attributes.
-# We want to extract all of he relevant information.
-# We want to put it in a csv.file.
-# That CSV file can then be read by other scripts to get added to the database relevant table.
+from cziMetadata import Metadata as mtdt
+import cziUtil as czi
 
-if __name__ == '__main__':
-    # Setup for tests
-    #directory = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-    #path = os.path.join(directory, 'testData')
-    #path = 'P:\\injection AAV\\résultats bruts\\2019-01-23'
-    path = 'P:\\'
-    metadata = rdr.getMetadataFromCzis(path)
 
-    metafile = open('meta.csv', 'w+', encoding='UTF-8')
-    channelfile = open('channel.csv', 'w+', encoding='UTF-8')
+def createCSVFromCZIMetadata(path):
+    metaFile = open('meta.csv', 'w+', encoding='UTF-8')
+    channelFile = open('channel.csv', 'w+', encoding='UTF-8')
+    setupCSVHeaders(metaFile, channelFile)
+    cziPathsAndNames = getAllCzisFromFolder(path)
 
-    metaKeys = ['name', 'mouse_id', 'path', 'microscope', 'objective', 'x_size', 'y_size', 'x_scale', 'y_scale',
-                'x_scaled', 'y_scaled', 'vectors']
-    metaTypes = ['TEXT', 'INT', 'TEXT', 'TEXT', 'TEXT', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 'TEXT']
+    for cziFile in cziPathsAndNames:
+        writeMetadataInCSV(metaFile, channelFile, cziFile)
+
+    metaFile.close()
+    channelFile.close()
+
+
+def writeMetadataInCSV(metaFile, channelFile, cziFile):
+    metaKeys = ['name', 'mouse_id', 'injection_site', 'viral_vectors', 'microscope', 'objective', 'x_size', 'y_size',
+                'x_scale', 'y_scale', 'x_scaled', 'y_scaled', 'tags', 'path']
     channelKeys = ['file_id', 'channel_id', 'channel_name', 'ex_wavelength_filter', 'em_wavelength_filter',
                    'beamsplitter', 'reflector', 'contrast_method', 'light_source', 'light_source_intensity', 'dye_name',
                    'channel_color', 'ex_wavelength', 'em_wavelength', 'effective_na', 'imaging_device',
                    'camera_adapter', 'exposure_time', 'binning_mode']
-    channelTypes = ['TEXT', 'TEXT', 'TEXT', 'TEXT', 'TEXT', 'INT', 'TEXT', 'TEXT', 'TEXT', 'TEXT', 'TEXT', 'TEXT', 'INT',
-                    'INT', 'INT', 'TEXT', 'TEXT', 'INT', 'TEXT']
+    try:
+        newMtdt = getMetadataFromCzi(cziFile[1], cziFile[0])
+        dictioMeta = newMtdt.exportAsDict()
+        data = ''
+        for key in metaKeys:
+            data += str(dictioMeta[key]) + ','
+        data = data.rstrip(',') + '\n'
+        metaFile.write(data)
 
-    # Setting up the headers
+        channels = newMtdt.getChannels()
+        for channel in channels:
+            chnlData = ''
+            dictioChnl = channel.exportAsDict()
+            for key in channelKeys:
+                chnlData += str(dictioChnl[key]) + ','
+            chnlData = chnlData.rstrip(',') + '\n'
+            channelFile.write(chnlData)
+    except Exception:
+        pass
+
+
+def setupCSVHeaders(metaFile, channelFile):
+    writeMetaFileHeader(metaFile)
+    writeChannelFileHeader(channelFile)
+
+
+def writeMetaFileHeader(metaFile):
+    metaKeys = ['name', 'mouse_id', 'injection_site', 'viral_vectors', 'microscope', 'objective', 'x_size', 'y_size',
+                'x_scale', 'y_scale', 'x_scaled', 'y_scaled', 'tags', 'path']
+    metaTypes = ['TEXT', 'INT', 'TEXT', 'TEXT', 'TEXT', 'TEXT', 'INT', 'INT', 'INT', 'INT', 'INT', 'INT', 'TEXT',
+                 'TEXT']
+
     metaHeader = ''
     for key in metaKeys:
         metaHeader += key + ','
     metaHeader = metaHeader.rstrip(',')
     metaHeader += '\n'
-    metafile.write(metaHeader)
+    metaFile.write(metaHeader)
 
     metaLine = ''
     for type in metaTypes:
         metaLine += type + ','
     metaLine = metaLine.rstrip(',')
     metaLine += '\n'
-    metafile.write(metaLine)
+    metaFile.write(metaLine)
+
+
+def writeChannelFileHeader(channelFile):
+    channelKeys = ['file_id', 'channel_id', 'channel_name', 'ex_wavelength_filter', 'em_wavelength_filter',
+                   'beamsplitter', 'reflector', 'contrast_method', 'light_source', 'light_source_intensity', 'dye_name',
+                   'channel_color', 'ex_wavelength', 'em_wavelength', 'effective_na', 'imaging_device',
+                   'camera_adapter', 'exposure_time', 'binning_mode']
+    channelTypes = ['TEXT', 'TEXT', 'TEXT', 'TEXT', 'TEXT', 'INT', 'TEXT', 'TEXT', 'TEXT', 'TEXT', 'TEXT', 'TEXT',
+                    'INT', 'INT', 'INT', 'TEXT', 'TEXT', 'INT', 'TEXT']
 
     channelHeader = ''
     for key in channelKeys:
         channelHeader += key + ','
     channelHeader = channelHeader.rstrip(',')
     channelHeader += '\n'
-    channelfile.write(channelHeader)
+    channelFile.write(channelHeader)
 
     channelLine = ''
     for type in channelTypes:
         channelLine += type + ','
     channelLine = channelLine.rstrip(',')
     channelLine += '\n'
-    channelfile.write(channelLine)
+    channelFile.write(channelLine)
 
-    # Getting the dictionaries out of the metadata objects.
-    for entry in metadata:
-        dictioMeta = entry.exportDataAsDict()
-        data = ''
-        for key in metaKeys:
-            data += str(dictioMeta[key]) + ','
-        data = data.rstrip(',') + '\n'
-        metafile.write(data)
 
-        channels = entry.getChannels()
-        for channel in channels:
-            chnlData = ''
-            dictioChnl = channel.exportDataAsDict()
-            for key in channelKeys:
-                chnlData += str(dictioChnl[key]) + ','
-            chnlData = chnlData.rstrip(',') + '\n'
-            channelfile.write(chnlData)
+def getAllCzisFromFolder(path):
+    print('Begining to search for .czi files in folder : {}'.format(path))
+    try:
+        cziPathsAndNames = czi.findAllCziFiles(path)
+        print(len(cziPathsAndNames), ' files were found!')
+        return cziPathsAndNames
+    except Exception as err:
+        print('An unforseen error occured : ', type(err), err)
 
-    metafile.close()
-    channelfile.close()
-    #os.remove('meta.csv')
-    #os.remove('channel.csv')
 
+def getMetadataFromCzi(name, path):
+    try:
+        print('Proccessing file : {}'.format(name))
+        newMetadata = mtdt(name, path)
+        return newMetadata
+    except OSError:
+        print('An error occured. Could not pocess file : {}'.format(name))
+        print(path)
+        print('Path is invalid or the file was already open.')
+    except KeyError:
+        print('An error occured. Could not pocess file : {}'.format(name))
+        print(path)
+        print('A key attribute in the xml was not valid or could not be found.')
+    except AttributeError:
+        print('An error occured. Could not pocess file : {}'.format(name))
+        print(path)
+        print('An entry in the XML could not be reached or returned none.')
+
+
+if __name__ == '__main__':
+    path = 'P:\\injection AAV\\résultats bruts'
+    createCSVFromCZIMetadata(path)
     print('Finished')
