@@ -11,8 +11,11 @@ class Image:
 
     def __init__(self, path: str):
         self.__path = path
-        imageData = self.imageDataFromPath(path)
-        self.__channels = self.channelsFromImageData(imageData)
+        try:
+            imageData = self.imageDataFromPath(path)
+            self.__channels = self.channelsFromImageData(imageData)
+        except:
+            raise ValueError("Not known format recognized")
 
     @property
     def channels(self):
@@ -69,6 +72,22 @@ class Image:
     def imageDataFromAnyFile(self, path: str):
         pilImage = PIL.Image.open(path)
         return np.array(pilImage, dtype=np.float32)
+
+class ImageCZI(Image):
+    def __init__(self, path):
+        Image.__init__(self, path)
+
+    def imageDataFromPath(self, path: str):
+        try:
+            cziObj = readCziImage(path)
+            imagesDirectory = cziObj.filtered_subblock_directory
+            subblocks = cziObj.subblocks()
+            imageData = cziObj.asarray()
+            closeCziFileObject(cziObj)
+            return imageData.astype(np.float32)
+        except:
+            pass
+
 
 
 if __name__ == '__main__':

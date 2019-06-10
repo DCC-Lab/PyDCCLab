@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8edb79ed-101c-49e3-a876-b403393446ee" name="Default Changelist" comment="Worked on image.py and cziUtil.&#10;Made a new method to read the data form czi files in cziUtil based on the one from czifile, but modified to get all the tiles in the mosaic, as well as the mosaic. Also, the problem of big czi files is due to the access to the server. When the file is on my computer, it is very fast.">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ImageAnalysis/source/channel.py" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/source/channel.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ImageAnalysis/source/cziUtil.py" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/source/cziUtil.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ImageAnalysis/source/image.py" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/source/image.py" afterDir="false" />
+    <list default="true" id="8edb79ed-101c-49e3-a876-b403393446ee" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dcclab/channel.py" beforeDir="false" afterPath="$PROJECT_DIR$/dcclab/channel.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dcclab/image.py" beforeDir="false" afterPath="$PROJECT_DIR$/dcclab/image.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dcclab/imageCollection.py" beforeDir="false" afterPath="$PROJECT_DIR$/dcclab/imageCollection.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -16,30 +16,6 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/ImageAnalysis/source/channel.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="102">
-              <caret line="15" column="47" selection-start-line="15" selection-start-column="47" selection-end-line="15" selection-end-column="47" />
-              <folding>
-                <element signature="e#0#18#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/ImageAnalysis/source/image.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="867">
-              <caret line="51" selection-start-line="51" selection-end-line="51" />
-              <folding>
-                <element signature="e#0#21#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ImageAnalysis/source/DCCImagesFromFiles.py">
           <provider selected="true" editor-type-id="text-editor">
             <state>
@@ -49,10 +25,66 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/dcclab/imageCollection.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="34">
+              <caret line="2" column="31" lean-forward="true" selection-start-line="2" selection-start-column="31" selection-end-line="2" selection-end-column="31" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/dcclab/image.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="355">
+              <caret line="88" column="16" selection-start-line="88" selection-start-column="16" selection-end-line="88" selection-end-column="16" />
+              <folding>
+                <element signature="e#0#22#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/ImageAnalysis/unitTesting/cziUtilTests.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="340">
+              <caret line="20" column="27" lean-forward="true" selection-start-line="20" selection-start-column="27" selection-end-line="20" selection-end-column="27" />
+              <folding>
+                <element signature="e#0#40#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/dcclab/cziUtil.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state>
+              <folding>
+                <element signature="e#0#14#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/dcclab/channel.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-954">
+              <caret line="250" column="36" selection-start-line="250" selection-start-column="8" selection-end-line="250" selection-end-column="36" />
+              <folding>
+                <element signature="e#0#18#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ImageAnalysis/source/cziUtil.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="17">
-              <caret line="174" column="56" selection-start-line="174" selection-start-column="56" selection-end-line="174" selection-end-column="56" />
+            <state relative-caret-position="350">
+              <caret line="46" column="20" selection-start-line="46" selection-start-column="20" selection-end-line="46" selection-end-column="20" />
             </state>
           </provider>
         </entry>
@@ -60,17 +92,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/czifile/czifile.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-357">
-              <caret line="159" column="49" selection-start-line="159" selection-end-line="159" selection-end-column="49" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/ImageAnalysis/source/DCCExceptions.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="884">
-              <caret line="52" selection-start-line="52" selection-end-line="52" />
+            <state relative-caret-position="231">
+              <caret line="198" column="8" selection-start-line="198" selection-start-column="8" selection-end-line="198" selection-end-column="8" />
             </state>
           </provider>
         </entry>
@@ -149,7 +172,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="HoughTransformAndOtherMethods" />
+        <entry key="$PROJECT_DIR$" value="RefactoringDCCImageInTwoClasses" />
       </map>
     </option>
   </component>
@@ -196,12 +219,15 @@
         <option value="$USER_HOME$/Anaconda3/Lib/site-packages/czifile/czifile.py" />
         <option value="$PROJECT_DIR$/ImageAnalysis/source/cziUtil.py" />
         <option value="$PROJECT_DIR$/ImageAnalysis/source/image.py" />
+        <option value="$PROJECT_DIR$/dcclab/imageCollection.py" />
+        <option value="$PROJECT_DIR$/dcclab/image.py" />
+        <option value="$PROJECT_DIR$/dcclab/channel.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="202" />
-    <option name="y" value="-8" />
+    <option name="x" value="1522" />
+    <option name="y" value="-11" />
     <option name="width" value="1456" />
     <option name="height" value="876" />
   </component>
@@ -237,6 +263,11 @@
             <path>
               <item name="BigData-ImageAnalysis" type="b2602c69:ProjectViewProjectNode" />
               <item name="BigData-ImageAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="dcclab" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="BigData-ImageAnalysis" type="b2602c69:ProjectViewProjectNode" />
+              <item name="BigData-ImageAnalysis" type="462c0819:PsiDirectoryNode" />
               <item name="ImageAnalysis" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -255,6 +286,11 @@
               <item name="BigData-ImageAnalysis" type="b2602c69:ProjectViewProjectNode" />
               <item name="BigData-ImageAnalysis" type="462c0819:PsiDirectoryNode" />
               <item name="ImageAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="unitTesting" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="BigData-ImageAnalysis" type="b2602c69:ProjectViewProjectNode" />
+              <item name="BigData-ImageAnalysis" type="462c0819:PsiDirectoryNode" />
               <item name="unitTesting" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
@@ -476,20 +512,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1558095021635</updated>
-    </task>
-    <task id="LOCAL-00002" summary="Remove temporary main from cziUtil.">
-      <created>1558465071505</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1558465071505</updated>
-    </task>
-    <task id="LOCAL-00003" summary="Rename imageAnalysis to ImageAnalysis">
-      <created>1558466938107</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1558466938107</updated>
     </task>
     <task id="LOCAL-00004" summary="New methods in DCCImages and test cases for DCCImages&#10;&#10;Created new methods for DCCImage and DCCImageStack and started to do unit testing on those functions.">
       <created>1558540640462</created>
@@ -820,7 +842,21 @@
       <option name="project" value="LOCAL" />
       <updated>1559937622763</updated>
     </task>
-    <option name="localTasksCounter" value="51" />
+    <task id="LOCAL-00051" summary="Renamed asNumpyArray into asArray">
+      <created>1560175040073</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1560175040077</updated>
+    </task>
+    <task id="LOCAL-00052" summary="Added the import of DCCException in image.py.">
+      <created>1560175184219</created>
+      <option name="number" value="00052" />
+      <option name="presentableId" value="LOCAL-00052" />
+      <option name="project" value="LOCAL" />
+      <updated>1560175184223</updated>
+    </task>
+    <option name="localTasksCounter" value="53" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -865,10 +901,10 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1616" height="876" extended-state="6" />
+    <frame x="1592" y="-8" width="1456" height="876" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.22243346" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24753174" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -880,7 +916,7 @@
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32974428" />
       <window_info anchor="bottom" id="Version Control" order="7" sideWeight="0.4992948" weight="0.32974428" />
       <window_info anchor="bottom" id="Terminal" order="8" weight="0.32974428" />
-      <window_info active="true" anchor="bottom" id="Python Console" order="9" visible="true" weight="0.32974428" />
+      <window_info anchor="bottom" id="Python Console" order="9" weight="0.32974428" />
       <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.50070524" side_tool="true" weight="0.32974428" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -957,8 +993,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="New histogram (gray images only) method" />
-    <MESSAGE value="New histogram-related methods and unit tests" />
     <MESSAGE value="Finished histogram methods and did sobel (horizontal, vertical and both) filters" />
     <MESSAGE value="Corrected some tests and modified the std deviation filters so that they throw warnings when nans encountered." />
     <MESSAGE value="Cleaning of the unit test folder (and at the same time modification to some tests)" />
@@ -982,47 +1016,11 @@
     <MESSAGE value="Started to work on multithreading to read czi files and &quot;decode&quot; the data because it takes a lot of time to read files." />
     <MESSAGE value="Removed everyting related to threading. For now, I will focus on reading relatively small czi files." />
     <MESSAGE value="Worked on image.py and cziUtil.&#10;Made a new method to read the data form czi files in cziUtil based on the one from czifile, but modified to get all the tiles in the mosaic, as well as the mosaic. Also, the problem of big czi files is due to the access to the server. When the file is on my computer, it is very fast." />
-    <option name="LAST_COMMIT_MESSAGE" value="Worked on image.py and cziUtil.&#10;Made a new method to read the data form czi files in cziUtil based on the one from czifile, but modified to get all the tiles in the mosaic, as well as the mosaic. Also, the problem of big czi files is due to the access to the server. When the file is on my computer, it is very fast." />
+    <MESSAGE value="Renamed asNumpyArray into asArray" />
+    <MESSAGE value="Added the import of DCCException in image.py." />
+    <option name="LAST_COMMIT_MESSAGE" value="Added the import of DCCException in image.py." />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/skimage/exposure/exposure.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="217">
-          <caret line="143" selection-start-line="143" selection-end-line="143" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/numpy/lib/histograms.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="915" column="16" selection-start-line="915" selection-start-column="16" selection-end-line="915" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/scipy/ndimage/filters.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1343">
-          <caret line="1186" column="26" lean-forward="true" selection-start-line="1186" selection-start-column="26" selection-end-line="1186" selection-end-column="26" />
-          <folding>
-            <element signature="e#1442#1506#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/skimage/feature/peak.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="661">
-          <caret line="78" column="11" lean-forward="true" selection-start-line="78" selection-start-column="11" selection-end-line="78" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/numpy/core/numeric.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="327">
-          <caret line="3086" column="29" lean-forward="true" selection-start-line="3086" selection-start-column="29" selection-end-line="3086" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/skimage/morphology/grey.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="465">
@@ -1270,13 +1268,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ImageAnalysis/source/DCCImagesFromFiles.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="23" selection-start-column="23" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/ImageAnalysis/source/DCCExceptions.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="884">
@@ -1304,26 +1295,79 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/ImageAnalysis/source/image.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="136">
+          <caret line="8" column="4" selection-start-line="8" selection-start-column="4" selection-end-line="8" selection-end-column="4" />
+          <folding>
+            <element signature="e#0#21#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ImageAnalysis/source/DCCImagesFromFiles.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="23" selection-start-column="23" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dcclab/cziUtil.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <element signature="e#0#14#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ImageAnalysis/unitTesting/cziUtilTests.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="340">
+          <caret line="20" column="27" lean-forward="true" selection-start-line="20" selection-start-column="27" selection-end-line="20" selection-end-column="27" />
+          <folding>
+            <element signature="e#0#40#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/ImageAnalysis/source/cziUtil.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="174" column="56" selection-start-line="174" selection-start-column="56" selection-end-line="174" selection-end-column="56" />
+        <state relative-caret-position="350">
+          <caret line="46" column="20" selection-start-line="46" selection-start-column="20" selection-end-line="46" selection-end-column="20" />
         </state>
       </provider>
     </entry>
     <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/czifile/czifile.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-357">
-          <caret line="159" column="49" selection-start-line="159" selection-end-line="159" selection-end-column="49" />
+        <state relative-caret-position="231">
+          <caret line="198" column="8" selection-start-line="198" selection-start-column="8" selection-end-line="198" selection-end-column="8" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ImageAnalysis/source/image.py">
+    <entry file="file://$PROJECT_DIR$/dcclab/imageCollection.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="867">
-          <caret line="51" selection-start-line="51" selection-end-line="51" />
+        <state relative-caret-position="34">
+          <caret line="2" column="31" lean-forward="true" selection-start-line="2" selection-start-column="31" selection-end-line="2" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dcclab/image.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="355">
+          <caret line="88" column="16" selection-start-line="88" selection-start-column="16" selection-end-line="88" selection-end-column="16" />
           <folding>
-            <element signature="e#0#21#0" expanded="true" />
+            <element signature="e#0#22#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dcclab/channel.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-954">
+          <caret line="250" column="36" selection-start-line="250" selection-start-column="8" selection-end-line="250" selection-end-column="36" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>
