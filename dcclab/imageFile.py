@@ -23,6 +23,7 @@ class CZIFile(ImageFile):
         out, self.__tilesWithChannelNumber = decodeImages(cziObj)
         out = np.squeeze(out).astype(np.float32)
         self.__numberOFChannels = out.shape[-3]
+        closeCziFileObject(cziObj)
         return out
 
 
@@ -32,7 +33,13 @@ class TIFFFile(ImageFile):
         ImageFile.__init__(self, path)
 
     def imageDataFromPath(self):
-        return
+        tiffFileObject = tifffile.TiffFile(self.path)
+        imageAsArray = tiffFileObject.asarray().astype(dtype="float32")
+        self.__metadata = tiffFileObject.ome_metadata
+        imageList = []
+        for i in range(imageAsArray.shape[0]):
+            imageList.append(imageAsArray[i])
+        return imageAsArray
 
 
 class PILFile(ImageFile):

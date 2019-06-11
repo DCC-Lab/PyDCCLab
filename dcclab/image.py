@@ -1,24 +1,29 @@
-from .channel import *
-from .DCCExceptions import *
-from .cziUtil import *
-import tifffile
-import PIL
-
-import re
+from .imageFile import *
 
 
 class Image:
+    supportedClasses = {CZIFile, TIFFFile, PILFile}
 
     def __init__(self, path: str):
         self.__path = path
 
-        self.fileObject = CZIFile(path)
-        # for type in suppertedTypes:
-        #   self.fileObject = objectFIle
+        self.__fileObject = None
+        imageData = None
+        for fileClass in self.supportedClasses:
+            try:
+                self.__fileObject = fileClass(path)
+                imageData = self.__fileObject.imageDataFromPath()
+                break
+            except:
+                continue
+        if self.__fileObject is None:
+            raise InvalidFileFormatException("The file cannot be read. Please check if the format is supported.")
 
-        imageData = self.fileObject.imageDataFromPath()
-        # self.__channels = self.channelsFromImageData(imageData)
-        metaData = self.fileObject.metadata()
+        self.__channels = self.channelsFromImageData(imageData)
+
+    @property
+    def path(self):
+        return self.__path
 
     @property
     def channels(self):
@@ -39,7 +44,7 @@ class Image:
 
     def channelsFromImageData(self, imageData):
         if imageData.ndim == 2:
-            return (Channel(imageData))
+            return Channel(imageData)
         elif imageData.ndim == 3:
             channelsData = np.squeeze(np.dsplit(imageData, imageData.shape[2]))
             channels = list(map(lambda pix: Channel(pix), channelsData))
@@ -75,33 +80,3 @@ class Image:
     # def imageDataFromAnyFile(self, path: str):
     #     pilImage = PIL.Image.open(path)
     #     return np.array(pilImage, dtype=np.float32)
-
-
-class ImageFile(object):
-    def __init__(self, path):
-        self.path = path
-        # self.imageDataFromPath()
-
-    def imageDataFromPath(self):
-        return
-
-    def metadata(self):
-        return
-
-
-class CZIFile(ImageFile):
-
-    def __init__(self, path: str):
-        ImageFile.__init__(self, path)
-
-    def imageDataFromPath(self):
-        cziObj = readCziImage(self.path)
-        out, tilesWithChannelNumber = decodeImages(cziObj)
-        self.__tiles = [Channel(tile[0], tile[1]) for tile in tilesWithChannelNumber]
-        cziObj.close()
-
-
-class TIFFFile(ImageFile):
-
-    def imageDataFromPath(self):
-        return
