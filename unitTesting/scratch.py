@@ -10,7 +10,7 @@ if __name__ == '__main__':
     # We extract the metadata from the files and create a list of objects containing that metadata.
     mdata = []
     for cziFile in allCziFiles:
-        newMData = mtdt.Metadata(cziFile[1], cziFile[0])
+        newMData = mtdt.CZIMetadata(cziFile[1], cziFile[0])
         newMData.setAttributesFromXml()
         mdata.append(newMData)
 

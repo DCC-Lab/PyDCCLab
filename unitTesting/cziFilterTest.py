@@ -1,5 +1,5 @@
-from cziFilter import Filter as fltr
-from cziMetadata import Metadata as mtdt
+from cziFilter import CZIFilter as fltr
+from cziMetadata import CZIMetadata as mtdt
 import xml.etree.ElementTree as ET
 import unittest
 import os
@@ -13,7 +13,6 @@ class TestFilter(unittest.TestCase):
         self.missingKeysPath = os.path.join(self.directory, 'testData', 'MissingKeys.xml')
 
         self.meta = mtdt(self.testPath)
-        self.meta.setAttributesFromXml()
         self.defaultFilter = self.meta.filters[0]
 
         self.testXml = self.meta.extractXmlAsStringFromCziImageObject(self.meta.cziFileToCziImageObject())
@@ -22,27 +21,27 @@ class TestFilter(unittest.TestCase):
         root = ET.fromstring(self.testXml)
         filter = fltr('Filter:2', '500', '550')
 
-        filter.setFilterSetId(root)
+        filter.setFilterSetIdAndType(root)
         self.assertEqual(filter.filterSetId, self.defaultFilter.filterSetId)
 
     def test_setFilterSetId_rightFilterType(self):
         root = ET.fromstring(self.testXml)
         filter = fltr('Filter:1', '450', '490')
 
-        filter.setFilterSetId(root)
+        filter.setFilterSetIdAndType(root)
         self.assertEqual(filter.filterType, 'Excitation')
 
     def test_setFilterSetId_missingKeys(self):
         tree = ET.parse(self.missingKeysPath)
         root = tree.getroot()
         filter = fltr('Filter:1', '450', '490')
-        with self.assertRaises(KeyError): filter.setFilterSetId(root)
+        with self.assertRaises(KeyError): filter.setFilterSetIdAndType(root)
 
     def test_setFilterSetId_missingEntries(self):
         tree = ET.parse(self.missingEntriesPath)
         root = tree.getroot()
         filter = fltr('Filter:1', '450', '490')
-        with self.assertRaises(AttributeError): filter.setFilterSetId(root)
+        with self.assertRaises(AttributeError): filter.setFilterSetIdAndType(root)
 
     def test_setChannelId_isEqual(self):
         root = ET.fromstring(self.testXml)

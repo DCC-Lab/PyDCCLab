@@ -1,7 +1,7 @@
 import re
 
 
-class Name:
+class CZINameAnalysis:
     def __init__(self, name):
         self.name = name
         self.mouseId = self.setMouseId()

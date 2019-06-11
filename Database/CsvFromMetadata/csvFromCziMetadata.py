@@ -1,4 +1,4 @@
-from cziMetadata import Metadata as mtdt
+from cziMetadata import CZIMetadata as mtdt
 import cziUtil as czi
 
 
