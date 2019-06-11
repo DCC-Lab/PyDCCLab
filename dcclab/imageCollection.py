@@ -49,6 +49,7 @@ class ImageCollection:
         directory = os.path.dirname(pathPattern)
         basePattern = os.path.basename(pathPattern)
         paths = [os.path.join(directory,f) for f in os.listdir(directory) if re.match(basePattern, f)]
+        paths.sort()
         for path in paths:
             try:
                 image = Image(path)
@@ -82,3 +83,23 @@ class ImageCollection:
             plt.imshow(self.images[i].asArray(), cmap=colorMap)
         plt.show()
         return imagesShown
+
+
+class ZStack(ImageCollection):
+    def __init__(self, images: typing.List[Image] = None, pathPattern:str=None):
+        ImageCollection.__init__(images, pathPattern)
+        if not self.imagesAreSimilar:
+            raise ValueError("Images in z-stack are not all the same shape")
+
+    def imagesAreSimilar(self) -> bool:
+        shape = None
+        for image in images:
+            if shape is None:
+                shape = image.shape
+            elif shape != image.shape:
+                return false
+        return true
+
+    def show(self):
+        # Do something nicer with z-stack
+        self.showAllSequentially()

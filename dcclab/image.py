@@ -10,7 +10,8 @@ import re
 class Image:
 
     def __init__(self, path: str):
-        self.__path = path
+        self.path = path
+        self.__channels = []
         try:
             imageData = self.imageDataFromPath(path)
             self.__channels = self.channelsFromImageData(imageData)
@@ -18,8 +19,17 @@ class Image:
             raise ValueError("Not known format recognized for {0}".format(path))
 
     @property
+    def shape(self):
+        if len(self.channels) != 0:
+            return self.channels[0].shape
+    
+    @property
     def channels(self):
         return self.__channels
+
+    def removeChannels(self, channels):
+        for index in channels:
+            del self.channels[index]
 
     def asChannelsArray(self):
         channelsPixels = list(map(lambda c: c.pixels, self.channels))
