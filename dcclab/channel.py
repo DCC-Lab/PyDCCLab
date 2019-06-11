@@ -58,12 +58,12 @@ class Channel:
 
     @property
     def numberOfPixels(self) -> int:
-        return self.width() * self.height()
+        return self.width * self.height
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, Channel):
             raise InvalidEqualityTestException(type(other))
-        return np.array_equal(self.pixels, other.pixels())
+        return np.array_equal(self.pixels, other.pixels)
 
     @deprecated(reason="Renamed as a @property pixels")
     def getPixels(self) -> np.ndarray:
