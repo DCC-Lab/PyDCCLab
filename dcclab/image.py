@@ -4,12 +4,12 @@ from .imageFile import *
 class Image:
 
     def __init__(self, path: str):
-        self.__supportedClasses = [CZIFile, TIFFFile, PILFile]
+        supportedClasses = [CZIFile, TIFFFile, PILFile]
         self.__path = path
 
         self.__fileObject = None
         imageData = None
-        for fileClass in self.__supportedClasses:
+        for fileClass in supportedClasses:
             try:
                 self.__fileObject = fileClass(path)
                 imageData = self.__fileObject.imageDataFromPath()
