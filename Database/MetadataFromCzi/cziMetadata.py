@@ -73,64 +73,60 @@ class CZIMetadata:
     def setMicroscope(self):
         try:
             return self.root.find('./Metadata/Information/Instrument/Microscopes/Microscope').attrib['Name']
-        except KeyError:
-            return "Name not found."
-        except AttributeError:
-            return "Empty field."
+        except Exception:
+            return ''
 
     def setObjective(self):
         try:
             return self.root.find('./Metadata/Information/Instrument/Objectives/Objective').attrib['Name']
-        except KeyError:
-            return "Name not found."
-        except AttributeError:
-            return 'Empty field.'
+        except Exception:
+            return ''
 
     def setXScale(self):
         try:
             return self.root.find('./Metadata/Scaling/Items/Distance[@Id="X"]/Value').text
-        except AttributeError:
+        except Exception:
             return 0
 
     def setYScale(self):
         try:
             return self.root.find('./Metadata/Scaling/Items/Distance[@Id="Y"]/Value').text
-        except AttributeError:
+        except Exception:
             return 0
 
     def setXSize(self):
         try:
             return self.root.find('./Metadata/Information/Image/SizeX').text
-        except AttributeError:
+        except Exception:
             return 0
 
     def setYSize(self):
         try:
             return self.root.find('./Metadata/Information/Image/SizeY').text
-        except AttributeError:
+        except Exception:
             return 0
 
     def setXScaled(self):
         try:
             return float(self.xSize) * float(self.xScale)
-        except ValueError:
+        except Exception:
             return 0
 
     def setYScaled(self):
         try:
             return float(self.ySize) * float(self.yScale)
-        except ValueError:
+        except Exception:
             return 0
 
     def findFiltersInRoot(self):
-        filters = []
+        newFilters = []
         try:
-            root = self.root.find('./Metadata/Information/Instrument/Filters')
-            if self.checkIfElementHasChildren(root):
-                for filter in root:
+            filters = self.root.find('./Metadata/Information/Instrument/Filters')
+            if self.checkIfElementHasChildren(filters):
+                for filter in filters:
                     filterId = filter.attrib['Id']
-                    filters.append(CZIFilter(filterId, self.root))
-            return filters
+                    newFilters.append(CZIFilter(filterId, self.root))
+            return newFilters
         except AttributeError:
             print('Atribute error in findFiltersInRoot')
         except KeyError:
