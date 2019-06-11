@@ -54,6 +54,10 @@ class Channel:
         return self.height
 
     @property
+    def sizeInBytes(self) -> int:
+        return self.pixels.nbytes
+
+    @property
     def numberOfPixels(self) -> int:
         return self.width() * self.height()
 

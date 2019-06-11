@@ -10,16 +10,33 @@ import re
 class Image:
 
     def __init__(self, path: str):
-        self.__path = path
+        self.path = path
+        self.__channels = []
         try:
             imageData = self.imageDataFromPath(path)
             self.__channels = self.channelsFromImageData(imageData)
         except:
-            raise ValueError("Not known format recognized")
+            raise ValueError("Not known format recognized for {0}".format(path))
 
+    @property
+    def shape(self):
+        if len(self.channels) != 0:
+            return self.channels[0].shape
+
+    @property
+    def sizeInBytes(self) -> int:
+        totalSize = 0
+        for channel in self.channels:
+            totalSize += channel.sizeInBytes
+        return totalSize
+    
     @property
     def channels(self):
         return self.__channels
+
+    def removeChannels(self, channels):
+        for index in channels:
+            del self.channels[index]
 
     def asChannelsArray(self):
         channelsPixels = list(map(lambda c: c.pixels, self.channels))
