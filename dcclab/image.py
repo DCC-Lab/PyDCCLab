@@ -22,6 +22,13 @@ class Image:
     def shape(self):
         if len(self.channels) != 0:
             return self.channels[0].shape
+
+    @property
+    def sizeInBytes(self) -> int:
+        totalSize = 0
+        for channel in self.channels:
+            totalSize += channel.sizeInBytes
+        return totalSize
     
     @property
     def channels(self):
