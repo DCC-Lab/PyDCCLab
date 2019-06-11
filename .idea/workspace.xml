@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8edb79ed-101c-49e3-a876-b403393446ee" name="Default Changelist" comment="Delete cziReader">
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ImageAnalysis/source/cziUtil.py" beforeDir="false" afterPath="$PROJECT_DIR$/ImageAnalysis/source/cziUtil.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dcclab/channel.py" beforeDir="false" afterPath="$PROJECT_DIR$/dcclab/channel.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dcclab/image.py" beforeDir="false" afterPath="$PROJECT_DIR$/dcclab/image.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dcclab/imageCollection.py" beforeDir="false" afterPath="$PROJECT_DIR$/dcclab/imageCollection.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
+    <list default="true" id="8edb79ed-101c-49e3-a876-b403393446ee" name="Default Changelist" comment="Replaced returns for cziChannel and updated unitTests in consequence.">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Database/MetadataFromCzi/cziFilter.py" beforeDir="false" afterPath="$PROJECT_DIR$/Database/MetadataFromCzi/cziFilter.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/unitTesting/cziFilterTest.py" beforeDir="false" afterPath="$PROJECT_DIR$/unitTesting/cziFilterTest.py" afterDir="false" />
     </list>
+    <ignored path=".idea/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -18,22 +16,10 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Database/CsvFromMetadata/csvFromCziMetadata.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-952">
-              <caret line="22" column="69" selection-start-line="22" selection-start-column="69" selection-end-line="22" selection-end-column="69" />
-              <folding>
-                <element signature="e#0#40#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Database/MetadataFromCzi/cziMetadata.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-170">
-              <caret line="8" column="42" lean-forward="true" selection-start-line="8" selection-start-column="42" selection-end-line="8" selection-end-column="42" />
+            <state relative-caret-position="2159">
+              <caret line="139" column="36" selection-start-line="139" selection-start-column="36" selection-end-line="139" selection-end-column="36" />
               <folding>
                 <element signature="e#0#34#0" expanded="true" />
               </folding>
@@ -42,19 +28,25 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Database/MetadataFromCzi/cziNameAnalysis.py">
+        <entry file="file://$PROJECT_DIR$/Database/CsvFromMetadata/csvFromCziMetadata.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="51">
-              <caret line="3" column="16" lean-forward="true" selection-start-line="3" selection-start-column="6" selection-end-line="3" selection-end-column="21" />
+            <state relative-caret-position="153">
+              <caret line="9" lean-forward="true" selection-start-line="9" selection-end-line="9" />
+              <folding>
+                <element signature="e#0#43#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Database/MetadataFromCzi/cziChannel.py">
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/unitTesting/cziFilterTest.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1717">
-              <caret line="158" column="20" selection-start-line="158" selection-start-column="20" selection-end-line="158" selection-end-column="20" />
+            <state relative-caret-position="187">
+              <caret line="11" column="96" selection-start-line="11" selection-start-column="96" selection-end-line="11" selection-end-column="96" />
+              <folding>
+                <element signature="e#0#39#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -62,32 +54,10 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Database/MetadataFromCzi/cziFilter.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1241">
-              <caret line="73" column="41" lean-forward="true" selection-start-line="73" selection-start-column="41" selection-end-line="73" selection-end-column="41" />
+            <state relative-caret-position="-722">
+              <caret line="18" column="42" selection-start-line="18" selection-start-column="42" selection-end-line="18" selection-end-column="42" />
             </state>
           </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/dcclab/channel.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2567">
-              <caret line="250" column="36" selection-start-line="250" selection-start-column="8" selection-end-line="250" selection-end-column="36" />
-              <folding>
-                <element signature="e#0#18#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Database/CsvFromMetadata/meta.csv">
-          <provider selected="true" editor-type-id="text-editor" />
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Database/CsvFromMetadata/channel.csv">
-          <provider selected="true" editor-type-id="text-editor" />
         </entry>
       </file>
     </leaf>
@@ -140,7 +110,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="RefactoringDCCImageInTwoClasses" />
+        <entry key="$PROJECT_DIR$" value="cziChannelUnitTesting" />
       </map>
     </option>
   </component>
@@ -190,6 +160,12 @@
         <option value="$PROJECT_DIR$/dcclab/imageCollection.py" />
         <option value="$PROJECT_DIR$/dcclab/image.py" />
         <option value="$PROJECT_DIR$/dcclab/channel.py" />
+        <option value="$PROJECT_DIR$/unitTesting/cziNameAnalysisTest.py" />
+        <option value="$PROJECT_DIR$/Database/MetadataFromCzi/cziMetadata.py" />
+        <option value="$PROJECT_DIR$/unitTesting/cziChannelTest.py" />
+        <option value="$PROJECT_DIR$/Database/MetadataFromCzi/cziChannel.py" />
+        <option value="$PROJECT_DIR$/Database/MetadataFromCzi/cziFilter.py" />
+        <option value="$PROJECT_DIR$/unitTesting/cziFilterTest.py" />
       </list>
     </option>
   </component>
@@ -235,6 +211,16 @@
               <item name="Database" type="462c0819:PsiDirectoryNode" />
               <item name="MetadataFromCzi" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="BigData-ImageAnalysis" type="b2602c69:ProjectViewProjectNode" />
+              <item name="BigData-ImageAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="testData" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="BigData-ImageAnalysis" type="b2602c69:ProjectViewProjectNode" />
+              <item name="BigData-ImageAnalysis" type="462c0819:PsiDirectoryNode" />
+              <item name="unitTesting" type="462c0819:PsiDirectoryNode" />
+            </path>
           </expand>
           <select />
         </subPane>
@@ -246,8 +232,9 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="TODO_SCOPE" value="All Places" />
     <property name="full.screen.before.presentation.mode" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/.idea" />
     <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+    <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Ignored.Files" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -267,7 +254,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.image">
+  <component name="RunManager" selected="Python tests.pytest for cziFilterTest.TestFilter">
     <configuration name="DCCImage" type="PythonConfigurationType" factoryName="Python">
       <module name="BigData-ImageAnalysis" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -281,90 +268,6 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ImageAnalysis/source/DCCImage.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="basicExamples" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="BigData-ImageAnalysis" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ImageAnalysis/examples" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ImageAnalysis/examples/basicExamples.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="image" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="BigData-ImageAnalysis" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ImageAnalysis/source" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ImageAnalysis/source/image.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="imageProcessing" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="BigData-ImageAnalysis" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ImageAnalysis" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ImageAnalysis/imageProcessing.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="temp" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="BigData-ImageAnalysis" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ImageAnalysis" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ImageAnalysis/temp.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -418,28 +321,88 @@
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
-    <configuration name="pytest in DCCImageTests.py" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+    <configuration name="pytest for cziFilterTest.TestFilter" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
       <module name="BigData-ImageAnalysis" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ImageAnalysis/unitTesting" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/unitTesting" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="_new_keywords" value="&quot;&quot;" />
       <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;$PROJECT_DIR$/ImageAnalysis/unitTesting/DCCImageTests.py&quot;" />
-      <option name="_new_targetType" value="&quot;PATH&quot;" />
+      <option name="_new_target" value="&quot;cziFilterTest.TestFilter&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest for cziFilterTest.TestFilter.test_getChannelId_noneValue" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="BigData-ImageAnalysis" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/unitTesting" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;cziFilterTest.TestFilter.test_getChannelId_noneValue&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest for cziFilterTest.TestFilter.test_getDichroic_expectedValue" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="BigData-ImageAnalysis" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/unitTesting" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;cziFilterTest.TestFilter.test_getDichroic_expectedValue&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest for cziFilterTest.TestFilter.test_getDichroic_noneValue" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="BigData-ImageAnalysis" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/unitTesting" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;cziFilterTest.TestFilter.test_getDichroic_noneValue&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest for cziFilterTest.TestFilter.test_getType_noneValue" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="BigData-ImageAnalysis" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/unitTesting" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;cziFilterTest.TestFilter.test_getType_noneValue&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.image" />
-        <item itemvalue="Python.basicExamples" />
-        <item itemvalue="Python.temp" />
-        <item itemvalue="Python.imageProcessing" />
-        <item itemvalue="Python tests.pytest in DCCImageTests.py" />
+        <item itemvalue="Python tests.pytest for cziFilterTest.TestFilter" />
+        <item itemvalue="Python tests.pytest for cziFilterTest.TestFilter.test_getDichroic_noneValue" />
+        <item itemvalue="Python tests.pytest for cziFilterTest.TestFilter.test_getChannelId_noneValue" />
+        <item itemvalue="Python tests.pytest for cziFilterTest.TestFilter.test_getType_noneValue" />
+        <item itemvalue="Python tests.pytest for cziFilterTest.TestFilter.test_getDichroic_expectedValue" />
       </list>
     </recent_temporary>
   </component>
@@ -453,76 +416,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1558095021635</updated>
-    </task>
-    <task id="LOCAL-00004" summary="New methods in DCCImages and test cases for DCCImages&#10;&#10;Created new methods for DCCImage and DCCImageStack and started to do unit testing on those functions.">
-      <created>1558540640462</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1558540640462</updated>
-    </task>
-    <task id="LOCAL-00005" summary="Modified and added methods in DCCImages. Added and modified unit tests of DCCImagesTest">
-      <created>1558550086461</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1558550086461</updated>
-    </task>
-    <task id="LOCAL-00006" summary="New tests for DCCImages and change encoding of the function that extracts metadata to utf-8 so mu character is saved properly.">
-      <created>1558616861808</created>
-      <option name="number" value="00006" />
-      <option name="presentableId" value="LOCAL-00006" />
-      <option name="project" value="LOCAL" />
-      <updated>1558616861808</updated>
-    </task>
-    <task id="LOCAL-00007" summary="Update README file">
-      <created>1558617463083</created>
-      <option name="number" value="00007" />
-      <option name="presentableId" value="LOCAL-00007" />
-      <option name="project" value="LOCAL" />
-      <updated>1558617463083</updated>
-    </task>
-    <task id="LOCAL-00008" summary="New class ans modification of already present classes&#10;&#10;Added a class that read tif files and convert them to DCCImageStack since tif file can contain more than one image.">
-      <created>1558622481943</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1558622481943</updated>
-    </task>
-    <task id="LOCAL-00009" summary="Added new test cases for the new methods and other little changes in methods">
-      <created>1558625769776</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1558625769776</updated>
-    </task>
-    <task id="LOCAL-00010" summary="New test cases and exceptions.">
-      <created>1558627150765</created>
-      <option name="number" value="00010" />
-      <option name="presentableId" value="LOCAL-00010" />
-      <option name="project" value="LOCAL" />
-      <updated>1558627150765</updated>
-    </task>
-    <task id="LOCAL-00011" summary="New test cases">
-      <created>1558631841211</created>
-      <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
-      <option name="project" value="LOCAL" />
-      <updated>1558631841211</updated>
-    </task>
-    <task id="LOCAL-00012" summary="New test cases v2 added files related to test cases">
-      <created>1558631877244</created>
-      <option name="number" value="00012" />
-      <option name="presentableId" value="LOCAL-00012" />
-      <option name="project" value="LOCAL" />
-      <updated>1558631877244</updated>
-    </task>
-    <task id="LOCAL-00013" summary="New methods and test cases (3rd commit about the same changes)">
-      <created>1558724466192</created>
-      <option name="number" value="00013" />
-      <option name="presentableId" value="LOCAL-00013" />
-      <option name="project" value="LOCAL" />
-      <updated>1558724466192</updated>
     </task>
     <task id="LOCAL-00014" summary="New methods and test cases">
       <created>1558729094615</created>
@@ -797,39 +690,109 @@
       <option name="project" value="LOCAL" />
       <updated>1560175184223</updated>
     </task>
-    <option name="localTasksCounter" value="53" />
+    <task id="LOCAL-00053" summary="Deleted cziReader. File was obsolete.">
+      <created>1560188393175</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1560188393179</updated>
+    </task>
+    <task id="LOCAL-00054" summary="Renaming cziNameTest to cziNameAnalysisTest and testing.">
+      <created>1560189085660</created>
+      <option name="number" value="00054" />
+      <option name="presentableId" value="LOCAL-00054" />
+      <option name="project" value="LOCAL" />
+      <updated>1560189085660</updated>
+    </task>
+    <task id="LOCAL-00055" summary="Renaming cziNameTest to cziNameAnalysisTest and testing.">
+      <created>1560189555166</created>
+      <option name="number" value="00055" />
+      <option name="presentableId" value="LOCAL-00055" />
+      <option name="project" value="LOCAL" />
+      <updated>1560189555166</updated>
+    </task>
+    <task id="LOCAL-00056" summary="Tests in cziChannelTest.&#10;Found out that cziFilters are not setup properly.">
+      <created>1560192722676</created>
+      <option name="number" value="00056" />
+      <option name="presentableId" value="LOCAL-00056" />
+      <option name="project" value="LOCAL" />
+      <updated>1560192722676</updated>
+    </task>
+    <task id="LOCAL-00057" summary="Tests in cziChannelTest.&#10;Found out that cziFilters are not setup properly.">
+      <created>1560253576868</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1560253576868</updated>
+    </task>
+    <task id="LOCAL-00058" summary="Tests in cziChannelTest.&#10;Found out that cziFilters are not setup properly.">
+      <created>1560254099048</created>
+      <option name="number" value="00058" />
+      <option name="presentableId" value="LOCAL-00058" />
+      <option name="project" value="LOCAL" />
+      <updated>1560254099048</updated>
+    </task>
+    <task id="LOCAL-00059" summary="Tests in cziChannelTest.&#10;Found out that cziFilters are not setup properly.">
+      <created>1560257220856</created>
+      <option name="number" value="00059" />
+      <option name="presentableId" value="LOCAL-00059" />
+      <option name="project" value="LOCAL" />
+      <updated>1560257220856</updated>
+    </task>
+    <task id="LOCAL-00060" summary="Corecting bugs. Some channel tests are not working properly.">
+      <created>1560259317859</created>
+      <option name="number" value="00060" />
+      <option name="presentableId" value="LOCAL-00060" />
+      <option name="project" value="LOCAL" />
+      <updated>1560259317859</updated>
+    </task>
+    <task id="LOCAL-00061" summary="Updated tests for cziChannel and corrected a bug with filters not being selected properly.">
+      <created>1560268220493</created>
+      <option name="number" value="00061" />
+      <option name="presentableId" value="LOCAL-00061" />
+      <option name="project" value="LOCAL" />
+      <updated>1560268220493</updated>
+    </task>
+    <task id="LOCAL-00062" summary="Replaced returns for cziChannel and updated unitTests in consequence.">
+      <created>1560271476062</created>
+      <option name="number" value="00062" />
+      <option name="presentableId" value="LOCAL-00062" />
+      <option name="project" value="LOCAL" />
+      <updated>1560271476062</updated>
+    </task>
+    <option name="localTasksCounter" value="63" />
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="pytest_for_DCCImageTests_TestDCCImageMethods_testDCCImageClosing - 2019.06.05 at 08h 15m 40s.xml">
-      <configuration name="pytest for DCCImageTests.TestDCCImageMethods.testDCCImageClosing" configurationId="tests" />
+    <history-entry file="pytest_for_cziFilterTest_TestFilter_test_getFilterRange_expectedValue - 2019.06.11 at 13h 39m 59s.xml">
+      <configuration name="pytest for cziFilterTest.TestFilter.test_getFilterRange_expectedValue" configurationId="tests" />
     </history-entry>
-    <history-entry file="pytest_for_DCCImageTests_TestDCCImageMethods_testDCCImageClosing - 2019.06.05 at 08h 23m 43s.xml">
-      <configuration name="pytest for DCCImageTests.TestDCCImageMethods.testDCCImageClosing" configurationId="tests" />
+    <history-entry file="pytest_for_cziFilterTest_TestFilter_test_getFilterRange_noneValues - 2019.06.11 at 13h 40m 50s.xml">
+      <configuration name="pytest for cziFilterTest.TestFilter.test_getFilterRange_noneValues" configurationId="tests" />
     </history-entry>
-    <history-entry file="pytest_for_DCCImageTests_TestDCCImageMethods_testDCCImageClosing - 2019.06.05 at 08h 23m 57s.xml">
-      <configuration name="pytest for DCCImageTests.TestDCCImageMethods.testDCCImageClosing" configurationId="tests" />
+    <history-entry file="pytest_for_cziFilterTest_TestFilter_test_getFilterRange_noneValues - 2019.06.11 at 13h 41m 08s.xml">
+      <configuration name="pytest for cziFilterTest.TestFilter.test_getFilterRange_noneValues" configurationId="tests" />
     </history-entry>
-    <history-entry file="pytest_for_DCCImageTests_TestDCCImageMethods_testDCCImageClosing - 2019.06.05 at 08h 24m 48s.xml">
-      <configuration name="pytest for DCCImageTests.TestDCCImageMethods.testDCCImageClosing" configurationId="tests" />
+    <history-entry file="pytest_for_cziFilterTest_TestFilter_test_getDichroic_expectedValue - 2019.06.11 at 13h 41m 36s.xml">
+      <configuration name="pytest for cziFilterTest.TestFilter.test_getDichroic_expectedValue" configurationId="tests" />
     </history-entry>
-    <history-entry file="pytest_for_DCCImageTests_TestDCCImageMethods_testDCCImageClosing - 2019.06.05 at 08h 25m 06s.xml">
-      <configuration name="pytest for DCCImageTests.TestDCCImageMethods.testDCCImageClosing" configurationId="tests" />
+    <history-entry file="pytest_for_cziFilterTest_TestFilter_test_getType_noneValue - 2019.06.11 at 13h 42m 30s.xml">
+      <configuration name="pytest for cziFilterTest.TestFilter.test_getType_noneValue" configurationId="tests" />
     </history-entry>
-    <history-entry file="pytest_in_DCCImageTests_py - 2019.06.05 at 08h 30m 56s.xml">
-      <configuration name="pytest in DCCImageTests.py" configurationId="tests" />
+    <history-entry file="pytest_for_cziFilterTest_TestFilter_test_getChannelId_noneValue - 2019.06.11 at 13h 43m 04s.xml">
+      <configuration name="pytest for cziFilterTest.TestFilter.test_getChannelId_noneValue" configurationId="tests" />
     </history-entry>
-    <history-entry file="pytest_in_DCCImagesFromFilesTests_py - 2019.06.05 at 08h 37m 34s.xml">
-      <configuration name="pytest in DCCImagesFromFilesTests.py" configurationId="tests" />
+    <history-entry file="pytest_for_cziFilterTest_TestFilter_test_getDichroic_noneValue - 2019.06.11 at 13h 43m 32s.xml">
+      <configuration name="pytest for cziFilterTest.TestFilter.test_getDichroic_noneValue" configurationId="tests" />
     </history-entry>
-    <history-entry file="pytest_for_DCCImageTests_TestDCCImageMethods_testDCCImageBinaryOpening - 2019.06.05 at 13h 27m 46s.xml">
-      <configuration name="pytest for DCCImageTests.TestDCCImageMethods.testDCCImageBinaryOpening" configurationId="tests" />
+    <history-entry file="pytest_for_cziFilterTest_TestFilter_test_getDichroic_noneValue - 2019.06.11 at 13h 43m 45s.xml">
+      <configuration name="pytest for cziFilterTest.TestFilter.test_getDichroic_noneValue" configurationId="tests" />
     </history-entry>
-    <history-entry file="pytest_for_DCCImageTests_TestDCCImageMethods_testDCCImageBinaryOpening - 2019.06.05 at 13h 28m 21s.xml">
-      <configuration name="pytest for DCCImageTests.TestDCCImageMethods.testDCCImageBinaryOpening" configurationId="tests" />
+    <history-entry file="pytest_for_cziFilterTest_TestFilter - 2019.06.11 at 13h 43m 55s.xml">
+      <configuration name="pytest for cziFilterTest.TestFilter" configurationId="tests" />
     </history-entry>
-    <history-entry file="pytest_in_DCCImageTests_py - 2019.06.05 at 15h 54m 25s.xml">
-      <configuration name="pytest in DCCImageTests.py" configurationId="tests" />
+    <history-entry file="pytest_for_cziFilterTest_TestFilter - 2019.06.11 at 13h 44m 29s.xml">
+      <configuration name="pytest for cziFilterTest.TestFilter" configurationId="tests" />
     </history-entry>
   </component>
   <component name="TodoView">
@@ -849,8 +812,8 @@
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32974428" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.2974428" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.39973083" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.2960993" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.39893618" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32974428" />
@@ -863,19 +826,19 @@
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
     </layout>
     <layout-to-restore>
-      <window_info content_ui="combo" id="Project" order="0" weight="0.22370088" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.16203336" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32974428" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.2974428" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.2960993" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39973083" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32974428" />
-      <window_info anchor="bottom" id="Version Control" order="7" sideWeight="0.4992948" weight="0.32974428" />
+      <window_info anchor="bottom" id="Version Control" order="7" sideWeight="0.4992948" weight="0.3280142" />
       <window_info anchor="bottom" id="Terminal" order="8" weight="0.32974428" />
-      <window_info anchor="bottom" id="Python Console" order="9" />
+      <window_info anchor="bottom" id="Python Console" order="9" weight="0.32974428" />
       <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.50070524" side_tool="true" weight="0.32974428" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -933,12 +896,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Finished histogram methods and did sobel (horizontal, vertical and both) filters" />
-    <MESSAGE value="Corrected some tests and modified the std deviation filters so that they throw warnings when nans encountered." />
-    <MESSAGE value="Cleaning of the unit test folder (and at the same time modification to some tests)" />
-    <MESSAGE value="Finished sobel filtering (and test cases). Added some thresholding methods and started watershed method" />
-    <MESSAGE value="New thresholding methods (and watershed method). New factoring methods and test cases related to the refactoring." />
-    <MESSAGE value="Chnaged the method __repr__ to __str__" />
     <MESSAGE value="Cleaning in cziUtil and in DCCImage class" />
     <MESSAGE value="Update in readme file and DCCImage" />
     <MESSAGE value="Modification of the otsu and isodata thresholding methods. Added unit tests related to the thresholding methods." />
@@ -958,63 +915,15 @@
     <MESSAGE value="Worked on image.py and cziUtil.&#10;Made a new method to read the data form czi files in cziUtil based on the one from czifile, but modified to get all the tiles in the mosaic, as well as the mosaic. Also, the problem of big czi files is due to the access to the server. When the file is on my computer, it is very fast." />
     <MESSAGE value="Renamed asNumpyArray into asArray" />
     <MESSAGE value="Added the import of DCCException in image.py." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added the import of DCCException in image.py." />
+    <MESSAGE value="Deleted cziReader. File was obsolete." />
+    <MESSAGE value="Renaming cziNameTest to cziNameAnalysisTest and testing." />
+    <MESSAGE value="Tests in cziChannelTest.&#10;Found out that cziFilters are not setup properly." />
+    <MESSAGE value="Corecting bugs. Some channel tests are not working properly." />
+    <MESSAGE value="Updated tests for cziChannel and corrected a bug with filters not being selected properly." />
+    <MESSAGE value="Replaced returns for cziChannel and updated unitTests in consequence." />
+    <option name="LAST_COMMIT_MESSAGE" value="Replaced returns for cziChannel and updated unitTests in consequence." />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/matplotlib/axes/_subplots.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="174">
-          <caret line="58" selection-start-line="58" selection-end-line="58" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Database/CziMetadataManagement/channel.py" />
-    <entry file="file://$PROJECT_DIR$/Database/CziMetadataManagement/metadata.py" />
-    <entry file="file://$PROJECT_DIR$/ImageAnalysis/unitTesting/DCCCollectionTests.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
-          <caret line="175" column="43" lean-forward="true" selection-start-line="175" selection-start-column="43" selection-end-line="175" selection-end-column="43" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/skimage/filters/edges.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-323">
-          <caret line="108" column="4" selection-start-line="108" selection-start-column="4" selection-end-line="108" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/skimage/morphology/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <folding>
-            <element signature="e#0#106#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/matplotlib/pyplot.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="174">
-          <caret line="2664" column="4" selection-start-line="2664" selection-start-column="4" selection-end-line="2664" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../hello-world/todoCompletion.py" />
-    <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/scipy/signal/signaltools.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="465">
-          <caret line="1011" column="11" lean-forward="true" selection-start-line="1011" selection-start-column="11" selection-end-line="1011" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/scipy/ndimage/morphology.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="174">
-          <caret line="2058" column="4" selection-start-line="2058" selection-start-column="4" selection-end-line="2058" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/skimage/color/colorconv.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="488">
@@ -1250,19 +1159,111 @@
     <entry file="file://$PROJECT_DIR$/setup.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/Database/MetadataFromCzi/cziFilter.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1241">
-          <caret line="73" column="41" lean-forward="true" selection-start-line="73" selection-start-column="41" selection-end-line="73" selection-end-column="41" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/dcclab/channel.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2567">
           <caret line="250" column="36" selection-start-line="250" selection-start-column="8" selection-end-line="250" selection-end-column="36" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Database/MetadataFromCzi/cziNameAnalysis.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-425">
+          <caret line="2" selection-start-line="2" selection-end-line="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/unitTesting/cziNameAnalysisTest.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="289">
+          <caret line="17" column="31" selection-start-line="17" selection-start-column="31" selection-end-line="17" selection-end-column="31" />
+          <folding>
+            <element signature="e#0#49#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Database/MetadataFromCzi/cziMetadata.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2159">
+          <caret line="139" column="36" selection-start-line="139" selection-start-column="36" selection-end-line="139" selection-end-column="36" />
+          <folding>
+            <element signature="e#0#34#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Database/CsvFromMetadata/meta.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-17077" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Database/CsvFromMetadata/channel.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-38344" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Database/MetadataFromCzi/cziChannel.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="986">
+          <caret line="58" column="25" lean-forward="true" selection-start-line="58" selection-start-column="25" selection-end-line="58" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Database/CsvFromMetadata/csvFromCziMetadata.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="9" lean-forward="true" selection-start-line="9" selection-end-line="9" />
+          <folding>
+            <element signature="e#0#43#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/unitTesting/cziChannelTest.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3825">
+          <caret line="225" column="52" selection-start-line="225" selection-start-column="52" selection-end-line="225" selection-end-column="52" />
+          <folding>
+            <element signature="e#0#42#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/testData/temp_full.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-407">
+          <folding>
+            <element signature="n#Experiment#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#HardwareSetting#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#Application#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#Document#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#Image#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#Microscopes#0;n#Instrument#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#LightSources#0;n#Instrument#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#Detectors#0;n#Instrument#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#Objectives#0;n#Instrument#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+            <element signature="n#FilterSets#0;n#Instrument#0;n#Information#0;n#Metadata#0;n#ImageDocument#0;n#!!top" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Database/MetadataFromCzi/cziFilter.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-722">
+          <caret line="18" column="42" selection-start-line="18" selection-start-column="42" selection-end-line="18" selection-end-column="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/unitTesting/cziFilterTest.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="11" column="96" selection-start-line="11" selection-start-column="96" selection-end-line="11" selection-end-column="96" />
+          <folding>
+            <element signature="e#0#39#0" expanded="true" />
           </folding>
         </state>
       </provider>
