@@ -4,7 +4,7 @@ import pathlib
 import platform
 
 class Database:
-    def __init__(self, path, readOnly=True):
+    def __init__(self, path, readOnly=False):
         self.path = path
         self.connection = None
         self.cursor = None
@@ -34,6 +34,10 @@ class Database:
     def commit(self):
         if self.isConnected:
             self.connection.commit()
+
+    def rollback(self):
+        if self.isConnected:
+            self.connection.rollback()
 
     def execute(self, statement) -> (lite.Row):
         if self.isConnected:
