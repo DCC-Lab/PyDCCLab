@@ -20,8 +20,10 @@ class CZIFilter:
         try:
             for filterSet in self.root.find('./Metadata/Information/Instrument/FilterSets'):
                 if self.filterId == filterSet.find('./EmissionFilters/EmissionFilterRef').attrib['Id']:
+                    print('Em', self.filterId == filterSet.find('./EmissionFilters/EmissionFilterRef').attrib['Id'])
                     return filterSet.attrib['Id'], 'Emission'
                 elif self.filterId == filterSet.find('./ExcitationFilters/ExcitationFilterRef').attrib['Id']:
+                    print('Exc', self.filterId == filterSet.find('./EmissionFilters/EmissionFilterRef').attrib['Id'])
                     return filterSet.attrib['Id'], 'Excitation'
         except KeyError:
             return 'Key not found.', 'Key not found.'
