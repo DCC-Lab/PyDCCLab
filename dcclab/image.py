@@ -4,46 +4,30 @@ from .imageFile import *
 class Image:
 
     def __init__(self, path: str):
-        self.path = path
-        self.__channels = []
-        try:
-            imageData = self.imageDataFromPath(path)
-            self.__channels = self.channelsFromImageData(imageData)
-        except:
-            raise ValueError("Not known format recognized for {0}".format(path))
-
-    def imageDataFromPath(self, path):
-        imageData = None
         supportedClasses = [CZIFile, TIFFFile, PILFile]
-        for supportedClass in supportedClasses:
+        self.__path = path
+
+        self.__fileObject = None
+        imageData = None
+        for fileClass in supportedClasses:
             try:
-                imageData = supportedClass(path).imageDataFromPath()
+                self.__fileObject = fileClass(path)
+                imageData = self.__fileObject.imageDataFromPath()
                 break
             except:
                 continue
-        if imageData is None:
-            raise ValueError
-        return imageData
+        if self.__fileObject is None:
+            raise InvalidFileFormatException("The file cannot be read. Please check if the format is supported.")
+
+        self.__channels = self.channelsFromImageData(imageData)
 
     @property
-    def shape(self):
-        if len(self.channels) != 0:
-            return self.channels[0].shape
-
-    @property
-    def sizeInBytes(self) -> int:
-        totalSize = 0
-        for channel in self.channels:
-            totalSize += channel.sizeInBytes
-        return totalSize
+    def path(self):
+        return self.__path
 
     @property
     def channels(self):
         return self.__channels
-
-    def removeChannels(self, channels):
-        for index in channels:
-            del self.channels[index]
 
     def asChannelsArray(self):
         channelsPixels = list(map(lambda c: c.pixels, self.channels))
