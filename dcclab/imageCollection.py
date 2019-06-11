@@ -93,7 +93,7 @@ class ZStack(ImageCollection):
 
     def imagesAreSimilar(self) -> bool:
         shape = None
-        for image in images:
+        for image in self.images:
             if shape is None:
                 shape = image.shape
             elif shape != image.shape:
@@ -101,5 +101,5 @@ class ZStack(ImageCollection):
         return true
 
     def show(self):
-        # Do something nicer with z-stack
+        # TODO: Do something nicer with z-stack
         self.showAllSequentially()
