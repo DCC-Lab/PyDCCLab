@@ -45,12 +45,10 @@ class CZIChannel:
         try:
             if not filters:
                 return -1
-
             for filter in filters:
                 if filter.getType() == 'Excitation' and self.channelId == filter.getChannelId():
                     return filter.getFilterRange()
-                else:
-                    return 0
+            return 0
         except Exception:
             return -1
 
@@ -58,12 +56,10 @@ class CZIChannel:
         try:
             if not filters:
                 return -1
-
             for filter in filters:
                 if filter.getType() == 'Emission' and self.channelId == filter.getChannelId():
                     return filter.getFilterRange()
-                else:
-                    return 0
+            return 0
         except Exception:
             return -1
 
@@ -71,7 +67,6 @@ class CZIChannel:
         try:
             if not filters:
                 return -1
-
             for filter in filters:
                 if self.channelId == filter.getChannelId():
                     return filter.getDichroic()
