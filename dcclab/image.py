@@ -2,14 +2,14 @@ from .imageFile import *
 
 
 class Image:
-    supportedClasses = {CZIFile, TIFFFile, PILFile}
 
     def __init__(self, path: str):
+        self.__supportedClasses = [CZIFile, TIFFFile, PILFile]
         self.__path = path
 
         self.__fileObject = None
         imageData = None
-        for fileClass in self.supportedClasses:
+        for fileClass in self.__supportedClasses:
             try:
                 self.__fileObject = fileClass(path)
                 imageData = self.__fileObject.imageDataFromPath()
@@ -46,6 +46,7 @@ class Image:
         if imageData.ndim == 2:
             return Channel(imageData)
         elif imageData.ndim == 3:
+
             channelsData = np.squeeze(np.dsplit(imageData, imageData.shape[2]))
             channels = list(map(lambda pix: Channel(pix), channelsData))
             return channels
