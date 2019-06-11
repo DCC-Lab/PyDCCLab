@@ -11,15 +11,7 @@ class ImageCollection:
                 raise NotDCCImageException
             self.__images = images
         elif pathPattern is not None:
-            directory = os.path.dirname(pathPattern)
-            basePattern = os.path.basename(pathPattern)
-            paths = [os.path.join(directory,f) for f in os.listdir(directory) if re.match(basePattern, f)]
-            for path in paths:
-                try:
-                    image = Image(path)
-                    self.__images.append(image)
-                except:
-                    pass
+            self.appendMatchingFiles(pathPattern)
 
     @property
     def images(self):
@@ -52,6 +44,17 @@ class ImageCollection:
         if self.contains(image):
             raise ImageAlreadyInCollectionException
         self.images.append(image)
+
+    def appendMatchingFiles(self, pathPattern):
+        directory = os.path.dirname(pathPattern)
+        basePattern = os.path.basename(pathPattern)
+        paths = [os.path.join(directory,f) for f in os.listdir(directory) if re.match(basePattern, f)]
+        for path in paths:
+            try:
+                image = Image(path)
+                self.__images.append(image)
+            except:
+                pass
 
     def removeAt(self, index: int):
         self.images.pop(index)
