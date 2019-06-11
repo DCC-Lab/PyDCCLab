@@ -24,7 +24,9 @@ class CZIFile(ImageFile):
         out = np.squeeze(out).astype(np.float32)
         self.__numberOFChannels = out.shape[-3]
         closeCziFileObject(cziObj)
-        return out
+        wholeImage = out.transpose((1, 2, 0))
+        print(wholeImage.shape)
+        return wholeImage
 
 
 class TIFFFile(ImageFile):
