@@ -13,7 +13,6 @@ class TestCziChannel(unittest.TestCase):
         self.missingKeysPath = os.path.join(self.directory, 'testData', 'MissingKeys.xml')
 
         self.meta = mtdt(self.testPath, 'testCziFile.czi')
-
         self.testXml = self.meta.extractXmlAsStringFromCziImageObject(self.meta.cziFileToCziImageObject())
 
     def test_setExWavelengthFilter_expectedValue(self):
@@ -74,13 +73,13 @@ class TestCziChannel(unittest.TestCase):
     def test_setReflector_missingKeys(self):
         root = ET.fromstring(self.testXml)
         channel = chnnl(['', 'EGFP', 'testCziFile.czi'], self.meta.filters, root)
-        self.assertEqual(channel.setReflector(), 'Missing attribute or key.')
+        self.assertEqual(channel.setReflector(), '')
 
     def test_setReflector_missingEntries(self):
         tree = ET.parse(self.missingEntriesPath)
         root = tree.getroot()
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, root)
-        self.assertEqual(channel.setReflector(), 'Missing attribute or key.')
+        self.assertEqual(channel.setReflector(), '')
 
     def test_setContrastMethod_expectedValue(self):
         root = ET.fromstring(self.testXml)
@@ -90,13 +89,13 @@ class TestCziChannel(unittest.TestCase):
     def test_setContrastMethod_missingKeys(self):
         root = ET.fromstring(self.testXml)
         channel = chnnl(['', 'EGFP', 'testCziFile.czi'], self.meta.filters, root)
-        self.assertEqual(channel.setContrastMethod(), 'Missing attribute or key.')
+        self.assertEqual(channel.setContrastMethod(), '')
 
     def test_setContrastMethod_missingEntries(self):
         tree = ET.parse(self.missingEntriesPath)
         root = tree.getroot()
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, root)
-        self.assertEqual(channel.setContrastMethod(), 'Missing attribute or key.')
+        self.assertEqual(channel.setContrastMethod(), '')
 
     def test_setLightSource_isEqual(self):
         root = ET.fromstring(self.testXml)

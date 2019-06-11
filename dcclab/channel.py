@@ -1,7 +1,7 @@
 import numpy as np
 import typing
 
-from skimage import measure, morphology, img_as_uint, img_as_ubyte
+from skimage import measure, morphology, img_as_ubyte
 from skimage.filters.rank import entropy
 from skimage.filters import *
 
@@ -21,22 +21,17 @@ except:
 
 class Channel:
 
-    def __init__(self, pixels: np.ndarray, channelNumber: int = None):
+    def __init__(self, pixels: np.ndarray):
         if not pixels.dtype == np.float32:
             raise PixelTypeException
         if pixels.ndim > 2:
             raise DimensionException(pixels.ndim)
         self.__pixels = np.copy(pixels)
         self.__original = None
-        self.__channelNumber = channelNumber
 
     @property
     def pixels(self):
         return self.__pixels
-
-    @property
-    def channelNumber(self):
-        return self.__channelNumber
 
     @property
     def dimension(self):
@@ -59,13 +54,17 @@ class Channel:
         return self.height
 
     @property
+    def sizeInBytes(self) -> int:
+        return self.pixels.nbytes
+
+    @property
     def numberOfPixels(self) -> int:
-        return self.width * self.height
+        return self.width() * self.height()
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, Channel):
             raise InvalidEqualityTestException(type(other))
-        return np.array_equal(self.pixels, other.pixels)
+        return np.array_equal(self.pixels, other.pixels())
 
     @deprecated(reason="Renamed as a @property pixels")
     def getPixels(self) -> np.ndarray:
@@ -102,7 +101,7 @@ class Channel:
         return self
 
     def getHistogramValues(self, normed: bool = False) -> typing.Tuple[np.ndarray, np.ndarray]:
-        array = img_as_uint(self.pixels).ravel()
+        array = self.pixels.astype(np.uint16).ravel()
         nbBins = len(np.bincount(array))
         hist, bins = np.histogram(array, nbBins, [0, nbBins], density=normed)
         return hist, bins
@@ -219,7 +218,7 @@ class Channel:
         return self.getPixelsOfIntensity(maximum)
 
     def getEntropyFiltering(self, filterSize: int):
-        # We have to cast image in 8 bits uint because the algorithm seems to properly works only in this type
+        # We have to cast image in 8 bits uint because the algorithm semms to properly works only in this type
         image = img_as_ubyte(self.pixels)
         entropyFiltered = entropy(image, morphology.selem.square(filterSize, dtype=np.float32))
         return Channel(entropyFiltered.astype(np.float32))
