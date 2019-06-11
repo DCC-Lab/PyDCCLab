@@ -1,5 +1,6 @@
 from .cziUtil import *
 from .channel import *
+import PIL.Image
 
 
 class ImageFile(object):
@@ -20,14 +21,12 @@ class CZIFile(ImageFile):
 
     def imageDataFromPath(self):
         cziObj = readCziImage(self.path)
-        out, self.__tilesWithChannelNumber = decodeImages(cziObj)
-        out = np.squeeze(out)
-        self.__numberOFChannels = out.shape[-3]
+        mosaic, self.__tilesWithChannelNumber = decodeImages(cziObj)
+        mosaic = np.squeeze(mosaic)
+        self.__numberOFChannels = mosaic.shape[-3]
         closeCziFileObject(cziObj)
-        wholeImage = out.transpose((1, 2, 0)) if out.ndim == 3 else out
-        dtype = wholeImage.dtype
-        normalizeValue = np.finfo(dtype).max if "float" in str(dtype) else np.iinfo(dtype).max
-        return (wholeImage / normalizeValue).astype(np.float32)
+        wholeImage = mosaic.transpose((1, 2, 0)) if mosaic.ndim == 3 else mosaic
+        return wholeImage
 
 
 class TIFFFile(ImageFile):
@@ -36,6 +35,7 @@ class TIFFFile(ImageFile):
         ImageFile.__init__(self, path)
 
     def imageDataFromPath(self):
+        #todo better method that return every images if multipage
         tiffFileObject = tifffile.TiffFile(self.path)
         imageAsArray = tiffFileObject.asarray().astype(dtype="float32")
         self.__metadata = tiffFileObject.ome_metadata
@@ -49,3 +49,8 @@ class PILFile(ImageFile):
 
     def __init__(self, path):
         ImageFile.__init__(self, path)
+
+    def imageDataFromPath(self):
+        image = PIL.Image.open(self.path)
+        imageAsArray = np.array(image)
+        return imageAsArray
