@@ -19,15 +19,15 @@ class TestCziChannel(unittest.TestCase):
 
     def test_setExWavelengthFilter_notFound(self):
         channel = chnnl(['', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
-        self.assertEqual(channel.exWavelengthFilter, 0)
+        self.assertIsNone(channel.exWavelengthFilter)
 
     def test_setExWavelengthFilter_emptyFilterList(self):
         channel = chnnl(['', 'EGFP', 'testCziFile.czi'], [], self.meta.root)
-        self.assertEqual(channel.exWavelengthFilter, -1)
+        self.assertIsNone(channel.exWavelengthFilter)
 
     def test_setExWavelengthFilter_notFilterList(self):
         channel = chnnl(['', 'EGFP', 'testCziFile.czi'], [1, 2, 3], self.meta.root)
-        self.assertEqual(channel.exWavelengthFilter, -1)
+        self.assertIsNone(channel.exWavelengthFilter)
 
     def test_setEmWavelengthFilter_expectedValue(self):
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
@@ -35,11 +35,11 @@ class TestCziChannel(unittest.TestCase):
 
     def test_setEmWavelengthFilter_notFound(self):
         channel = chnnl(['', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
-        self.assertEqual(channel.emWavelengthFilter, 0)
+        self.assertIsNone(channel.emWavelengthFilter)
 
     def test_setEmWavelengthFilter_noFilters(self):
         channel = chnnl(['', 'EGFP', 'testCziFile.czi'], [], self.meta.root)
-        self.assertEqual(channel.emWavelengthFilter, -1)
+        self.assertIsNone(channel.emWavelengthFilter)
 
     def test_setBeamsplitter_expectedValue(self):
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
@@ -47,11 +47,11 @@ class TestCziChannel(unittest.TestCase):
 
     def test_setBeamsplitter_notFound(self):
         channel = chnnl(['', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
-        self.assertEqual(channel.beamsplitter, 0)
+        self.assertIsNone(channel.beamsplitter)
 
     def test_setBeamsplitter_noFilters(self):
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], [], self.meta.root)
-        self.assertEqual(channel.beamsplitter, -1)
+        self.assertIsNone(channel.beamsplitter)
 
     def test_setReflector_expectedValue(self):
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
@@ -59,13 +59,13 @@ class TestCziChannel(unittest.TestCase):
 
     def test_setReflector_missingKeys(self):
         channel = chnnl(['', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
-        self.assertEqual(channel.setReflector(), '')
+        self.assertIsNone(channel.setReflector())
 
     def test_setReflector_missingEntries(self):
         tree = ET.parse(self.missingEntriesPath)
         root = tree.getroot()
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, root)
-        self.assertEqual(channel.setReflector(), '')
+        self.assertIsNone(channel.setReflector())
 
     def test_setContrastMethod_expectedValue(self):
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
@@ -73,13 +73,13 @@ class TestCziChannel(unittest.TestCase):
 
     def test_setContrastMethod_missingKeys(self):
         channel = chnnl(['', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
-        self.assertEqual(channel.setContrastMethod(), '')
+        self.assertIsNone(channel.setContrastMethod())
 
     def test_setContrastMethod_missingEntries(self):
         tree = ET.parse(self.missingEntriesPath)
         root = tree.getroot()
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, root)
-        self.assertEqual(channel.setContrastMethod(), '')
+        self.assertIsNone(channel.setContrastMethod())
 
     def test_setLightSource_expectedValue(self):
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
@@ -87,13 +87,13 @@ class TestCziChannel(unittest.TestCase):
 
     def test_setLightSource_missingKeys(self):
         channel = chnnl(['', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
-        self.assertEqual(channel.setLightSource(), '')
+        self.assertIsNone(channel.setLightSource())
 
     def test_setLightSource_missingEntries(self):
         tree = ET.parse(self.missingEntriesPath)
         root = tree.getroot()
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, root)
-        self.assertEqual(channel.setLightSource(), '')
+        self.assertIsNone(channel.setLightSource())
 
     def test_setLightSourceIntensity_expectedValue(self):
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
@@ -101,13 +101,13 @@ class TestCziChannel(unittest.TestCase):
 
     def test_setLightSourceIntensity_missingKeys(self):
         channel = chnnl(['', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
-        self.assertEqual(channel.setLightSourceIntensity(), '')
+        self.assertIsNone(channel.setLightSourceIntensity())
 
     def test_setLightSourceIntensity_missingEntries(self):
         tree = ET.parse(self.missingEntriesPath)
         root = tree.getroot()
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, root)
-        self.assertEqual(channel.setLightSourceIntensity(), '')
+        self.assertIsNone(channel.setLightSourceIntensity())
 
     def test_setDyeName_expectedValue(self):
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
@@ -115,13 +115,13 @@ class TestCziChannel(unittest.TestCase):
 
     def test_setDyeName_missingKeys(self):
         channel = chnnl(['', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
-        self.assertEqual(channel.setDyeName(), '')
+        self.assertIsNone(channel.setDyeName())
 
     def test_setDyeName_missingEntries(self):
         tree = ET.parse(self.missingEntriesPath)
         root = tree.getroot()
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, root)
-        self.assertEqual(channel.setDyeName(), '')
+        self.assertIsNone(channel.setDyeName())
 
     def test_setChannelColor_expectedValue(self):
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
@@ -129,13 +129,13 @@ class TestCziChannel(unittest.TestCase):
 
     def test_setChannelColor_missingKeys(self):
         channel = chnnl(['', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
-        self.assertEqual(channel.setChannelColor(), '')
+        self.assertIsNone(channel.setChannelColor())
 
     def test_setChannelColor_missingEntries(self):
         tree = ET.parse(self.missingEntriesPath)
         root = tree.getroot()
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, root)
-        self.assertEqual(channel.setChannelColor(), '')
+        self.assertIsNone(channel.setChannelColor())
 
     def test_setExWavelength_expectedValue(self):
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
@@ -143,13 +143,13 @@ class TestCziChannel(unittest.TestCase):
 
     def test_setExWavelength_missingKeys(self):
         channel = chnnl(['', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
-        self.assertEqual(channel.setExWavelength(), 0)
+        self.assertIsNone(channel.setExWavelength())
 
     def test_setExWavelength_missingEntries(self):
         tree = ET.parse(self.missingEntriesPath)
         root = tree.getroot()
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, root)
-        self.assertEqual(channel.setExWavelength(), 0)
+        self.assertIsNone(channel.setExWavelength())
 
     def test_setEmWavelength_expectedValue(self):
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
@@ -157,13 +157,13 @@ class TestCziChannel(unittest.TestCase):
 
     def test_setEmWavelength_missingKeys(self):
         channel = chnnl(['', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
-        self.assertEqual(channel.setEmWavelength(), 0)
+        self.assertIsNone(channel.setEmWavelength())
 
     def test_setEmWavelength_missingEntries(self):
         tree = ET.parse(self.missingEntriesPath)
         root = tree.getroot()
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, root)
-        self.assertEqual(channel.setEmWavelength(), 0)
+        self.assertIsNone(channel.setEmWavelength())
 
     def test_setExposureTime_expectedValue(self):
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
@@ -171,13 +171,13 @@ class TestCziChannel(unittest.TestCase):
 
     def test_setExposureTime_missingKeys(self):
         channel = chnnl(['', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
-        self.assertEqual(channel.setExposureTime(), 0)
+        self.assertIsNone(channel.setExposureTime())
 
     def test_setExposureTime_missingEntries(self):
         tree = ET.parse(self.missingEntriesPath)
         root = tree.getroot()
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, root)
-        self.assertEqual(channel.setExposureTime(), 0)
+        self.assertIsNone(channel.setExposureTime())
 
     def test_setEffectiveNA_expectedValue(self):
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
@@ -187,7 +187,7 @@ class TestCziChannel(unittest.TestCase):
         tree = ET.parse(self.missingEntriesPath)
         root = tree.getroot()
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, root)
-        self.assertEqual(channel.setEffectiveNA(), 0)
+        self.assertIsNone(channel.setEffectiveNA())
 
     def test_setImagingDevice_expectedValue(self):
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
@@ -197,13 +197,13 @@ class TestCziChannel(unittest.TestCase):
         tree = ET.parse(self.missingEntriesPath)
         root = tree.getroot()
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, root)
-        self.assertEqual(channel.setImagingDevice(), '')
+        self.assertIsNone(channel.setImagingDevice())
 
     def test_setImagingDevice_missingKeys(self):
         tree = ET.parse(self.missingKeysPath)
         root = tree.getroot()
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, root)
-        self.assertEqual(channel.setImagingDevice(), '')
+        self.assertIsNone(channel.setImagingDevice())
 
     def test_setCameraAdapter_expectedValue(self):
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
@@ -213,7 +213,7 @@ class TestCziChannel(unittest.TestCase):
         tree = ET.parse(self.missingEntriesPath)
         root = tree.getroot()
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, root)
-        self.assertEqual(channel.setCameraAdapter(), '')
+        self.assertIsNone(channel.setCameraAdapter())
 
     def test_setBinningMode_expectedValue(self):
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
@@ -223,7 +223,7 @@ class TestCziChannel(unittest.TestCase):
         tree = ET.parse(self.missingEntriesPath)
         root = tree.getroot()
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, root)
-        self.assertEqual(channel.setCameraAdapter(), '')
+        self.assertIsNone(channel.setCameraAdapter())
 
 
 if __name__ == '__main__':
