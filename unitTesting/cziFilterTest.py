@@ -17,12 +17,11 @@ class TestFilter(unittest.TestCase):
 
         self.testXml = self.meta.extractXmlAsStringFromCziImageObject(self.meta.cziFileToCziImageObject())
 
-    def test_setFilterSetId_isEqual(self):
+    def test_setFilterSetIdAndType_expectedValue(self):
         root = ET.fromstring(self.testXml)
-        filter = fltr('Filter:2', '500', '550')
-
-        filter.setFilterSetIdAndType(root)
-        self.assertEqual(filter.filterSetId, self.defaultFilter.filterSetId)
+        filter = fltr('Filter:1', root)
+        print('Here ->', filter.setFilterSetIdAndType(), filter.getFilterRange())
+        #self.assertEqual(filter.filterSetId, )
 
     def test_setFilterSetId_rightFilterType(self):
         root = ET.fromstring(self.testXml)
