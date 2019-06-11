@@ -1,14 +1,14 @@
-class Filter:
-    def __init__(self, filterId, cutIn, cutOut):
+class CZIFilter:
+    def __init__(self, filterId, root):
         self.filterId = filterId
-        self.cutIn = cutIn
-        self.cutOut = cutOut
+        self.root = root
 
-        self.channelId = None
-        self.filterSetId = None
-        self.filterType = None
-        self.dichroicId = None
-        self.dichroic = None
+        self.filterSetId, self.filterType = self.setFilterSetIdAndType()
+        self.cutIn = self.setCutIn()
+        self.cutOut = self.setCutOut()
+        self.channelId = self.setChannelId()
+        self.dichroicId = self.setDichroicId()
+        self.dichroic = self.setDichroic()
 
     def __repr__(self):
         return '{};{};{};{}-{}'.format(self.filterId, self.channelId, self.dichroic, self.cutIn, self.cutOut)
@@ -16,53 +16,64 @@ class Filter:
     def __eq__(self, other):
         return repr(self) == repr(other)
 
-    def setFilterData(self, root):
-        self.setChannelId(root)
-        self.setDichroic(root)
-
-    def setFilterSetId(self, root):
+    def setFilterSetIdAndType(self):
         try:
-            for filterSet in root.find('./Metadata/Information/Instrument/FilterSets'):
+            for filterSet in self.root.find('./Metadata/Information/Instrument/FilterSets'):
                 if self.filterId == filterSet.find('./EmissionFilters/EmissionFilterRef').attrib['Id']:
-                    self.filterSetId = filterSet.attrib['Id']
-                    self.filterType = 'Emission'
+                    return filterSet.attrib['Id'], 'Emission'
                 elif self.filterId == filterSet.find('./ExcitationFilters/ExcitationFilterRef').attrib['Id']:
-                    self.filterSetId = filterSet.attrib['Id']
-                    self.filterType = 'Excitation'
-        except KeyError as error:
-            raise error
-        except AttributeError as error:
-            raise error
+                    return filterSet.attrib['Id'], 'Excitation'
+        except KeyError:
+            return 'Key not found.', 'Key not found.'
+        except AttributeError:
+            return 'Attribute not found.', 'Attribute not found.'
 
-    def setChannelId(self, root):
-        self.setFilterSetId(root)
+    def setCutIn(self):
         try:
-            for channel in root.find('./Metadata/Information/Image/Dimensions/Channels'):
+            return self.root.find('./Metadata/Information/Instrument/Filters/Filter[@Id="{}"]'
+                                  '/TransmittanceRange/CutIn'.format(self.filterId)).text
+        except AttributeError:
+            return 'Attribute not found.'
+        except KeyError:
+            return 'Key not found.'
+
+    def setCutOut(self):
+        try:
+            return self.root.find('./Metadata/Information/Instrument/Filters/Filter[@Id="{}"]'
+                                  '/TransmittanceRange/CutOut'.format(self.filterId)).text
+        except AttributeError:
+            return 'Attribute not found.'
+        except KeyError:
+            return 'Key not found.'
+
+    def setChannelId(self):
+        self.setFilterSetIdAndType()
+        try:
+            for channel in self.root.find('./Metadata/Information/Image/Dimensions/Channels'):
                 if channel.find('FilterSetRef').attrib['Id'] == self.filterSetId:
-                    self.channelId = channel.attrib['Id']
+                    return channel.attrib['Id']
         except KeyError:
-            raise
+            return 'Key not found.'
         except AttributeError:
-            raise
+            return 'Attribute not found.'
 
-    def setDichroicId(self, root):
+    def setDichroicId(self):
         try:
-            self.dichroicId = root.find('./Metadata/Information/Instrument/FilterSets/FilterSet[@Id="{}"]'
-                                        '/DichroicRef'.format(self.filterSetId)).attrib['Id']
+            return self.root.find('./Metadata/Information/Instrument/FilterSets/'
+                                  'FilterSet[@Id="{}"]/DichroicRef'.format(self.filterSetId)).attrib['Id']
         except KeyError:
-            raise
+            return 'Key not found.'
         except AttributeError:
-            raise
+            return 'Attribute not found.'
 
-    def setDichroic(self, root):
-        self.setDichroicId(root)
+    def setDichroic(self):
         try:
-            self.dichroic = root.find('./Metadata/Information/Instrument/Dichroics/Dichroic[@Id="{}"]/Wavelengths'
-                                      '/Wavelength'.format(self.dichroicId)).text
+            return self.root.find('./Metadata/Information/Instrument/Dichroics/'
+                                  'Dichroic[@Id="{}"]/Wavelengths/Wavelength'.format(self.dichroicId)).text
         except AttributeError:
-            raise
+            return 'Attribute not found.'
         except KeyError:
-            raise
+            return 'Key not found.'
 
     def getType(self):
         return self.filterType
