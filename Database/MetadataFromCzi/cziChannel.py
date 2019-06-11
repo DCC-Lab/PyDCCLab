@@ -45,6 +45,7 @@ class CZIChannel:
         try:
             if not filters:
                 return -1
+
             for filter in filters:
                 if filter.getType() == 'Excitation' and self.channelId == filter.getChannelId():
                     return filter.getFilterRange()
@@ -57,7 +58,9 @@ class CZIChannel:
         try:
             if not filters:
                 return -1
+
             for filter in filters:
+                print(filter)
                 if filter.getType() == 'Emission' and self.channelId == filter.getChannelId():
                     return filter.getFilterRange()
                 else:

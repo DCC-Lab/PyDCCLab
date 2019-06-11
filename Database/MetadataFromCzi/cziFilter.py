@@ -11,7 +11,7 @@ class CZIFilter:
         self.dichroic = self.setDichroic()
 
     def __repr__(self):
-        return '{};{};{};{}-{}'.format(self.filterId, self.channelId, self.dichroic, self.cutIn, self.cutOut)
+        return '{};{};{};{}-{}'.format(self.filterId, self.channelId, self.filterType, self.cutIn, self.cutOut)
 
     def __eq__(self, other):
         return repr(self) == repr(other)
@@ -20,10 +20,8 @@ class CZIFilter:
         try:
             for filterSet in self.root.find('./Metadata/Information/Instrument/FilterSets'):
                 if self.filterId == filterSet.find('./EmissionFilters/EmissionFilterRef').attrib['Id']:
-                    print('Em', self.filterId == filterSet.find('./EmissionFilters/EmissionFilterRef').attrib['Id'])
                     return filterSet.attrib['Id'], 'Emission'
                 elif self.filterId == filterSet.find('./ExcitationFilters/ExcitationFilterRef').attrib['Id']:
-                    print('Exc', self.filterId == filterSet.find('./EmissionFilters/EmissionFilterRef').attrib['Id'])
                     return filterSet.attrib['Id'], 'Excitation'
         except KeyError:
             return 'Key not found.', 'Key not found.'
