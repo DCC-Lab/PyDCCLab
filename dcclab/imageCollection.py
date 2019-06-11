@@ -97,8 +97,8 @@ class ZStack(ImageCollection):
             if shape is None:
                 shape = image.shape
             elif shape != image.shape:
-                return false
-        return true
+                return False
+        return True
 
     def show(self):
         # TODO: Do something nicer with z-stack
