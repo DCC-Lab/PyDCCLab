@@ -3,17 +3,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 import typing
 
-
 class ImageCollection:
-    def __init__(self, images: typing.List[Image] = None, pathList=None):
+    def __init__(self, images: typing.List[Image] = None, pathPattern:str=None):
+        self.__images = []
         if images is not None:
             if not all(isinstance(image, Image) for image in images):
                 raise NotDCCImageException
             self.__images = images
-        elif pathList is not None:
-            raise NotImplemented("pathList not implemented yet")
-        else:
-            self.__images = []
+        elif pathPattern is not None:
+            self.appendMatchingFiles(pathPattern)
 
     @property
     def images(self):
@@ -47,6 +45,18 @@ class ImageCollection:
             raise ImageAlreadyInCollectionException
         self.images.append(image)
 
+    def appendMatchingFiles(self, pathPattern):
+        directory = os.path.dirname(pathPattern)
+        basePattern = os.path.basename(pathPattern)
+        paths = [os.path.join(directory,f) for f in os.listdir(directory) if re.match(basePattern, f)]
+        paths.sort()
+        for path in paths:
+            try:
+                image = Image(path)
+                self.__images.append(image)
+            except:
+                pass
+
     def removeAt(self, index: int):
         self.images.pop(index)
 
@@ -73,3 +83,23 @@ class ImageCollection:
             plt.imshow(self.images[i].asArray(), cmap=colorMap)
         plt.show()
         return imagesShown
+
+
+class ZStack(ImageCollection):
+    def __init__(self, images: typing.List[Image] = None, pathPattern:str=None):
+        ImageCollection.__init__(images, pathPattern)
+        if not self.imagesAreSimilar:
+            raise ValueError("Images in z-stack are not all the same shape")
+
+    def imagesAreSimilar(self) -> bool:
+        shape = None
+        for image in self.images:
+            if shape is None:
+                shape = image.shape
+            elif shape != image.shape:
+                return False
+        return True
+
+    def show(self):
+        # TODO: Do something nicer with z-stack
+        self.showAllSequentially()
