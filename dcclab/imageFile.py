@@ -21,12 +21,13 @@ class CZIFile(ImageFile):
     def imageDataFromPath(self):
         cziObj = readCziImage(self.path)
         out, self.__tilesWithChannelNumber = decodeImages(cziObj)
-        out = np.squeeze(out).astype(np.float32)
+        out = np.squeeze(out)
         self.__numberOFChannels = out.shape[-3]
         closeCziFileObject(cziObj)
-        wholeImage = out.transpose((1, 2, 0))
-        print(wholeImage.shape)
-        return wholeImage
+        wholeImage = out.transpose((1, 2, 0)) if out.ndim == 3 else out
+        dtype = wholeImage.dtype
+        normalizeValue = np.finfo(dtype).max if "float" in str(dtype) else np.iinfo(dtype).max
+        return (wholeImage / normalizeValue).astype(np.float32)
 
 
 class TIFFFile(ImageFile):
