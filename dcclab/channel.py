@@ -21,14 +21,8 @@ except:
 
 class Channel:
 
-<<<<<<< Updated upstream
-    def __init__(self, pixels: np.ndarray):
-        if not pixels.dtype == np.float32:
-            raise PixelTypeException
-=======
     def __init__(self, pixels: np.ndarray, channelNumber: int = None):
         self.__originalDType = pixels.dtype
->>>>>>> Stashed changes
         if pixels.ndim > 2:
             raise DimensionException(pixels.ndim)
         self.__pixels = self.toFloat32(pixels, self.__originalDType)
@@ -106,12 +100,8 @@ class Channel:
         return self
 
     def getHistogramValues(self, normed: bool = False) -> typing.Tuple[np.ndarray, np.ndarray]:
-<<<<<<< Updated upstream
-        array = self.pixels.astype(np.uint16).ravel()
-=======
         originalDTypeCoefficient = self.dTypeMaxValue(self.__originalDType)
         array = (self.pixels * originalDTypeCoefficient).astype(self.__originalDType).ravel()
->>>>>>> Stashed changes
         nbBins = len(np.bincount(array))
         hist, bins = np.histogram(array, nbBins, [0, nbBins], density=normed)
         return hist, bins
