@@ -21,17 +21,22 @@ except:
 
 class Channel:
 
-    def __init__(self, pixels: np.ndarray):
+    def __init__(self, pixels: np.ndarray, channelNumber: int = None):
         if not pixels.dtype == np.float32:
             raise PixelTypeException
         if pixels.ndim > 2:
             raise DimensionException(pixels.ndim)
         self.__pixels = np.copy(pixels)
         self.__original = None
+        self.__channelNumber = channelNumber
 
     @property
     def pixels(self):
         return self.__pixels
+
+    @property
+    def channelNumber(self):
+        return self.__channelNumber
 
     @property
     def dimension(self):
