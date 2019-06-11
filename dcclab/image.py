@@ -15,7 +15,7 @@ class Image:
             imageData = self.imageDataFromPath(path)
             self.__channels = self.channelsFromImageData(imageData)
         except:
-            raise ValueError("Not known format recognized")
+            raise ValueError("Not known format recognized for {0}".format(path))
 
     @property
     def channels(self):

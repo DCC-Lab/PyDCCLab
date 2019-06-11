@@ -3,17 +3,23 @@ import numpy as np
 import matplotlib.pyplot as plt
 import typing
 
-
 class ImageCollection:
-    def __init__(self, images: typing.List[Image] = None, pathList=None):
+    def __init__(self, images: typing.List[Image] = None, pathPattern:str=None):
+        self.__images = []
         if images is not None:
             if not all(isinstance(image, Image) for image in images):
                 raise NotDCCImageException
             self.__images = images
-        elif pathList is not None:
-            raise NotImplemented("pathList not implemented yet")
-        else:
-            self.__images = []
+        elif pathPattern is not None:
+            directory = os.path.dirname(pathPattern)
+            basePattern = os.path.basename(pathPattern)
+            paths = [os.path.join(directory,f) for f in os.listdir(directory) if re.match(basePattern, f)]
+            for path in paths:
+                try:
+                    image = Image(path)
+                    self.__images.append(image)
+                except:
+                    pass
 
     @property
     def images(self):
