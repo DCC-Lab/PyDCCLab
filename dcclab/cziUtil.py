@@ -116,7 +116,7 @@ def decodeImages(cziObj, max_workers=None):
         index = tuple(slice(i - j, i - j + k) for i, j, k in
                       zip(directory_entry.start, start, tile.shape))
         channel = index[-4].stop
-        imagesQueue.put((np.squeeze(tile).astype(np.float32), channel))
+        imagesQueue.put((np.squeeze(tile), channel))
         print("{} / {} images read".format(imagesQueue.qsize(), maxSize))
         try:
             out[index] = tile
@@ -140,7 +140,7 @@ def decodeImages(cziObj, max_workers=None):
     returnList = []
     while imagesQueue.qsize() != 0:
         returnList.append(np.squeeze(imagesQueue.get()))
-    return np.squeeze(out).astype(np.float32), returnList
+    return np.squeeze(out), returnList
 
 
 def showImagesFromCziFileObject(cziObject):
