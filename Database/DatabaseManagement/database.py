@@ -3,93 +3,63 @@ import urllib.parse as parse
 import pathlib
 import platform
 
-
 class Database:
-    def __init__(self, path, name=''):
+    def __init__(self, path, readOnly=True):
         self.path = path
-        self.name = name
-        self.conn = None
-        self.curs = None
+        self.connection = None
+        self.cursor = None
+        self.readOnly = readOnly
+        self.connect()
 
-    def createConnection(self, mode='ro'):
-        if self.checkIfIsConnected() is False:
-            path = pathToURI(self.path, mode)
-            try:
-                self.conn = lite.connect(path, uri=True)
-                return 'connected'
-            except lite.OperationalError:
-                raise
-        else:
-            raise ConnectionError('Already connected to a database : ' + self.name + " : " + self.path)
+    def __del__(self):
+        self.disconnect()
 
-    def closeConnection(self):
-        if self.checkIfIsConnected() is True and self.checkIfCursorExists() is False:
-            self.conn.close()
-            self.conn = None
-            return 'disconnected'
-        if self.checkIfIsConnected() is True and self.checkIfCursorExists() is True:
-            raise AttributeError('A cursor exists and has to be closed first.')
-        else:
-            raise ConnectionError('Connection does not exist.')
+    def connect(self):
+        if not self.isConnected:
+            self.connection = lite.connect(self.path, uri=False)
+            self.connection.row_factory = lite.Row
+            self.cursor = self.connection.cursor()       
 
-    def checkIfIsConnected(self):
-        if self.conn is not None:
-            return True
-        else:
-            return False
+    def disconnect(self):
+        if self.isConnected:
+            self.commit()
+            self.connection.close()
+            self.connection = None
+            self.cursor = None
 
-    def checkIfCursorExists(self):
-        if self.curs is not None:
-            return True
-        else:
-            return False
-
-    def changeConnectionMode(self, mode):
-        if self.checkIfIsConnected():
-            self.closeConnection()
-            try:
-                self.createConnection(mode)
-                return True
-            except lite.OperationalError:
-                raise
-        else:
-            return False
-
-    def createCursor(self):
-        if self.checkIfIsConnected() is True and self.checkIfCursorExists() is False:
-            self.curs = self.conn.cursor()
-            return True
-        elif self.checkIfIsConnected() is False:
-            raise ConnectionError('Connection does not exist.')
-        elif self.checkIfIsConnected() is True and self.checkIfCursorExists() is True:
-            raise AttributeError('A cursor already exists.')
-
-    def closeCursor(self):
-        if self.checkIfCursorExists():
-            self.curs.close()
-            self.curs = None
-            return True
-        else:
-            return False
+    @property
+    def isConnected(self):
+        return self.connection is not None
 
     def commit(self):
-        if self.checkIfIsConnected() is False:
-            raise ConnectionError('Connection does not exist.')
-        elif self.checkIfCursorExists() is False:
-            raise AttributeError('Cursor does not exist.')
+        if self.isConnected:
+            self.connection.commit()
+
+    def execute(self, statement) -> (lite.Row):
+        if self.isConnected:
+            self.cursor.execute(statement)
+            return self.cursor.fetchall()
+
+    @property
+    def tables(self) -> (lite.Row):
+        rows = self.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        results = list(map(lambda row: row['name'], rows))
+        return results
+
+    def select(self, table, columns='*', condition=None) -> (lite.Row):
+        if condition is None:
+            rows = self.execute("SELECT {0} FROM {1}".format(columns, table))            
         else:
-            try:
-                self.conn.commit()
-                return True
-            except lite.OperationalError:
-                raise
+            rows = self.execute("SELECT {0} FROM {1} where {2}".format(columns, table, condition))
+        return rows
+
 
 # TODO Below is stuff to do eventually.
 '''
 def CreateNewDatabase(self):
     try:
-        self.conn.createConnection(self.path, 'rwc')
-        self.closeConnection()
+        self.connection.connect(self.path, 'rwc')
+        self.disconnect()
     except lite.OperationalError as error:
         raise error
 
