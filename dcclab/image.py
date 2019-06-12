@@ -3,20 +3,37 @@ from .DCCExceptions import *
 from .cziUtil import *
 import tifffile
 import PIL
+from .imageFile import *
 
 import re
 
 
 class Image:
+    supportedClasses = [CZIFile, TIFFFile, PILFile]
+    supportedFormats = []
 
     def __init__(self, path: str):
+        if not os.path.exists(path):
+            raise ValueError("Cannot load '{0}': file does not exist".format(path))
+
+        self._getSupportedFormats() #FIXME
+
         self.path = path
         self.__channels = []
-        try:
-            imageData = self.imageDataFromPath(path)
-            self.__channels = self.channelsFromImageData(imageData)
-        except:
-            raise ValueError("Not known format recognized for {0}".format(path))
+        self.__fileObject = None
+        for supportedClass in Image.supportedClasses:
+            try:
+                fileObject = supportedClass(path)
+                imageData = fileObject.imageDataFromPath()
+                if imageData.nbytes != 0:
+                    self.__channels = self.channelsFromImageData(imageData)
+                    self.__fileObject = fileObject
+                break
+            except:
+                continue
+        if self.__fileObject is None:
+            message = "Cannot read '{0}': not a recognized image format ({1})".format(self.path, Image.supportedFormats)
+            raise InvalidFileFormatException(message)
 
     @property
     def shape(self):
@@ -29,7 +46,7 @@ class Image:
         for channel in self.channels:
             totalSize += channel.sizeInBytes
         return totalSize
-    
+
     @property
     def channels(self):
         return self.__channels
@@ -60,60 +77,6 @@ class Image:
             return channels
 
         return ()
-
-    def imageDataFromPath(self, path: str):
-        cziPattern = r'\.czi\Z'
-        tiffPattern = r"\.ti[f]{1,2}\Z"
-        if re.search(cziPattern, path, re.IGNORECASE) is not None:
-            imageData = self.imageDataFromCZI(path)
-        elif re.search(tiffPattern, path, re.IGNORECASE) is not None:
-            imageData = self.imageDataFromTIFF(path)
-        else:
-            imageData = self.imageDataFromAnyFile(path)
-        return imageData.astype(np.float32)
-
-    def imageDataFromCZI(self, path):
-        cziObj = readCziImage(path)
-        imagesDirectory = cziObj.filtered_subblock_directory
-        subblocks = cziObj.subblocks()
-        imageData = cziObj.asarray()
-        closeCziFileObject(cziObj)
-        return imageData.astype(np.float32)
-
-    def imageDataFromTIFF(self, path):
-        tiffFileObject = tifffile.TiffFile(path)
-        imageData = tiffFileObject.asarray().astype(dtype="float32")
-        # self.__metadata = tiffFileObject.ome_metadata
-        return imageData.astype(np.float32)
-
-    def imageDataFromAnyFile(self, path: str):
-        pilImage = PIL.Image.open(path)
-        return np.array(pilImage, dtype=np.float32)
-
-class ImageCZI(Image):
-    def __init__(self, path):
-        Image.__init__(self, path)
-
-    def imageDataFromPath(self, path: str):
-        try:
-            cziObj = readCziImage(path)
-            imagesDirectory = cziObj.filtered_subblock_directory
-            subblocks = cziObj.subblocks()
-            imageData = cziObj.asarray()
-            closeCziFileObject(cziObj)
-            return imageData.astype(np.float32)
-        except:
-            pass
-
-
-
-if __name__ == '__main__':
-    path = r"A:\injection AAV\résultats bruts\AAV\AAV493AAV498\AAV493AAV498_S51\AAV493AAV498_S51\S51-06.czi"
-    path2 = r"A:\injection AAV\résultats bruts\AAV\AAV498AAV455\AAV498AAV455_S95\AAV498-455_S95_C-06.czi"
-    path3 = r"A:\injection AAV\résultats bruts\AAV\AAV343\Jun109_AAV344a.tif"
-    path4 = r"AAV498-455_S95_C-06.czi"
-    path5 = r"S51-06.czi"
-    im = Image(path)
-    # im = Image(r"/tmp/test.tiff")
-    # im2 = Image(r"/tmp/test2.png")
-    # im2.display()
+    def _getSupportedFormats(self):
+        fmts = list(map( lambda cls: cls.supportedFormats, Image.supportedClasses))
+        Image.supportedFormats = [item for sublist in fmts for item in sublist]
