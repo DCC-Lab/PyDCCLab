@@ -3,6 +3,7 @@ from .DCCExceptions import *
 from .cziUtil import *
 import tifffile
 import PIL
+from .imageFile import *
 
 import re
 
@@ -11,12 +12,20 @@ class Image:
 
     def __init__(self, path: str):
         self.path = path
+        supportedClasses = [CZIFile, TIFFFile, PILFile]
         self.__channels = []
-        try:
-            imageData = self.imageDataFromPath(path)
-            self.__channels = self.channelsFromImageData(imageData)
-        except:
-            raise ValueError("Not known format recognized for {0}".format(path))
+        self.__fileObject = None
+        for supportedClass in supportedClasses:
+            try:
+                self.__fileObject = supportedClass(path)
+                imageData = self.__fileObject.imageDataFromPath()
+                self.__channels = self.channelsFromImageData(imageData)
+                break
+            except:
+                continue
+        if self.__fileObject is None:
+            raise InvalidFileFormatException(
+                "Cannot read {}. Please verify that the name is correct.".format(self.path))
 
     @property
     def shape(self):
@@ -29,7 +38,7 @@ class Image:
         for channel in self.channels:
             totalSize += channel.sizeInBytes
         return totalSize
-    
+
     @property
     def channels(self):
         return self.__channels
@@ -60,60 +69,3 @@ class Image:
             return channels
 
         return ()
-
-    def imageDataFromPath(self, path: str):
-        cziPattern = r'\.czi\Z'
-        tiffPattern = r"\.ti[f]{1,2}\Z"
-        if re.search(cziPattern, path, re.IGNORECASE) is not None:
-            imageData = self.imageDataFromCZI(path)
-        elif re.search(tiffPattern, path, re.IGNORECASE) is not None:
-            imageData = self.imageDataFromTIFF(path)
-        else:
-            imageData = self.imageDataFromAnyFile(path)
-        return imageData.astype(np.float32)
-
-    def imageDataFromCZI(self, path):
-        cziObj = readCziImage(path)
-        imagesDirectory = cziObj.filtered_subblock_directory
-        subblocks = cziObj.subblocks()
-        imageData = cziObj.asarray()
-        closeCziFileObject(cziObj)
-        return imageData.astype(np.float32)
-
-    def imageDataFromTIFF(self, path):
-        tiffFileObject = tifffile.TiffFile(path)
-        imageData = tiffFileObject.asarray().astype(dtype="float32")
-        # self.__metadata = tiffFileObject.ome_metadata
-        return imageData.astype(np.float32)
-
-    def imageDataFromAnyFile(self, path: str):
-        pilImage = PIL.Image.open(path)
-        return np.array(pilImage, dtype=np.float32)
-
-class ImageCZI(Image):
-    def __init__(self, path):
-        Image.__init__(self, path)
-
-    def imageDataFromPath(self, path: str):
-        try:
-            cziObj = readCziImage(path)
-            imagesDirectory = cziObj.filtered_subblock_directory
-            subblocks = cziObj.subblocks()
-            imageData = cziObj.asarray()
-            closeCziFileObject(cziObj)
-            return imageData.astype(np.float32)
-        except:
-            pass
-
-
-
-if __name__ == '__main__':
-    path = r"A:\injection AAV\résultats bruts\AAV\AAV493AAV498\AAV493AAV498_S51\AAV493AAV498_S51\S51-06.czi"
-    path2 = r"A:\injection AAV\résultats bruts\AAV\AAV498AAV455\AAV498AAV455_S95\AAV498-455_S95_C-06.czi"
-    path3 = r"A:\injection AAV\résultats bruts\AAV\AAV343\Jun109_AAV344a.tif"
-    path4 = r"AAV498-455_S95_C-06.czi"
-    path5 = r"S51-06.czi"
-    im = Image(path)
-    # im = Image(r"/tmp/test.tiff")
-    # im2 = Image(r"/tmp/test2.png")
-    # im2.display()
