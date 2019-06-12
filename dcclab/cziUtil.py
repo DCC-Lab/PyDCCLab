@@ -115,7 +115,7 @@ def decodeImages(cziObj, max_workers=None):
 
         index = tuple(slice(i - j, i - j + k) for i, j, k in
                       zip(directory_entry.start, start, tile.shape))
-        channel = index[-4].stop
+        channel = index[-4].stop - 1
         imagesQueue.put((np.squeeze(tile), channel))
         print("{} / {} images read".format(imagesQueue.qsize(), maxSize))
         try:
