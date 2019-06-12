@@ -16,9 +16,29 @@ Currently under development, a `Database` class allows one to obtain files from 
 For example, the database will allow requests such as:
 
 1. All images using the viral vector AAV-173
-
 2. All images of microglia.
-
 3. All images of neurons from the subthalamic nucleus.
 
-   
+## Installation
+
+To install development versions, use:
+
+```
+python setup.py install -f
+```
+
+Required modules should be installed automatically. If anything is missing, [let us know](mailto:dccote@cervo.ulaval.ca).
+
+You should then be able to simply import the module in your own scripts:
+
+```
+import dcclab
+
+# ... you script
+img = Image('yourFile.tiff')
+img.display()
+
+```
+
+
+
