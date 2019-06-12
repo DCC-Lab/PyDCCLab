@@ -297,7 +297,7 @@ class Channel:
         for i in range(len(distances)):
             if distances[i] is not None and 0 <= distances[i] < binWidth:
                 thresh = binsCenters[i]
-        threshArray = self.pixels >= thresh
+        threshArray = self.pixels >= (thresh / self.dTypeMaxValue(self.__originalDType))
         return Channel(threshArray.astype(np.float32))
 
     def getOtsuThresholding(self):
@@ -324,7 +324,7 @@ class Channel:
                 pixelIntensityGroupOneMean[:-1] - pixelIntensityGroupTwoMean[1:]) ** 2
         index = np.nanargmax(varianceTwoGroups)
         thresh = binsCenters[index]
-        threshArray = self.pixels >= thresh
+        threshArray = self.pixels >= (thresh / self.dTypeMaxValue(self.__originalDType))
         return Channel(threshArray.astype(np.float32))
 
     def getAdaptiveThreshold(self):
@@ -336,7 +336,7 @@ class Channel:
         return Channel(opened)
 
     def getBinaryOpening(self, windowSize: int = 3):
-        if not self.arePixelsInBinary():
+        if not self.isBinary:
             raise NotBinaryImageException
         binaryOpened = morphology.binary_opening(self.pixels, np.ones((windowSize, windowSize))).astype(np.float32)
         return Channel(binaryOpened)
@@ -346,13 +346,13 @@ class Channel:
         return Channel(closed)
 
     def getBinaryClosing(self, windowSize: int = 3):
-        if not self.arePixelsInBinary():
+        if not self.isBinary:
             raise NotBinaryImageException
         binarClosed = morphology.binary_closing(self.pixels, np.ones((windowSize, windowSize))).astype(np.float32)
         return Channel(binarClosed)
 
     def getConnectedComponents(self) -> tuple:
-        if not self.arePixelsInBinary():
+        if not self.isBinary:
             raise NotBinaryImageException
         labeled, nbObjects = label(self.pixels)
         sizes = sum(self.pixels, labeled, range(nbObjects + 1))
