@@ -1,7 +1,7 @@
 from .cziUtil import *
 from .channel import *
 import PIL.Image
-
+import scipy.io as sio
 
 class ImageFile(object):
     supportedFormats:[]
@@ -60,3 +60,20 @@ class PILFile(ImageFile):
         image = PIL.Image.open(self.path)
         imageAsArray = np.array(image)
         return imageAsArray
+
+class MATLABFile(ImageFile):
+    supportedFormats = ['mat']
+
+    def __init__(self, path, variable):
+        ImageFile.__init__(self, path)
+        self.variable = variable
+
+    def imageDataFromPath(self):
+        dataset = sio.loadmat(self.path)
+        array = dataset[self.variable]
+        if array.ndim == 2:
+            np.expand_dims(array, axis=2)
+        elif array.ndim != 3:
+            raise ValueError("Not an image variable")
+
+        return array
