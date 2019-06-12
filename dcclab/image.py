@@ -10,13 +10,13 @@ import re
 
 class Image:
     supportedClasses = [CZIFile, TIFFFile, PILFile]
-    supportedFormats = list(map( lambda cls: cls.supportedFormats, supportedClasses))
+    supportedFormats = []
 
     def __init__(self, path: str):
         if not os.path.exists(path):
             raise ValueError("Cannot load '{0}': file does not exist".format(path))
 
-        self._flattenSupportedFormats() #FIXME
+        self._getSupportedFormats() #FIXME
 
         self.path = path
         self.__channels = []
@@ -77,5 +77,6 @@ class Image:
             return channels
 
         return ()
-    def _flattenSupportedFormats(self):
-        Image.supportedFormats = [item for sublist in Image.supportedFormats for item in sublist]
+    def _getSupportedFormats(self):
+        fmts = list(map( lambda cls: cls.supportedFormats, Image.supportedClasses))
+        Image.supportedFormats = [item for sublist in fmts for item in sublist]
