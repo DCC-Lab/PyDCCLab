@@ -4,6 +4,8 @@ import PIL.Image
 
 
 class ImageFile(object):
+    supportedFormats:[]
+
     def __init__(self, path):
         self.path = path
 
@@ -13,8 +15,10 @@ class ImageFile(object):
     def metadata(self):
         return
 
+    
 
 class CZIFile(ImageFile):
+    supportedFormats = ['czi']
 
     def __init__(self, path: str):
         ImageFile.__init__(self, path)
@@ -30,6 +34,7 @@ class CZIFile(ImageFile):
 
 
 class TIFFFile(ImageFile):
+    supportedFormats = ['tif','tiff']
 
     def __init__(self, path):
         ImageFile.__init__(self, path)
@@ -46,6 +51,7 @@ class TIFFFile(ImageFile):
 
 
 class PILFile(ImageFile):
+    supportedFormats = ['(formats supported by PIL module))']
 
     def __init__(self, path):
         ImageFile.__init__(self, path)
