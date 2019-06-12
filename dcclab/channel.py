@@ -21,11 +21,32 @@ except:
 
 class Channel:
 
-    def __init__(self, pixels: np.ndarray, channelNumber: int = None):
-        self.__originalDType = pixels.dtype
-        if pixels.ndim > 2:
+    def __init__(self, pixels: np.ndarray):
+        pixels.squeeze()
+        if pixels.ndim != 2:
             raise DimensionException(pixels.ndim)
-        self.__pixels = self.toFloat32(pixels, self.__originalDType)
+        self.__originalDType = pixels.dtype        
+
+        if "float" in str(self.__originalDType): 
+            # For a float array, we must determine if array is
+            # already normalized or not: we don't take the 
+            # maximum of float type, we take max of array
+            maxValue = max(max(pixels))
+            if maxValue <= 1.0:
+                # don't normalize an already normalized float array
+                self.__originalFactor = 1.0
+                self.__pixels = np.copy(pixels)
+            else:
+                # normalize a non-normalized float array
+                self.__originalFactor = maxValue
+                self.__pixels = np.copy(pixels) / maxValue 
+        else:  
+            # For a bound integer array, we take the maximum of the type
+            # and we convert the array to float
+            self.__originalFactor = np.iinfo(self.__originalDType).max
+            floatArray = np.copy(pixels).astype(np.float32)
+            self.__pixels = floatArray / self.__originalFactor
+
         self.__original = None
 
     @property
@@ -100,8 +121,7 @@ class Channel:
         return self
 
     def getHistogramValues(self, normed: bool = False) -> typing.Tuple[np.ndarray, np.ndarray]:
-        originalDTypeCoefficient = self.dTypeMaxValue(self.__originalDType)
-        array = (self.pixels * originalDTypeCoefficient).astype(self.__originalDType).ravel()
+        array = (self.pixels * self.__originalFactor).astype(self.__originalDType).ravel()
         nbBins = len(np.bincount(array))
         hist, bins = np.histogram(array, nbBins, [0, nbBins], density=normed)
         return hist, bins
@@ -118,20 +138,26 @@ class Channel:
 
     """ Manipulation-related functions """
 
-    @staticmethod
-    def dTypeMaxValue(dtype):
-        return np.finfo(dtype).max if "float" in str(dtype) else np.iinfo(dtype).max
-
-    def toFloat32(self, pixels: np.ndarray, fromDType) -> np.ndarray:
-        convert = np.copy(pixels)
-        if np.all(np.logical_and(convert <= 1.0, convert >= 0)):
-            convert.astype(np.float32)
-        else:
-            dtype = fromDType
-            normalize = np.finfo(dtype).max if "float" in str(dtype) else np.iinfo(dtype).max
-            convert = (convert / normalize).astype(np.float32)
-        return convert
-
+    def toFloat32(self):
+        if "float" in str(self.pixels.dtype): 
+            # For a float array, we must determine if array is
+            # already normalized or not: we don't take the 
+            # maximum of float type, we take max of array
+            maxValue = max(max(self.pixels))
+            if maxValue <= 1.0:
+                # don't normalize an already normalized float array
+                self.__originalFactor = 1.0
+            else:
+                # normalize a non-normalized float array
+                self.__originalFactor = maxValue
+                self.pixels /= maxValue 
+        else:  
+            # For a bound integer array, we take the maximum of the type
+            # and we convert the array to float
+            self.__originalFactor = np.iinfo(self.pixels.dtype).max
+            floatArray = np.copy(self.pixels).astype(np.float32)
+            self.pixels = floatArray / self.__originalFactor
+    
     def saveOriginal(self):
         if self.__original == None:
             self.__original = np.copy(self.pixels)
@@ -297,7 +323,7 @@ class Channel:
         for i in range(len(distances)):
             if distances[i] is not None and 0 <= distances[i] < binWidth:
                 thresh = binsCenters[i]
-        threshArray = self.pixels >= (thresh / self.dTypeMaxValue(self.__originalDType))
+        threshArray = self.pixels >= (thresh / self.__originalFactor)
         return Channel(threshArray.astype(np.float32))
 
     def getOtsuThresholding(self):
@@ -324,7 +350,7 @@ class Channel:
                 pixelIntensityGroupOneMean[:-1] - pixelIntensityGroupTwoMean[1:]) ** 2
         index = np.nanargmax(varianceTwoGroups)
         thresh = binsCenters[index]
-        threshArray = self.pixels >= (thresh / self.dTypeMaxValue(self.__originalDType))
+        threshArray = self.pixels >= (thresh / self.__originalFactor)
         return Channel(threshArray.astype(np.float32))
 
     def getAdaptiveThreshold(self):
