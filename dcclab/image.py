@@ -16,6 +16,8 @@ class Image:
         if not os.path.exists(path):
             raise ValueError("Cannot load '{0}': file does not exist".format(path))
 
+        self._flattenSupportedFormats() #FIXME
+
         self.path = path
         self.__channels = []
         self.__fileObject = None
@@ -75,3 +77,5 @@ class Image:
             return channels
 
         return ()
+    def _flattenSupportedFormats(self):
+        Image.supportedFormats = [item for sublist in Image.supportedFormats for item in sublist]
