@@ -6,6 +6,8 @@ To document:
 
 To distribute:
 =============
+rm dist/*; python setup.py sdist --formats=gztar,zip
+or
 rm dist/*; python setup.py sdist bdist_wheel; python -m twine upload dist/* 
 
 """
@@ -22,7 +24,7 @@ setuptools.setup(
     license='MIT',
     keywords='image analysis stack movies',
     packages=setuptools.find_packages(),
-    install_requires=['matplotlib','numpy','scikit-image','scipy'],
+    install_requires=['matplotlib','numpy','scikit-image','scipy','czifile','tifffile'],
     python_requires='>=3',
     package_data = {
         # If any package contains *.txt or *.rst files, include them:
