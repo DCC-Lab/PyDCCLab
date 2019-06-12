@@ -20,8 +20,7 @@ class TestFilter(unittest.TestCase):
     def test_setFilterSetIdAndType_expectedValue(self):
         root = ET.fromstring(self.testXml)
         filter = fltr('Filter:1', root)
-        print('Here ->', filter.setFilterSetIdAndType(), filter.getFilterRange())
-        #self.assertEqual(filter.filterSetId, )
+        self.assertEqual(filter.filterSetId, '0')
 
     def test_setFilterSetId_rightFilterType(self):
         root = ET.fromstring(self.testXml)
