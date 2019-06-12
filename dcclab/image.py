@@ -9,23 +9,29 @@ import re
 
 
 class Image:
+    supportedClasses = [CZIFile, TIFFFile, PILFile]
+    supportedFormats = list(map( lambda cls: cls.supportedFormats, supportedClasses))
 
     def __init__(self, path: str):
+        if not os.path.exists(path):
+            raise ValueError("Cannot load '{0}': file does not exist".format(path))
+
         self.path = path
-        supportedClasses = [CZIFile, TIFFFile, PILFile]
         self.__channels = []
         self.__fileObject = None
-        for supportedClass in supportedClasses:
+        for supportedClass in Image.supportedClasses:
             try:
-                self.__fileObject = supportedClass(path)
-                imageData = self.__fileObject.imageDataFromPath()
-                self.__channels = self.channelsFromImageData(imageData)
+                fileObject = supportedClass(path)
+                imageData = fileObject.imageDataFromPath()
+                if imageData.nbytes != 0:
+                    self.__channels = self.channelsFromImageData(imageData)
+                    self.__fileObject = fileObject
                 break
             except:
                 continue
         if self.__fileObject is None:
             raise InvalidFileFormatException(
-                "Cannot read {}. Please verify that the name is correct.".format(self.path))
+                "Cannot read '{0}': not a recognized image format ({1})".format(self.path, Image.supportedFormats))
 
     @property
     def shape(self):
