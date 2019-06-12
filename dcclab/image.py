@@ -30,8 +30,8 @@ class Image:
             except:
                 continue
         if self.__fileObject is None:
-            raise InvalidFileFormatException(
-                "Cannot read '{0}': not a recognized image format ({1})".format(self.path, Image.supportedFormats))
+            message = "Cannot read '{0}': not a recognized image format ({1})".format(self.path, Image.supportedFormats)
+            raise InvalidFileFormatException(message)
 
     @property
     def shape(self):
