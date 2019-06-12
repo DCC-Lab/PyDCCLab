@@ -3,7 +3,7 @@ class CZIFilter:
         self.filterId = filterId
         self.root = root
 
-        self.filterSetId, self.filterType = self.setFilterSetIdAndType()
+        self.filterSetId, self.filterType = self.setFilterSetIdAndFilterType()
         self.channelId = self.setChannelId()
         self.cutIn = self.setCutIn()
         self.cutOut = self.setCutOut()
@@ -16,15 +16,16 @@ class CZIFilter:
     def __eq__(self, other):
         return repr(self) == repr(other)
 
-    def setFilterSetIdAndType(self):
+    def setFilterSetIdAndFilterType(self):
         try:
             for filterSet in self.root.find('./Metadata/Information/Instrument/FilterSets'):
                 if self.filterId == filterSet.find('./EmissionFilters/EmissionFilterRef').attrib['Id']:
                     return filterSet.attrib['Id'], 'Emission'
-                elif self.filterId == filterSet.find('./ExcitationFilters/ExcitationFilterRef').attrib['Id']:
+                if self.filterId == filterSet.find('./ExcitationFilters/ExcitationFilterRef').attrib['Id']:
                     return filterSet.attrib['Id'], 'Excitation'
+                return None, None
         except Exception:
-            return '', ''
+            return None, None
 
     def setChannelId(self):
         try:
@@ -32,35 +33,35 @@ class CZIFilter:
                 if channel.find('FilterSetRef').attrib['Id'] == self.filterSetId:
                     return channel.attrib['Id']
         except Exception:
-            return ''
+            return None
 
     def setCutIn(self):
         try:
             return self.root.find('./Metadata/Information/Instrument/Filters/Filter[@Id="{}"]'
                                   '/TransmittanceRange/CutIn'.format(self.filterId)).text
         except Exception:
-            return ''
+            return None
 
     def setCutOut(self):
         try:
             return self.root.find('./Metadata/Information/Instrument/Filters/Filter[@Id="{}"]'
                                   '/TransmittanceRange/CutOut'.format(self.filterId)).text
         except Exception:
-            return ''
+            return None
 
     def setDichroicId(self):
         try:
             return self.root.find('./Metadata/Information/Instrument/FilterSets/'
                                   'FilterSet[@Id="{}"]/DichroicRef'.format(self.filterSetId)).attrib['Id']
         except Exception:
-            return ''
+            return None
 
     def setDichroic(self):
         try:
             return self.root.find('./Metadata/Information/Instrument/Dichroics/'
                                   'Dichroic[@Id="{}"]/Wavelengths/Wavelength'.format(self.dichroicId)).text
         except Exception:
-            return ''
+            return None
 
     def getType(self):
         return self.filterType

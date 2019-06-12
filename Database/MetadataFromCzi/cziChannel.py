@@ -43,56 +43,44 @@ class CZIChannel:
 
     def setExWavelengthFilter(self, filters):
         try:
-            if not filters:
-                return -1
-
             for filter in filters:
                 if filter.getType() == 'Excitation' and self.channelId == filter.getChannelId():
                     return filter.getFilterRange()
-                else:
-                    return 0
+            return None
         except Exception:
-            return -1
+            return None
 
     def setEmWavelengthFilter(self, filters):
         try:
-            if not filters:
-                return -1
-
             for filter in filters:
                 if filter.getType() == 'Emission' and self.channelId == filter.getChannelId():
                     return filter.getFilterRange()
-                else:
-                    return 0
+            return None
         except Exception:
-            return -1
+            return None
 
     def setBeamsplitter(self, filters):
         try:
-            if not filters:
-                return -1
-
             for filter in filters:
                 if self.channelId == filter.getChannelId():
                     return filter.getDichroic()
-                else:
-                    return 0
+            return None
         except Exception:
-            return -1
+            return None
 
     def setReflector(self):
         try:
             return self.root.find('./Metadata/Information/Image/Dimensions/Channels/Channel[@Id="{}"]'
                                   '/Reflector'.format(self.channelId)).text
         except Exception:
-            return ''
+            return None
 
     def setContrastMethod(self):
         try:
             return self.root.find('./Metadata/Information/Image/Dimensions/Channels/Channel[@Id="{}"]'
                                   '/ContrastMethod'.format(self.channelId)).text
         except Exception:
-            return ''
+            return None
 
     def setLightSource(self):
         try:
@@ -101,70 +89,70 @@ class CZIChannel:
             return self.root.find('./Metadata/Information/Instrument/LightSources'
                                   '/LightSource[@Id="{}"]'.format(lightId)).attrib['Name']
         except Exception:
-            return ''
+            return None
 
     def setLightSourceIntensity(self):
         try:
             return self.root.find('./Metadata/Information/Image/Dimensions/Channels/Channel[@Id="{}"]'
                                   '/LightSourcesSettings/LightSourceSettings/Intensity'.format(self.channelId)).text
         except Exception:
-            return ''
+            return None
 
     def setDyeName(self):
         try:
             return self.root.find('./Metadata/DisplaySetting/Channels/Channel[@Id="{}"]'
                                   '/DyeName'.format(self.channelId)).text
         except Exception:
-            return ''
+            return None
 
     def setChannelColor(self):
         try:
             return self.root.find('./Metadata/Information/Image/Dimensions/Channels/Channel[@Id="{}"]'
                                   '/Color'.format(self.channelId)).text
         except Exception:
-            return ''
+            return None
 
     def setExWavelength(self):
         try:
             return self.root.find('./Metadata/Information/Image/Dimensions/Channels/Channel[@Id="{}"]'
                                   '/ExcitationWavelength'.format(self.channelId)).text
         except Exception:
-            return 0
+            return None
 
     def setEmWavelength(self):
         try:
             return self.root.find('./Metadata/Information/Image/Dimensions/Channels/Channel[@Id="{}"]'
                                   '/EmissionWavelength'.format(self.channelId)).text
         except Exception:
-            return 0
+            return None
 
     def setExposureTime(self):
         try:
             return self.root.find('./Metadata/Information/Image/Dimensions/Channels/Channel[@Id="{}"]'
                                   '/ExposureTime'.format(self.channelId)).text
         except Exception:
-            return 0
+            return None
 
     def setEffectiveNA(self):
         try:
             return self.root.find('./Metadata/Information/Instrument/Objectives/Objective/LensNA').text
         except Exception:
-            return 0
+            return None
 
     def setImagingDevice(self):
         try:
             return self.root.find('./Metadata/Information/Instrument/Detectors/Detector').attrib['Name']
         except Exception:
-            return ''
+            return None
 
     def setCameraAdapter(self):
         try:
             return self.root.find('./Metadata/Information/Instrument/Detectors/Detector/Adapter/Manufacturer/Model').text
         except Exception:
-            return ''
+            return None
 
     def setBinningMode(self):
         try:
             return self.root.find('./Metadata/Information/Image/Dimensions/Channels/Channel/DetectorSettings/Binning').text
         except Exception:
-            return 0
+            return None

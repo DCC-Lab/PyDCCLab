@@ -10,151 +10,94 @@ class TestFilter(unittest.TestCase):
         self.directory = os.path.dirname(os.path.dirname(__file__))
         self.testPath = os.path.join(self.directory, 'testData', 'testCziFile.czi')
         self.missingEntriesPath = os.path.join(self.directory, 'testData', 'MissingEntries.xml')
-        self.missingKeysPath = os.path.join(self.directory, 'testData', 'MissingKeys.xml')
-
         self.meta = mtdt(self.testPath)
-        self.defaultFilter = self.meta.filters[0]
 
-        self.testXml = self.meta.extractXmlAsStringFromCziImageObject(self.meta.cziFileToCziImageObject())
+    def test_setFilterSetIdAndType_expectedValues(self):
+        filter = fltr('Filter:1', self.meta.root)
+        self.assertEqual(filter.setFilterSetIdAndFilterType(), ('FilterSet:1', 'Excitation'))
 
-    def test_setFilterSetIdAndType_expectedValue(self):
-        root = ET.fromstring(self.testXml)
-        filter = fltr('Filter:1', root)
-        print('Here ->', filter.setFilterSetIdAndType(), filter.getFilterRange())
-        #self.assertEqual(filter.filterSetId, )
+    def test_setFilterSetIdAndType_missingKeys(self):
+        filter = fltr('', self.meta.root)
+        self.assertIsNone(filter.setFilterSetIdAndFilterType()[0])
 
-    def test_setFilterSetId_rightFilterType(self):
-        root = ET.fromstring(self.testXml)
-        filter = fltr('Filter:1', '450', '490')
-
-        filter.setFilterSetIdAndType(root)
-        self.assertEqual(filter.filterType, 'Excitation')
-
-    def test_setFilterSetId_missingKeys(self):
-        tree = ET.parse(self.missingKeysPath)
-        root = tree.getroot()
-        filter = fltr('Filter:1', '450', '490')
-        with self.assertRaises(KeyError): filter.setFilterSetIdAndType(root)
-
-    def test_setFilterSetId_missingEntries(self):
+    def test_setFilterSetIdAndType_missingEntries(self):
         tree = ET.parse(self.missingEntriesPath)
         root = tree.getroot()
-        filter = fltr('Filter:1', '450', '490')
-        with self.assertRaises(AttributeError): filter.setFilterSetIdAndType(root)
+        filter = fltr('Filter:1', root)
+        self.assertIsNone(filter.setFilterSetIdAndFilterType()[0])
 
-    def test_setChannelId_isEqual(self):
-        root = ET.fromstring(self.testXml)
-        filter = fltr('Filter:1', '450', '490')
-
-        filter.setChannelId(root)
-        self.assertEqual(filter.channelId, self.defaultFilter.channelId)
+    def test_setChannelId_expectedValue(self):
+        filter = fltr('Filter:1', self.meta.root)
+        self.assertEqual(filter.setChannelId(), 'Channel:0')
 
     def test_setChannelId_missingKeys(self):
-        tree = ET.parse(self.missingKeysPath)
-        root = tree.getroot()
-        filter = fltr('Filter:1', '450', '490')
-
-        with self.assertRaises(KeyError): filter.setChannelId(root)
+        filter = fltr('', self.meta.root)
+        self.assertIsNone(filter.setChannelId())
 
     def test_setChannelId_missingEntries(self):
         tree = ET.parse(self.missingEntriesPath)
         root = tree.getroot()
-        filter = fltr('Filter:1', '450', '490')
-        with self.assertRaises(AttributeError): filter.setChannelId(root)
+        filter = fltr('Filter:1', root)
+        self.assertIsNone(filter.setChannelId())
 
-    def test_setDichroicId_isEqual(self):
-        root = ET.fromstring(self.testXml)
-        filter = fltr('Filter:1', '450', '490')
-
-        filter.setChannelId(root)
-        filter.setDichroicId(root)
-        self.assertEqual(filter.dichroicId, self.defaultFilter.dichroicId)
+    def test_setDichroicId_expectedValue(self):
+        filter = fltr('Filter:1', self.meta.root)
+        self.assertEqual(filter.setDichroicId(), 'Dichroic:1')
 
     def test_setDichroicId_missingKeys(self):
-        tree = ET.parse(self.missingKeysPath)
-        root = tree.getroot()
-        filter = fltr('Filter:9', '999', '999')
-        filter.filterSetId = 'FilterSet:1'
-
-        with self.assertRaises(KeyError): filter.setDichroicId(root)
+        filter = fltr('', self.meta.root)
+        self.assertIsNone(filter.setDichroicId())
 
     def test_setDichroicId_missingEntries(self):
         tree = ET.parse(self.missingEntriesPath)
         root = tree.getroot()
-        filter = fltr('Filter:9', '999', '999')
-        filter.filterSetId = 'FilterSet:1'
+        filter = fltr('Filter:1', root)
+        self.assertIsNone(filter.setDichroicId())
 
-        with self.assertRaises(AttributeError): filter.setDichroicId(root)
-
-    def test_setDichroic_isEqual(self):
-        root = ET.fromstring(self.testXml)
-        filter = fltr('Filter:1', '450', '490')
-
-        filter.setChannelId(root)
-        filter.setDichroic(root)
-        self.assertEqual(filter.dichroic, self.defaultFilter.dichroic)
+    def test_setDichroic_expectedValue(self):
+        filter = fltr('Filter:1', self.meta.root)
+        self.assertEqual(filter.setDichroic(), '495')
 
     def test_setDichroic_missingKeys(self):
-        tree = ET.parse(self.missingKeysPath)
-        root = tree.getroot()
-        filter = fltr('Filter:2', '999', '999')
-        filter.filterSetId = 'FilterSet:2'
-
-        with self.assertRaises(AttributeError): filter.setDichroic(root)
+        filter = fltr('', self.meta.root)
+        self.assertIsNone(filter.setDichroic())
 
     def test_setDichroic_missingEntries(self):
         tree = ET.parse(self.missingEntriesPath)
         root = tree.getroot()
-        filter = fltr('Filter:2', '999', '999')
-        filter.filterSetId = 'FilterSet:2'
+        filter = fltr('Filter:1', root)
+        self.assertIsNone(filter.setDichroic())
 
-        with self.assertRaises(AttributeError): filter.setDichroic(root)
+    def test_getType_expectedValue(self):
+        filter = fltr('Filter:1', self.meta.root)
+        self.assertEqual(filter.getType(), 'Excitation')
 
-    def test_getType_isEqual(self):
-        root = ET.fromstring(self.testXml)
-        filter = fltr('Filter:2', '500', '550')
-        filter.setChannelId(root)
-        filter.setDichroic(root)
-
-        self.assertEqual(filter.getType(), 'Emission')
-
-    def test_getType_isNone(self):
-        filter = fltr('Filter:2', '500', '550')
-
+    def test_getType_noneValue(self):
+        filter = fltr('', self.meta.root)
         self.assertIsNone(filter.getType())
 
-    def test_getChannelId_isEqual(self):
-        root = ET.fromstring(self.testXml)
-        filter = fltr('Filter:2', '500', '550')
-        filter.setChannelId(root)
-        filter.setDichroic(root)
-
+    def test_getChannelId_expectedValue(self):
+        filter = fltr('Filter:1', self.meta.root)
         self.assertEqual(filter.getChannelId(), 'Channel:0')
 
-    def test_getChannelId_isNone(self):
-        filter = fltr('Filter:2', '500', '550')
-
+    def test_getChannelId_noneValue(self):
+        filter = fltr('', self.meta.root)
         self.assertIsNone(filter.getChannelId())
 
-    def test_getFilterRange_isEqual(self):
-        root = ET.fromstring(self.testXml)
-        filter = fltr('Filter:2', '500', '550')
-        filter.setChannelId(root)
-        filter.setDichroic(root)
+    def test_getFilterRange_expectedValue(self):
+        filter = fltr('Filter:1', self.meta.root)
+        self.assertEqual(filter.getFilterRange(), '450-490')
 
-        self.assertEqual(filter.getFilterRange(), '500-550')
+    def test_getFilterRange_noneValues(self):
+        filter = fltr('', self.meta.root)
+        self.assertEqual(filter.getFilterRange(), 'None-None')
 
-    def test_getDichroic_isEqual(self):
-        root = ET.fromstring(self.testXml)
-        filter = fltr('Filter:2', '500', '550')
-        filter.setChannelId(root)
-        filter.setDichroic(root)
-
+    def test_getDichroic_expectedValue(self):
+        filter = fltr('Filter:1', self.meta.root)
         self.assertEqual(filter.getDichroic(), '495')
 
-    def test_getDichroic_isNone(self):
-        filter = fltr('Filter:2', '500', '550')
-
+    def test_getDichroic_noneValue(self):
+        filter = fltr('', self.meta.root)
         self.assertIsNone(filter.getDichroic())
 
 
