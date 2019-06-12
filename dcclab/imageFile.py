@@ -9,7 +9,7 @@ class ImageFile(object):
     def __init__(self, path):
         self.path = path
 
-    def imageDataFromPath(self):
+    def imageDataFromPath(self) -> np.ndarray:
         return
 
     def metadata(self):
@@ -23,7 +23,7 @@ class CZIFile(ImageFile):
     def __init__(self, path: str):
         ImageFile.__init__(self, path)
 
-    def imageDataFromPath(self):
+    def imageDataFromPath(self) -> np.ndarray:
         cziObj = readCziImage(self.path)
         mosaic, self.__tilesWithChannelNumber = decodeImages(cziObj)
         mosaic = np.squeeze(mosaic)
@@ -39,7 +39,7 @@ class TIFFFile(ImageFile):
     def __init__(self, path):
         ImageFile.__init__(self, path)
 
-    def imageDataFromPath(self):
+    def imageDataFromPath(self) -> np.ndarray:
         #todo better method that return every images if multipage
         tiffFileObject = tifffile.TiffFile(self.path)
         imageAsArray = tiffFileObject.asarray().astype(dtype="float32")
@@ -56,7 +56,7 @@ class PILFile(ImageFile):
     def __init__(self, path):
         ImageFile.__init__(self, path)
 
-    def imageDataFromPath(self):
+    def imageDataFromPath(self) -> np.ndarray:
         image = PIL.Image.open(self.path)
         imageAsArray = np.array(image)
         return imageAsArray
@@ -64,16 +64,22 @@ class PILFile(ImageFile):
 class MATLABFile(ImageFile):
     supportedFormats = ['mat']
 
-    def __init__(self, path, variable):
+    def __init__(self, path, variable = None):
         ImageFile.__init__(self, path)
         self.variable = variable
 
-    def imageDataFromPath(self):
+    def imageDataFromPath(self) -> np.ndarray:
         dataset = sio.loadmat(self.path)
-        array = dataset[self.variable]
-        if array.ndim == 2:
-            np.expand_dims(array, axis=2)
-        elif array.ndim != 3:
-            raise ValueError("Not an image variable")
-
-        return array
+        if self.variable is not None:
+            array = dataset[self.variable]
+            if array.ndim == 2 or array.ndim == 3:
+                return array
+            elif array.ndim != 3:
+                raise ValueError("Not an image variable")
+        else:
+            for name in dataset.keys():
+                variable = dataset[name]
+                if isinstance(variable, np.ndarray):
+                    if variable.ndim == 2 or variable.ndim == 3:
+                        return variable
+        return None
