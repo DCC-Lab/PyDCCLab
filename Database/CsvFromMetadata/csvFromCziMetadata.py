@@ -1,5 +1,5 @@
 from cziMetadata import CZIMetadata as mtdt
-import cziUtil as czi
+from dcclab import cziUtil as czi
 
 
 def createCSVFromCZIMetadata(path):
@@ -31,8 +31,7 @@ def writeMetadataInCSV(metaFile, channelFile, cziFile):
         data = data.rstrip(',') + '\n'
         metaFile.write(data)
 
-        channels = newMtdt.getChannels()
-        for channel in channels:
+        for channel in newMtdt.channels:
             chnlData = ''
             dictioChnl = channel.exportAsDict()
             for key in channelKeys:
@@ -123,5 +122,6 @@ def getMetadataFromCzi(name, path):
 
 if __name__ == '__main__':
     path = 'P:\\injection AAV\\résultats bruts'
+    #path = 'P:\\injection AAV\\résultats bruts\\AAV\\AAV498AAV455'
     createCSVFromCZIMetadata(path)
     print('Finished')

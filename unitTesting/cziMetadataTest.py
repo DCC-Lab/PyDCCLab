@@ -18,7 +18,6 @@ class TestMetadata(unittest.TestCase):
 
     def test_cziFileToCziImageObject_isCziImageObject(self):
         mdata = mtdt.CZIMetadata(self.testPath)
-
         self.assertIs(type(mdata.cziFileToCziImageObject()), czi.CziFile)
 
     def test_cziFileToCziImageObject_FileNotFoundError(self):
@@ -160,7 +159,7 @@ class TestMetadata(unittest.TestCase):
         mdata.xSize = mdata.setXSize()
         mdata.xScale = mdata.setXScale()
 
-        self.assertEqual(mdata.setXScaled(), 0.001757888)
+        self.assertEqual(mdata.xScaled(), 0.001757888)
 
     def test_setXScaled_wrongValue(self):
         mdata = mtdt.CZIMetadata(self.testPath)
@@ -168,7 +167,7 @@ class TestMetadata(unittest.TestCase):
         mdata.xSize = mdata.setXSize()
         mdata.xScale = 'abcd'
 
-        with self.assertRaises(ValueError): mdata.setXScaled()
+        with self.assertRaises(ValueError): mdata.xScaled()
 
     def test_setYScaled_isEqual(self):
         mdata = mtdt.CZIMetadata(self.testPath)
@@ -176,7 +175,7 @@ class TestMetadata(unittest.TestCase):
         mdata.ySize = mdata.setYSize()
         mdata.yScale = mdata.setYScale()
 
-        self.assertEqual(mdata.setYScaled(), 0.00132568)
+        self.assertEqual(mdata.yScaled(), 0.00132568)
 
     def test_setYScaled_wrongValue(self):
         mdata = mtdt.CZIMetadata(self.testPath)
@@ -184,7 +183,7 @@ class TestMetadata(unittest.TestCase):
         mdata.ySize = mdata.setYSize()
         mdata.yScale = 'abcd'
 
-        with self.assertRaises(ValueError): mdata.setYScaled()
+        with self.assertRaises(ValueError): mdata.yScaled()
 
     def test_findFiltersEntriesInXml_returnsListOfFilters(self):
         mdata = mtdt.CZIMetadata(self.testPath)
