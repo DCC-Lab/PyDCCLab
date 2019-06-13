@@ -1,5 +1,4 @@
 from .channel import *
-from .channelFloat import ChannelFloat
 import cv2 as cv
 
 
@@ -9,13 +8,14 @@ class ChannelInt(Channel):
         Channel.__init__(self, pixels)
         if "int" not in str(pixels.dtype):
             raise TypeError("Pixel type must be integer.")
-        self.__originalFactor = np.iinfo(self.__originalDType).max
+        self._originalFactor = np.iinfo(self._originalDType).max
 
     def convertToNormalizedFloat(self):
+        from .channelFloat import ChannelFloat
         # For a bound integer array, we take the maximum of the type
         # and we convert the array to float
         floatArray = np.copy(self.pixels).astype(np.float32)
-        return ChannelFloat(floatArray / self.__originalFactor)
+        return ChannelFloat(floatArray / self._originalFactor)
 
     def getHistogramValues(self, normed: bool = False) -> typing.Tuple[np.ndarray, np.ndarray]:
         array = self.pixels.ravel()
