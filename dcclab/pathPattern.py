@@ -4,6 +4,32 @@ class PathPattern:
     def __init__(self, pattern:str):
         self.pattern = pattern
 
+    @property
+    def hasCaptureGroups(self) -> bool:
+        if re.search(r"\(.+\)", self.pattern):
+            return True
+        else:
+            return False
+
+    @property
+    def numberOfCaptureGroups(self) -> int:
+        match = re.search(r"(\(.*\))", self.pattern)
+        if match is not None:
+            return len(match.groups())
+        else:
+            return 0
+
+    @property
+    def isPythonFormatString(self) -> bool:
+        if re.search(r"\{\d+.*\}"):
+            return True
+        else:
+            return False
+
+    @property
+    def numberOfFormatElements(self) -> int:
+        return 0
+
     def isWritePattern(self) -> bool:
         if self.isPythonFormatString:
             return True
@@ -23,27 +49,3 @@ class PathPattern:
         else:
             return False
 
-    @property
-    def hasCaptureGroups(self) -> bool:
-        if re.search(r"\(.+\)"):
-            return True
-        else:
-            return False
-
-    @property
-    def numberOfCaptureGroups(self) -> int:
-        if re.search(r"\(.+\)"):
-            return 0
-        else:
-            return 0
-
-    @property
-    def isPythonFormatString(self) -> bool:
-        if re.search(r"\{\d+.*\}"):
-            return True
-        else:
-            return False
-
-    @property
-    def numberOfFormatElements(self) -> int:
-        return 0
