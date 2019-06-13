@@ -121,6 +121,9 @@ class LIFFile:
     def numberOfSeries(self):
         return len(self.__series)
 
+    def __len__(self):
+        return self.numberOfSeries
+
     def __getitem__(self, indices: typing.Union[int, tuple, list, slice]):
         if type(indices) is slice:
             return self.__series[indices]
@@ -138,6 +141,16 @@ class LIFFile:
     def removeAt(self, index: int):
         self.__series.pop(index)
 
+    def getMetadata(self, serieIndex: int=None):
+        if serieIndex is None:
+            metadata = []
+            for serie in self.__series:
+                metadata.append(serie.getMetadata())
+        else:
+            metadata = self.__series[serieIndex].getMetadata()
+
+        return metadata
+
     def getZStacks(self, seriesIndices=None, channels=None):
         series = self[seriesIndices]
 
@@ -147,6 +160,3 @@ class LIFFile:
             stacks.append(serie.getStack(channels))  # numpy array
 
         return stacks
-
-    def getMetadata(self, serieIndex: int=0):
-        return self.__series[serieIndex].getMetadata()

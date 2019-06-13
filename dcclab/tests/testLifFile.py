@@ -25,6 +25,9 @@ class TestLifFile(unittest.TestCase):
     def testNumberOfSeries(self):
         self.assertTrue(self.lifObj.numberOfSeries == 8)
 
+    def testLifLength(self):
+        self.assertTrue(len(self.lifObj) == 8)
+
     def testGetItemWithInteger(self):
         self.assertIsInstance(self.lifObj[0], LifSerie)
 
@@ -46,6 +49,30 @@ class TestLifFile(unittest.TestCase):
         series = self.lifObj[2:5]
         self.assertTrue(len(series) == 3)
         self.assertIsInstance(series[0], LifSerie)
+
+    def testKeepSeries(self):
+        self.lifObj.keepSeries([0, 1, 2])
+        self.assertTrue(self.lifObj.numberOfSeries == 3)
+        self.assertIsInstance(self.lifObj.series[0], LifSerie)
+
+    def testRemoveAt(self):
+        self.lifObj.removeAt(0)
+        self.assertTrue(self.lifObj.numberOfSeries == 7)
+
+    def testGetMetadataFromSerieObj(self):
+        metadata = self.lifObj[0].getMetadata()
+        self.assertIsInstance(metadata, dict)
+        self.assertTrue(metadata['channel_number'] == 1)
+
+    def testGetMetadataAtIndex(self):
+        metadata = self.lifObj.getMetadata(serieIndex=0)
+        self.assertIsInstance(metadata, dict)
+        self.assertTrue(metadata['channel_number'] == 1)
+
+    def testGetAllMetadata(self):
+        metadata = self.lifObj.getMetadata()
+        self.assertIsInstance(metadata, list)
+        self.assertIsInstance(metadata[0], dict)
 
 
 if __name__ == '__main__':
