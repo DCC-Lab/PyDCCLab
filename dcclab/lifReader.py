@@ -19,7 +19,23 @@ class FastSerie(Serie):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def getStackChannel(self, channel=0, T=0, dtype=np.uint8):
+    def getStack(self, channels=None):
+        if channels is None:
+            channels = self.getChannels()
+        elif type(channels) is not list:
+            channels = [channels]
+
+        channelStacks = []
+        for channel in channels:
+            channelStacks.append(self.__getStackChannel(channel))
+
+        if len(channelStacks) == 1:
+            return channelStacks[0]
+        else:
+            return np.stack(channelStacks)
+
+    def __getStackChannel(self, channel=0, T=0, dtype=np.uint8):
+        """ Renamed custom version of getFrame """
         zcyx = []
         zSize = self.getBoxShape()[-1]
         for z in range(zSize):
