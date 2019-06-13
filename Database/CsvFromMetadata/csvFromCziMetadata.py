@@ -33,7 +33,7 @@ def writeMetadataInCSV(metaFile, channelFile, cziFile):
 
         for channel in newMtdt.channels:
             chnlData = ''
-            dictioChnl = channel.AsDict()
+            dictioChnl = channel.asDict()
             for key in channelKeys:
                 chnlData += str(dictioChnl[key]) + ','
             chnlData = chnlData.rstrip(',') + '\n'
