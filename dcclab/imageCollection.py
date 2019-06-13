@@ -121,9 +121,12 @@ class ZStack(ImageCollection):
 
     @property
     def shape(self):
-        imageShape = self[0].shape
-        depth = len(self)
-        return imageShape[0], imageShape[1], depth
+        if self.__array:
+            return self.__array.shape
+        else:
+            imageShape = self[0].shape
+            depth = len(self)
+            return imageShape[0], imageShape[1], depth
 
     def asArray(self) -> np.ndarray:
         if self.__array is None:
