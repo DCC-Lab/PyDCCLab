@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
-import dcclab.cziUtil as czi
-from cziChannel import CZIChannel
-from cziFilter import CZIFilter
+from cziChannel import CZIChannel as chnnl
+from cziFilter import CZIFilter as fltr
+from dcclab import readCziImage, extractMetadataFromCziFileObject
 import re
 
 
@@ -32,29 +32,29 @@ class CZIMetadata:
     def __eq__(self, other):
         return repr(self) == repr(other)
 
-    def exportAsDict(self):
+    def asDict(self):
         return {'path': self.path, 'microscope': self.microscope, 'objective': self.objective, 'x_size': self.xSize,
                 'y_size': self.ySize, 'x_scale': self.xScale, 'y_scale': self.yScale, 'x_scaled': self.xScaled,
                 'y_scaled': self.yScaled, 'name': self.name, 'mouse_id': self.mouseId,
-                'viral_vectors': self.formatViralVectors(), 'injection_site': self.injectionSite, 'tags': self.tags}
+                'viral_vectors': self.viralVectors, 'injection_site': self.injectionSite, 'tags': self.tags}
 
-    def cziFileToCziImageObject(self):
+    def cziImageObjectFromPath(self):
         try:
-            return czi.readCziImage(self.path)
+            return readCziImage(self.path)
         except FileNotFoundError:
             raise
         except ValueError:
             raise
 
-    def extractXmlAsStringFromCziImageObject(self, cziImageObject):
+    def xmlFromCziImageObject(self, cziImageObject):
         try:
-            return czi.extractMetadataFromCziFileObject(cziImageObject)
+            return extractMetadataFromCziFileObject(cziImageObject)
         except AttributeError:
             raise
 
     def createElementTreeRoot(self):
-        cziImageObject = self.cziFileToCziImageObject()
-        stringXML = self.extractXmlAsStringFromCziImageObject(cziImageObject)
+        cziImageObject = self.cziImageObjectFromPath()
+        stringXML = self.xmlFromCziImageObject(cziImageObject)
         return ET.fromstring(stringXML)
 
     def checkIfElementHasChildren(self, element):
@@ -73,54 +73,43 @@ class CZIMetadata:
         try:
             return re.search(r's\d{1,4}', self.name, re.IGNORECASE).group()[1:]
         except AttributeError:
-            return 0
+            return None
 
     def setViralVectors(self):
         try:
-            vectors = []
-            vectors.extend(self.findAAVVectors())
-            vectors.extend(self.findRabVectors())
+            vectors = self.findAAVVectors() + ';' + self.findRabVectors()
+            vectors = vectors.lstrip(';')
+            vectors = vectors.rstrip(';')
             return vectors
         except Exception:
-            pass
-
-    def formatViralVectors(self):
-        if self.viralVectors:
-            vectorLine = ''
-            for vector in self.viralVectors:
-                vectorLine += vector + ';'
-            return vectorLine.rstrip(';')
+            return None
 
     def findRabVectors(self):
         # We can have either rab#.# or rabv#.# so we try to find either patterns.
         try:
-            return re.findall(r'(rabv?\d(?:\.\d))', self.name, re.IGNORECASE)
+            rabList = re.findall(r'(rabv?\d(?:\.\d)?)', self.name, re.IGNORECASE)
+            rabs = ';'.join(rabList)
+            return rabs
         except Exception:
-            return []
+            return None
 
     def findAAVVectors(self):
         # We can have either very distinct AAV### patterns or AAV###+### or AAV###-###.
         # We have to search for all three. AAV###-### and AAV###+### are splitted into different vectors and their
         # names are normalized to AAV###.
         try:
-            AAVs = re.findall(r'AAV\d{3,4}[+-]\d{3,4}|AAV\d{3,4}', self.name, re.IGNORECASE)
-            for AAV in AAVs:
-                if re.search(r'[+-]', AAV):
-                    splitAAV = re.compile(r'[+-]').split(AAV)
-                    for i in range(len(splitAAV)):
-                        if re.match(r'^\d{3,4}', splitAAV[i]):
-                            splitAAV[i] = splitAAV[i].replace(splitAAV[i], 'AAV' + splitAAV[i])
-                    AAVs.remove(AAV)
-                    AAVs.extend(splitAAV)
-            return AAVs
+            aavList = re.findall(r'AAV\d{3,4}(?:[-+]\d{3,4})?', self.name, re.IGNORECASE)
+            aavs = ';'.join(aavList)
+            aavs = re.sub(r'[-+]', ';AAV', aavs)
+            return aavs
         except Exception:
-            return []
+            return None
 
     def setInjectionSite(self):
         try:
             return re.search(r'patte|IV', self.name, re.IGNORECASE).group()
         except Exception:
-            return ''
+            return None
 
     def setMicroscope(self):
         try:
@@ -179,7 +168,7 @@ class CZIMetadata:
             if self.checkIfElementHasChildren(filters):
                 for filter in filters:
                     filterId = filter.attrib['Id']
-                    newFilters.append(CZIFilter(filterId, self.root))
+                    newFilters.append(fltr(filterId, self.root))
             return newFilters
         except Exception:
             return newFilters
@@ -191,19 +180,21 @@ class CZIMetadata:
             if self.checkIfElementHasChildren(channels):
                 for channel in channels:
                     channelInformation = [channel.attrib['Id'], channel.attrib['Name'], self.name]
-                    newChannels.append(CZIChannel(channelInformation, self.filters, self.root))
+                    newChannels.append(chnnl(channelInformation, self.filters, self.root))
             return newChannels
         except Exception:
             return newChannels
 
     def setTags(self):
         try:
-            tagLine = ''
-            tags = re.findall(r'moelle|neurones|drg|BB|anti\s?mcherry|anti\s?rabbit|cre|cx3cr1', self.name, re.IGNORECASE)
-            for tag in tags:
-                trueTag = tag.replace(' ', '')
-                if tagLine.find(trueTag) == -1:
-                    tagLine += trueTag + ';'
-            return tagLine.rstrip(';')
+            tagList = re.findall(r'moelle|neurones|drg|BB|anti\s?mcherry|anti\s?rabbit|cre|cx3cr1', self.name, re.IGNORECASE)
+
+            newTagList = []
+            for tag in tagList:
+                if newTagList.count(tag) < 1:
+                    newTagList.append(tag)
+            tags = ';'.join(newTagList)
+            tags = re.sub(' ', '', tags)
+            return tags
         except Exception:
             return []
