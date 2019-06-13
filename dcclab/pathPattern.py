@@ -66,3 +66,20 @@ class PathPattern:
                 paths.append(filePath)
         paths.sort()
         return paths
+
+    def filePathWithIndex(self, i:int, j:int = None, k:int = None):
+        if self.isReadPattern:
+            raise ValueError("Patterns with capture groups are for reading files, not writing")
+
+        if self.numberOfFormatGroups == 1:
+            filePath = self.pattern.format(i)
+        elif self.numberOfFormatGroups == 2:
+            filePath = self.pattern.format(i, j)
+        elif self.numberOfFormatGroups == 3:
+            filePath = self.pattern.format(i, j, k)
+        else:
+            raise ValueError("More than 3 indices not supported")
+            
+        return filePath
+
+

@@ -46,12 +46,12 @@ class TestPatterns(unittest.TestCase):
         self.assertTrue(pat.numberOfCaptureGroups == 3)
 
     def testInitWith1PythonFormatString(self):
-        pat = PathPattern(r'abl\{0\}')
+        pat = PathPattern(r'abl{0}')
         self.assertTrue(pat.isPythonFormatString)
         self.assertTrue(pat.numberOfFormatGroups == 1)
 
     def testInitWith2PythonFormatString(self):
-        pat = PathPattern(r'abl\{0\}blabal\{1:03f\}')
+        pat = PathPattern(r'abl{0}blabal{1:03f}')
         self.assertTrue(pat.isPythonFormatString)
         self.assertTrue(pat.numberOfFormatGroups == 2)
 
@@ -61,7 +61,7 @@ class TestPatterns(unittest.TestCase):
         self.assertTrue(pat.numberOfFormatGroups == 0)
 
     def testIsWritePattern(self):
-        pat = PathPattern(r'abl\{0\}blabal\{1:03f\}')
+        pat = PathPattern(r'abl{0}blabal{1:03f}')
         self.assertTrue(pat.isWritePattern)
         self.assertFalse(pat.isReadPattern)
 
@@ -83,8 +83,8 @@ class TestPatterns(unittest.TestCase):
         self.assertEqual(pat.basePattern, "test.tiff")
 
     def testBasenameWithFormats(self):
-        pat = PathPattern(r'/Users/dccote/test-\{0\}.tiff')
-        self.assertEqual(pat.basePattern, r"test-\{0\}.tiff")
+        pat = PathPattern(r'/Users/dccote/test-{0}.tiff')
+        self.assertEqual(pat.basePattern, r"test-{0}.tiff")
 
     def testBasenameWithCapture(self):
         pat = PathPattern(r'/Users/dccote/test-(\d+).tiff')
@@ -98,9 +98,27 @@ class TestPatterns(unittest.TestCase):
 
     def testFailedFindFilesWritePattern(self):
         # Use this test directory
-        pat = PathPattern(r'test.\{0}.py')
+        pat = PathPattern(r'test.{0}.py')
         with self.assertRaises(ValueError):
             files = pat.matchingFiles()
+
+    def testFindFilesCheckExist(self):
+        # Use this test directory
+        pat = PathPattern(r'test.+\.py')
+        files = pat.matchingFiles()
+        for filePath in files:
+            self.assertTrue(os.path.exists(filePath))
+
+    def testFileExpansion(self):
+        pat = PathPattern(r'test-{0}.py')
+        for i in range(4):
+            self.assertEqual(pat.filePathWithIndex(i), "test-{0}.py".format(i))
+
+    def testFileExpansionWithFancyFormat(self):
+        pat = PathPattern(r'test-{0:03d}.py')
+        self.assertEqual(pat.filePathWithIndex(1), "test-001.py")
+        for i in range(4):
+            self.assertEqual(pat.filePathWithIndex(i), "test-{0:03d}.py".format(i))
 
 if __name__ == '__main__':
     unittest.main()
