@@ -7,7 +7,8 @@ from .image import *
 from .channel import *
 from .imageCollection import *
 from .DCCExceptions import *
+from .channelInteger import *
+from .channelFloat import *
 
 __version__ = "0.9.0"
 __author__ = "Daniel Cote <dccote@cervo.ulaval.ca>"
-
