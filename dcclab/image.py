@@ -20,14 +20,14 @@ class Image:
                 raise ValueError("Cannot load '{0}': file does not exist".format(path))
 
             self.path = path
-            self.__channels = []
+            self.channels = []
             self.__fileObject = None
             for supportedClass in Image.supportedClasses:
                 try:
                     fileObject = supportedClass(path)
                     imageData = fileObject.imageDataFromPath()
                     if imageData.nbytes != 0:
-                        self.__channels = self.channelsFromImageData(imageData)
+                        self.channels = self.channelsFromImageData(imageData)
                         self.__fileObject = fileObject
                     break
                 except:
@@ -38,8 +38,12 @@ class Image:
         else:
             self.path = None
             self.__fileObject = None
-            self.__channels = self.channelsFromImageData(imageData)
+            self.channels = self.channelsFromImageData(imageData)
 
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, Image):
+            return false
+        return np.array_equal(self.asArray(), other.asArray())
 
     @property
     def shape(self):
@@ -53,15 +57,12 @@ class Image:
             totalSize += channel.sizeInBytes
         return totalSize
 
-    @property
-    def channels(self):
-        return self.__channels
-
-    def removeChannels(self, channels):
+    def removeChannels(self, channels:list):
         for index in channels:
             del self.channels[index]
 
     def asChannelsArray(self):
+        print(self.channels)
         channelsPixels = list(map(lambda c: c.pixels, self.channels))
         return channelsPixels
 
