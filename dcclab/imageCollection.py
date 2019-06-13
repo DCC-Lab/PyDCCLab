@@ -2,6 +2,8 @@ from .image import *
 import numpy as np
 import matplotlib.pyplot as plt
 import typing
+from .lifReader import LifReader
+
 
 class ImageCollection:
     def __init__(self, images: typing.List[Image] = None, pathPattern:str=None):
@@ -86,7 +88,7 @@ class ImageCollection:
 
 
 class ZStack(ImageCollection):
-    def __init__(self, images: typing.List[Image] = None, pathPattern:str=None):
+    def __init__(self, images: typing.List[Image] = None, pathPattern: str=None):
         ImageCollection.__init__(images, pathPattern)
         if not self.imagesAreSimilar:
             raise ValueError("Images in z-stack are not all the same shape")
@@ -103,3 +105,45 @@ class ZStack(ImageCollection):
     def show(self):
         # TODO: Do something nicer with z-stack
         self.showAllSequentially()
+
+
+class LIFFile:
+    def __init__(self, path: str):
+        self.path = path
+        lifObject = LifReader(self.path)
+        self.__series = lifObject.getSeries()
+
+    @property
+    def series(self):
+        return self.__series
+
+    def __getitem__(self, indices: list or int):
+        if indices is None:
+            return self.__series
+        elif type(indices) is not list:
+            indices = [indices]
+        if max(indices) < len(self.__series):
+            raise IndexError
+
+        items = [self.__series[i] for i in indices]
+
+        return items[0] if len(items) == 1 else items
+
+    def keepSeries(self, indices: list or int):
+        self.__series = self[indices]
+
+    def removeAt(self, index: int):
+        self.__series.pop(index)
+
+    def getZStacks(self, seriesIndices=None, channels=None):
+        series = self[seriesIndices]
+
+        stacks = []
+        for serie in series:
+            # TODO: create ZStackCollection Object with array
+            stacks.append(serie.getStack(channels))  # numpy array
+
+        return stacks
+
+    def getMetadata(self, serieIndex: int=0):
+        return self.__series[serieIndex].getMetadata()
