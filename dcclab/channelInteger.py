@@ -1,5 +1,6 @@
 from .channel import *
 from .channelFloat import ChannelFloat
+import cv2 as cv
 
 
 class ChannelInt(Channel):
@@ -68,3 +69,70 @@ class ChannelUint8(ChannelInt):
     def getBothDirectionsSobelFilter(self):
         sobelHV = sobel(self.pixels.astype(float))
         return ChannelUint8(sobelHV.astype(np.uint8))
+
+    def getIsodataThresholding(self):
+        """
+        Adapted from skimage's isodata thresholding method.
+        Their version was not behaving properly with our image format (different than uint8).
+        :return: The thresholded Channel instance according to isodata method.
+        """
+        # We ignore warnings related to division by 0 since they give nan and we treat nan later.
+        warnings.catch_warnings()
+        warnings.simplefilter("ignore", category=RuntimeWarning)
+        hist, bins = self.getHistogramValues()
+
+        hist = np.array(hist, dtype=np.float32)
+        bins = np.array(bins)
+        binsCenters = np.array([(i + i + 1) / 2 for i in range(len(bins) - 1)])
+        pixelProbabilityThresholdOne = np.cumsum(hist)
+        pixelProbabilityThresholdTwo = np.cumsum(hist[::-1])[::-1] - hist
+        intensitySum = hist * binsCenters
+        pixelProbabilityThresholdTwo[-1] = 1
+        low = np.cumsum(intensitySum) / pixelProbabilityThresholdOne
+        high = (np.cumsum(intensitySum[::-1])[::-1] - intensitySum) / pixelProbabilityThresholdTwo
+        allMean = (low + high) / 2
+        binWidth = binsCenters[1] - binsCenters[0]
+        distances = allMean - binsCenters
+        thresh = 0
+        for i in range(len(distances)):
+            if distances[i] is not None and 0 <= distances[i] < binWidth:
+                thresh = binsCenters[i]
+        threshArray = self.pixels >= thresh
+        return ChannelUint8(threshArray.astype(np.uint8))
+
+    def getOtsuThresholding(self):
+        """
+        Adapted from skimage's Otsu thresholding method.
+        Their version was not behaving properly with our image format (different than uint8).
+        :return: The thresholded DCCImage instance according to Otsu's method.
+        """
+        # We ignore warnings related to division by 0 since they give nan and we treat nan later.
+        warnings.catch_warnings()
+        warnings.simplefilter("ignore", category=RuntimeWarning)
+        if self.getExtremaValuesOfPixels()[0] == self.getExtremaValuesOfPixels()[1]:
+            raise ValueError(
+                "This method only works for image with more than one \"color\" (i.e. more than one pixel value).")
+        hist, bins = self.getHistogramValues()
+        hist = np.array(hist, dtype=np.float32)
+        bins = np.array(bins)
+        binsCenters = np.array([(i + i + 1) / 2 for i in range(len(bins) - 1)])
+        pixelProbabilityGroupOne = np.cumsum(hist)
+        pixelProbabilityGroupTwo = np.cumsum(hist[::-1])[::-1]
+        pixelIntensityGroupOneMean = np.cumsum(hist * binsCenters) / pixelProbabilityGroupOne
+        pixelIntensityGroupTwoMean = (np.cumsum((hist * binsCenters)[::-1]) / pixelProbabilityGroupTwo[::-1])[::-1]
+        varianceTwoGroups = pixelProbabilityGroupOne[:-1] * pixelProbabilityGroupTwo[1:] * (
+                pixelIntensityGroupOneMean[:-1] - pixelIntensityGroupTwoMean[1:]) ** 2
+        index = np.nanargmax(varianceTwoGroups)
+        thresh = binsCenters[index]
+        threshArray = self.pixels >= thresh
+        return ChannelUint8(threshArray.astype(np.uint8))
+
+    def getAdaptiveThresholdMean(self, oddRegionSize: int = 3):
+        threshArray = cv.adaptiveThreshold(self.pixels.astype(float), 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY,
+                                           oddRegionSize, 0)
+        return ChannelUint8(threshArray.astype(np.uint8))
+
+    def getAdaptiveThresholdGaussian(self, oddRegionSize: int = 3):
+        threshArray = cv.adaptiveThreshold(self.pixels.astype(float), 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C,
+                                           cv.THRESH_BINARY, oddRegionSize, 0)
+        return ChannelUint8(threshArray.astype(np.uint8))
