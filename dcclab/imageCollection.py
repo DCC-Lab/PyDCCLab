@@ -9,9 +9,12 @@ class ImageCollection:
     def __init__(self, images: Union[List[Image], np.ndarray]=None, pathPattern: str=None):
         self.__images = []
         if images is not None:
-            if not all(isinstance(image, Image) for image in images):
+            if type(images) is np.ndarray:
+                self.collectionFromArray(images)
+            elif not all(isinstance(image, Image) for image in images):
                 raise NotDCCImageException
-            self.__images = images
+            else:
+                self.__images = images
         elif pathPattern is not None:
             self.appendMatchingFiles(pathPattern)
 
@@ -58,6 +61,16 @@ class ImageCollection:
                 self.__images.append(image)
             except:
                 pass
+
+    def collectionFromArray(self, array):
+        if array.ndim < 3:
+            raise EmptyDCCImageCollectionException  # fixme: better exception or redirect for error "image collection from single image"...
+
+        elif array.ndim == 3:
+            self.__images = [Image(array[:, :, i]) for i in range(array.shape[2])]
+
+        elif array.ndim > 3:  # Todo
+            raise NotImplementedError("ImageCollection from single channel 3D array only.")
 
     def removeAt(self, index: int):
         self.images.pop(index)
