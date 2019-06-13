@@ -1,7 +1,7 @@
-from cziNameAnalysis import CZINameAnalysis as nm
-import unittest
+#from cziNameAnalysis import CZINameAnalysis as nm
+#import unittest
 
-
+'''
 class TestCziName(unittest.TestCase):
     def setUp(self) -> None:
         pass
@@ -144,3 +144,4 @@ class TestCziName(unittest.TestCase):
     def test_setTags_noName(self):
         name = nm('')
         self.assertEqual(name.setTags(), '')
+'''
