@@ -22,11 +22,12 @@ except:
 class Channel:
 
     def __init__(self, pixels: np.ndarray):
-        if not pixels.dtype == np.float32:
-            raise PixelTypeException
-        if pixels.ndim > 2:
+        pixels.squeeze()
+        if pixels.ndim != 2:
             raise DimensionException(pixels.ndim)
         self.__pixels = np.copy(pixels)
+        self.__originalFactor = 1.0
+        self.__originalDType = pixels.dtype
         self.__original = None
 
     @property
@@ -50,10 +51,6 @@ class Channel:
         return int(self.shape[1])
 
     @property
-    def length(self) -> int:
-        return self.height
-
-    @property
     def sizeInBytes(self) -> int:
         return self.pixels.nbytes
 
@@ -63,35 +60,18 @@ class Channel:
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, Channel):
-            raise InvalidEqualityTestException(type(other))
+            return False
         return np.array_equal(self.pixels, other.pixels)
-
-    @deprecated(reason="Renamed as a @property pixels")
-    def getPixels(self) -> np.ndarray:
-        return self.pixels
-
-    @deprecated(reason="Renamed as a @property width")
-    def getWidth(self) -> int:
-        return self.width
-
-    @deprecated(reason="Renamed as a @property height")
-    def getLength(self) -> int:
-        return self.height
-
-    @deprecated(reason="Renamed as a @property numberOfPixels")
-    def getNumberOfPixels(self) -> int:
-        return self.getLength() * self.getWidth()
 
     def copy(self) -> np.ndarray:
         return np.copy(self.pixels)
 
-    @deprecated(reason="Renamed as a @property isBinary")
-    def arePixelsInBinary(self) -> bool:
-        return self.isBinary
-
     @property
     def isBinary(self) -> bool:
-        return np.alltrue(np.logical_or(self.pixels == 0, self.pixels) == 1)
+        # FIXME?: This function should return True as considered
+        # by morphology.binary_opening.  It appears that
+        # a int array should be only 0 and 1.
+        return np.array_equal(self.pixels, self.pixels.astype(bool))
 
     """ Display-related functions """
 
@@ -101,10 +81,11 @@ class Channel:
         return self
 
     def getHistogramValues(self, normed: bool = False) -> typing.Tuple[np.ndarray, np.ndarray]:
-        array = self.pixels.astype(np.uint16).ravel()
-        nbBins = len(np.bincount(array))
-        hist, bins = np.histogram(array, nbBins, [0, nbBins], density=normed)
-        return hist, bins
+        # array = (self.pixels * self.__originalFactor).astype(self.__originalDType).ravel()
+        # nbBins = len(np.bincount(array))
+        # hist, bins = np.histogram(array, nbBins, [0, nbBins], density=normed)
+        # return hist, bins
+        pass
 
     def displayHistogram(self, normed: bool = False) -> typing.Tuple[np.ndarray, np.ndarray]:
         histogram, bins = self.getHistogramValues(normed)
@@ -112,11 +93,28 @@ class Channel:
         plt.show()
         return histogram, bins
 
-    @deprecated(reason="Renamed as display()")
-    def displayChannel(self, colorMap=None):
-        return self.display()
-
     """ Manipulation-related functions """
+
+    def convertToNormalizedFloat(self):
+        if "float" in str(self.__originalDType):
+            # For a float array, we must determine if array is
+            # already normalized or not: we don't take the 
+            # maximum of float type, we take max of array
+            maxValue = np.max(np.max(self.pixels))
+            if maxValue <= 1.0:
+                # don't normalize an already normalized float array
+                self.__originalFactor = 1.0
+                self.__pixels = np.copy(self.pixels)
+            else:
+                # normalize a non-normalized float array
+                self.__originalFactor = maxValue
+                self.__pixels = np.copy(self.pixels) / maxValue
+        else:
+            # For a bound integer array, we take the maximum of the type
+            # and we convert the array to float
+            self.__originalFactor = np.iinfo(self.__originalDType).max
+            floatArray = np.copy(self.pixels).astype(np.float32)
+            self.__pixels = floatArray / self.__originalFactor
 
     def saveOriginal(self):
         if self.__original == None:
@@ -223,11 +221,8 @@ class Channel:
         entropyFiltered = entropy(image, morphology.selem.square(filterSize, dtype=np.float32))
         return Channel(entropyFiltered.astype(np.float32))
 
+    @deprecated(reason="Too slow. Use getStandardDeviationFilter")
     def getStandardDeviationFilteringSlow(self, filterSize: int):
-        message = "This filtering method is very slow with big images. " \
-                  "Use getStandardDeviationFiltering for faster results."
-        warnings.warn(message)
-        # VERY SLOW WITH BIG IMAGES
         stdFiltered = filters.generic_filter(self.pixels, np.std, size=filterSize, mode="nearest")
         return Channel(stdFiltered.astype(np.float32))
 
@@ -260,7 +255,7 @@ class Channel:
         """
         Adapted from skimage's isodata thresholding method.
         Their version was not behaving properly with our image format (different than uint8).
-        :return: The thresholded DCCImage instance according to isodata method.
+        :return: The thresholded Channel instance according to isodata method.
         """
         # We ignore warnings related to division by 0 since they give nan and we treat nan later.
         warnings.catch_warnings()
@@ -283,7 +278,7 @@ class Channel:
         for i in range(len(distances)):
             if distances[i] is not None and 0 <= distances[i] < binWidth:
                 thresh = binsCenters[i]
-        threshArray = self.pixels >= thresh
+        threshArray = self.pixels >= (thresh / self.__originalFactor)
         return Channel(threshArray.astype(np.float32))
 
     def getOtsuThresholding(self):
@@ -310,19 +305,21 @@ class Channel:
                 pixelIntensityGroupOneMean[:-1] - pixelIntensityGroupTwoMean[1:]) ** 2
         index = np.nanargmax(varianceTwoGroups)
         thresh = binsCenters[index]
-        threshArray = self.pixels >= thresh
+        threshArray = self.pixels >= (thresh / self.__originalFactor)
         return Channel(threshArray.astype(np.float32))
 
-    def getAdaptiveThreshold(self):
-        # todo voir avec openCV
-        pass
+    def getAdaptiveThresholdMean(self, oddRegionSize: int = 3):
+        raise NotImplementedError
+
+    def getAdaptiveThresholdGaussian(self, oddRegionSize: int = 3):
+        raise NotImplementedError
 
     def getOpening(self, windowSize: int = 3):
         opened = morphology.opening(self.pixels, np.ones((windowSize, windowSize)))
         return Channel(opened)
 
     def getBinaryOpening(self, windowSize: int = 3):
-        if not self.arePixelsInBinary():
+        if not self.isBinary:
             raise NotBinaryImageException
         binaryOpened = morphology.binary_opening(self.pixels, np.ones((windowSize, windowSize))).astype(np.float32)
         return Channel(binaryOpened)
@@ -332,13 +329,13 @@ class Channel:
         return Channel(closed)
 
     def getBinaryClosing(self, windowSize: int = 3):
-        if not self.arePixelsInBinary():
+        if not self.isBinary:
             raise NotBinaryImageException
         binarClosed = morphology.binary_closing(self.pixels, np.ones((windowSize, windowSize))).astype(np.float32)
         return Channel(binarClosed)
 
     def getConnectedComponents(self) -> tuple:
-        if not self.arePixelsInBinary():
+        if not self.isBinary:
             raise NotBinaryImageException
         labeled, nbObjects = label(self.pixels)
         sizes = sum(self.pixels, labeled, range(nbObjects + 1))
