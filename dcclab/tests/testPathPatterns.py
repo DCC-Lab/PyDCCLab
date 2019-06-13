@@ -74,6 +74,10 @@ class TestPatterns(unittest.TestCase):
         pat = PathPattern(r'/Users/dccote/test.tiff')
         self.assertEqual(pat.directory, "/Users/dccote")
 
+    def testEmptyDirectory(self):
+        pat = PathPattern(r'test.tiff')
+        self.assertEqual(pat.directory, "./")
+
     def testBasename(self):
         pat = PathPattern(r'/Users/dccote/test.tiff')
         self.assertEqual(pat.basePattern, "test.tiff")
@@ -86,6 +90,11 @@ class TestPatterns(unittest.TestCase):
         pat = PathPattern(r'/Users/dccote/test-(\d+).tiff')
         self.assertEqual(pat.basePattern, r"test-(\d+).tiff")
 
-        
+    def testFindFiles(self):
+        # Use this test directory
+        pat = PathPattern(r'.+\.py')
+        files = pat.matchingFiles()
+        self.assertTrue(len(files) != 0)
+
 if __name__ == '__main__':
     unittest.main()

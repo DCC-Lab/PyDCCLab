@@ -8,7 +8,10 @@ class PathPattern:
 
     @property
     def directory(self):
-        return os.path.dirname(self.pattern)
+        dirName = os.path.dirname(self.pattern)
+        if dirName == '':
+            dirName = './'
+        return dirName
 
     @property
     def basePattern(self):
@@ -51,3 +54,15 @@ class PathPattern:
             return True
         else:
             return False
+
+    def matchingFiles(self) -> list:
+        if self.isWritePattern:
+            raise ValueError("Patterns with format strings are for writing files, not reading")
+
+        paths = []
+        for filename in os.listdir(self.directory):
+            if re.match(self.basePattern, filename):
+                filePath = os.path.join(self.directory,filename)
+                paths.append(filePath)
+        paths.sort()
+        return paths
