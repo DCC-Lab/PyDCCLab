@@ -86,8 +86,6 @@ class PathPattern:
             filePath = self.pattern.format(i, j)
         elif self.numberOfFormatGroups == 3:
             filePath = self.pattern.format(i, j, k)
-        else:
-            raise ValueError("More than 3 indices not supported")
 
         return filePath
 

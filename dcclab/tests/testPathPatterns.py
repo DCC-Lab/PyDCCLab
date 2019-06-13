@@ -141,5 +141,29 @@ class TestPatterns(unittest.TestCase):
                     with self.assertRaises(ValueError):
                         pat.filePathWithIndex(i,j)
 
+    def testFileExpansionMissingPatternIndices(self):
+        pat = PathPattern(r'test-{0}-{1}.py')
+        for i in range(4):
+            for j in range(4):
+                for k in range(4):
+                    with self.assertRaises(ValueError):
+                        pat.filePathWithIndex(i,j,k)
+
+    def testFileExpansionWithReadPattern(self):
+        pat = PathPattern(r'test-(\d).py')
+        for i in range(4):
+            for j in range(4):
+                for k in range(4):
+                    with self.assertRaises(ValueError):
+                        pat.filePathWithIndex(i,j,k)
+
+    def testFileExpansionWithTooManyIndices(self):
+        pat = PathPattern(r'test-{0}-{1}-{2}-{3}.py')
+        for i in range(4):
+            for j in range(4):
+                for k in range(4):
+                    with self.assertRaises(ValueError):
+                        pat.filePathWithIndex(i,j,k)
+
 if __name__ == '__main__':
     unittest.main()
