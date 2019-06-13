@@ -101,10 +101,16 @@ class TestLifFile(unittest.TestCase):
         self.assertTrue(len(stacks) == 2)
         self.assertTrue(stacks[0].shape == (448, 448, 448))
 
+    def testGetZStacksBadChannels(self):
+        with self.assertRaises(Exception):
+            self.lifObj.getZStacks(seriesIndices=0, channels=(0, 1))
+
     def testGetZStacksMultipleChannels(self):
         # fixme: no small test data file with multiple channels
         pass
 
+    def testGetZStacksMultipleChannelsStackArrays(self):
+        pass
 
 if __name__ == '__main__':
     unittest.main()
