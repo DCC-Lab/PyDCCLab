@@ -25,28 +25,8 @@ class Channel:
         pixels.squeeze()
         if pixels.ndim != 2:
             raise DimensionException(pixels.ndim)
-        self.__originalDType = pixels.dtype        
-
-        if "float" in str(self.__originalDType): 
-            # For a float array, we must determine if array is
-            # already normalized or not: we don't take the 
-            # maximum of float type, we take max of array
-            maxValue = np.max(np.max(pixels))
-            if maxValue <= 1.0:
-                # don't normalize an already normalized float array
-                self.__originalFactor = 1.0
-                self.__pixels = np.copy(pixels)
-            else:
-                # normalize a non-normalized float array
-                self.__originalFactor = maxValue
-                self.__pixels = np.copy(pixels) / maxValue 
-        else:  
-            # For a bound integer array, we take the maximum of the type
-            # and we convert the array to float
-            self.__originalFactor = np.iinfo(self.__originalDType).max
-            floatArray = np.copy(pixels).astype(np.float32)
-            self.__pixels = floatArray / self.__originalFactor
-
+        self.__pixels = np.copy(pixels)
+        self.__originalDType = pixels.dtype
         self.__original = None
 
     @property
@@ -70,10 +50,6 @@ class Channel:
         return int(self.shape[1])
 
     @property
-    def length(self) -> int:
-        return self.height
-
-    @property
     def sizeInBytes(self) -> int:
         return self.pixels.nbytes
 
@@ -83,31 +59,11 @@ class Channel:
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, Channel):
-            raise InvalidEqualityTestException(type(other))
+            return False
         return np.array_equal(self.pixels, other.pixels)
-
-    @deprecated(reason="Renamed as a @property pixels")
-    def getPixels(self) -> np.ndarray:
-        return self.pixels
-
-    @deprecated(reason="Renamed as a @property width")
-    def getWidth(self) -> int:
-        return self.width
-
-    @deprecated(reason="Renamed as a @property height")
-    def getLength(self) -> int:
-        return self.height
-
-    @deprecated(reason="Renamed as a @property numberOfPixels")
-    def getNumberOfPixels(self) -> int:
-        return self.getLength() * self.getWidth()
 
     def copy(self) -> np.ndarray:
         return np.copy(self.pixels)
-
-    @deprecated(reason="Renamed as a @property isBinary")
-    def arePixelsInBinary(self) -> bool:
-        return self.isBinary
 
     @property
     def isBinary(self) -> bool:
@@ -138,25 +94,26 @@ class Channel:
 
     """ Manipulation-related functions """
 
-    def toFloat32(self):
-        if "float" in str(self.pixels.dtype): 
+    def convertToNormalizedFloat(self):
+        if "float" in str(self.__originalDType): 
             # For a float array, we must determine if array is
             # already normalized or not: we don't take the 
             # maximum of float type, we take max of array
-            maxValue = max(max(self.pixels))
+            maxValue = np.max(np.max(pixels))
             if maxValue <= 1.0:
                 # don't normalize an already normalized float array
                 self.__originalFactor = 1.0
+                self.__pixels = np.copy(pixels)
             else:
                 # normalize a non-normalized float array
                 self.__originalFactor = maxValue
-                self.pixels /= maxValue 
+                self.__pixels = np.copy(pixels) / maxValue 
         else:  
             # For a bound integer array, we take the maximum of the type
             # and we convert the array to float
-            self.__originalFactor = np.iinfo(self.pixels.dtype).max
-            floatArray = np.copy(self.pixels).astype(np.float32)
-            self.pixels = floatArray / self.__originalFactor
+            self.__originalFactor = np.iinfo(self.__originalDType).max
+            floatArray = np.copy(pixels).astype(np.float32)
+            self.__pixels = floatArray / self.__originalFactor
     
     def saveOriginal(self):
         if self.__original == None:
@@ -300,7 +257,7 @@ class Channel:
         """
         Adapted from skimage's isodata thresholding method.
         Their version was not behaving properly with our image format (different than uint8).
-        :return: The thresholded DCCImage instance according to isodata method.
+        :return: The thresholded Channel instance according to isodata method.
         """
         # We ignore warnings related to division by 0 since they give nan and we treat nan later.
         warnings.catch_warnings()
