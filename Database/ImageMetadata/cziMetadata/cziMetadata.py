@@ -1,15 +1,15 @@
 import xml.etree.ElementTree as ET
-from cziChannel import CZIChannel as chnnl
-from cziFilter import CZIFilter as fltr
+from .cziChannel import CZIChannel as chnnl
+from .cziFilter import CZIFilter as fltr
 from dcclab import readCziImage, extractMetadataFromCziFileObject
 import re
 import os
 
 
 class CZIMetadata:
-    def __init__(self, path, name=''):
+    def __init__(self, path, name=None):
         self.path = path
-        if name:
+        if name is not None:
             self.name = name
         else:
             self.name = self.nameFromPath()

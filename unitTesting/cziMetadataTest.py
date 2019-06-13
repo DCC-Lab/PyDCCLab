@@ -193,13 +193,13 @@ class TestMetadata(unittest.TestCase):
         mdata = mtdt(self.testPath)
         self.assertFalse(mdata.checkIfElementHasChildren(None))
 
-    def test_AsDict_expectedValue(self):
+    def test_asDict_expectedValue(self):
         mdata = mtdt(self.testPath)
         expectedValue = {
             'path': 'C:\\Users\\MathieuLaptop\\Documents\\Ulaval\\ProgPython\\Projets\\BigData-ImageAnalysis\\testData\\testCziFile.czi',
             'microscope': 'Axio Observer.Z1 / 7', 'objective': 'LD A-Plan 5x/0.15 Ph1', 'x_size': '1936',
             'y_size': '1460', 'x_scale': '9.08E-07', 'y_scale': '9.08E-07', 'x_scaled': 0.001757888,
-            'y_scaled': 0.00132568, 'name': '', 'mouse_id': None, 'viral_vectors': '', 'injection_site': None, 'tags': ''}
+            'y_scaled': 0.00132568, 'name': 'testCziFile.czi', 'mouse_id': None, 'viral_vectors': '', 'injection_site': None, 'tags': ''}
         self.assertEqual(mdata.asDict(), expectedValue)
 
     def test_setMouseId_upperCase(self):
@@ -331,9 +331,19 @@ class TestMetadata(unittest.TestCase):
         mdata.name = 0
         self.assertFalse(mdata.setTags())
 
-    def test_nameFromPath_test(self):
+    def test_nameFromPath_expectedValue(self):
         mdata = mtdt(self.testPath)
-        print(mdata.nameFromPath())
+        self.assertEqual(mdata.nameFromPath(), 'testCziFile.czi')
+
+    def test_nameFromPath_noPath(self):
+        mdata = mtdt(self.testPath)
+        mdata.path = ''
+        self.assertEqual(mdata.nameFromPath(), '')
+
+    def test_nameFromPath_wrongType(self):
+        mdata = mtdt(self.testPath)
+        mdata.path = 0
+        self.assertIsNone(mdata.nameFromPath())
 
 
 if __name__ == '__main__':

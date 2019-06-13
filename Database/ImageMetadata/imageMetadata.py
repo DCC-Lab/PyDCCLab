@@ -1,4 +1,4 @@
-from cziMetadata import CZIMetadata
+from .cziMetadata.cziMetadata import CZIMetadata
 import os
 
 
@@ -14,7 +14,7 @@ class ImageMetadata:
         self.__fileObject = None
         for supportedClass in ImageMetadata.supportedClasses:
             try:
-                fileObject = supportedClass(path)
+                self.__fileObject = supportedClass(path)
                 break
             except:
                 continue

@@ -1,5 +1,5 @@
-from Database.MetadataFromCzi.cziChannel import CZIChannel as chnnl
-from Database.MetadataFromCzi.cziMetadata import CZIMetadata as mtdt
+from Database.ImageMetadata.cziMetadata.cziChannel import CZIChannel as chnnl
+from Database.ImageMetadata.cziMetadata.cziMetadata import CZIMetadata as mtdt
 import xml.etree.ElementTree as ET
 import unittest
 import os
