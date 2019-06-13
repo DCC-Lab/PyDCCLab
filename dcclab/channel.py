@@ -26,8 +26,8 @@ class Channel:
         if pixels.ndim != 2:
             raise DimensionException(pixels.ndim)
         self.__pixels = np.copy(pixels)
-        self.__originalFactor = 1.0
-        self.__originalDType = pixels.dtype
+        self._originalFactor = 1.0
+        self._originalDType = pixels.dtype
         self.__original = None
 
     @property
@@ -96,25 +96,25 @@ class Channel:
     """ Manipulation-related functions """
 
     def convertToNormalizedFloat(self):
-        if "float" in str(self.__originalDType):
+        if "float" in str(self._originalDType):
             # For a float array, we must determine if array is
             # already normalized or not: we don't take the 
             # maximum of float type, we take max of array
             maxValue = np.max(np.max(self.pixels))
             if maxValue <= 1.0:
                 # don't normalize an already normalized float array
-                self.__originalFactor = 1.0
+                self._originalFactor = 1.0
                 self.__pixels = np.copy(self.pixels)
             else:
                 # normalize a non-normalized float array
-                self.__originalFactor = maxValue
+                self._originalFactor = maxValue
                 self.__pixels = np.copy(self.pixels) / maxValue
         else:
             # For a bound integer array, we take the maximum of the type
             # and we convert the array to float
-            self.__originalFactor = np.iinfo(self.__originalDType).max
+            self._originalFactor = np.iinfo(self._originalDType).max
             floatArray = np.copy(self.pixels).astype(np.float32)
-            self.__pixels = floatArray / self.__originalFactor
+            self.__pixels = floatArray / self._originalFactor
 
     def saveOriginal(self):
         if self.__original == None:
@@ -278,7 +278,7 @@ class Channel:
         for i in range(len(distances)):
             if distances[i] is not None and 0 <= distances[i] < binWidth:
                 thresh = binsCenters[i]
-        threshArray = self.pixels >= (thresh / self.__originalFactor)
+        threshArray = self.pixels >= (thresh / self._originalFactor)
         return Channel(threshArray.astype(np.float32))
 
     def getOtsuThresholding(self):
@@ -305,7 +305,7 @@ class Channel:
                 pixelIntensityGroupOneMean[:-1] - pixelIntensityGroupTwoMean[1:]) ** 2
         index = np.nanargmax(varianceTwoGroups)
         thresh = binsCenters[index]
-        threshArray = self.pixels >= (thresh / self.__originalFactor)
+        threshArray = self.pixels >= (thresh / self._originalFactor)
         return Channel(threshArray.astype(np.float32))
 
     def getAdaptiveThresholdMean(self, oddRegionSize: int = 3):
@@ -340,3 +340,5 @@ class Channel:
         labeled, nbObjects = label(self.pixels)
         sizes = sum(self.pixels, labeled, range(nbObjects + 1))
         return Channel(labeled.astype(np.float32)), nbObjects, sizes
+
+
