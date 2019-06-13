@@ -92,9 +92,15 @@ class TestPatterns(unittest.TestCase):
 
     def testFindFiles(self):
         # Use this test directory
-        pat = PathPattern(r'.+\.py')
+        pat = PathPattern(r'test.+\.py')
         files = pat.matchingFiles()
         self.assertTrue(len(files) != 0)
+
+    def testFailedFindFilesWritePattern(self):
+        # Use this test directory
+        pat = PathPattern(r'test.\{0}.py')
+        with self.assertRaises(ValueError):
+            files = pat.matchingFiles()
 
 if __name__ == '__main__':
     unittest.main()
