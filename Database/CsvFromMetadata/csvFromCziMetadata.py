@@ -1,5 +1,5 @@
-from cziMetadata import CZIMetadata as mtdt
-from dcclab import cziUtil as czi
+from dcclab import findAllCziFiles
+from Database.MetadataFromCzi.cziMetadata import CZIMetadata as mtdt
 
 
 def createCSVFromCZIMetadata(path):
@@ -24,7 +24,7 @@ def writeMetadataInCSV(metaFile, channelFile, cziFile):
                    'camera_adapter', 'exposure_time', 'binning_mode']
     try:
         newMtdt = getMetadataFromCzi(cziFile[1], cziFile[0])
-        dictioMeta = newMtdt.exportAsDict()
+        dictioMeta = newMtdt.AsDict()
         data = ''
         for key in metaKeys:
             data += str(dictioMeta[key]) + ','
@@ -33,7 +33,7 @@ def writeMetadataInCSV(metaFile, channelFile, cziFile):
 
         for channel in newMtdt.channels:
             chnlData = ''
-            dictioChnl = channel.exportAsDict()
+            dictioChnl = channel.AsDict()
             for key in channelKeys:
                 chnlData += str(dictioChnl[key]) + ','
             chnlData = chnlData.rstrip(',') + '\n'
@@ -94,7 +94,7 @@ def writeChannelFileHeader(channelFile):
 def getAllCzisFromFolder(path):
     print('Begining to search for .czi files in folder : {}'.format(path))
     try:
-        cziPathsAndNames = czi.findAllCziFiles(path)
+        cziPathsAndNames = findAllCziFiles(path)
         print(len(cziPathsAndNames), ' files were found!')
         return cziPathsAndNames
     except Exception as err:
