@@ -50,6 +50,11 @@ class TestLifFile(unittest.TestCase):
         self.assertTrue(len(series) == 3)
         self.assertIsInstance(series[0], LifSerie)
 
+    def testGetItemWithNone(self):
+        series = self.lifObj[None]
+        self.assertTrue(len(series) == 8)
+        self.assertIsInstance(series[0], LifSerie)
+
     def testKeepSeries(self):
         self.lifObj.keepSeries([0, 1, 2])
         self.assertTrue(self.lifObj.numberOfSeries == 3)
@@ -73,6 +78,32 @@ class TestLifFile(unittest.TestCase):
         metadata = self.lifObj.getMetadata()
         self.assertIsInstance(metadata, list)
         self.assertIsInstance(metadata[0], dict)
+
+    def testGetZStackOneSeriesOneChannel(self):
+        stacks = self.lifObj.getZStacks(seriesIndices=0, channels=0)
+
+        self.assertIsInstance(stacks, list)
+        self.assertTrue(len(stacks) == 1)
+        self.assertTrue(stacks[0].shape == (448, 448, 448))
+
+    def testGetZStackOneSeries(self):
+        stacks = self.lifObj.getZStacks(seriesIndices=0)
+
+        self.assertIsInstance(stacks, list)
+        self.assertTrue(len(stacks) == 1)
+        self.assertTrue(stacks[0].shape == (448, 448, 448))
+
+    def testGetAllZStacks(self):
+        self.lifObj.keepSeries([0, 1])
+        stacks = self.lifObj.getZStacks()
+
+        self.assertIsInstance(stacks, list)
+        self.assertTrue(len(stacks) == 2)
+        self.assertTrue(stacks[0].shape == (448, 448, 448))
+
+    def testGetZStacksMultipleChannels(self):
+        # fixme: no small test data file with multiple channels
+        pass
 
 
 if __name__ == '__main__':

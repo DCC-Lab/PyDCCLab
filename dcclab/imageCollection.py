@@ -124,7 +124,9 @@ class LIFFile:
     def __len__(self):
         return self.numberOfSeries
 
-    def __getitem__(self, indices: typing.Union[int, tuple, list, slice]):
+    def __getitem__(self, indices: typing.Union[int, tuple, list, slice]=None):
+        if indices is None:
+            return self.__series
         if type(indices) is slice:
             return self.__series[indices]
         elif type(indices) is int:
@@ -152,6 +154,9 @@ class LIFFile:
         return metadata
 
     def getZStacks(self, seriesIndices=None, channels=None):
+        if type(seriesIndices) is int:
+            seriesIndices = [seriesIndices]
+
         series = self[seriesIndices]
 
         stacks = []
