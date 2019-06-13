@@ -42,7 +42,7 @@ class Image:
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, Image):
-            return false
+            return False
         return np.array_equal(self.asArray(), other.asArray())
 
     @property
