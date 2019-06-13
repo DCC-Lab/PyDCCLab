@@ -31,7 +31,7 @@ class CZIChannel:
     def __eq__(self, other):
         return repr(self) == repr(other)
 
-    def exportAsDict(self):
+    def asDict(self):
         return {'file_id': self.fileId, 'channel_id': self.channelId, 'channel_name': self.channelName,
                 'ex_wavelength_filter': self.exWavelengthFilter, 'em_wavelength_filter': self.emWavelengthFilter,
                 'beamsplitter': self.beamsplitter, 'reflector': self.reflector, 'contrast_method': self.contrastMethod,

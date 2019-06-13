@@ -12,28 +12,38 @@ class Image:
     supportedClasses = [CZIFile, TIFFFile, PILFile, MATLABFile]
     supportedFormats = []
 
-    def __init__(self, path: str):
-        if not os.path.exists(path):
-            raise ValueError("Cannot load '{0}': file does not exist".format(path))
-
+    def __init__(self, imageData:np.ndarray = None, path: str = None):
         self._getSupportedFormats() #FIXME
 
-        self.path = path
-        self.__channels = []
-        self.__fileObject = None
-        for supportedClass in Image.supportedClasses:
-            try:
-                fileObject = supportedClass(path)
-                imageData = fileObject.imageDataFromPath()
-                if imageData.nbytes != 0:
-                    self.__channels = self.channelsFromImageData(imageData)
-                    self.__fileObject = fileObject
-                break
-            except:
-                continue
-        if self.__fileObject is None:
-            message = "Cannot read '{0}': not a recognized image format ({1})".format(self.path, Image.supportedFormats)
-            raise InvalidFileFormatException(message)
+        if path is not None:
+            if not os.path.exists(path):
+                raise ValueError("Cannot load '{0}': file does not exist".format(path))
+
+            self.path = path
+            self.channels = []
+            self.__fileObject = None
+            for supportedClass in Image.supportedClasses:
+                try:
+                    fileObject = supportedClass(path)
+                    imageData = fileObject.imageDataFromPath()
+                    if imageData.nbytes != 0:
+                        self.channels = self.channelsFromImageData(imageData)
+                        self.__fileObject = fileObject
+                    break
+                except:
+                    continue
+            if self.__fileObject is None:
+                message = "Cannot read '{0}': not a recognized image format ({1})".format(self.path, Image.supportedFormats)
+                raise InvalidFileFormatException(message)
+        else:
+            self.path = None
+            self.__fileObject = None
+            self.channels = self.channelsFromImageData(imageData)
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, Image):
+            return false
+        return np.array_equal(self.asArray(), other.asArray())
 
     @property
     def shape(self):
@@ -47,15 +57,12 @@ class Image:
             totalSize += channel.sizeInBytes
         return totalSize
 
-    @property
-    def channels(self):
-        return self.__channels
-
-    def removeChannels(self, channels):
+    def removeChannels(self, channels:list):
         for index in channels:
             del self.channels[index]
 
     def asChannelsArray(self):
+        print(self.channels)
         channelsPixels = list(map(lambda c: c.pixels, self.channels))
         return channelsPixels
 
@@ -75,6 +82,8 @@ class Image:
             channelsData = np.squeeze(np.dsplit(imageData, imageData.shape[2]))
             channels = list(map(lambda pix: Channel(pix), channelsData))
             return channels
+        else:
+            raise DimensionException(imageData.ndim)
 
         return ()
     def _getSupportedFormats(self):

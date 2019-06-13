@@ -1,3 +1,4 @@
+import env
 import unittest
 from DCCImagesFromFiles import *
 import DCCExceptions as DCCExcep

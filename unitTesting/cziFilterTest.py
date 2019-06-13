@@ -1,5 +1,5 @@
-from cziFilter import CZIFilter as fltr
-from cziMetadata import CZIMetadata as mtdt
+from Database.MetadataFromCzi.cziFilter import CZIFilter as fltr
+from Database.MetadataFromCzi.cziMetadata import CZIMetadata as mtdt
 import xml.etree.ElementTree as ET
 import unittest
 import os
