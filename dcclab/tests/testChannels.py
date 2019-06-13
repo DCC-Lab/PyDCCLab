@@ -17,8 +17,11 @@ class TestChannels(unittest.TestCase):
         self.assertIsNotNone(channel)
         self.assertIsInstance(channel, Channel)
 
-    def testInitWith3DArrayFails(self):
+    def testInitWith1DOR3DArrayFails(self):
         array = np.ones((100, 100, 3), dtype=np.float32)
+        with self.assertRaises(DimensionException):
+            channel = Channel(pixels=array)
+        array = np.ones((100), dtype=np.float32)
         with self.assertRaises(DimensionException):
             channel = Channel(pixels=array)
         
