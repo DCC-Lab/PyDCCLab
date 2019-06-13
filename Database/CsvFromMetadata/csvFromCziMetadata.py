@@ -24,7 +24,7 @@ def writeMetadataInCSV(metaFile, channelFile, cziFile):
                    'camera_adapter', 'exposure_time', 'binning_mode']
     try:
         newMtdt = getMetadataFromCzi(cziFile[1], cziFile[0])
-        dictioMeta = newMtdt.AsDict()
+        dictioMeta = newMtdt.asDict()
         data = ''
         for key in metaKeys:
             data += str(dictioMeta[key]) + ','
@@ -33,7 +33,7 @@ def writeMetadataInCSV(metaFile, channelFile, cziFile):
 
         for channel in newMtdt.channels:
             chnlData = ''
-            dictioChnl = channel.AsDict()
+            dictioChnl = channel.asDict()
             for key in channelKeys:
                 chnlData += str(dictioChnl[key]) + ','
             chnlData = chnlData.rstrip(',') + '\n'

@@ -32,7 +32,7 @@ class CZIMetadata:
     def __eq__(self, other):
         return repr(self) == repr(other)
 
-    def AsDict(self):
+    def asDict(self):
         return {'path': self.path, 'microscope': self.microscope, 'objective': self.objective, 'x_size': self.xSize,
                 'y_size': self.ySize, 'x_scale': self.xScale, 'y_scale': self.yScale, 'x_scaled': self.xScaled,
                 'y_scaled': self.yScaled, 'name': self.name, 'mouse_id': self.mouseId,
