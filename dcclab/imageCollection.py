@@ -89,7 +89,7 @@ class ImageCollection:
 
 class ZStack(ImageCollection):
     def __init__(self, images: typing.List[Image] = None, pathPattern: str=None):
-        ImageCollection.__init__(images, pathPattern)
+        super().__init__(images, pathPattern)
         if not self.imagesAreSimilar:
             raise ValueError("Images in z-stack are not all the same shape")
 
