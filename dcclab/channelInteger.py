@@ -254,4 +254,4 @@ class ChannelUint16(ChannelInt):
 
     def convertTo8BitsInteger(self) -> ChannelUint8:
         convertedArray = np.copy(self.pixels.astype(float)) / (2 ** 16) * 255
-        return ChannelUint16(convertedArray.astype(np.uint8))
+        return ChannelUint8(convertedArray.astype(np.uint8))
