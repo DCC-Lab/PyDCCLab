@@ -106,6 +106,10 @@ class ZStack(ImageCollection):
         if not self.imagesAreSimilar:
             raise ValueError("Images in z-stack are not all the same shape")
 
+        self.__array = None
+        if type(images) is np.ndarray:
+            self.__array = images
+
     def imagesAreSimilar(self) -> bool:
         shape = None
         for image in self.images:
@@ -114,6 +118,18 @@ class ZStack(ImageCollection):
             elif shape != image.shape:
                 return False
         return True
+
+    @property
+    def shape(self):
+        imageShape = self[0].shape
+        depth = len(self)
+        return imageShape[0], imageShape[1], depth
+
+    def asArray(self) -> np.ndarray:
+        if self.__array is None:
+            self.__array = np.dstack([im.asArray() for im in self.images])
+
+        return self.__array
 
     def show(self):
         # TODO: Do something nicer with z-stack
