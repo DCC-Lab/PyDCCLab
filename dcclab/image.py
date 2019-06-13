@@ -77,7 +77,7 @@ class Image:
 
     def channelsFromImageData(self, imageData):
         if imageData.ndim == 2:
-            return (Channel(imageData))
+            return [Channel(imageData)]
         elif imageData.ndim == 3:
             channelsData = np.squeeze(np.dsplit(imageData, imageData.shape[2]))
             channels = list(map(lambda pix: Channel(pix), channelsData))
