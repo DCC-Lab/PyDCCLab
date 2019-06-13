@@ -105,10 +105,11 @@ class TestLifFile(unittest.TestCase):
         with self.assertRaises(Exception):
             self.lifObj.getZStacks(seriesIndices=0, channels=(0, 1))
 
+    @unittest.skip("no small test data file with multiple channels")
     def testGetZStacksMultipleChannels(self):
-        # fixme: no small test data file with multiple channels
         pass
 
+    @unittest.skip("no small test data file with multiple channels")
     def testGetZStacksMultipleChannelsStackArrays(self):
         pass
 
