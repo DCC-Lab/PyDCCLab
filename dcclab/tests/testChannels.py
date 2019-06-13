@@ -30,6 +30,11 @@ class TestChannels(unittest.TestCase):
         channel = Channel(pixels=array)
         self.assertEqual(array.all(), channel.pixels.all())
 
+    def testInitCopiesPixels(self):
+        array = np.random.randint(low=0, high=255, size=(100, 200))
+        channel = Channel(pixels=array)
+        self.assertFalse(array is channel.pixels)
+
     def testDimension(self):
         array = np.random.randint(low=0, high=255, size=(100, 200))
         channel = Channel(pixels=array)
@@ -70,9 +75,15 @@ class TestChannels(unittest.TestCase):
         array = np.random.randint(low=0, high=255, size=(100, 200))
         channel = Channel(pixels=array)
 
-        self.assertNotEqual(1, 'abc')
+        self.assertNotEqual(1, 'abc') # not an error, simply false
         self.assertNotEqual(1, np) # not an error, simply false
         self.assertNotEqual(1, channel) # not an error, simply false
+
+    def testPixelsCopy(self):
+        array = np.random.randint(low=0, high=255, size=(100, 200))
+        channel = Channel(pixels=array)
+        pixels = channel.copy()
+        self.assertFalse(pixels is array)
         
 if __name__ == '__main__':
     unittest.main()
