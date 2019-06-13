@@ -22,10 +22,25 @@ class TestPatterns(unittest.TestCase):
         match = re.search(r"(\(.*\))", "abc(daniel)def")
         self.assertIsNotNone(match)
         self.assertTrue(len(match.groups()) == 1)
+        strings = re.findall(r"(\(.+?\))", "abc(daniel)(def)")
+        print(strings)
+        self.assertTrue(len(strings) == 2)
+
+    def testInitWith0CaptureGroup(self):
+        pat = PathPattern(r'abckjhasd')
+        self.assertTrue(pat.numberOfCaptureGroups == 0)
+        pat = PathPattern(r'abckjha(sd')
+        self.assertTrue(pat.numberOfCaptureGroups == 0)
+        pat = PathPattern(r'abckjha)sd')
+        self.assertTrue(pat.numberOfCaptureGroups == 0)
 
     def testInitWith1CaptureGroup(self):
         pat = PathPattern(r'abc(\d)')
         self.assertTrue(pat.numberOfCaptureGroups == 1)
+
+    # def testInitWith2CaptureGroups(self):
+    #     pat = PathPattern(r'abc(\d)...(lkha)')
+    #     self.assertTrue(pat.numberOfCaptureGroups == 2)
 
         
 if __name__ == '__main__':

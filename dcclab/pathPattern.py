@@ -13,11 +13,8 @@ class PathPattern:
 
     @property
     def numberOfCaptureGroups(self) -> int:
-        match = re.search(r"(\(.*\))", self.pattern)
-        if match is not None:
-            return len(match.groups())
-        else:
-            return 0
+        captureGroups = re.findall(r"(\(.+?\))", self.pattern)
+        return len(captureGroups)
 
     @property
     def isPythonFormatString(self) -> bool:
