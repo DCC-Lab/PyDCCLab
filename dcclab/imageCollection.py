@@ -117,6 +117,10 @@ class LIFFile:
     def series(self):
         return self.__series
 
+    @property
+    def numberOfSeries(self):
+        return len(self.__series)
+
     def __getitem__(self, indices: list or int):
         if indices is None:
             return self.__series
