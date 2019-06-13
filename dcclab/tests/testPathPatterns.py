@@ -10,6 +10,10 @@ class TestPatterns(unittest.TestCase):
     def testInit(self):
         self.assertIsNotNone(PathPattern('abc'))
 
+    def testInitInvalid(self):
+        with self.assertRaises(Exception):
+            PathPattern('(abc')
+
     def testInitNoCaptureGroups(self):
         pat = PathPattern('abc')
         self.assertFalse(pat.hasCaptureGroups)
@@ -27,10 +31,6 @@ class TestPatterns(unittest.TestCase):
 
     def testInitWith0CaptureGroup(self):
         pat = PathPattern(r'abckjhasd')
-        self.assertTrue(pat.numberOfCaptureGroups == 0)
-        pat = PathPattern(r'abckjha(sd')
-        self.assertTrue(pat.numberOfCaptureGroups == 0)
-        pat = PathPattern(r'abckjha)sd')
         self.assertTrue(pat.numberOfCaptureGroups == 0)
 
     def testInitWith1CaptureGroup(self):

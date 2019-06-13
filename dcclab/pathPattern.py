@@ -4,7 +4,7 @@ import os
 class PathPattern:
     def __init__(self, pattern:str):
         self.pattern = pattern
-
+        re.compile(pattern) # will raise exception if needed
 
     @property
     def directory(self):
