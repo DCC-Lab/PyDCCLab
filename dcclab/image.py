@@ -62,13 +62,15 @@ class Image:
             del self.channels[index]
 
     def asChannelsArray(self):
-        print(self.channels)
         channelsPixels = list(map(lambda c: c.pixels, self.channels))
         return channelsPixels
 
     def asArray(self):
         channelArrays = self.asChannelsArray()
-        imageData = np.dstack(channelArrays)
+        if len(self.channels) == 1:
+            imageData = channelArrays[0]
+        else:
+            imageData = np.dstack(channelArrays)
         return imageData
 
     def display(self, colorMap=None):
