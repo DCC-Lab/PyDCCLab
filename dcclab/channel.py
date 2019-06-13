@@ -80,10 +80,11 @@ class Channel:
         return self
 
     def getHistogramValues(self, normed: bool = False) -> typing.Tuple[np.ndarray, np.ndarray]:
-        array = (self.pixels * self.__originalFactor).astype(self.__originalDType).ravel()
-        nbBins = len(np.bincount(array))
-        hist, bins = np.histogram(array, nbBins, [0, nbBins], density=normed)
-        return hist, bins
+        # array = (self.pixels * self.__originalFactor).astype(self.__originalDType).ravel()
+        # nbBins = len(np.bincount(array))
+        # hist, bins = np.histogram(array, nbBins, [0, nbBins], density=normed)
+        # return hist, bins
+        pass
 
     def displayHistogram(self, normed: bool = False) -> typing.Tuple[np.ndarray, np.ndarray]:
         histogram, bins = self.getHistogramValues(normed)
@@ -98,26 +99,26 @@ class Channel:
     """ Manipulation-related functions """
 
     def convertToNormalizedFloat(self):
-        if "float" in str(self.__originalDType): 
+        if "float" in str(self.__originalDType):
             # For a float array, we must determine if array is
             # already normalized or not: we don't take the 
             # maximum of float type, we take max of array
-            maxValue = np.max(np.max(pixels))
+            maxValue = np.max(np.max(self.pixels))
             if maxValue <= 1.0:
                 # don't normalize an already normalized float array
                 self.__originalFactor = 1.0
-                self.__pixels = np.copy(pixels)
+                self.__pixels = np.copy(self.pixels)
             else:
                 # normalize a non-normalized float array
                 self.__originalFactor = maxValue
-                self.__pixels = np.copy(pixels) / maxValue 
-        else:  
+                self.__pixels = np.copy(self.pixels) / maxValue
+        else:
             # For a bound integer array, we take the maximum of the type
             # and we convert the array to float
             self.__originalFactor = np.iinfo(self.__originalDType).max
-            floatArray = np.copy(pixels).astype(np.float32)
+            floatArray = np.copy(self.pixels).astype(np.float32)
             self.__pixels = floatArray / self.__originalFactor
-    
+
     def saveOriginal(self):
         if self.__original == None:
             self.__original = np.copy(self.pixels)
@@ -223,11 +224,8 @@ class Channel:
         entropyFiltered = entropy(image, morphology.selem.square(filterSize, dtype=np.float32))
         return Channel(entropyFiltered.astype(np.float32))
 
+    @deprecated(reason="Too slow. Use getStandardDeviationFilter")
     def getStandardDeviationFilteringSlow(self, filterSize: int):
-        message = "This filtering method is very slow with big images. " \
-                  "Use getStandardDeviationFiltering for faster results."
-        warnings.warn(message)
-        # VERY SLOW WITH BIG IMAGES
         stdFiltered = filters.generic_filter(self.pixels, np.std, size=filterSize, mode="nearest")
         return Channel(stdFiltered.astype(np.float32))
 
@@ -313,9 +311,11 @@ class Channel:
         threshArray = self.pixels >= (thresh / self.__originalFactor)
         return Channel(threshArray.astype(np.float32))
 
-    def getAdaptiveThreshold(self):
-        # todo voir avec openCV
-        pass
+    def getAdaptiveThresholdMean(self, oddRegionSize: int = 3):
+        raise NotImplementedError
+
+    def getAdaptiveThresholdGaussian(self, oddRegionSize: int = 3):
+        raise NotImplementedError
 
     def getOpening(self, windowSize: int = 3):
         opened = morphology.opening(self.pixels, np.ones((windowSize, windowSize)))
