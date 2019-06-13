@@ -10,12 +10,12 @@ class LifReader(Reader):
     def getSeries(self):
         if not hasattr(self, '__series'):
             self.__series = [
-                FastSerie(s.root, self.f, self.offsets[i]) for i, s in enumerate(self.getSeriesHeaders())
+                LifSerie(s.root, self.f, self.offsets[i]) for i, s in enumerate(self.getSeriesHeaders())
             ]
         return self.__series
 
 
-class FastSerie(Serie):
+class LifSerie(Serie):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
