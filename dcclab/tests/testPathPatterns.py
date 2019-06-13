@@ -70,6 +70,14 @@ class TestPatterns(unittest.TestCase):
         self.assertTrue(pat.isReadPattern)
         self.assertFalse(pat.isWritePattern)
 
+    def testDirectory(self):
+        pat = PathPattern(r'/Users/dccote/test.tiff')
+        self.assertEqual(pat.directory, "/Users/dccote")
+
+    def testBasename(self):
+        pat = PathPattern(r'/Users/dccote/test.tiff')
+        self.assertEqual(pat.basePattern, "test.tiff")
+
         
 if __name__ == '__main__':
     unittest.main()

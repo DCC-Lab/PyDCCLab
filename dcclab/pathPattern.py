@@ -1,8 +1,18 @@
 import re
+import os
 
 class PathPattern:
     def __init__(self, pattern:str):
         self.pattern = pattern
+
+
+    @property
+    def directory(self):
+        return os.path.dirname(self.pattern)
+
+    @property
+    def basePattern(self):
+        return os.path.basename(self.pattern)
 
     @property
     def hasCaptureGroups(self) -> bool:
@@ -41,4 +51,3 @@ class PathPattern:
             return True
         else:
             return False
-            
