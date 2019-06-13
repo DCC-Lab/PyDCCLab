@@ -122,7 +122,7 @@ class LIFFile:
             return self.__series
         elif type(indices) is not list:
             indices = [indices]
-        if max(indices) < len(self.__series):
+        if not max(indices) < len(self.__series):
             raise IndexError
 
         items = [self.__series[i] for i in indices]
