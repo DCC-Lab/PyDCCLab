@@ -1,12 +1,12 @@
 from .image import *
 import numpy as np
 import matplotlib.pyplot as plt
-import typing
+from typing import List, Union
 from .__lifReader import LifReader
 
 
 class ImageCollection:
-    def __init__(self, images: typing.List[Image] = None, pathPattern:str=None):
+    def __init__(self, images: Union[List[Image], np.ndarray]=None, pathPattern: str=None):
         self.__images = []
         if images is not None:
             if not all(isinstance(image, Image) for image in images):
@@ -88,7 +88,7 @@ class ImageCollection:
 
 
 class ZStack(ImageCollection):
-    def __init__(self, images: typing.List[Image] = None, pathPattern: str=None):
+    def __init__(self, images: Union[List[Image], np.ndarray]=None, pathPattern: str=None):
         super().__init__(images, pathPattern)
         if not self.imagesAreSimilar:
             raise ValueError("Images in z-stack are not all the same shape")
@@ -124,7 +124,7 @@ class LIFFile:
     def __len__(self):
         return self.numberOfSeries
 
-    def __getitem__(self, indices: typing.Union[int, tuple, list, slice]=None):
+    def __getitem__(self, indices: Union[int, tuple, list, slice]=None):
         if indices is None:
             return self.__series
         if type(indices) is slice:
