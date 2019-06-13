@@ -54,7 +54,7 @@ class ImageCollection:
         paths.sort()
         for path in paths:
             try:
-                image = Image(path)
+                image = Image(path=path)
                 self.__images.append(image)
             except:
                 pass
