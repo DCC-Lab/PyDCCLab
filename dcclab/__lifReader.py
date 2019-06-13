@@ -1,7 +1,9 @@
-from read_lif.read_lif import Reader, Serie, SerieHeader
+from read_lif.read_lif import Reader, Serie
 import numpy as np
 import warnings
 import sys
+
+# TODO: hide/move this library wrapper out of dcclab module
 
 
 class LifReader(Reader):

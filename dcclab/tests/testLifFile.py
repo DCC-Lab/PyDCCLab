@@ -1,5 +1,5 @@
 from dcclab.imageCollection import LIFFile
-from dcclab.lifReader import LifSerie
+from dcclab.__lifReader import LifSerie
 import unittest
 
 

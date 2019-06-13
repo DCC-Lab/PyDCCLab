@@ -2,7 +2,7 @@ from .image import *
 import numpy as np
 import matplotlib.pyplot as plt
 import typing
-from .lifReader import LifReader
+from .__lifReader import LifReader
 
 
 class ImageCollection:
