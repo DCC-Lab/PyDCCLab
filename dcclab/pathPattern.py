@@ -71,6 +71,15 @@ class PathPattern:
         if self.isReadPattern:
             raise ValueError("Patterns with capture groups are for reading files, not writing")
 
+        passedArguments = 1
+        if i is not None and j is not None and k is None:
+            passedArguments = 2
+        elif i is not None and j is not None and k is not None:
+            passedArguments = 3
+
+        if self.numberOfFormatGroups != passedArguments:
+            raise ValueError("Pattern has {0} indices, only passed {1}".format(self.numberOfFormatGroups, passedArguments))
+
         if self.numberOfFormatGroups == 1:
             filePath = self.pattern.format(i)
         elif self.numberOfFormatGroups == 2:
@@ -79,7 +88,7 @@ class PathPattern:
             filePath = self.pattern.format(i, j, k)
         else:
             raise ValueError("More than 3 indices not supported")
-            
+
         return filePath
 
 

@@ -120,5 +120,26 @@ class TestPatterns(unittest.TestCase):
         for i in range(4):
             self.assertEqual(pat.filePathWithIndex(i), "test-{0:03d}.py".format(i))
 
+    def testFileExpansion2Indices(self):
+        pat = PathPattern(r'test-{0}-{1}.py')
+        for i in range(4):
+            for j in range(4):
+                self.assertEqual(pat.filePathWithIndex(i,j), "test-{0}-{1}.py".format(i,j))
+
+    def testFileExpansion3Indices(self):
+        pat = PathPattern(r'test-{0}-{1}-{2}.py')
+        for i in range(4):
+            for j in range(4):
+                for k in range(4):
+                    self.assertEqual(pat.filePathWithIndex(i,j,k), "test-{0}-{1}-{2}.py".format(i,j,k))
+
+    def testFileExpansionMissingIndices(self):
+        pat = PathPattern(r'test-{0}-{1}-{2}.py')
+        for i in range(4):
+            for j in range(4):
+                for k in range(4):
+                    with self.assertRaises(ValueError):
+                        pat.filePathWithIndex(i,j)
+
 if __name__ == '__main__':
     unittest.main()
