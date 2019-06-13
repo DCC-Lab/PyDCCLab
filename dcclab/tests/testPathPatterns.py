@@ -23,7 +23,6 @@ class TestPatterns(unittest.TestCase):
         self.assertIsNotNone(match)
         self.assertTrue(len(match.groups()) == 1)
         strings = re.findall(r"(\(.+?\))", "abc(daniel)(def)")
-        print(strings)
         self.assertTrue(len(strings) == 2)
 
     def testInitWith0CaptureGroup(self):
@@ -38,9 +37,38 @@ class TestPatterns(unittest.TestCase):
         pat = PathPattern(r'abc(\d)')
         self.assertTrue(pat.numberOfCaptureGroups == 1)
 
-    # def testInitWith2CaptureGroups(self):
-    #     pat = PathPattern(r'abc(\d)...(lkha)')
-    #     self.assertTrue(pat.numberOfCaptureGroups == 2)
+    def testInitWith2CaptureGroups(self):
+        pat = PathPattern(r'abc(\d)...(lkha)')
+        self.assertTrue(pat.numberOfCaptureGroups == 2)
+
+    def testInitWith3CaptureGroups(self):
+        pat = PathPattern(r'abc(\d)...(lkha)bla(asd)')
+        self.assertTrue(pat.numberOfCaptureGroups == 3)
+
+    def testInitWith1PythonFormatString(self):
+        pat = PathPattern(r'abl\{0\}')
+        self.assertTrue(pat.isPythonFormatString)
+        self.assertTrue(pat.numberOfFormatGroups == 1)
+
+    def testInitWith2PythonFormatString(self):
+        pat = PathPattern(r'abl\{0\}blabal\{1:03f\}')
+        self.assertTrue(pat.isPythonFormatString)
+        self.assertTrue(pat.numberOfFormatGroups == 2)
+
+    def testInitWithoutPythonFormatString(self):
+        pat = PathPattern(r'abl')
+        self.assertFalse(pat.isPythonFormatString)
+        self.assertTrue(pat.numberOfFormatGroups == 0)
+
+    def testIsWritePattern(self):
+        pat = PathPattern(r'abl\{0\}blabal\{1:03f\}')
+        self.assertTrue(pat.isWritePattern)
+        self.assertFalse(pat.isReadPattern)
+
+    def testIsReadPattern(self):
+        pat = PathPattern(r'abl(\d)')
+        self.assertTrue(pat.isReadPattern)
+        self.assertFalse(pat.isWritePattern)
 
         
 if __name__ == '__main__':

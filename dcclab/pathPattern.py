@@ -18,31 +18,27 @@ class PathPattern:
 
     @property
     def isPythonFormatString(self) -> bool:
-        if re.search(r"\{\d+.*\}"):
+        if re.search(r"\{\d+.*?\}", self.pattern):
             return True
         else:
             return False
 
     @property
-    def numberOfFormatElements(self) -> int:
-        return 0
+    def numberOfFormatGroups(self) -> int:
+        formatGroups = re.findall(r"\{\d+.*?\}", self.pattern)
+        return len(formatGroups)
 
+    @property
     def isWritePattern(self) -> bool:
         if self.isPythonFormatString:
             return True
         else:
             return False
 
+    @property
     def isReadPattern(self) -> bool:
-        try:
-            re.compile(self.pattern)
-            # is Valid regexp
-
-        except:
-            pass
-
-        if re.search(""):
+        if self.hasCaptureGroups:
             return True
         else:
             return False
-
+            
