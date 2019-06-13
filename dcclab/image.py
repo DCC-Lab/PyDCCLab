@@ -81,6 +81,8 @@ class Image:
             channelsData = np.squeeze(np.dsplit(imageData, imageData.shape[2]))
             channels = list(map(lambda pix: Channel(pix), channelsData))
             return channels
+        else:
+            raise DimensionException(imageData.ndim)
 
         return ()
     def _getSupportedFormats(self):
