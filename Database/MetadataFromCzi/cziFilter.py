@@ -23,7 +23,7 @@ class CZIFilter:
                     return filterSet.attrib['Id'], 'Emission'
                 if self.filterId == filterSet.find('./ExcitationFilters/ExcitationFilterRef').attrib['Id']:
                     return filterSet.attrib['Id'], 'Excitation'
-                return None, None
+            return None, None
         except Exception:
             return None, None
 

@@ -1,7 +1,5 @@
-import cziMetadata as mtdt
-import cziFilter as fltr
-import cziChannel as chnnl
-import czifile as czi
+from Database.MetadataFromCzi.cziMetadata import CZIMetadata as mtdt
+from dcclab import readCziImage
 import xml.etree.ElementTree as ET
 import unittest
 import os
@@ -16,317 +14,322 @@ class TestMetadata(unittest.TestCase):
         self.missingEntriesPath = os.path.join(self.directory, 'testData', 'MissingEntries.xml')
         self.missingKeysPath = os.path.join(self.directory, 'testData', 'MissingKeys.xml')
 
-    def test_cziFileToCziImageObject_isCziImageObject(self):
-        mdata = mtdt.CZIMetadata(self.testPath)
+    def test_cziImageObjectFromPath_isCziImageObject(self):
+        mdata = mtdt(self.testPath)
+        self.assertIs(type(mdata.cziImageObjectFromPath()), type(readCziImage(self.testPath)))
 
-        self.assertIs(type(mdata.cziFileToCziImageObject()), czi.CziFile)
+    def test_cziImageObjectFromPath_fileNotFound(self):
+        mdata = mtdt(self.testPath)
+        mdata.path = self.wrongFilePath
+        with self.assertRaises(FileNotFoundError): mdata.cziImageObjectFromPath()
 
-    def test_cziFileToCziImageObject_FileNotFoundError(self):
-        mdata = mtdt.CZIMetadata(self.wrongFilePath)
+    def test_cziFileToCziImageObject_wrongFileType(self):
+        mdata = mtdt(self.testPath)
+        mdata.path = self.wrongFileType
+        with self.assertRaises(ValueError): mdata.cziImageObjectFromPath()
 
-        with self.assertRaises(FileNotFoundError): mdata.cziFileToCziImageObject()
+    def test_xmlFromCziImageObject_returnsString(self):
+        mdata = mtdt(self.testPath)
+        cziImageObject = mdata.cziImageObjectFromPath()
+        self.assertIs(type(mdata.xmlFromCziImageObject(cziImageObject)), str)
 
-    def test_cziFileToCziImageObject_ValueError(self):
-        mdata = mtdt.CZIMetadata(self.wrongFileType)
-
-        with self.assertRaises(ValueError): mdata.cziFileToCziImageObject()
-
-    def test_extractXmlAsStringFromCziImageObject_returnsString(self):
-        mdata = mtdt.CZIMetadata(self.testPath)
-        cziImageObject = mdata.cziFileToCziImageObject()
-
-        self.assertIs(type(mdata.extractXmlAsStringFromCziImageObject(cziImageObject)), str)
-
-    def test_extractXmlAsStringFromCziImageObject_wrongTypeOfObject(self):
-        mdata = mtdt.CZIMetadata(self.testPath)
+    def test_xmlFromCziImageObject_wrongTypeOfObject(self):
+        mdata = mtdt(self.testPath)
         cziImageObject = 'WrongTypeOfObject'
-
-        with self.assertRaises(AttributeError): mdata.extractXmlAsStringFromCziImageObject(cziImageObject)
+        with self.assertRaises(AttributeError): mdata.xmlFromCziImageObject(cziImageObject)
 
     def test_createElementTreeRoot_returnsElement(self):
-        mdata = mtdt.CZIMetadata(self.testPath)
-
+        mdata = mtdt(self.testPath)
         self.assertIs(type(mdata.createElementTreeRoot()), ET.Element)
 
-    def test_setMicroscope_isEqual(self):
-        mdata = mtdt.CZIMetadata(self.testPath)
-        mdata.root = mdata.createElementTreeRoot()
-
+    def test_setMicroscope_expectedValue(self):
+        mdata = mtdt(self.testPath)
         self.assertEqual(mdata.setMicroscope(), 'Axio Observer.Z1 / 7')
 
-    def test_setMicroscope_noId(self):
+    def test_setMicroscope_missingKey(self):
+        mdata = mtdt(self.testPath)
         tree = ET.parse(self.missingKeysPath)
-        mdata = mtdt.CZIMetadata(self.missingKeysPath)
         mdata.root = tree.getroot()
+        self.assertIsNone(mdata.setMicroscope())
 
-        with self.assertRaises(KeyError): mdata.setMicroscope()
-
-    def test_setMicroscope_noEntry(self):
+    def test_setMicroscope_missingEntries(self):
+        mdata = mtdt(self.testPath)
         tree = ET.parse(self.missingEntriesPath)
-        mdata = mtdt.CZIMetadata(self.missingEntriesPath)
         mdata.root = tree.getroot()
+        self.assertIsNone(mdata.setMicroscope())
 
-        with self.assertRaises(AttributeError): mdata.setMicroscope()
-
-    def test_setObjective_isEqual(self):
-        mdata = mtdt.CZIMetadata(self.testPath)
-        mdata.root = mdata.createElementTreeRoot()
-
+    def test_setObjective_expectedValue(self):
+        mdata = mtdt(self.testPath)
         self.assertEqual(mdata.setObjective(), 'LD A-Plan 5x/0.15 Ph1')
 
-    def test_setObjective_noId(self):
+    def test_setObjective_missingKey(self):
+        mdata = mtdt(self.testPath)
         tree = ET.parse(self.missingKeysPath)
-        mdata = mtdt.CZIMetadata(self.missingKeysPath)
         mdata.root = tree.getroot()
+        self.assertIsNone(mdata.setObjective())
 
-        with self.assertRaises(KeyError): mdata.setObjective()
-
-    def test_setObjective_noEntry(self):
+    def test_setObjective_missingEntries(self):
+        mdata = mtdt(self.testPath)
         tree = ET.parse(self.missingEntriesPath)
-        mdata = mtdt.CZIMetadata(self.missingEntriesPath)
         mdata.root = tree.getroot()
+        self.assertIsNone(mdata.setObjective())
 
-        with self.assertRaises(AttributeError): mdata.setObjective()
-
-    def test_setXScale_isEqual(self):
-        mdata = mtdt.CZIMetadata(self.testPath)
-        mdata.root = mdata.createElementTreeRoot()
-
+    def test_setXScale_expectedValue(self):
+        mdata = mtdt(self.testPath)
         self.assertEqual(mdata.setXScale(), '9.08E-07')
 
-    def test_setXScale_noId(self):
+    def test_setXScale_missingKey(self):
+        mdata = mtdt(self.testPath)
         tree = ET.parse(self.missingKeysPath)
-        mdata = mtdt.CZIMetadata(self.missingKeysPath)
         mdata.root = tree.getroot()
+        self.assertIsNone(mdata.setXScale())
 
-        with self.assertRaises(AttributeError): mdata.setXScale()
-
-    def test_setXScale_noEntry(self):
+    def test_setXScale_missingEntries(self):
+        mdata = mtdt(self.testPath)
         tree = ET.parse(self.missingEntriesPath)
-        mdata = mtdt.CZIMetadata(self.missingEntriesPath)
         mdata.root = tree.getroot()
+        self.assertIsNone(mdata.setXScale())
 
-        with self.assertRaises(AttributeError): mdata.setXScale()
-
-    def test_setYScale_isEqual(self):
-        mdata = mtdt.CZIMetadata(self.testPath)
-        mdata.root = mdata.createElementTreeRoot()
-
+    def test_setYScale_expectedValue(self):
+        mdata = mtdt(self.testPath)
         self.assertEqual(mdata.setYScale(), '9.08E-07')
 
-    def test_setYScale_noId(self):
+    def test_setYScale_missingKey(self):
+        mdata = mtdt(self.testPath)
         tree = ET.parse(self.missingKeysPath)
-        mdata = mtdt.CZIMetadata(self.missingKeysPath)
         mdata.root = tree.getroot()
+        self.assertIsNone(mdata.setYScale())
 
-        with self.assertRaises(AttributeError): mdata.setYScale()
-
-    def test_setYScale_noEntry(self):
+    def test_setYScale_missingEntries(self):
+        mdata = mtdt(self.testPath)
         tree = ET.parse(self.missingEntriesPath)
-        mdata = mtdt.CZIMetadata(self.missingEntriesPath)
         mdata.root = tree.getroot()
+        self.assertIsNone(mdata.setYScale())
 
-        with self.assertRaises(AttributeError): mdata.setYScale()
-
-    def test_setXSize_isEqual(self):
-        mdata = mtdt.CZIMetadata(self.testPath)
-        mdata.root = mdata.createElementTreeRoot()
-
+    def test_setXSize_expectedValue(self):
+        mdata = mtdt(self.testPath)
         self.assertEqual(mdata.setXSize(), '1936')
 
-    def test_setXSize_noEntry(self):
+    def test_setXSize_missingEntries(self):
+        mdata = mtdt(self.testPath)
         tree = ET.parse(self.missingEntriesPath)
-        mdata = mtdt.CZIMetadata(self.missingEntriesPath)
         mdata.root = tree.getroot()
+        self.assertIsNone(mdata.setXSize())
 
-        with self.assertRaises(AttributeError): mdata.setXSize()
-
-    def test_setYSize_isEqual(self):
-        mdata = mtdt.CZIMetadata(self.testPath)
-        mdata.root = mdata.createElementTreeRoot()
-
+    def test_setYSize_expectedValue(self):
+        mdata = mtdt(self.testPath)
         self.assertEqual(mdata.setYSize(), '1460')
 
-    def test_setYSize_noEntry(self):
+    def test_setYSize_missingEntries(self):
+        mdata = mtdt(self.testPath)
         tree = ET.parse(self.missingEntriesPath)
-        mdata = mtdt.CZIMetadata(self.missingEntriesPath)
         mdata.root = tree.getroot()
+        self.assertIsNone(mdata.setYSize())
 
-        with self.assertRaises(AttributeError): mdata.setYSize()
+    def test_xScaled_expectedValue(self):
+        mdata = mtdt(self.testPath)
+        self.assertEqual(mdata.xScaled, 0.001757888)
 
-    def test_setXScaled_isEqual(self):
-        mdata = mtdt.CZIMetadata(self.testPath)
-        mdata.root = mdata.createElementTreeRoot()
-        mdata.xSize = mdata.setXSize()
-        mdata.xScale = mdata.setXScale()
-
-        self.assertEqual(mdata.setXScaled(), 0.001757888)
-
-    def test_setXScaled_wrongValue(self):
-        mdata = mtdt.CZIMetadata(self.testPath)
-        mdata.root = mdata.createElementTreeRoot()
-        mdata.xSize = mdata.setXSize()
+    def test_xScaled_wrongValue(self):
+        mdata = mtdt(self.testPath)
         mdata.xScale = 'abcd'
+        self.assertIsNone(mdata.xScaled)
 
-        with self.assertRaises(ValueError): mdata.setXScaled()
+    def test_yScaled_expectedValue(self):
+        mdata = mtdt(self.testPath)
+        self.assertEqual(mdata.yScaled, 0.00132568)
 
-    def test_setYScaled_isEqual(self):
-        mdata = mtdt.CZIMetadata(self.testPath)
-        mdata.root = mdata.createElementTreeRoot()
-        mdata.ySize = mdata.setYSize()
-        mdata.yScale = mdata.setYScale()
-
-        self.assertEqual(mdata.setYScaled(), 0.00132568)
-
-    def test_setYScaled_wrongValue(self):
-        mdata = mtdt.CZIMetadata(self.testPath)
-        mdata.root = mdata.createElementTreeRoot()
-        mdata.ySize = mdata.setYSize()
+    def test_yScaled_wrongValue(self):
+        mdata = mtdt(self.testPath)
         mdata.yScale = 'abcd'
+        self.assertIsNone(mdata.yScaled)
 
-        with self.assertRaises(ValueError): mdata.setYScaled()
+    def test_findFiltersInRoot_returnsListOfFilters(self):
+        mdata = mtdt(self.testPath)
+        testFilters = ['Filter:1', 'Filter:2', 'Filter:3', 'Filter:4']
+        for filter, testFilter in zip(mdata.findFiltersInRoot(), testFilters):
+            self.assertEqual(filter.filterId, testFilter)
 
-    def test_findFiltersEntriesInXml_returnsListOfFilters(self):
-        mdata = mtdt.CZIMetadata(self.testPath)
-        mdata.root = mdata.createElementTreeRoot()
-
+    def test_findFiltersInRoot_missingEntries(self):
+        mdata = mtdt(self.testPath)
+        tree = ET.parse(self.missingEntriesPath)
+        mdata.root = tree.getroot()
         for filter in mdata.findFiltersInRoot():
-            self.assertIs(type(filter), fltr.CZIFilter)
+            self.assertIsNone(filter.filterType)
 
-    def test_findFiltersEntriesInXml_missingEntries(self):
-        tree = ET.parse(self.missingEntriesPath)
-        mdata = mtdt.CZIMetadata(self.missingEntriesPath)
-        mdata.root = tree.getroot()
-
-        with self.assertRaises(AttributeError): mdata.findFiltersInRoot()
-
-    def test_findFiltersEntriesInXml_noId(self):
+    def test_findFiltersInRoot_missingKey(self):
+        mdata = mtdt(self.testPath)
         tree = ET.parse(self.missingKeysPath)
-        mdata = mtdt.CZIMetadata(self.missingKeysPath)
         mdata.root = tree.getroot()
+        for filter in mdata.findFiltersInRoot():
+            self.assertIsNone(filter.channelId)
 
-        with self.assertRaises(KeyError): mdata.findFiltersInRoot()
+    def test_findChannelsInRoot_returnsListOfChannels(self):
+        mdata = mtdt(self.testPath)
+        testChannels = ['Channel:0', 'Channel:1']
+        for channel, testChannel in zip(mdata.findChannelsInRoot(), testChannels):
+            self.assertEqual(channel.channelId, testChannel)
 
-    def test_setFiltersData_isEqual(self):
-        mdata_1 = mtdt.CZIMetadata(self.testPath)
-        mdata_1.root = mdata_1.createElementTreeRoot()
-
-        mdata_2 = mtdt.CZIMetadata(self.testPath)
-        mdata_2.root = mdata_2.createElementTreeRoot()
-
-        self.assertEqual(mdata_1.setFiltersData(), mdata_2.setFiltersData())
-
-    def test_setFiltersData_isNotEqual(self):
-        mdata = mtdt.CZIMetadata(self.testPath)
-        mdata.root = mdata.createElementTreeRoot()
-
-        self.assertNotEqual(mdata.findFiltersInRoot(), mdata.setFiltersData())
-
-    def test_findChannelsEntriesInXml_returnsListOfChannels(self):
-        mdata = mtdt.CZIMetadata(self.testPath)
-        mdata.root = mdata.createElementTreeRoot()
-
+    def test_findChannelsInRoot_missingEntries(self):
+        mdata = mtdt(self.testPath)
+        tree = ET.parse(self.missingEntriesPath)
+        mdata.root = tree.getroot()
         for channel in mdata.findChannelsInRoot():
-            self.assertIs(type(channel), chnnl.CZIChannel)
-
-    def test_findChannelsEntriesInXml_missingEntries(self):
-        tree = ET.parse(self.missingEntriesPath)
-        mdata = mtdt.CZIMetadata(self.missingEntriesPath)
-        mdata.root = tree.getroot()
-
-        with self.assertRaises(AttributeError): mdata.findChannelsInRoot()
-
-    def test_findChannelsEntriesInXml_noId(self):
-        tree = ET.parse(self.missingKeysPath)
-        mdata = mtdt.CZIMetadata(self.missingKeysPath)
-        mdata.root = tree.getroot()
-
-        with self.assertRaises(KeyError): mdata.findChannelsInRoot()
-
-    def test_setChannelsData_isEqual(self):
-        mdata_1 = mtdt.CZIMetadata(self.testPath)
-        mdata_1.root = mdata_1.createElementTreeRoot()
-        mdata_1.filters = mdata_1.setFiltersData()
-
-        mdata_2 = mtdt.CZIMetadata(self.testPath)
-        mdata_2.root = mdata_2.createElementTreeRoot()
-        mdata_2.filters = mdata_2.setFiltersData()
-
-        self.assertEqual(mdata_1.setChannelsData(), mdata_2.setChannelsData())
-
-    def test_setChannelsData_isNotEqual(self):
-        mdata = mtdt.CZIMetadata(self.testPath)
-        mdata.root = mdata.createElementTreeRoot()
-        mdata.filters = mdata.setFiltersData()
-
-        self.assertNotEqual(mdata.findChannelsInRoot(), mdata.setChannelsData())
+            self.assertIsNone(channel)
 
     def test_checkIfElementHasChildren_hasChildren(self):
-        mdata = mtdt.CZIMetadata(self.testPath)
-        mdata.root = mdata.createElementTreeRoot()
+        mdata = mtdt(self.testPath)
         root = mdata.root.find('./Metadata/Information/Image/Dimensions/Channels')
-
         self.assertTrue(mdata.checkIfElementHasChildren(root))
 
     def test_checkIfElementHasChildren_hasNoChildren(self):
+        mdata = mtdt(self.testPath)
         tree = ET.parse(self.missingEntriesPath)
-        mdata = mtdt.CZIMetadata(self.missingEntriesPath)
-        mdata.root = tree.getroot()
-        root = mdata.root.find('./Metadata/Information/Image/Dimensions/Channels')
+        root = tree.getroot()
+        newRoot = root.find('./Metadata/Information/Image/Dimensions/Channels')
+        self.assertFalse(mdata.checkIfElementHasChildren(newRoot))
 
-        with self.assertRaises(AttributeError): mdata.checkIfElementHasChildren(root)
+    def test_checkIfElementHasChildren_elementIsNone(self):
+        mdata = mtdt(self.testPath)
+        self.assertFalse(mdata.checkIfElementHasChildren(None))
 
-    def test_setAttributeFromXml_isEqual(self):
-        mdata_1 = mtdt.CZIMetadata(self.testPath)
-        mdata_1.setAttributesFromXml()
-        mdata_2 = mtdt.CZIMetadata(self.testPath)
-        mdata_2.setAttributesFromXml()
+    def test_AsDict_expectedValue(self):
+        mdata = mtdt(self.testPath)
+        expectedValue = {
+            'path': 'C:\\Users\\MathieuLaptop\\Documents\\Ulaval\\ProgPython\\Projets\\BigData-ImageAnalysis\\testData\\testCziFile.czi',
+            'microscope': 'Axio Observer.Z1 / 7', 'objective': 'LD A-Plan 5x/0.15 Ph1', 'x_size': '1936',
+            'y_size': '1460', 'x_scale': '9.08E-07', 'y_scale': '9.08E-07', 'x_scaled': 0.001757888,
+            'y_scaled': 0.00132568, 'name': '', 'mouse_id': None, 'viral_vectors': '', 'injection_site': None, 'tags': ''}
+        self.assertEqual(mdata.asDict(), expectedValue)
 
-        self.assertEqual(mdata_1, mdata_2)
+    def test_setMouseId_upperCase(self):
+        mdata = mtdt(self.testPath, 'S123_test_czi')
+        self.assertEqual(mdata.setMouseId(), '123')
 
-    def test_setAttributeFromXml_isNotEqual(self):
-        mdata_1 = mtdt.CZIMetadata(self.testPath)
-        mdata_1.setAttributesFromXml()
-        mdata_2 = mtdt.CZIMetadata(self.testPath)
+    def test_setMouseId_lowerCase(self):
+        mdata = mtdt(self.testPath, 's123_test_czi')
+        self.assertEqual(mdata.setMouseId(), '123')
 
-        self.assertNotEqual(mdata_1, mdata_2)
+    def test_setMouseId_lessDigits(self):
+        mdata = mtdt(self.testPath, 's1_test_czi')
+        self.assertEqual(mdata.setMouseId(), '1')
 
-    def test_exportDataAsDict_isEqual(self):
-        mdata = mtdt.CZIMetadata(self.testPath)
-        mdata.setAttributesFromXml()
+    def test_setMouseId_moreDigits(self):
+        mdata = mtdt(self.testPath, 's1234_test_czi')
+        self.assertEqual(mdata.setMouseId(), '1234')
 
-        expectedValue = {'name': None, 'mouse_id': None,
-                         'path': 'C:\\Users\\MathieuLaptop\\Documents\\Ulaval\\ProgPython\\Projets\\BigData-ImageAnalysis\\testData\\testCziFile.czi',
-                         'microscope': 'Axio Observer.Z1 / 7', 'objective': 'LD A-Plan 5x/0.15 Ph1', 'x_size': '1936',
-                         'y_size': '1460', 'x_scale': '9.08E-07', 'y_scale': '9.08E-07', 'x_scaled': 0.001757888,
-                         'y_scaled': 0.00132568, 'vectors': None}
-        self.assertEqual(mdata.exportAsDict(), expectedValue)
+    def test_setMouseId_noIdFound(self):
+        mdata = mtdt(self.testPath, 'test_czi')
+        self.assertIsNone(mdata.setMouseId())
 
-    def test_getChannels_isEqual(self):
-        mdata = mtdt.CZIMetadata(self.testPath)
-        mdata.setAttributesFromXml()
+    def test_findRabVectors_upperCase(self):
+        mdata = mtdt(self.testPath, 'RAB1.2_RABV3.2_czi')
+        self.assertEqual(mdata.findRabVectors(), 'RAB1.2;RABV3.2')
 
-        expectedValue = []
-        for channel in mdata.channels:
-            expectedValue.append(channel)
-        self.assertEqual(mdata.getChannels(), expectedValue)
+    def test_findRabVectors_lowerCase(self):
+        mdata = mtdt(self.testPath, 'rab1.2_rabv3.2_czi')
+        self.assertEqual(mdata.findRabVectors(), 'rab1.2;rabv3.2')
 
-    def test_getName_isEqual(self):
-        mdata = mtdt.CZIMetadata(self.testPath, 'testName')
+    def test_findRabVectors_expectedValues(self):
+        mdata = mtdt(self.testPath, 'rab1_rabv1_RAB1.1_rabv1.1_czi')
+        self.assertEqual(mdata.findRabVectors(), 'rab1;rabv1;RAB1.1;rabv1.1')
 
-        self.assertEqual(mdata.getName(), 'testName')
+    def test_findRabVectors_noVectorsFound(self):
+        mdata = mtdt(self.testPath, 'test_czi')
+        self.assertFalse(mdata.findRabVectors())
 
-    def test_setMouseId_isEqual(self):
-        mdata = mtdt.CZIMetadata(self.testPath)
-        mdata.setMouseId('123')
+    def test_findRabVectors_wrongValue(self):
+        mdata = mtdt(self.testPath, 'test_czi')
+        mdata.name = 0
+        self.assertIsNone(mdata.findRabVectors())
 
-        self.assertEqual(mdata.mouseId, '123')
+    def test_findAAVVectors_upperCase(self):
+        mdata = mtdt(self.testPath, 'AAV123_czi')
+        self.assertEqual(mdata.findAAVVectors(), 'AAV123')
 
-    def test_setVectors_isEqual(self):
-        mdata = mtdt.CZIMetadata(self.testPath)
-        mdata.setVectors('abc123')
+    def test_findAAVVectors_lowerCase(self):
+        mdata = mtdt(self.testPath, 'aav112_czi')
+        self.assertEqual(mdata.findAAVVectors(), 'aav112')
 
-        self.assertEqual(mdata.vectors, 'abc123')
+    def test_findAAVVectors_plusSeparator(self):
+        mdata = mtdt(self.testPath, 'AAV123+456_czi')
+        self.assertEqual(mdata.findAAVVectors(), 'AAV123;AAV456')
+
+    def test_findAAVVectors_minusSeparator(self):
+        mdata = mtdt(self.testPath, 'AAV789-101_czi')
+        self.assertEqual(mdata.findAAVVectors(), 'AAV789;AAV101')
+
+    def test_findAAVVectors_expectedValues(self):
+        mdata = mtdt(self.testPath, 'AAV123+456_AAV789-101_aav112_czi')
+        self.assertEqual(mdata.findAAVVectors(), 'AAV123;AAV456;AAV789;AAV101;aav112')
+
+    def test_findAAVVectors_noVectorsFound(self):
+        mdata = mtdt(self.testPath, 'test_czi')
+        self.assertFalse(mdata.findAAVVectors())
+
+    def test_findAAVVectors_wrongValue(self):
+        mdata = mtdt(self.testPath, 'test_czi')
+        mdata.name = 0
+        self.assertIsNone(mdata.findAAVVectors())
+
+    def test_setViralVectors_expectedValue(self):
+        mdata = mtdt(self.testPath, 'AAV123_rab2_test_czi')
+        self.assertEqual(mdata.setViralVectors(), 'AAV123;rab2')
+
+    def test_setViralVectors_noVectorsFound(self):
+        mdata = mtdt(self.testPath, 'test_czi')
+        self.assertFalse(mdata.setViralVectors())
+
+    def test_setViralVectors_wrongValue(self):
+        mdata = mtdt(self.testPath, 'test_czi')
+        mdata.name = 0
+        self.assertIsNone(mdata.setViralVectors())
+
+    def test_setInjectionSite_upperCase(self):
+        mdata = mtdt(self.testPath, 'AAV425_PATTE_DRG-02.czi')
+        self.assertEqual(mdata.setInjectionSite(), 'PATTE')
+
+    def test_setInjectionSite_lowerCase(self):
+        mdata = mtdt(self.testPath, 'AAV425_iv_DRG-02.czi')
+        self.assertEqual(mdata.setInjectionSite(), 'iv')
+
+    def test_setInjectionSite_noInjectionSiteFound(self):
+        mdata = mtdt(self.testPath, 'AAV425_DRG-02.czi')
+        self.assertFalse(mdata.setInjectionSite())
+
+    def test_setInjectionSite_wrongValue(self):
+        mdata = mtdt(self.testPath, 'AAV425_DRG-02.czi')
+        mdata.name = 0
+        self.assertIsNone(mdata.setInjectionSite())
+
+    def test_setTags_upperCase(self):
+        mdata = mtdt(self.testPath, 'AAV425_patte_NEURONES_czi')
+        self.assertEqual(mdata.setTags(), 'NEURONES')
+
+    def test_setTags_lowerCase(self):
+        mdata = mtdt(self.testPath, 'AAV425_patte_moelle_czi')
+        self.assertEqual(mdata.setTags(), 'moelle')
+
+    def test_setTags_withSpace(self):
+        mdata = mtdt(self.testPath, 'AAV400_anti rabbit-03.czi')
+        self.assertEqual(mdata.setTags(), 'antirabbit')
+
+    def test_setTags_duplicates(self):
+        mdata = mtdt(self.testPath, 'AAV400_moelle_moelle-03.czi')
+        self.assertEqual(mdata.setTags(), 'moelle')
+
+    def test_setTags_expectedValues(self):
+        mdata = mtdt(self.testPath, 'AAV400_cerveau_moelle_neurones_BB-03.czi')
+        self.assertEqual(mdata.setTags(), 'moelle;neurones;BB')
+
+    def test_setTags_noTagsFound(self):
+        mdata = mtdt(self.testPath, 'AAV400_cerveau-03.czi')
+        self.assertFalse(mdata.setTags())
+
+    def test_setTags_wrongValue(self):
+        mdata = mtdt(self.testPath, 'AAV400_cerveau-03.czi')
+        mdata.name = 0
+        self.assertFalse(mdata.setTags())
 
 
 if __name__ == '__main__':
