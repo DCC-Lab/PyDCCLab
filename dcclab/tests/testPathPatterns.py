@@ -78,6 +78,14 @@ class TestPatterns(unittest.TestCase):
         pat = PathPattern(r'/Users/dccote/test.tiff')
         self.assertEqual(pat.basePattern, "test.tiff")
 
+    def testBasenameWithFormats(self):
+        pat = PathPattern(r'/Users/dccote/test-\{0\}.tiff')
+        self.assertEqual(pat.basePattern, r"test-\{0\}.tiff")
+
+    def testBasenameWithCapture(self):
+        pat = PathPattern(r'/Users/dccote/test-(\d+).tiff')
+        self.assertEqual(pat.basePattern, r"test-(\d+).tiff")
+
         
 if __name__ == '__main__':
     unittest.main()
