@@ -54,5 +54,6 @@ pip install Scipy
 pip install Matplotlib
 pip install Tifffile
 pip install czifile
+pip install opencv-python
 ```
 

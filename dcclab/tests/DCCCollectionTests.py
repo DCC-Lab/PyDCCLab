@@ -1,4 +1,5 @@
 try:
+    import env
     import unittest
     import DCCImage
     import DCCExceptions as DCCExcep
