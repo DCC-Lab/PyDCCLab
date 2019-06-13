@@ -121,19 +121,18 @@ class LIFFile:
     def numberOfSeries(self):
         return len(self.__series)
 
-    def __getitem__(self, indices: list or int):
-        if indices is None:
-            return self.__series
-        elif type(indices) is not list:
-            indices = [indices]
-        if not max(indices) < len(self.__series):
-            raise IndexError
+    def __getitem__(self, indices: typing.Union[int, tuple, list, slice]):
+        if type(indices) is slice:
+            return self.__series[indices]
+        elif type(indices) is int:
+            return self.__series[indices]
+        elif type(indices) is tuple:
+            indices = list(indices)
 
-        items = [self.__series[i] for i in indices]
+        if type(indices) is list:
+            return [self.__series[i] for i in indices]
 
-        return items[0] if len(items) == 1 else items
-
-    def keepSeries(self, indices: list or int):
+    def keepSeries(self, indices):
         self.__series = self[indices]
 
     def removeAt(self, index: int):

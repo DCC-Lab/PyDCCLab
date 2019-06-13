@@ -1,13 +1,15 @@
 from dcclab.imageCollection import LIFFile
-from dcclab.lifReader import FastSerie
+from dcclab.lifReader import LifSerie
 import unittest
 
 
 class TestLifFile(unittest.TestCase):
 
+    def setUp(self):
+        self.lifObj = LIFFile('test_LifFile.lif')
+
     def testInitWithLifFile(self):
-        lifObj = LIFFile("test_LifFile.lif")
-        self.assertIsNotNone(lifObj)
+        self.assertIsNotNone(self.lifObj)
 
     def testInitWithDirectory(self):
         with self.assertRaises(Exception):
@@ -18,22 +20,33 @@ class TestLifFile(unittest.TestCase):
             LIFFile("test_NotLifFile.lif")
 
     def testInitSeries(self):
-        lifObj = LIFFile("test_LifFile.lif")
-        self.assertTrue(len(lifObj.series), 4)
+        self.assertTrue(len(self.lifObj.series) == 8)
 
     def testNumberOfSeries(self):
-        lifObj = LIFFile("test_LifFile.lif")
-        self.assertTrue(lifObj.numberOfSeries, 4)
+        self.assertTrue(self.lifObj.numberOfSeries == 8)
 
     def testGetItemWithInteger(self):
-        lifObj = LIFFile("test_LifFile.lif")
-        self.assertIsInstance(lifObj[0], FastSerie)
+        self.assertIsInstance(self.lifObj[0], LifSerie)
 
-    def testGetItemWithListOfIntegers(self):
-        lifObj = LIFFile("test_LifFile.lif")
-        series = lifObj[0, 1, 2]
+    def testGetItemWithIntegersTuple(self):
+        series = self.lifObj[0, 1, 2]
         self.assertTrue(len(series) == 3)
-        self.assertIsInstance(series[0], FastSerie)
+        self.assertIsInstance(series[0], LifSerie)
+
+    def testGetItemWithIntegersList(self):
+        series = self.lifObj[[0, 1, 2]]
+        self.assertTrue(len(series) == 3)
+        self.assertIsInstance(series[0], LifSerie)
+
+    def testGetItemWithBadIndex(self):
+        with self.assertRaises(IndexError):
+            series = self.lifObj[8]
+
+    def testGetItemWithSlice(self):
+        series = self.lifObj[2:5]
+        self.assertTrue(len(series) == 3)
+        self.assertIsInstance(series[0], LifSerie)
+
 
 if __name__ == '__main__':
     unittest.main()
