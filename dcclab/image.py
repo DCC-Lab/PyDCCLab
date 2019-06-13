@@ -12,28 +12,34 @@ class Image:
     supportedClasses = [CZIFile, TIFFFile, PILFile]
     supportedFormats = []
 
-    def __init__(self, path: str):
-        if not os.path.exists(path):
-            raise ValueError("Cannot load '{0}': file does not exist".format(path))
-
+    def __init__(self, imageData:np.ndarray = None, path: str = None):
         self._getSupportedFormats() #FIXME
 
-        self.path = path
-        self.__channels = []
-        self.__fileObject = None
-        for supportedClass in Image.supportedClasses:
-            try:
-                fileObject = supportedClass(path)
-                imageData = fileObject.imageDataFromPath()
-                if imageData.nbytes != 0:
-                    self.__channels = self.channelsFromImageData(imageData)
-                    self.__fileObject = fileObject
-                break
-            except:
-                continue
-        if self.__fileObject is None:
-            message = "Cannot read '{0}': not a recognized image format ({1})".format(self.path, Image.supportedFormats)
-            raise InvalidFileFormatException(message)
+        if path is not None:
+            if not os.path.exists(path):
+                raise ValueError("Cannot load '{0}': file does not exist".format(path))
+
+            self.path = path
+            self.__channels = []
+            self.__fileObject = None
+            for supportedClass in Image.supportedClasses:
+                try:
+                    fileObject = supportedClass(path)
+                    imageData = fileObject.imageDataFromPath()
+                    if imageData.nbytes != 0:
+                        self.__channels = self.channelsFromImageData(imageData)
+                        self.__fileObject = fileObject
+                    break
+                except:
+                    continue
+            if self.__fileObject is None:
+                message = "Cannot read '{0}': not a recognized image format ({1})".format(self.path, Image.supportedFormats)
+                raise InvalidFileFormatException(message)
+        else:
+            self.path = None
+            self.__fileObject = None
+            self.__channels = self.channelsFromImageData(imageData)
+
 
     @property
     def shape(self):

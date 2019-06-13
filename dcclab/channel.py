@@ -31,7 +31,7 @@ class Channel:
             # For a float array, we must determine if array is
             # already normalized or not: we don't take the 
             # maximum of float type, we take max of array
-            maxValue = max(max(pixels))
+            maxValue = np.max(np.max(pixels))
             if maxValue <= 1.0:
                 # don't normalize an already normalized float array
                 self.__originalFactor = 1.0
