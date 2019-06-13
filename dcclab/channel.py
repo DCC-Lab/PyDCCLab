@@ -67,7 +67,10 @@ class Channel:
 
     @property
     def isBinary(self) -> bool:
-        return np.alltrue(np.logical_or(self.pixels == 0, self.pixels) == 1)
+        # FIXME: This function should return True as considered
+        # by morphology.binary_opening.  It appears that
+        # a int array should be only 0 and 1.
+        return np.array_equal(self.pixels, self.pixels.astype(bool))
 
     """ Display-related functions """
 

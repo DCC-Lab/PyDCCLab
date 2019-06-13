@@ -84,6 +84,15 @@ class TestChannels(unittest.TestCase):
         channel = Channel(pixels=array)
         pixels = channel.copy()
         self.assertFalse(pixels is array)
+
+    def testIsBinary(self):        
+        array = np.random.randint(low=0, high=2, size=(100, 200))
+        self.assertTrue(Channel(pixels=array).isBinary)
+        self.assertFalse(Channel(pixels=array*255).isBinary)
+        self.assertFalse(Channel(pixels=array*200).isBinary)
+
+        array = np.random.randint(low=0, high=255, size=(100, 200))
+        self.assertFalse(Channel(pixels=array).isBinary)
         
 if __name__ == '__main__':
     unittest.main()
