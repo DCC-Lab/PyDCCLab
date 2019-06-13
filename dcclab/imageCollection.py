@@ -50,7 +50,7 @@ class ImageCollection:
         paths = PathPattern(pattern)
         for path in paths.matchingFiles():
             try:
-                image = Image(path)
+                image = Image(path=path)
                 self.__images.append(image)
             except:
                 pass
