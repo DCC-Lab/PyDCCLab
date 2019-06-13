@@ -147,15 +147,15 @@ class ChannelUint16(ChannelInt):
 
     def convolveWith(self, matrix: typing.Union[np.ndarray, list]):
         convolvedArray = convolve2d(self.pixels.astype(float), matrix, mode="same", boundary="symm")
-        return ChannelUint8(convolvedArray.astype(np.uint16))
+        return ChannelUint16(convolvedArray.astype(np.uint16))
 
     def getEntropyFiltering(self, filterSize: int):
         entropyFiltered = entropy(self.pixels.astype(float), morphology.selem.square(filterSize))
-        return ChannelUint8(entropyFiltered.astype(np.uint16))
+        return ChannelUint16(entropyFiltered.astype(np.uint16))
 
     def getStandardDeviationFilteringSlow(self, filterSize: int):
         stdFiltered = filters.generic_filter(self.pixels.astype(float), np.std, size=filterSize, mode="nearest")
-        return ChannelUint8(stdFiltered.astype(np.uint16))
+        return ChannelUint16(stdFiltered.astype(np.uint16))
 
     def getStandardDeviationFilter(self, filterSize: int):
         pixels = self.pixels.astype(float)
@@ -165,24 +165,24 @@ class ChannelUint16(ChannelInt):
         if np.any(np.isnan(stdFiltered)):
             warnings.warn("Nan values encountered! Replacing them with 0.", category=RuntimeWarning)
             stdFiltered = np.nan_to_num(stdFiltered)
-        return ChannelUint8(stdFiltered.astype(np.uint16))
+        return ChannelUint16(stdFiltered.astype(np.uint16))
 
     def getGaussianFilter(self, sigma: float = 1):
         gaussianFiltered = gaussian(self.pixels.astype(float), sigma, mode="nearest", multichannel=False,
                                     preserve_range=True)
-        return ChannelUint8(gaussianFiltered.astype(np.uint16))
+        return ChannelUint16(gaussianFiltered.astype(np.uint16))
 
     def getHorizontalSobelFilter(self):
         sobelH = sobel_h(self.pixels.astype(float))
-        return ChannelUint8(sobelH.astype(np.uint16))
+        return ChannelUint16(sobelH.astype(np.uint16))
 
     def getVerticalSobelFilter(self):
         sobelV = sobel_v(self.pixels.astype(float))
-        return ChannelUint8(sobelV.astype(np.uint16))
+        return ChannelUint16(sobelV.astype(np.uint16))
 
     def getBothDirectionsSobelFilter(self):
         sobelHV = sobel(self.pixels.astype(float))
-        return ChannelUint8(sobelHV.astype(np.uint16))
+        return ChannelUint16(sobelHV.astype(np.uint16))
 
     def getIsodataThresholding(self):
         """
@@ -212,7 +212,7 @@ class ChannelUint16(ChannelInt):
             if distances[i] is not None and 0 <= distances[i] < binWidth:
                 thresh = binsCenters[i]
         threshArray = self.pixels >= thresh
-        return ChannelUint8(threshArray.astype(np.uint16))
+        return ChannelUint16(threshArray.astype(np.uint16))
 
     def getOtsuThresholding(self):
         """
@@ -239,19 +239,19 @@ class ChannelUint16(ChannelInt):
         index = np.nanargmax(varianceTwoGroups)
         thresh = binsCenters[index]
         threshArray = self.pixels >= thresh
-        return ChannelUint8(threshArray.astype(np.uint16))
+        return ChannelUint16(threshArray.astype(np.uint16))
 
     def getAdaptiveThresholdMean(self, oddRegionSize: int = 3):
         threshArray = cv.adaptiveThreshold(self.convertTo8BitsInteger().pixels, 256, cv.ADAPTIVE_THRESH_MEAN_C,
                                            cv.THRESH_BINARY,
                                            oddRegionSize, 0)
-        return ChannelUint8(threshArray.astype(np.uint16))
+        return ChannelUint16(threshArray.astype(np.uint16))
 
     def getAdaptiveThresholdGaussian(self, oddRegionSize: int = 3):
         threshArray = cv.adaptiveThreshold(self.convertTo8BitsInteger().pixels, 256, cv.ADAPTIVE_THRESH_GAUSSIAN_C,
                                            cv.THRESH_BINARY, oddRegionSize, 0)
-        return ChannelUint8(threshArray.astype(np.uint16))
+        return ChannelUint16(threshArray.astype(np.uint16))
 
     def convertTo8BitsInteger(self) -> ChannelUint8:
         convertedArray = np.copy(self.pixels.astype(float)) / (2 ** 16) * 255
-        return ChannelUint8(convertedArray.astype(np.uint8))
+        return ChannelUint16(convertedArray.astype(np.uint8))
