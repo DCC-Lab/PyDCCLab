@@ -26,6 +26,7 @@ class Channel:
         if pixels.ndim != 2:
             raise DimensionException(pixels.ndim)
         self.__pixels = np.copy(pixels)
+        self.__originalFactor = 1.0
         self.__originalDType = pixels.dtype
         self.__original = None
 
@@ -67,7 +68,7 @@ class Channel:
 
     @property
     def isBinary(self) -> bool:
-        # FIXME: This function should return True as considered
+        # FIXME?: This function should return True as considered
         # by morphology.binary_opening.  It appears that
         # a int array should be only 0 and 1.
         return np.array_equal(self.pixels, self.pixels.astype(bool))
@@ -91,10 +92,6 @@ class Channel:
         plt.bar(bins[:-1], histogram, width=np.diff(bins), ec="k", align="edge", color="black", alpha=0.5)
         plt.show()
         return histogram, bins
-
-    @deprecated(reason="Renamed as display()")
-    def displayChannel(self, colorMap=None):
-        return self.display()
 
     """ Manipulation-related functions """
 
