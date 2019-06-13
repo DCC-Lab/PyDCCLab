@@ -22,9 +22,12 @@ class LifSerie(Serie):
 
     def getStack(self, channels=None):
         if channels is None:
-            channels = self.getChannels()
-        elif type(channels) is not list:
+            channelInfos = self.getChannels()
+            channels = [int(c.getAttribute("ChannelTag")) for c in channelInfos]
+        elif type(channels) is int:
             channels = [channels]
+        elif type(channels) is tuple:
+            channels = list(channels)
 
         channelStacks = []
         for channel in channels:
