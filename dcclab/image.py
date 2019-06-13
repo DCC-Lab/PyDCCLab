@@ -85,7 +85,6 @@ class Image:
         else:
             raise DimensionException(imageData.ndim)
 
-        return ()
     def _getSupportedFormats(self):
         fmts = list(map( lambda cls: cls.supportedFormats, Image.supportedClasses))
         Image.supportedFormats = [item for sublist in fmts for item in sublist]
