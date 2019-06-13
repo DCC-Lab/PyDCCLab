@@ -1,5 +1,6 @@
 from .channel import *
 import cv2 as cv
+import warnings
 
 
 class ChannelInt(Channel):
@@ -25,6 +26,7 @@ class ChannelInt(Channel):
 
 
 class ChannelUint8(ChannelInt):
+    from .channelFloat import ChannelFloat
 
     def __int__(self, pixels: np.ndarray):
         ChannelInt.__init__(self, pixels)
@@ -35,9 +37,10 @@ class ChannelUint8(ChannelInt):
         convolvedArray = convolve2d(self.pixels.astype(float), matrix, mode="same", boundary="symm")
         return ChannelUint8(convolvedArray.astype(np.uint8))
 
-    def getEntropyFiltering(self, filterSize: int):
-        entropyFiltered = entropy(self.pixels.astype(float), morphology.selem.square(filterSize))
-        return ChannelUint8(entropyFiltered.astype(np.uint8))
+    def getEntropyFilter(self, filterSize: int):
+        warnings.warn("The result of this filter will be a 32-float channel")
+        entropyFiltered = entropy(self.pixels, morphology.selem.square(filterSize))
+        return self.ChannelFloat(entropyFiltered)
 
     def getStandardDeviationFilteringSlow(self, filterSize: int):
         stdFiltered = filters.generic_filter(self.pixels.astype(float), np.std, size=filterSize, mode="nearest")
