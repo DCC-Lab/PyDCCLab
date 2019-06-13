@@ -1,4 +1,5 @@
 from .image import *
+from .pathPattern import *
 import numpy as np
 import matplotlib.pyplot as plt
 import typing
@@ -45,12 +46,9 @@ class ImageCollection:
             raise ImageAlreadyInCollectionException
         self.images.append(image)
 
-    def appendMatchingFiles(self, pathPattern):
-        directory = os.path.dirname(pathPattern)
-        basePattern = os.path.basename(pathPattern)
-        paths = [os.path.join(directory,f) for f in os.listdir(directory) if re.match(basePattern, f)]
-        paths.sort()
-        for path in paths:
+    def appendMatchingFiles(self, pattern):
+        paths = PathPattern(pattern)
+        for path in paths.matchingFiles():
             try:
                 image = Image(path)
                 self.__images.append(image)
