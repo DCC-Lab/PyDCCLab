@@ -2,7 +2,7 @@ import env
 from dcclab import *
 import unittest
 import numpy as np
-import coverage
+
 
 
 class TestChannelInteger(unittest.TestCase):
