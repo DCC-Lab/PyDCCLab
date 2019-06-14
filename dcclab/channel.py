@@ -340,3 +340,22 @@ class Channel:
         labeled, nbObjects = label(self.pixels)
         sizes = sum(self.pixels, labeled, range(nbObjects + 1))
         return Channel(labeled.astype(np.float32)), nbObjects, sizes
+
+    def getErosion(self, size:int = 2):
+        return Channel(ndimage.grey_erosion(self.pixels, size=size))
+
+    def getDilation(self, size:int = 2):
+        return Channel(ndimage.grey_dilation(self.pixels, size=size))
+
+    def getNoiseFiltering(self, algorithm=None):
+        if algorithm is None:
+            algorithm = Channel.defaultNoiseFilter
+
+        return self.getNoiseFiltering() 
+
+    def getNoiseFilteringWithErosion(self, erosion_size=2, dilation_size=2, closing_size=2):
+        workingChannel = self.getErosion(erosion_size)
+        workingChannel.applyDilation(dilation_size)
+        workingChannel.applyClosing(windowSize = closing_size)
+        return workingChannel
+
