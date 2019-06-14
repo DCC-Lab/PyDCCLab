@@ -1,4 +1,5 @@
 from dcclab.imageCollection import ZStack, ImageCollection
+from unittest.mock import Mock, patch
 import numpy as np
 import unittest
 
@@ -49,6 +50,65 @@ class TestZStackFrom3DArray(unittest.TestCase):
         zStack = ZStack(self.grayStack, keepOriginal=False)
         zStack.removeNoise()
         self.assertIsNone(zStack.originalZStack)
+
+    def testMask(self):
+        pass
+
+    def testSetMaskCreatesCopy(self):
+        pass
+
+    def testApplyMask(self):
+        pass
+
+    def testLabelWithoutMask(self):
+        pass
+
+    def testLabel(self):
+        pass
+
+    def testSetLabelCreatesCopy(self):
+        pass
+
+    def testApplyLabel(self):
+        pass
+
+    def testAllStacksAreInMemory(self):
+        pass
+
+    def testParameterize(self):
+        pass
+
+    def testParamObjectsSize(self):
+        pass
+
+    def testParamTotalSize(self):
+        pass
+
+    def testParamObjectsMass(self):
+        pass
+
+    def testParamTotalMass(self):
+        pass
+
+    def testParamObjectsCenterOfMass(self):
+        pass
+
+    def testParamTotalCenterOfMass(self):
+        pass
+
+    def testSaveParamsToFile(self):
+        pass
+
+    def testStacksInMemory(self):
+        pass
+
+    @patch("matplotlib.pyplot.show", new=Mock)
+    def testShow(self):
+        pass
+
+    @patch("matplotlib.pyplot.show", new=Mock)
+    def testShowAllStacks(self):
+        pass
 
 
 class TestZStackFrom4DArray(unittest.TestCase):
