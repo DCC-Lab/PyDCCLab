@@ -348,9 +348,9 @@ class Channel:
         return Channel(ndimage.grey_dilation(self.pixels, size=size))
 
     def getNoiseFiltering(self, algorithm=None):
-        return self.getNoiseFiltering() 
+        return self.getNoiseFilteringWithErosionDilation() 
 
-    def getNoiseFilteringWithErosion(self, erosion_size=2, dilation_size=2, closing_size=2):
+    def getNoiseFilteringWithErosionDilation(self, erosion_size=2, dilation_size=2, closing_size=2):
         workingChannel = self.getErosion(erosion_size)
         workingChannel.applyDilation(dilation_size)
         workingChannel.applyClosing(windowSize = closing_size)
