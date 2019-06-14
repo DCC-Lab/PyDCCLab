@@ -2,6 +2,8 @@ from dcclab.imageCollection import LIFFile
 from dcclab.__lifReader import LifSerie
 import unittest
 
+# TODO: create ZStack Objects instead and test
+
 
 class TestLifFile(unittest.TestCase):
 
