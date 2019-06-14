@@ -16,6 +16,21 @@ class ChannelInt(Channel):
         result = self.convolveWith(matrix).convertToUnsignedInt(self._originalDType)
         self._pixels = result.pixels
 
+    def applyGaussianFilter(self, sigma: float):
+        self.saveOriginal()
+        result = self.getGaussianFilter().convertToUnsignedInt(self._originalDType)
+        self._pixels = result.pixels
+
+    def applyXDerivative(self):
+        self.saveOriginal()
+        result = self.getXAxisDerivative().convertToUnsignedInt(self._originalDType)
+        self._pixels = result.pixels
+
+    def applyYDerivative(self):
+        self.saveOriginal()
+        result = self.getYAxisDerivative().convertToUnsignedInt(self._originalDType)
+        self._pixels = result.pixels
+
     def getHistogramValues(self, normed: bool = False) -> typing.Tuple[np.ndarray, np.ndarray]:
         array = self.pixels.ravel()
         nbBins = len(np.bincount(array))
@@ -23,44 +38,45 @@ class ChannelInt(Channel):
         return hist, bins
 
     def convolveWith(self, matrix: typing.Union[np.ndarray, list]):
-        warnings.warn("Converting to float32 prior to the convolution.")
-        convolvedArray = convolve2d(self.convertToNormalizedFloat().pixels, matrix, mode="same", boundary="symm")
-        return Channel(convolvedArray)
-
-    def getEntropyFiltering(self, filterSize: int):
-        entropyFiltered = entropy(self.pixels.astype(float), morphology.selem.square(filterSize))
-        return Channel(entropyFiltered)
-
-    def getStandardDeviationFilteringSlow(self, filterSize: int):
-        stdFiltered = filters.generic_filter(self.pixels.astype(float), np.std, size=filterSize, mode="nearest")
-        return Channel(stdFiltered)
-
-    def getStandardDeviationFilter(self, filterSize: int):
-        pixels = self.pixels.astype(float)
-        stdDevFilter1 = filters.uniform_filter(pixels, filterSize, mode="nearest")
-        stdDevFilter2 = filters.uniform_filter(pixels * pixels, filterSize, mode="nearest")
-        stdFiltered = np.sqrt(stdDevFilter2 - stdDevFilter1 * stdDevFilter1)
-        if np.any(np.isnan(stdFiltered)):
-            warnings.warn("Nan values encountered! Replacing them with 0.", category=RuntimeWarning)
-            stdFiltered = np.nan_to_num(stdFiltered)
-        return Channel(stdFiltered)
+        warnings.warn("Converting to float32.")
+        floatChannel = self.convertToNormalizedFloat()
+        return floatChannel.convolveWith(matrix)
 
     def getGaussianFilter(self, sigma: float = 1):
-        gaussianFiltered = gaussian(self.pixels.astype(float), sigma, mode="nearest", multichannel=False,
-                                    preserve_range=True)
-        return Channel(gaussianFiltered)
+        warnings.warn("Converting to float32.")
+        floatChannel = self.convertToNormalizedFloat()
+        return floatChannel.getGaussianFilter(sigma)
+
+    def getEntropyFiltering(self, filterSize: int):
+        if self._originalDType == np.uint16:
+            warnings.warn("Converting to uint8.")
+        entropyFiltered = entropy(self.convertTo8BitsInteger().pixels, morphology.selem.square(filterSize))
+        return Channel(entropyFiltered)
+
+    def getStandardDeviationFilterSlow(self, filterSize: int):
+        warnings.warn("Converting to float32.")
+        floatChannel = self.convertToNormalizedFloat()
+        return floatChannel.getStandardDeviationFilterSlow(filterSize)
+
+    def getStandardDeviationFilter(self, filterSize: int):
+        warnings.warn("Converting to float32.")
+        floatChannel = self.convertToNormalizedFloat()
+        return floatChannel.getStandardDeviationFilter(filterSize)
 
     def getHorizontalSobelFilter(self):
-        sobelH = sobel_h(self.pixels.astype(float))
-        return Channel(sobelH)
+        warnings.warn("Converting to float32.")
+        floatChannel = self.convertToNormalizedFloat()
+        return floatChannel.getHorizontalSobelFilter()
 
     def getVerticalSobelFilter(self):
-        sobelV = sobel_v(self.pixels.astype(float))
-        return Channel(sobelV)
+        warnings.warn("Converting to float32.")
+        floatChannel = self.convertToNormalizedFloat()
+        return floatChannel.getVerticalSobelFilter()
 
     def getBothDirectionsSobelFilter(self):
-        sobelHV = sobel(self.pixels.astype(float))
-        return Channel(sobelHV)
+        warnings.warn("Converting to float32.")
+        floatChannel = self.convertToNormalizedFloat()
+        return floatChannel.getBothDirectionsSobelFilter()
 
     def getIsodataThresholding(self):
         """
