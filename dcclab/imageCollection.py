@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from typing import List, Union
 from .__lifReader import LifReader
+from scipy import ndimage
 
 
 class ImageCollection:
@@ -101,7 +102,6 @@ class ImageCollection:
 
 
 class ZStack(ImageCollection):
-    def __init__(self, images: Union[List[Image], np.ndarray]=None, pathPattern: str=None):
     def __init__(self, images: Union[List[Image], np.ndarray]=None, pathPattern: str=None, keepOriginal: bool=True):
         super().__init__(images, pathPattern)
         if not self.imagesAreSimilar:
@@ -157,17 +157,23 @@ class ZStack(ImageCollection):
         self.setArray()
         return self.__array
 
-    """ 
-    Future segmentation implementation layout.
-    Notice that I will need an originalStack copy and a labeledStack in memory
-    """
     def removeNoise(self, erosion_size=2, dilation_size=2, closing_size=2):
-        raise NotImplementedError
         self.__checkOriginal()
         if self.__array is None:
             self.setArray()
+        self.__array = ndimage.grey_erosion(self, size=erosion_size)
+        self.__array = ndimage.grey_dilation(self, size=dilation_size)
+        self.__array = ndimage.grey_closing(self, size=closing_size)
+
     def setMask(self, maskClosing=3, __apply=False):  # todo: better mask options/algo
         self.__checkOriginal()
+        mask = self.__array > self.__array.max()/80
+        mask = ndimage.binary_opening(mask, iterations=maskClosing)
+        mask = ndimage.binary_closing(mask, iterations=maskClosing)
+        if __apply:
+            self.__array = mask
+        else:
+            self.maskedZStack = mask
         self.__masked = True
 
     def applyMask(self, maskClosing=3):
@@ -175,6 +181,12 @@ class ZStack(ImageCollection):
 
     def setLabel(self, __apply=False):
         mask = self.__checkMask()
+        labeledZStack, nbOfObjects = ndimage.label(mask)
+        self.params["nbOfObjects"] = nbOfObjects
+        if __apply:
+            self.__array = labeledZStack
+        else:
+            self.labeledZStack = labeledZStack
 
     def applyLabel(self):
         self.setLabel(__apply=True)
