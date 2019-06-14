@@ -79,7 +79,7 @@ class ImageCollection:
         index = self.indexOf(image)
         del self.images[index]
 
-    def asArray(self) -> np.ndarray:
+    def getArray(self) -> np.ndarray:
         return np.array(self.images)
 
     def showAllSequentially(self, showInGray: object = True):
@@ -144,10 +144,12 @@ class ZStack(ImageCollection):
             depth = len(self)
             return imageShape[0], imageShape[1], depth
 
-    def asArray(self) -> np.ndarray:
+    def setArray(self):
         if self.__array is None:
             self.__array = np.dstack([im.asArray() for im in self.images])
 
+    def getArray(self) -> np.ndarray:
+        self.setArray()
         return self.__array
 
     """ 
@@ -156,6 +158,8 @@ class ZStack(ImageCollection):
     """
     def removeNoise(self, erosion_size=2, dilation_size=2, closing_size=2):
         raise NotImplementedError
+        if self.__array is None:
+            self.setArray()
 
     def label(self):
         raise NotImplementedError
