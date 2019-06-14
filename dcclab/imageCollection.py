@@ -124,9 +124,10 @@ class ZStack(ImageCollection):
 
     def __getitem__(self, index):
         if self.__array is not None:
-            return self.__array[index]
-        else:
-            return self.images[index]
+            if self.__array.ndim == 3:
+                return self.__array[:, :, index]
+
+        return self.images[index]
 
     def __len__(self) -> int:
         if self.__array is not None:
