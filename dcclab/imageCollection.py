@@ -262,8 +262,10 @@ class ZStack(ImageCollection):
 
     def saveParamsToFile(self, filepath):
         jsonParams = json.dumps(self.params, indent=4)
+        if filepath.split(".")[-1] != "json":
+            filepath += ".json"
 
-        with open(filepath+".json", "w+") as file:
+        with open(filepath, "w+") as file:
             file.write(jsonParams)
 
     def show(self, axis=-1):
