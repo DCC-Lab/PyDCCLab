@@ -211,7 +211,10 @@ class ZStack(ImageCollection):
         if not self.__masked:
             raise Exception("Cannot label without a mask reference.")
         else:
-            return self.maskedZStack or self.__array
+            if self.maskedZStack is not None:
+                return self.maskedZStack
+            else:
+                return self.__array
 
     def parameterize(self):
         assert self._allStacksAreInMemory(), "Need all stacks in memory. Use setters method."
