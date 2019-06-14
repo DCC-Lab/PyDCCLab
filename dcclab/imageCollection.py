@@ -24,6 +24,10 @@ class ImageCollection:
     def images(self):
         return self.__images
 
+    @property
+    def array(self) -> np.ndarray:
+        return np.array(self.images)
+
     def __getitem__(self, index):
         return self.images[index]
 
@@ -80,9 +84,6 @@ class ImageCollection:
     def remove(self, image: Image):
         index = self.indexOf(image)
         del self.images[index]
-
-    def getArray(self) -> np.ndarray:
-        return np.array(self.images)
 
     def showAllSequentially(self, showInGray: object = True):
         for image in self.images:
@@ -155,7 +156,8 @@ class ZStack(ImageCollection):
         if self.__array is None:
             self.__array = np.dstack([im.asArray() for im in self.images])
 
-    def getArray(self) -> np.ndarray:
+    @property
+    def array(self) -> np.ndarray:
         self.setArray()
         return self.__array
 
