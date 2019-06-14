@@ -77,11 +77,11 @@ class ChannelFloat(Channel):
         return Channel(sobelHV)
 
     def convertTo8BitsInteger(self):
-        return self.convertToUnsignedInt(np.uint8)
+        return self._convertToUnsignedInt(np.uint8)
 
     def convertTo16BitsInteger(self):
-        return self.convertToUnsignedInt(np.uint16)
+        return self._convertToUnsignedInt(np.uint16)
 
-    def convertToUnsignedInt(self, dtype):
+    def _convertToUnsignedInt(self, dtype):
         convertedArray = ((np.copy(self.pixels)) * np.iinfo(dtype).max)
         return Channel(convertedArray.astype(dtype))

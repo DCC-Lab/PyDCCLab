@@ -11,32 +11,32 @@ class ChannelInt(Channel):
             raise TypeError("Pixel type must be integer.")
         self._originalFactor = np.iinfo(self._originalDType).max
 
-    def applyConvolution(self, matrix: typing.Union[np.ndarray, list]):
+    def applyConvolution(self, matrix: typing.Union[np.ndarray, list]) -> None:
         with warnings.catch_warnings():
             warnings.simplefilter('ignore', category=UserWarning)
             self.saveOriginal()
-            result = self.convolveWith(matrix).convertToUnsignedInt(self._originalDType)
+            result = self.convolveWith(matrix)._convertToUnsignedInt(self._originalDType)
         self._pixels = result.pixels
 
-    def applyGaussianFilter(self, sigma: float):
+    def applyGaussianFilter(self, sigma: float) -> None:
         with warnings.catch_warnings():
             warnings.simplefilter('ignore', category=UserWarning)
             self.saveOriginal()
-            result = self.getGaussianFilter().convertToUnsignedInt(self._originalDType)
+            result = self.getGaussianFilter()._convertToUnsignedInt(self._originalDType)
         self._pixels = result.pixels
 
-    def applyXDerivative(self):
+    def applyXDerivative(self) -> None:
         with warnings.catch_warnings():
             warnings.simplefilter('ignore', category=UserWarning)
             self.saveOriginal()
-            result = self.getXAxisDerivative().convertToUnsignedInt(self._originalDType)
+            result = self.getXAxisDerivative()._convertToUnsignedInt(self._originalDType)
         self._pixels = result.pixels
 
-    def applyYDerivative(self):
+    def applyYDerivative(self) -> None:
         with warnings.catch_warnings():
             warnings.simplefilter('ignore', category=UserWarning)
             self.saveOriginal()
-            result = self.getYAxisDerivative().convertToUnsignedInt(self._originalDType)
+            result = self.getYAxisDerivative()._convertToUnsignedInt(self._originalDType)
         self._pixels = result.pixels
 
     def getHistogramValues(self, normed: bool = False) -> typing.Tuple[np.ndarray, np.ndarray]:
@@ -45,48 +45,46 @@ class ChannelInt(Channel):
         hist, bins = np.histogram(array, nbBins, [0, nbBins], density=normed)
         return hist, bins
 
-    def convolveWith(self, matrix: typing.Union[np.ndarray, list]):
+    def convolveWith(self, matrix: typing.Union[np.ndarray, list]) -> Channel:
         warnings.warn("Converting to float32.")
         floatChannel = self.convertToNormalizedFloat()
         return floatChannel.convolveWith(matrix)
 
-    def getGaussianFilter(self, sigma: float = 1):
+    def getGaussianFilter(self, sigma: float = 1) -> Channel:
         warnings.warn("Converting to float32.")
         floatChannel = self.convertToNormalizedFloat()
         return floatChannel.getGaussianFilter(sigma)
 
-    def getEntropyFilter(self, filterSize: int):
+    def getEntropyFilter(self, filterSize: int) -> Channel:
         if self._originalDType == np.uint16:
             warnings.warn("Converting to uint8.")
         entropyFiltered = entropy(self.convertTo8BitsInteger().pixels, morphology.selem.square(filterSize))
         return Channel(entropyFiltered)
 
-
-
-    def getStandardDeviationFilter(self, filterSize: int):
+    def getStandardDeviationFilter(self, filterSize: int) -> Channel:
         warnings.warn("Converting to float32.")
         floatChannel = self.convertToNormalizedFloat()
         return floatChannel.getStandardDeviationFilter(filterSize)
 
-    def getHorizontalSobelFilter(self):
+    def getHorizontalSobelFilter(self) -> Channel:
         warnings.warn("Converting to float32.")
         floatChannel = self.convertToNormalizedFloat()
         return floatChannel.getHorizontalSobelFilter()
 
-    def getVerticalSobelFilter(self):
+    def getVerticalSobelFilter(self) -> Channel:
         warnings.warn("Converting to float32.")
         floatChannel = self.convertToNormalizedFloat()
         return floatChannel.getVerticalSobelFilter()
 
-    def getBothDirectionsSobelFilter(self):
+    def getBothDirectionsSobelFilter(self) -> Channel:
         warnings.warn("Converting to float32.")
         floatChannel = self.convertToNormalizedFloat()
         return floatChannel.getBothDirectionsSobelFilter()
 
-    def getIsodataThresholding(self):
+    def getIsodataThresholding(self) -> Channel:
         """
         Adapted from skimage's isodata thresholding method.
-        Their version was not behaving properly with our image format (different than uint8).
+        Their version was not behaving properly with data different than uint8.
         :return: The thresholded Channel instance according to isodata method.
         """
         # We ignore warnings related to division by 0 since they give nan and we treat nan later.
@@ -113,10 +111,10 @@ class ChannelInt(Channel):
         threshArray = self.pixels >= thresh
         return Channel(threshArray.astype(np.uint8))
 
-    def getOtsuThresholding(self):
+    def getOtsuThresholding(self) -> Channel:
         """
         Adapted from skimage's Otsu thresholding method.
-        Their version was not behaving properly with our image format (different than uint8).
+        Their version was not behaving properly with data different than uint8.
         :return: The thresholded DCCImage instance according to Otsu's method.
         """
         # We ignore warnings related to division by 0 since they give nan and we treat nan later.
@@ -140,26 +138,26 @@ class ChannelInt(Channel):
         threshArray = self.pixels >= thresh
         return Channel(threshArray.astype(np.uint8))
 
-    def getAdaptiveThresholdMean(self, oddRegionSize: int = 3):
+    def getAdaptiveThresholdMean(self, oddRegionSize: int = 3) -> Channel:
         threshArray = cv.adaptiveThreshold(self.convertTo8BitsInteger().pixels, 256, cv.ADAPTIVE_THRESH_MEAN_C,
                                            cv.THRESH_BINARY,
                                            oddRegionSize, 0)
         return Channel(threshArray.astype(np.uint8))
 
-    def getAdaptiveThresholdGaussian(self, oddRegionSize: int = 3):
+    def getAdaptiveThresholdGaussian(self, oddRegionSize: int = 3) -> Channel:
         threshArray = cv.adaptiveThreshold(self.convertTo8BitsInteger().pixels, 256, cv.ADAPTIVE_THRESH_GAUSSIAN_C,
                                            cv.THRESH_BINARY, oddRegionSize, 0)
         return Channel(threshArray.astype(np.uint8))
 
-    def convertTo8BitsInteger(self):
-        return self.convertToUnsignedInt(np.uint8)
+    def convertTo8BitsInteger(self) -> Channel:
+        return self._convertToUnsignedInt(np.uint8)
 
-    def convertTo16BitsInteger(self):
-        return self.convertToUnsignedInt(np.uint16)
+    def convertTo16BitsInteger(self) -> Channel:
+        return self._convertToUnsignedInt(np.uint16)
 
-    def convertToNormalizedFloat(self):
+    def convertToNormalizedFloat(self) -> Channel:
         return Channel(np.copy(self.pixels) / self._originalFactor)
 
-    def convertToUnsignedInt(self, dtype):
+    def _convertToUnsignedInt(self, dtype) -> Channel:
         convertedArray = np.copy(self.pixels.astype(float)) / self._originalFactor * np.iinfo(dtype).max
         return Channel(convertedArray.astype(dtype))

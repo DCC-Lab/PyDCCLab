@@ -38,19 +38,19 @@ class Channel:
         self._originalDType = pixels.dtype
         self.__original = None
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.pixels)
 
     @property
-    def pixels(self):
+    def pixels(self) -> np.ndarray:
         return self._pixels
 
     @property
-    def dimension(self):
+    def dimension(self) -> int:
         return self.pixels.ndim
 
     @property
-    def shape(self):
+    def shape(self) -> typing.Tuple[int, int, int]:
         return self.pixels.shape
 
     @property
@@ -102,48 +102,48 @@ class Channel:
     def convertToNormalizedFloat(self):
         pass
 
-    def saveOriginal(self):
-        if self.__original == None:
+    def saveOriginal(self) -> None:
+        if self.__original is None:
             self.__original = np.copy(self.pixels)
 
-    def restoreOriginal(self):
+    def restoreOriginal(self) -> None:
         if self.__original is not None:
             self._pixels = self.__original
 
-    def applyConvolution(self, matrix: typing.Union[np.ndarray, list]):
+    def applyConvolution(self, matrix: typing.Union[np.ndarray, list]) -> None:
         self.saveOriginal()
         result = self.convolveWith(matrix)
         self._pixels = result.pixels
 
-    def applyXDerivative(self):
+    def applyXDerivative(self) -> None:
         self.saveOriginal()
         result = self.getXAxisDerivative()
         self._pixels = result.pixels
 
-    def applyYDerivative(self):
+    def applyYDerivative(self) -> None:
         self.saveOriginal()
         result = self.getYAxisDerivative()
         self._pixels = result.pixels
 
-    def applyGaussianFilter(self, sigma: float):
+    def applyGaussianFilter(self, sigma: float) -> None:
         self.saveOriginal()
         result = self.getGaussianFilter(sigma)
         self._pixels = result.pixels
 
-    def applyThresholding(self):
+    def applyThresholding(self) -> None:
         self.applyIsodataThresholding()
 
-    def applyIsodataThresholding(self):
+    def applyIsodataThresholding(self) -> None:
         self.saveOriginal()
         result = self.getIsodataThresholding()
         self._pixels = result.pixels
 
-    def applyOtsuThresholding(self):
+    def applyOtsuThresholding(self) -> None:
         self.saveOriginal()
         result = self.getOtsuThresholding()
         self._pixels = result.pixels
 
-    def applyOpening(self):
+    def applyOpening(self) -> None:
         self.saveOriginal()
         if self.isBinary:
             result = self.getBinaryOpening()
@@ -151,7 +151,7 @@ class Channel:
             result = self.getOpening()
         self._pixels = result.pixels
 
-    def applyClosing(self):
+    def applyClosing(self) -> None:
         self.saveOriginal()
         if self.isBinary:
             result = self.getBinaryClosing()
@@ -195,7 +195,7 @@ class Channel:
         minimum = self.getExtremaValuesOfPixels()[0]
         return self.getPixelsOfIntensity(minimum)
 
-    def getMaximumIntensityPixels(self):
+    def getMaximumIntensityPixels(self) -> typing.List[tuple]:
         maximum = self.getExtremaValuesOfPixels()[1]
         return self.getPixelsOfIntensity(maximum)
 
@@ -262,8 +262,17 @@ class Channel:
     def convertTo8BitsInteger(self):
         pass
 
-    def convertToUnsignedInt(self, dtype):
+    def _convertToUnsignedInt(self, dtype):
         pass
+
+    @staticmethod
+    def multiChannelDisplay(channels: list):
+        nrows = int(np.ceil(len(channels) / 4))
+        ncols = len(channels) if len(channels) < 4 else 4
+        for i in range(len(channels)):
+            plt.subplot(nrows, ncols, i + 1)
+            plt.imshow(channels[i].pixels)
+        plt.show()
 
 
 from .channelFloat import ChannelFloat

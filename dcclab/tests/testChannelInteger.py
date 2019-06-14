@@ -136,6 +136,69 @@ class TestChannelInteger(unittest.TestCase):
             computedSobel = channel.getHorizontalSobelFilter()
         self.assertTrue(np.array_equal(computedSobel.pixels, sobelResult) and isinstance(computedSobel, ChannelFloat))
 
+    def testGetVerticalSobelFilter(self):
+        array = np.zeros((5, 5), dtype=np.uint8)
+        for i in range(1, 4):
+            for j in range(1, 4):
+                array[i][j] = 1
+        channel = Channel(array)
+        sobelResult = (np.array([[0.25, 0.75, 1, 0.75, 0.25], [0.25, 0.75, 1, 0.75, 0.25], [0, 0, 0, 0, 0],
+                                 [-0.25, -0.75, -1, -0.75, -0.25], [-0.25, -0.75, -1, -0.75, -0.25]]) / 255).T
+        # Remove false edges:
+        sobelResult[0, :] = 0
+        sobelResult[-1, :] = 0
+        sobelResult[:, 0] = 0
+        sobelResult[:, -1] = 0
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', category=UserWarning)
+            computedSobel = channel.getVerticalSobelFilter()
+        self.assertTrue(np.array_equal(computedSobel.pixels, sobelResult) and isinstance(computedSobel, ChannelFloat))
+
+    def testGetBothDirectionSobelFilter(self):
+        array = np.zeros((5, 5), dtype=np.uint8)
+        for i in range(1, 4):
+            for j in range(1, 4):
+                array[i][j] = 1
+        channel = Channel(array)
+        HSobelResult = np.array([[0.25, 0.75, 1, 0.75, 0.25], [0.25, 0.75, 1, 0.75, 0.25], [0, 0, 0, 0, 0],
+                                 [-0.25, -0.75, -1, -0.75, -0.25], [-0.25, -0.75, -1, -0.75, -0.25]]) / 255
+        # Remove false edges:
+        HSobelResult[0, :] = 0
+        HSobelResult[-1, :] = 0
+        HSobelResult[:, 0] = 0
+        HSobelResult[:, -1] = 0
+        VSobelResult = HSobelResult.T
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', category=UserWarning)
+            computedSobel = channel.getBothDirectionsSobelFilter()
+        sobelResult = np.sqrt(HSobelResult ** 2 + VSobelResult ** 2) / np.sqrt(2)
+        self.assertTrue(np.array_equal(computedSobel.pixels, sobelResult) and isinstance(computedSobel, ChannelFloat))
+
+    def testIsodataThresh(self):
+        # Calculation by hand
+        thresholding = 0.5
+        array = np.zeros((5, 5), dtype=np.uint8)
+        for i in range(1, 4):
+            for j in range(1, 4):
+                array[i][j] = 1
+        channel = Channel(array)
+        handCalculatedThresholdedImage = Channel((array >= thresholding).astype("uint"))
+        self.assertTrue(channel.getIsodataThresholding() == handCalculatedThresholdedImage)
+
+    def testOtsuThresh(self):
+        # Calculation by hand
+        thresholding = 0.5
+        array = np.zeros((5, 5), dtype=np.uint8)
+        for i in range(1, 4):
+            for j in range(1, 4):
+                array[i][j] = 1
+        channel = Channel(array)
+        handCalculatedThresholdedImage = Channel((array >= thresholding).astype("uint"))
+        self.assertTrue(channel.getOtsuThresholding() == handCalculatedThresholdedImage)
+
+    def testMulti(self):
+        pass
+
 
 if __name__ == '__main__':
     unittest.main()
