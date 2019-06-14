@@ -1,5 +1,5 @@
-from Database.ImageMetadata.cziMetadata.cziFilter import CZIFilter as fltr
-from Database.ImageMetadata.cziMetadata.cziMetadata import CZIMetadata as mtdt
+from Database.ImageMetadata import CZIFilter as fltr
+from Database.ImageMetadata import CZIMetadata as mtdt
 import xml.etree.ElementTree as ET
 import unittest
 import os

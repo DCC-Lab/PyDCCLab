@@ -1,4 +1,4 @@
-from Database.ImageMetadata.cziMetadata.cziMetadata import CZIMetadata as mtdt
+from Database.ImageMetadata import CZIMetadata as mtdt
 from dcclab import readCziImage
 import xml.etree.ElementTree as ET
 import unittest
