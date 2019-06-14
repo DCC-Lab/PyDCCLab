@@ -102,6 +102,7 @@ class ImageCollection:
 
 class ZStack(ImageCollection):
     def __init__(self, images: Union[List[Image], np.ndarray]=None, pathPattern: str=None):
+    def __init__(self, images: Union[List[Image], np.ndarray]=None, pathPattern: str=None, keepOriginal: bool=True):
         super().__init__(images, pathPattern)
         if not self.imagesAreSimilar:
             raise ValueError("Images in z-stack are not all the same shape")
@@ -110,8 +111,12 @@ class ZStack(ImageCollection):
         if type(images) is np.ndarray:
             self.__array = images
 
+        self.__keepOriginal = keepOriginal
+        self.__masked = False
         self.originalZStack = None
+        self.maskedZStack = None
         self.labeledZStack = None
+        self.params = {}
 
     def imagesAreSimilar(self) -> bool:
         shape = None
@@ -158,11 +163,31 @@ class ZStack(ImageCollection):
     """
     def removeNoise(self, erosion_size=2, dilation_size=2, closing_size=2):
         raise NotImplementedError
+        self.__checkOriginal()
         if self.__array is None:
             self.setArray()
+    def setMask(self, maskClosing=3, __apply=False):  # todo: better mask options/algo
+        self.__checkOriginal()
+        self.__masked = True
 
-    def label(self):
-        raise NotImplementedError
+    def applyMask(self, maskClosing=3):
+        self.setMask(maskClosing, __apply=True)
+
+    def setLabel(self, __apply=False):
+        mask = self.__checkMask()
+
+    def applyLabel(self):
+        self.setLabel(__apply=True)
+
+    def __checkOriginal(self):
+        if (self.originalZStack is None) and self.__keepOriginal:
+            self.originalZStack = self.__array.copy()
+
+    def __checkMask(self):
+        if not self.__masked:
+            raise TypeError("Cannot label without a mask reference.")
+        else:
+            return self.maskedZStack or self.__array
 
     def getParameters(self):
         raise NotImplementedError
