@@ -35,7 +35,6 @@ class Channel:
         if pixels.ndim != 2:
             raise DimensionException(pixels.ndim)
         self._pixels = np.copy(pixels)
-        self._originalFactor = 1.0
         self._originalDType = pixels.dtype
         self.__original = None
 
@@ -211,8 +210,7 @@ class Channel:
         pass
 
     def getGaussianFilter(self, sigma: float = 1):
-        gaussianFiltered = gaussian(self.pixels, sigma, mode="nearest", multichannel=False, preserve_range=True)
-        return Channel(gaussianFiltered)
+        pass
 
     def getHorizontalSobelFilter(self):
         pass
