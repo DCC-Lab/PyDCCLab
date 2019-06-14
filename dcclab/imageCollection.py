@@ -239,11 +239,21 @@ class ZStack(ImageCollection):
         return list(maskSizes)
 
     def __getObjectsMass(self):
-        sumValues = ndimage.sum(self.originalZStack, self.labeledZStack, range(1, self.params['nbOfObjects'] + 1))
+        if self.originalZStack is None:
+            originalZStack = self.__array
+        else:
+            originalZStack = self.originalZStack
+
+        sumValues = ndimage.sum(originalZStack, self.labeledZStack, range(1, self.params['nbOfObjects'] + 1))
         return list(sumValues)
 
     def __getObjectsCenterOfMass(self):
-        centersOfMass = ndimage.center_of_mass(self.originalZStack, self.labeledZStack, range(1, self.params['nbOfObjects'] + 1))
+        if self.originalZStack is None:
+            originalZStack = self.__array
+        else:
+            originalZStack = self.originalZStack
+
+        centersOfMass = ndimage.center_of_mass(originalZStack, self.labeledZStack, range(1, self.params['nbOfObjects'] + 1))
         return list(centersOfMass)
 
     def __getCenterOfMass(self):
