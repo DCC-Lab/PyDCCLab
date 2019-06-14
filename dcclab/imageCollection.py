@@ -27,7 +27,7 @@ class ImageCollection:
 
     @property
     def array(self) -> np.ndarray:
-        return np.array(self.images)
+        return np.dstack([ image.asArray() for image in self.images ])
 
     def __getitem__(self, index):
         return self.images[index]
