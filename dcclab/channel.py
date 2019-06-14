@@ -173,7 +173,7 @@ class Channel:
     def getAverageValueOfPixels(self) -> float:
         return np.average(self.pixels)
 
-    def getStadardDeviationOfPixels(self):
+    def getStandardDeviationOfPixels(self):
         return np.std(self.pixels)
 
     def getShannonEntropyOfPixels(self, base=2) -> float:
@@ -199,7 +199,7 @@ class Channel:
         maximum = self.getExtremaValuesOfPixels()[1]
         return self.getPixelsOfIntensity(maximum)
 
-    def getEntropyFiltering(self, filterSize: int):
+    def getEntropyFilter(self, filterSize: int):
         pass
 
     @deprecated(reason="Too slow. Use getStandardDeviationFilter")

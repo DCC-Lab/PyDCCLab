@@ -22,7 +22,7 @@ class ChannelFloat(Channel):
         hist, bins = np.histogram(array, nbBins, [0, nbBins], density=normed)
         return hist, bins
 
-    def getEntropyFiltering(self, filterSize: int):
+    def getEntropyFilter(self, filterSize: int):
         warnings.warn("Converting to uint8.")
         pixels = self.convertTo8BitsInteger().pixels
         entropyFiltered = entropy(pixels, morphology.selem.square(filterSize, dtype=np.float32))
@@ -39,7 +39,7 @@ class ChannelFloat(Channel):
 
     def getStandardDeviationFilterSlow(self, filterSize: int):
         warnings.warn("Converting to float32.")
-        stdFiltered = filters.generic_filter(self.convertToNormalizedFloat().pixels, np.std, size=filterSize,
+        stdFiltered = filters.generic_filter(self.pixels, np.std, size=filterSize,
                                              mode="nearest")
         return Channel(stdFiltered)
 

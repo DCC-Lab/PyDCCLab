@@ -55,7 +55,7 @@ class ChannelInt(Channel):
         floatChannel = self.convertToNormalizedFloat()
         return floatChannel.getGaussianFilter(sigma)
 
-    def getEntropyFiltering(self, filterSize: int):
+    def getEntropyFilter(self, filterSize: int):
         if self._originalDType == np.uint16:
             warnings.warn("Converting to uint8.")
         entropyFiltered = entropy(self.convertTo8BitsInteger().pixels, morphology.selem.square(filterSize))
