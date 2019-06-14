@@ -179,6 +179,11 @@ class ZStack(ImageCollection):
         self.__masked = True
 
     def applyMask(self, maskClosing=3):
+        """
+        Precision/ambiguity : There's a difference between turning a Zstack
+        into a mask (what applyMask does right now) and applying a mask on
+        zStack to remove some pixels (which no methods here do).
+        """
         self.setMask(maskClosing, __apply=True)
 
     def setLabel(self, __apply=False):
