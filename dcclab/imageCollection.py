@@ -119,9 +119,21 @@ class ZStack(ImageCollection):
                 return False
         return True
 
+    def __getitem__(self, index):
+        if self.__array is not None:
+            return self.__array[index]
+        else:
+            return self.images[index]
+
+    def __len__(self) -> int:
+        if self.__array is not None:
+            return self.__array.shape[-1]
+        else:
+            return len(self.images)
+
     @property
     def shape(self):
-        if self.__array:
+        if self.__array is not None:
             return self.__array.shape
         else:
             imageShape = self[0].shape
