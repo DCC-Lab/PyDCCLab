@@ -11,12 +11,10 @@ class ChannelInt(Channel):
             raise TypeError("Pixel type must be integer.")
         self._originalFactor = np.iinfo(self._originalDType).max
 
-    def convertToNormalizedFloat(self):
-        from .channelFloat import ChannelFloat
-        # For a bound integer array, we take the maximum of the type
-        # and we convert the array to float
-        floatArray = np.copy(self.pixels).astype(np.float32)
-        return ChannelFloat(floatArray / self._originalFactor)
+    def applyConvolution(self, matrix: typing.Union[np.ndarray, list]):
+        self.saveOriginal()
+        result = self.convolveWith(matrix).convertToUnsignedInt(self._originalDType)
+        self._pixels = result.pixels
 
     def getHistogramValues(self, normed: bool = False) -> typing.Tuple[np.ndarray, np.ndarray]:
         array = self.pixels.ravel()
@@ -31,11 +29,11 @@ class ChannelInt(Channel):
 
     def getEntropyFiltering(self, filterSize: int):
         entropyFiltered = entropy(self.pixels.astype(float), morphology.selem.square(filterSize))
-        return Channel(entropyFiltered.astype(np.uint16))
+        return Channel(entropyFiltered)
 
     def getStandardDeviationFilteringSlow(self, filterSize: int):
         stdFiltered = filters.generic_filter(self.pixels.astype(float), np.std, size=filterSize, mode="nearest")
-        return Channel(stdFiltered.astype(np.uint16))
+        return Channel(stdFiltered)
 
     def getStandardDeviationFilter(self, filterSize: int):
         pixels = self.pixels.astype(float)
@@ -45,24 +43,24 @@ class ChannelInt(Channel):
         if np.any(np.isnan(stdFiltered)):
             warnings.warn("Nan values encountered! Replacing them with 0.", category=RuntimeWarning)
             stdFiltered = np.nan_to_num(stdFiltered)
-        return Channel(stdFiltered.astype(np.uint16))
+        return Channel(stdFiltered)
 
     def getGaussianFilter(self, sigma: float = 1):
         gaussianFiltered = gaussian(self.pixels.astype(float), sigma, mode="nearest", multichannel=False,
                                     preserve_range=True)
-        return Channel(gaussianFiltered.astype(np.uint16))
+        return Channel(gaussianFiltered)
 
     def getHorizontalSobelFilter(self):
         sobelH = sobel_h(self.pixels.astype(float))
-        return Channel(sobelH.astype(np.uint16))
+        return Channel(sobelH)
 
     def getVerticalSobelFilter(self):
         sobelV = sobel_v(self.pixels.astype(float))
-        return ChannelUint16(sobelV.astype(np.uint16))
+        return Channel(sobelV)
 
     def getBothDirectionsSobelFilter(self):
         sobelHV = sobel(self.pixels.astype(float))
-        return Channel(sobelHV.astype(np.uint16))
+        return Channel(sobelHV)
 
     def getIsodataThresholding(self):
         """
@@ -92,7 +90,7 @@ class ChannelInt(Channel):
             if distances[i] is not None and 0 <= distances[i] < binWidth:
                 thresh = binsCenters[i]
         threshArray = self.pixels >= thresh
-        return Channel(threshArray.astype(np.uint16))
+        return Channel(threshArray.astype(np.uint8))
 
     def getOtsuThresholding(self):
         """
@@ -119,26 +117,28 @@ class ChannelInt(Channel):
         index = np.nanargmax(varianceTwoGroups)
         thresh = binsCenters[index]
         threshArray = self.pixels >= thresh
-        return Channel(threshArray.astype(np.uint16))
+        return Channel(threshArray.astype(np.uint8))
 
     def getAdaptiveThresholdMean(self, oddRegionSize: int = 3):
         threshArray = cv.adaptiveThreshold(self.convertTo8BitsInteger().pixels, 256, cv.ADAPTIVE_THRESH_MEAN_C,
                                            cv.THRESH_BINARY,
                                            oddRegionSize, 0)
-        return Channel(threshArray.astype(np.uint16))
+        return Channel(threshArray.astype(np.uint8))
 
     def getAdaptiveThresholdGaussian(self, oddRegionSize: int = 3):
         threshArray = cv.adaptiveThreshold(self.convertTo8BitsInteger().pixels, 256, cv.ADAPTIVE_THRESH_GAUSSIAN_C,
                                            cv.THRESH_BINARY, oddRegionSize, 0)
-        return Channel(threshArray.astype(np.uint16))
+        return Channel(threshArray.astype(np.uint8))
 
     def convertTo8BitsInteger(self):
-        convertedArray = np.copy(self.pixels.astype(float)) / self._originalFactor * 255
-        return Channel(convertedArray.astype(np.uint8))
+        return self.convertToUnsignedInt(np.uint8)
 
     def convertTo16BitsInteger(self):
-        convertedArray = np.copy(self.pixels.astype(float)) / self._originalFactor * (2 ** 16 - 1)
-        return Channel(convertedArray.astype(np.uint16))
+        return self.convertToUnsignedInt(np.uint16)
 
     def convertToNormalizedFloat(self):
-        return Channel(self.pixels / self._originalFactor)
+        return Channel(np.copy(self.pixels) / self._originalFactor)
+
+    def convertToUnsignedInt(self, dtype):
+        convertedArray = np.copy(self.pixels.astype(float)) / self._originalFactor * np.iinfo(dtype).max
+        return Channel(convertedArray.astype(dtype))
