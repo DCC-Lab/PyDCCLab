@@ -130,7 +130,17 @@ class TestZStackFrom3DArray(unittest.TestCase):
 
         self.assertTrue(len(self.zStack._stacksInMemory()) == 3)
 
+    """ TEST FAILS """
+    def testStacksInMemoryOrdered(self):
+        self.zStack.removeNoise()
+        self.zStack.setMask()
+        self.zStack.setLabel()
 
+        orderedKeys = ["Original ", "", "Mask ", "Label "]
+
+        for key, orderedKey in zip(self.zStack._stacksInMemory().keys(), orderedKeys):
+            self.assertEqual(key, orderedKey)
+    
     @unittest.skip
     def testParameterize(self):
         self.zStack.setMask(maskClosing=1)
