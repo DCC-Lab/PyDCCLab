@@ -12,23 +12,31 @@ class ChannelInt(Channel):
         self._originalFactor = np.iinfo(self._originalDType).max
 
     def applyConvolution(self, matrix: typing.Union[np.ndarray, list]):
-        self.saveOriginal()
-        result = self.convolveWith(matrix).convertToUnsignedInt(self._originalDType)
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', category=UserWarning)
+            self.saveOriginal()
+            result = self.convolveWith(matrix).convertToUnsignedInt(self._originalDType)
         self._pixels = result.pixels
 
     def applyGaussianFilter(self, sigma: float):
-        self.saveOriginal()
-        result = self.getGaussianFilter().convertToUnsignedInt(self._originalDType)
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', category=UserWarning)
+            self.saveOriginal()
+            result = self.getGaussianFilter().convertToUnsignedInt(self._originalDType)
         self._pixels = result.pixels
 
     def applyXDerivative(self):
-        self.saveOriginal()
-        result = self.getXAxisDerivative().convertToUnsignedInt(self._originalDType)
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', category=UserWarning)
+            self.saveOriginal()
+            result = self.getXAxisDerivative().convertToUnsignedInt(self._originalDType)
         self._pixels = result.pixels
 
     def applyYDerivative(self):
-        self.saveOriginal()
-        result = self.getYAxisDerivative().convertToUnsignedInt(self._originalDType)
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', category=UserWarning)
+            self.saveOriginal()
+            result = self.getYAxisDerivative().convertToUnsignedInt(self._originalDType)
         self._pixels = result.pixels
 
     def getHistogramValues(self, normed: bool = False) -> typing.Tuple[np.ndarray, np.ndarray]:
