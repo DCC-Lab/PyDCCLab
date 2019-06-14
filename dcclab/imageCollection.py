@@ -219,9 +219,9 @@ class ZStack(ImageCollection):
     def parameterize(self):
         assert self._readyForParameterization(), "Need all stacks in memory. Use setters method."
         self.params["objectsSize"] = self.__getObjectsSize()
-        self.params["totalSize"] = sum(self.params["objectsSize"])
+        self.params["totalSize"] = np.sum(self.params["objectsSize"])
         self.params["objectsMass"] = self.__getObjectsMass()
-        self.params["totalMass"] = sum(self.params["objectsMass"])
+        self.params["totalMass"] = np.sum(self.params["objectsMass"])
         self.params["objectsCM"] = self.__getObjectsCenterOfMass()
         self.params["totalCM"] = self.__getCenterOfMass()
 
