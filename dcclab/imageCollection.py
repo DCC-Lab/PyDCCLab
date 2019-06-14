@@ -217,7 +217,7 @@ class ZStack(ImageCollection):
                 return self.__array
 
     def parameterize(self):
-        assert self._readyForParameterization(), "Need all stacks in memory. Use setters method."
+        assert self._allStacksAreInMemory(), "Need all stacks in memory. Use setters method."
         self.params["objectsSize"] = self.__getObjectsSize()
         self.params["totalSize"] = sum(self.params["objectsSize"])
         self.params["objectsMass"] = self.__getObjectsMass()
@@ -227,8 +227,8 @@ class ZStack(ImageCollection):
 
         return self.params
 
-    def _readyForParameterization(self):
-        stacks = [self.maskedZStack, self.labeledZStack]
+    def _allStacksAreInMemory(self):
+        stacks = [self.originalZStack, self.maskedZStack, self.labeledZStack]
         if any(stack is None for stack in stacks):
             return False
         else:

@@ -4,7 +4,6 @@ import numpy as np
 import unittest
 
 # Fixme: only tested Zstacks with 3D Arrays : test zStack/ImageCollection from image files
-# Todo: I can prepare a small stack sample folder.
 
 
 class TestZStackFrom3DArray(unittest.TestCase):
@@ -113,38 +112,11 @@ class TestZStackFrom3DArray(unittest.TestCase):
         self.assertIsInstance(self.zStack.originalZStack, np.ndarray)
         self.assertIsNone(self.zStack.labeledZStack)
 
-    def testNotReadyForParameterization(self):
-        self.zStack.setMask()
-
-        self.assertFalse(self.zStack._readyForParameterization())
-
-    def testReadyForParameterization(self):
-        self.zStack.setMask()
-        self.zStack.setLabel()
-
-        self.assertTrue(self.zStack._readyForParameterization())
-
-    def testStacksInMemory(self):
-        self.zStack.setMask()
-        self.zStack.setLabel()
-
-        self.assertTrue(len(self.zStack._stacksInMemory()) == 3)
-
-    def testStacksInMemoryOrdered(self):
-        self.zStack.removeNoise()
-        self.zStack.setMask()
-        self.zStack.setLabel()
-
-        orderedKeys = ["Original ", "", "Mask ", "Label "]
-
-        for key, orderedKey in zip(self.zStack._stacksInMemory().keys(), orderedKeys):
-            self.assertEqual(key, orderedKey)
+    def testAllStacksAreInMemory(self):
+        pass
 
     def testParameterize(self):
-        self.zStack.setMask(maskClosing=1)
-        self.zStack.setLabel()
-        self.zStack.parameterize()
-        print(self.zStack.params)
+        pass
 
     def testParamObjectsSize(self):
         pass
