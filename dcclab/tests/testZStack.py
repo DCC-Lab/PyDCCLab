@@ -2,6 +2,7 @@ from dcclab.imageCollection import ZStack, ImageCollection
 from unittest.mock import Mock, patch
 import numpy as np
 import unittest
+import os
 
 # Fixme: only tested Zstacks with 3D Arrays : test zStack/ImageCollection from image files
 # Todo: I can prepare a small stack sample folder.
@@ -174,10 +175,26 @@ class TestZStackFrom3DArray(unittest.TestCase):
         pass
 
     def testSaveParamsToFile(self):
-        pass
+        self.zStack.setMask(maskClosing=1)
+        self.zStack.setLabel()
+        self.zStack.parameterize()
 
-    def testStacksInMemory(self):
-        pass
+        filepath = "$testParams$.json"
+        self.zStack.saveParamsToFile(filepath)
+
+        self.assertTrue(os.path.exists(filepath))
+        os.remove(filepath)
+
+    def testSaveParamsToBadFileExt(self):
+        self.zStack.setMask(maskClosing=1)
+        self.zStack.setLabel()
+        self.zStack.parameterize()
+
+        filepath = "$testParams$.txt"
+        self.zStack.saveParamsToFile(filepath)
+
+        self.assertTrue(os.path.exists(filepath + ".json"))
+        os.remove(filepath + ".json")
 
     @patch("matplotlib.pyplot.show", new=Mock)
     def testShow(self):
