@@ -88,6 +88,12 @@ class TestZStackFrom3DArray(unittest.TestCase):
         self.assertEqual(self.zStack.labeledZStack.dtype, np.dtype('int'))
         self.assertTrue(np.array_equal(self.zStack.labeledZStack[2:8, 2:8, 1:self.depth-1], onesRegion))
 
+    def testSetLabelSetNumberOfObjects(self):
+        self.zStack.setMask(maskClosing=1)
+        self.zStack.setLabel()
+
+        self.assertTrue(self.zStack.params["nbOfObjects"] == 1)
+
     def testSetLabelWithoutMask(self):
         with self.assertRaises(Exception):
             self.zStack.setLabel()
@@ -140,13 +146,14 @@ class TestZStackFrom3DArray(unittest.TestCase):
 
         for key, orderedKey in zip(self.zStack._stacksInMemory().keys(), orderedKeys):
             self.assertEqual(key, orderedKey)
-    
-    @unittest.skip
+
     def testParameterize(self):
         self.zStack.setMask(maskClosing=1)
         self.zStack.setLabel()
-        self.zStack.parameterize()
-        print(self.zStack.params)
+        params = self.zStack.parameterize()
+
+        self.assertTrue(len(params) == 7)
+        self.assertTrue(params["totalSize"] == 180)
 
     def testParamObjectsSize(self):
         pass
