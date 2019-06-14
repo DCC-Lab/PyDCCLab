@@ -14,13 +14,11 @@ class TestZStack(unittest.TestCase):
 
         self.assertTrue(len(collection) == self.depth)
         self.assertTrue(collection[0].shape == (10, 10))
-        self.assertTrue(collection[0].asArray().shape == (10, 10))
 
     def testZStackFrom3DArray(self):
         stack = ZStack(self.grayStack)
         self.assertTrue(len(stack) == self.depth)
         self.assertTrue(stack[0].shape == (10, 10))
-        self.assertTrue(stack[0].asArray().shape == (10, 10))
 
     def testZStackShape(self):
         stack = ZStack(self.grayStack)
