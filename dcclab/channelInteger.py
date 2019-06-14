@@ -61,10 +61,7 @@ class ChannelInt(Channel):
         entropyFiltered = entropy(self.convertTo8BitsInteger().pixels, morphology.selem.square(filterSize))
         return Channel(entropyFiltered)
 
-    def getStandardDeviationFilterSlow(self, filterSize: int):
-        warnings.warn("Converting to float32.")
-        floatChannel = self.convertToNormalizedFloat()
-        return floatChannel.getStandardDeviationFilterSlow(filterSize)
+
 
     def getStandardDeviationFilter(self, filterSize: int):
         warnings.warn("Converting to float32.")

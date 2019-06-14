@@ -202,10 +202,6 @@ class Channel:
     def getEntropyFilter(self, filterSize: int):
         pass
 
-    @deprecated(reason="Too slow. Use getStandardDeviationFilter")
-    def getStandardDeviationFilterSlow(self, filterSize: int):
-        pass
-
     def getStandardDeviationFilter(self, filterSize: int):
         pass
 

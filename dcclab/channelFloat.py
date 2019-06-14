@@ -37,11 +37,6 @@ class ChannelFloat(Channel):
                                     preserve_range=True)
         return Channel(gaussianFiltered)
 
-    def getStandardDeviationFilterSlow(self, filterSize: int):
-        warnings.warn("Converting to float32.")
-        stdFiltered = filters.generic_filter(self.pixels, np.std, size=filterSize,
-                                             mode="nearest")
-        return Channel(stdFiltered)
 
     def getStandardDeviationFilter(self, filterSize: int):
         pixels = self.pixels

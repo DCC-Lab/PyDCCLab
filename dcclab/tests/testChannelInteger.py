@@ -113,10 +113,29 @@ class TestChannelInteger(unittest.TestCase):
                                dtype=np.float32).reshape((5, 5))
         with warnings.catch_warnings():
             warnings.simplefilter('ignore', category=UserWarning)
-            stdDevChannelPixels = Channel(array).getStandardDeviationFilterSlow(filterSize=3).pixels
-        print(resultArray)
-        print(stdDevChannelPixels)
-        self.assertTrue(np.allclose(resultArray, stdDevChannelPixels))
+            stdDevChannel = Channel(array).getStandardDeviationFilter(filterSize=3)
+            stdDevChannelPixels = stdDevChannel.pixels
 
-        if __name__ == '__main__':
-            unittest.main()
+        self.assertTrue(np.allclose(resultArray, stdDevChannelPixels) and isinstance(stdDevChannel, ChannelFloat))
+
+    def testGetHorizontalSobelFilter(self):
+        array = np.zeros((5, 5), dtype=np.uint8)
+        for i in range(1, 4):
+            for j in range(1, 4):
+                array[i][j] = 1
+        channel = Channel(array)
+        sobelResult = np.array([[0.25, 0.75, 1, 0.75, 0.25], [0.25, 0.75, 1, 0.75, 0.25], [0, 0, 0, 0, 0],
+                                [-0.25, -0.75, -1, -0.75, -0.25], [-0.25, -0.75, -1, -0.75, -0.25]]) / 255
+        # Remove false edges:
+        sobelResult[0, :] = 0
+        sobelResult[-1, :] = 0
+        sobelResult[:, 0] = 0
+        sobelResult[:, -1] = 0
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', category=UserWarning)
+            computedSobel = channel.getHorizontalSobelFilter()
+        self.assertTrue(np.array_equal(computedSobel.pixels, sobelResult) and isinstance(computedSobel, ChannelFloat))
+
+
+if __name__ == '__main__':
+    unittest.main()
