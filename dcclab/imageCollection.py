@@ -212,7 +212,7 @@ class ZStack(ImageCollection):
             return self.maskedZStack or self.__array
 
     def parameterize(self):
-        assert self.__allStacksInMemory(), "Need all stacks in memory. Use setters method."
+        assert self._allStacksAreInMemory(), "Need all stacks in memory. Use setters method."
         self.params["objectsSize"] = self.__getObjectsSize()
         self.params["totalSize"] = sum(self.params["objectsSize"])
         self.params["objectsMass"] = self.__getObjectsMass()
@@ -222,7 +222,7 @@ class ZStack(ImageCollection):
 
         return self.params
 
-    def __allStacksInMemory(self):
+    def _allStacksAreInMemory(self):
         stacks = [self.originalZStack, self.maskedZStack, self.labeledZStack]
         if any(stack is None for stack in stacks):
             return False
@@ -251,22 +251,22 @@ class ZStack(ImageCollection):
         with open(filepath+".json", "w+") as file:
             file.write(jsonParams)
 
-    def show(self):
-        plt.imshow(self.__array.mean(-1))
+    def show(self, axis=-1):
+        plt.imshow(self.__array.mean(axis))
         plt.show()
 
-    def showAllStacks(self):
-        stacks = self.__stacksInMemory()
+    def showAllStacks(self, axis=-1):
+        stacks = self._stacksInMemory()
         fig, axes = plt.subplots(1, len(stacks))
         for i, (key, stack) in enumerate(stacks.items()):
             if key in ["Original ", ""]:
-                axes[i].imshow(stack.mean(-1))
+                axes[i].imshow(stack.mean(axis))
             else:
-                axes[i].imshow(stack.max(-1))
+                axes[i].imshow(stack.max(axis))
             axes[i].set_title(key + "Stack")
         plt.show()
 
-    def __stacksInMemory(self):
+    def _stacksInMemory(self):
         stacks = {"Original ": self.originalZStack, "": self.__array, "Mask ": self.maskedZStack, "Label ": self.labeledZStack}
         stacksInMemory = {k: v for k, v in stacks.items() if v is not None}
         return stacksInMemory
