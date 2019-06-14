@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from typing import List, Union
 from .__lifReader import LifReader
 from scipy import ndimage
+from collections import OrderedDict
 
 
 class ImageCollection:
@@ -119,7 +120,7 @@ class ZStack(ImageCollection):
         self.originalZStack = None
         self.maskedZStack = None
         self.labeledZStack = None
-        self.params = {}
+        self.params = OrderedDict()
 
     def imagesAreSimilar(self) -> bool:
         shape = None
@@ -170,11 +171,11 @@ class ZStack(ImageCollection):
         self.__array = ndimage.grey_closing(self, size=closing_size)
 
     def setMask(self, maskClosing=3, __apply=False):  # todo: better mask options/algo
-        self.__checkOriginal()
         mask = self.__array > self.__array.max()/80
         mask = ndimage.binary_opening(mask, iterations=maskClosing)
         mask = ndimage.binary_closing(mask, iterations=maskClosing)
         if __apply:
+            self.__checkOriginal()
             self.__array = mask
         else:
             self.maskedZStack = mask
@@ -193,6 +194,7 @@ class ZStack(ImageCollection):
         labeledZStack, nbOfObjects = ndimage.label(mask)
         self.params["nbOfObjects"] = nbOfObjects
         if __apply:
+            self.__checkOriginal()
             self.__array = labeledZStack
         else:
             self.labeledZStack = labeledZStack
@@ -267,7 +269,7 @@ class ZStack(ImageCollection):
         plt.show()
 
     def _stacksInMemory(self):
-        stacks = {"Original ": self.originalZStack, "": self.__array, "Mask ": self.maskedZStack, "Label ": self.labeledZStack}
+        stacks = OrderedDict([("Original ", self.originalZStack), ("", self.__array), ("Mask ", self.maskedZStack), ("Label ", self.labeledZStack)])
         stacksInMemory = {k: v for k, v in stacks.items() if v is not None}
         return stacksInMemory
 
