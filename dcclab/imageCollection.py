@@ -110,6 +110,9 @@ class ZStack(ImageCollection):
         if type(images) is np.ndarray:
             self.__array = images
 
+        self.originalZStack = None
+        self.labeledZStack = None
+
     def imagesAreSimilar(self) -> bool:
         shape = None
         for image in self.images:
@@ -146,9 +149,27 @@ class ZStack(ImageCollection):
 
         return self.__array
 
+    """ 
+    Future segmentation implementation layout.
+    Notice that I will need an originalStack copy and a labeledStack in memory
+    """
+    def removeNoise(self, erosion_size=2, dilation_size=2, closing_size=2):
+        raise NotImplementedError
+
+    def label(self):
+        raise NotImplementedError
+
+    def getParameters(self):
+        raise NotImplementedError
+
     def show(self):
-        # TODO: Do something nicer with z-stack
-        self.showAllSequentially()
+        raise NotImplementedError
+
+    def showLabel(self):
+        raise NotImplementedError
+
+    def showAllStacks(self):
+        raise NotImplementedError
 
 
 class LIFFile:
