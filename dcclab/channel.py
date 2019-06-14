@@ -1,7 +1,7 @@
 import numpy as np
 import typing
 
-from skimage import measure, morphology, img_as_ubyte
+from skimage import measure, morphology
 from skimage.filters.rank import entropy
 from skimage.filters import *
 
@@ -80,9 +80,6 @@ class Channel:
 
     @property
     def isBinary(self) -> bool:
-        # FIXME?: This function should return True as considered
-        # by morphology.binary_opening.  It appears that
-        # a int array should be only 0 and 1.
         return np.array_equal(self.pixels, self.pixels.astype(bool))
 
     """ Display-related functions """
@@ -204,102 +201,39 @@ class Channel:
         return self.getPixelsOfIntensity(maximum)
 
     def getEntropyFiltering(self, filterSize: int):
-        # We have to cast image in 8 bits uint because the algorithm semms to properly works only in this type
-        entropyFiltered = entropy(self.convertTo8BitsInteger(), morphology.selem.square(filterSize, dtype=np.float32))
-        return Channel(entropyFiltered.astype(np.float32))
+        pass
 
     @deprecated(reason="Too slow. Use getStandardDeviationFilter")
-    def getStandardDeviationFilteringSlow(self, filterSize: int):
-        stdFiltered = filters.generic_filter(self.pixels, np.std, size=filterSize, mode="nearest")
-        return Channel(stdFiltered.astype(np.float32))
+    def getStandardDeviationFilterSlow(self, filterSize: int):
+        pass
 
     def getStandardDeviationFilter(self, filterSize: int):
-        stdDevFilter1 = filters.uniform_filter(self.pixels, filterSize, mode="nearest")
-        stdDevFilter2 = filters.uniform_filter(self.pixels * self.pixels, filterSize, mode="nearest")
-        stdFiltered = np.sqrt(stdDevFilter2 - stdDevFilter1 * stdDevFilter1).astype(np.float32)
-        if np.any(np.isnan(stdFiltered)):
-            warnings.warn("Nan values encountered! Replacing them with 0.", category=RuntimeWarning)
-            stdFiltered = np.nan_to_num(stdFiltered)
-        return Channel(stdFiltered)
+        pass
 
     def getGaussianFilter(self, sigma: float = 1):
         gaussianFiltered = gaussian(self.pixels, sigma, mode="nearest", multichannel=False, preserve_range=True)
         return Channel(gaussianFiltered)
 
     def getHorizontalSobelFilter(self):
-        sobelH = sobel_h(self.pixels)
-        return Channel(sobelH)
+        pass
 
     def getVerticalSobelFilter(self):
-        sobelV = sobel_v(self.pixels)
-        return Channel(sobelV)
+        pass
 
     def getBothDirectionsSobelFilter(self):
-        sobelHV = sobel(self.pixels)
-        return Channel(sobelHV)
+        pass
 
     def getIsodataThresholding(self):
-        """
-        Adapted from skimage's isodata thresholding method.
-        Their version was not behaving properly with our image format (different than uint8).
-        :return: The thresholded Channel instance according to isodata method.
-        """
-        # We ignore warnings related to division by 0 since they give nan and we treat nan later.
-        warnings.catch_warnings()
-        warnings.simplefilter("ignore", category=RuntimeWarning)
-        hist, bins = self.getHistogramValues()
-
-        hist = np.array(hist, dtype=np.float32)
-        bins = np.array(bins)
-        binsCenters = np.array([(i + i + 1) / 2 for i in range(len(bins) - 1)])
-        pixelProbabilityThresholdOne = np.cumsum(hist)
-        pixelProbabilityThresholdTwo = np.cumsum(hist[::-1])[::-1] - hist
-        intensitySum = hist * binsCenters
-        pixelProbabilityThresholdTwo[-1] = 1
-        low = np.cumsum(intensitySum) / pixelProbabilityThresholdOne
-        high = (np.cumsum(intensitySum[::-1])[::-1] - intensitySum) / pixelProbabilityThresholdTwo
-        allMean = (low + high) / 2
-        binWidth = binsCenters[1] - binsCenters[0]
-        distances = allMean - binsCenters
-        thresh = 0
-        for i in range(len(distances)):
-            if distances[i] is not None and 0 <= distances[i] < binWidth:
-                thresh = binsCenters[i]
-        threshArray = self.pixels >= (thresh / self._originalFactor)
-        return Channel(threshArray.astype(np.float32))
+        pass
 
     def getOtsuThresholding(self):
-        """
-        Adapted from skimage's Otsu thresholding method.
-        Their version was not behaving properly with our image format (different than uint8).
-        :return: The thresholded DCCImage instance according to Otsu's method.
-        """
-        # We ignore warnings related to division by 0 since they give nan and we treat nan later.
-        warnings.catch_warnings()
-        warnings.simplefilter("ignore", category=RuntimeWarning)
-        if self.getExtremaValuesOfPixels()[0] == self.getExtremaValuesOfPixels()[1]:
-            raise ValueError(
-                "This method only works for image with more than one \"color\" (i.e. more than one pixel value).")
-        hist, bins = self.getHistogramValues()
-        hist = np.array(hist, dtype=np.float32)
-        bins = np.array(bins)
-        binsCenters = np.array([(i + i + 1) / 2 for i in range(len(bins) - 1)])
-        pixelProbabilityGroupOne = np.cumsum(hist)
-        pixelProbabilityGroupTwo = np.cumsum(hist[::-1])[::-1]
-        pixelIntensityGroupOneMean = np.cumsum(hist * binsCenters) / pixelProbabilityGroupOne
-        pixelIntensityGroupTwoMean = (np.cumsum((hist * binsCenters)[::-1]) / pixelProbabilityGroupTwo[::-1])[::-1]
-        varianceTwoGroups = pixelProbabilityGroupOne[:-1] * pixelProbabilityGroupTwo[1:] * (
-                pixelIntensityGroupOneMean[:-1] - pixelIntensityGroupTwoMean[1:]) ** 2
-        index = np.nanargmax(varianceTwoGroups)
-        thresh = binsCenters[index]
-        threshArray = self.pixels >= (thresh / self._originalFactor)
-        return Channel(threshArray.astype(np.float32))
+        pass
 
     def getAdaptiveThresholdMean(self, oddRegionSize: int = 3):
-        raise NotImplementedError
+        pass
 
     def getAdaptiveThresholdGaussian(self, oddRegionSize: int = 3):
-        raise NotImplementedError
+        pass
 
     def getOpening(self, windowSize: int = 3):
         opened = morphology.opening(self.pixels, np.ones((windowSize, windowSize)))
@@ -321,12 +255,12 @@ class Channel:
         binarClosed = morphology.binary_closing(self.pixels, np.ones((windowSize, windowSize))).astype(np.float32)
         return Channel(binarClosed)
 
-    def getConnectedComponents(self) -> tuple:
+    def getConnectedComponents(self, connectionStructure: np.ndarray = None) -> tuple:
         if not self.isBinary:
             raise NotBinaryImageException
-        labeled, nbObjects = label(self.pixels)
+        labeled, nbObjects = label(self.pixels, structure=connectionStructure)
         sizes = sum(self.pixels, labeled, range(nbObjects + 1))
-        return Channel(labeled.astype(np.float32)), nbObjects, sizes
+        return Channel(labeled), nbObjects, sizes
 
     def convertTo16BitsInteger(self):
         pass
