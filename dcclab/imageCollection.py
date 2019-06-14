@@ -170,11 +170,11 @@ class ZStack(ImageCollection):
         self.__array = ndimage.grey_dilation(self, size=dilation_size)
         self.__array = ndimage.grey_closing(self, size=closing_size)
 
-    def setMask(self, maskClosing=3, __apply=False):  # todo: better mask options/algo
+    def setMask(self, maskClosing=3, _apply=False):  # todo: better mask options/algo
         mask = self.__array > self.__array.max()/80
         mask = ndimage.binary_opening(mask, iterations=maskClosing)
         mask = ndimage.binary_closing(mask, iterations=maskClosing)
-        if __apply:
+        if _apply:
             self.__checkOriginal()
             self.__array = mask
         else:
@@ -187,13 +187,13 @@ class ZStack(ImageCollection):
         into a mask (what applyMask does right now) and applying a mask on
         zStack to remove some pixels (which no methods here do).
         """
-        self.setMask(maskClosing, __apply=True)
+        self.setMask(maskClosing, _apply=True)
 
-    def setLabel(self, __apply=False):
+    def setLabel(self, _apply=False):
         mask = self.__checkMask()
         labeledZStack, nbOfObjects = ndimage.label(mask)
         self.params["nbOfObjects"] = nbOfObjects
-        if __apply:
+        if _apply:
             self.__checkOriginal()
             self.__array = labeledZStack
         else:
@@ -201,7 +201,7 @@ class ZStack(ImageCollection):
         self.__labeled = True
 
     def applyLabel(self):
-        self.setLabel(__apply=True)
+        self.setLabel(_apply=True)
 
     def __checkOriginal(self):
         if (self.originalZStack is None) and self.__keepOriginal:
