@@ -21,15 +21,6 @@ except:
 
 class Channel:
 
-    def __new__(cls, pixels: np.ndarray):
-        if cls is Channel:
-            if "float" in str(pixels.dtype):
-                return super(Channel, cls).__new__(ChannelFloat)
-            elif "int" in str(pixels.dtype):
-                return super(Channel, cls).__new__(ChannelInt)
-            else:
-                raise PixelTypeException("Can't read images of type {}".format(pixels.dtype))
-
     def __init__(self, pixels: np.ndarray):
         pixels.squeeze()
         if pixels.ndim != 2:
@@ -38,9 +29,6 @@ class Channel:
         self._originalFactor = 1.0
         self._originalDType = pixels.dtype
         self.__original = None
-
-    def __str__(self):
-        return str(self.pixels)
 
     @property
     def pixels(self):
@@ -108,7 +96,25 @@ class Channel:
     """ Manipulation-related functions """
 
     def convertToNormalizedFloat(self):
-        return self
+        if "float" in str(self._originalDType):
+            # For a float array, we must determine if array is
+            # already normalized or not: we don't take the 
+            # maximum of float type, we take max of array
+            maxValue = np.max(np.max(self.pixels))
+            if maxValue <= 1.0:
+                # don't normalize an already normalized float array
+                self._originalFactor = 1.0
+                self.__pixels = np.copy(self.pixels)
+            else:
+                # normalize a non-normalized float array
+                self._originalFactor = maxValue
+                self.__pixels = np.copy(self.pixels) / maxValue
+        else:
+            # For a bound integer array, we take the maximum of the type
+            # and we convert the array to float
+            self._originalFactor = np.iinfo(self._originalDType).max
+            floatArray = np.copy(self.pixels).astype(np.float32)
+            self.__pixels = floatArray / self._originalFactor
 
     def saveOriginal(self):
         if self.__original == None:
@@ -167,8 +173,10 @@ class Channel:
             result = self.getClosing()
         self.__pixels = result.pixels
 
-    def convolveWith(self, matrix: np.ndarray):
-        pass
+    def convolveWith(self, matrix: typing.Union[np.ndarray, list]):
+        # todo test unitaire
+        convolvedArray = convolve2d(self.pixels, matrix, mode="same", boundary="symm")
+        return Channel(convolvedArray.astype(np.float32))
 
     def getXAxisDerivative(self):
         dxFilter = [[-1, 0, 1]]
@@ -208,7 +216,9 @@ class Channel:
         return self.getPixelsOfIntensity(maximum)
 
     def getEntropyFiltering(self, filterSize: int):
-        entropyFiltered = entropy(self.convertTo8BitsInteger(), morphology.selem.square(filterSize, dtype=np.float32))
+        # We have to cast image in 8 bits uint because the algorithm semms to properly works only in this type
+        image = img_as_ubyte(self.pixels)
+        entropyFiltered = entropy(image, morphology.selem.square(filterSize, dtype=np.float32))
         return Channel(entropyFiltered.astype(np.float32))
 
     @deprecated(reason="Too slow. Use getStandardDeviationFilter")
@@ -231,15 +241,15 @@ class Channel:
 
     def getHorizontalSobelFilter(self):
         sobelH = sobel_h(self.pixels)
-        return Channel(sobelH)
+        return Channel(sobelH.astype(np.float32))
 
     def getVerticalSobelFilter(self):
         sobelV = sobel_v(self.pixels)
-        return Channel(sobelV)
+        return Channel(sobelV.astype(np.float32))
 
     def getBothDirectionsSobelFilter(self):
         sobelHV = sobel(self.pixels)
-        return Channel(sobelHV)
+        return Channel(sobelHV.astype(np.float32))
 
     def getIsodataThresholding(self):
         """
@@ -331,12 +341,4 @@ class Channel:
         sizes = sum(self.pixels, labeled, range(nbObjects + 1))
         return Channel(labeled.astype(np.float32)), nbObjects, sizes
 
-    def convertTo16BitsInteger(self):
-        pass
 
-    def convertTo8BitsInteger(self):
-        pass
-
-
-from .channelFloat import ChannelFloat
-from .channelInteger import ChannelInt
