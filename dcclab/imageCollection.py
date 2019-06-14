@@ -1,5 +1,6 @@
 from .image import *
 import numpy as np
+import json
 import matplotlib.pyplot as plt
 from typing import List, Union
 from .__lifReader import LifReader
@@ -113,6 +114,7 @@ class ZStack(ImageCollection):
 
         self.__keepOriginal = keepOriginal
         self.__masked = False
+        self.__labeled = False
         self.originalZStack = None
         self.maskedZStack = None
         self.labeledZStack = None
@@ -187,6 +189,7 @@ class ZStack(ImageCollection):
             self.__array = labeledZStack
         else:
             self.labeledZStack = labeledZStack
+        self.__labeled = True
 
     def applyLabel(self):
         self.setLabel(__apply=True)
@@ -197,18 +200,53 @@ class ZStack(ImageCollection):
 
     def __checkMask(self):
         if not self.__masked:
-            raise TypeError("Cannot label without a mask reference.")
+            raise Exception("Cannot label without a mask reference.")
         else:
             return self.maskedZStack or self.__array
 
-    def getParameters(self):
-        raise NotImplementedError
+    def parameterize(self):
+        assert self.__allStacksInMemory(), "Need all stacks in memory. Use setters method."
+        self.params["objectsSize"] = self.__getObjectsSize()
+        self.params["totalSize"] = sum(self.params["objectsSize"])
+        self.params["objectsMass"] = self.__getObjectsMass()
+        self.params["totalMass"] = sum(self.params["objectsMass"])
+        self.params["objectsCM"] = self.__getObjectsCenterOfMass()
+        self.params["totalCM"] = self.__getCenterOfMass()
+
+        return self.params
+
+    def __allStacksInMemory(self):
+        stacks = [self.originalZStack, self.maskedZStack, self.labeledZStack]
+        if any(stack is None for stack in stacks):
+            return False
+        else:
+            return True
+
+    def __getObjectsSize(self):
+        maskSizes = ndimage.sum(self.maskedZStack, self.labeledZStack, range(1, self.params['nbOfObjects'] + 1))
+        return list(maskSizes)
+
+    def __getObjectsMass(self):
+        sumValues = ndimage.sum(self.originalZStack, self.labeledZStack, range(1, self.params['nbOfObjects'] + 1))
+        return list(sumValues)
+
+    def __getObjectsCenterOfMass(self):
+        centersOfMass = ndimage.center_of_mass(self.originalZStack, self.labeledZStack, range(1, self.params['nbOfObjects'] + 1))
+        return list(centersOfMass)
+
+    def __getCenterOfMass(self):
+        centerOfMass = np.average(self.params["objectsCM"], axis=0, weights=self.params["objectsMass"])
+        return list(centerOfMass)
+
+    def saveParamsToFile(self, filepath):
+        jsonParams = json.dumps(self.params, indent=4)
+
+        with open(filepath+".json", "w+") as file:
+            file.write(jsonParams)
 
     def show(self):
-        raise NotImplementedError
-
-    def showLabel(self):
-        raise NotImplementedError
+        plt.imshow(self.__array.mean(-1))
+        plt.show()
 
     def showAllStacks(self):
         raise NotImplementedError
