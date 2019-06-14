@@ -34,7 +34,7 @@ class Channel:
         pixels.squeeze()
         if pixels.ndim != 2:
             raise DimensionException(pixels.ndim)
-        self.__pixels = np.copy(pixels)
+        self._pixels = np.copy(pixels)
         self._originalFactor = 1.0
         self._originalDType = pixels.dtype
         self.__original = None
@@ -44,7 +44,7 @@ class Channel:
 
     @property
     def pixels(self):
-        return self.__pixels
+        return self._pixels
 
     @property
     def dimension(self):
@@ -93,10 +93,6 @@ class Channel:
         return self
 
     def getHistogramValues(self, normed: bool = False) -> typing.Tuple[np.ndarray, np.ndarray]:
-        # array = (self.pixels * self.__originalFactor).astype(self.__originalDType).ravel()
-        # nbBins = len(np.bincount(array))
-        # hist, bins = np.histogram(array, nbBins, [0, nbBins], density=normed)
-        # return hist, bins
         pass
 
     def displayHistogram(self, normed: bool = False) -> typing.Tuple[np.ndarray, np.ndarray]:
@@ -116,27 +112,27 @@ class Channel:
 
     def restoreOriginal(self):
         if self.__original is not None:
-            self.__pixels = self.__original
+            self._pixels = self.__original
 
     def applyConvolution(self, matrix: typing.Union[np.ndarray, list]):
         self.saveOriginal()
         result = self.convolveWith(matrix)
-        self.__pixels = result.pixels
+        self._pixels = result.pixels
 
     def applyXDerivative(self):
         self.saveOriginal()
         result = self.getXAxisDerivative()
-        self.__pixels = result.pixels
+        self._pixels = result.pixels
 
     def applyYDerivative(self):
         self.saveOriginal()
         result = self.getYAxisDerivative()
-        self.__pixels = result.pixels
+        self._pixels = result.pixels
 
     def applyGaussianFilter(self, sigma: float):
         self.saveOriginal()
         result = self.getGaussianFilter(sigma)
-        self.__pixels = result.pixels
+        self._pixels = result.pixels
 
     def applyThresholding(self):
         self.applyIsodataThresholding()
@@ -144,12 +140,12 @@ class Channel:
     def applyIsodataThresholding(self):
         self.saveOriginal()
         result = self.getIsodataThresholding()
-        self.__pixels = result.pixels
+        self._pixels = result.pixels
 
     def applyOtsuThresholding(self):
         self.saveOriginal()
         result = self.getOtsuThresholding()
-        self.__pixels = result.pixels
+        self._pixels = result.pixels
 
     def applyOpening(self):
         self.saveOriginal()
@@ -157,7 +153,7 @@ class Channel:
             result = self.getBinaryOpening()
         else:
             result = self.getOpening()
-        self.__pixels = result.pixels
+        self._pixels = result.pixels
 
     def applyClosing(self):
         self.saveOriginal()
@@ -165,7 +161,7 @@ class Channel:
             result = self.getBinaryClosing()
         else:
             result = self.getClosing()
-        self.__pixels = result.pixels
+        self._pixels = result.pixels
 
     def convolveWith(self, matrix: typing.Union[np.ndarray, list]):
         pass
@@ -336,6 +332,9 @@ class Channel:
         pass
 
     def convertTo8BitsInteger(self):
+        pass
+
+    def convertToUnsignedInt(self, dtype):
         pass
 
 
