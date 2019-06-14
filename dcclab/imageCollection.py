@@ -254,7 +254,20 @@ class ZStack(ImageCollection):
         plt.show()
 
     def showAllStacks(self):
-        raise NotImplementedError
+        stacks = self.__stacksInMemory()
+        fig, axes = plt.subplots(1, len(stacks))
+        for i, (key, stack) in enumerate(stacks.items()):
+            if key in ["Original ", ""]:
+                axes[i].imshow(stack.mean(-1))
+            else:
+                axes[i].imshow(stack.max(-1))
+            axes[i].set_title(key + "Stack")
+        plt.show()
+
+    def __stacksInMemory(self):
+        stacks = {"Original ": self.originalZStack, "": self.__array, "Mask ": self.maskedZStack, "Label ": self.labeledZStack}
+        stacksInMemory = {k: v for k, v in stacks.items() if v is not None}
+        return stacksInMemory
 
 
 class LIFFile:
