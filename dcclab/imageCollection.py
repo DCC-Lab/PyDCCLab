@@ -104,6 +104,23 @@ class ImageCollection:
         return imagesShown
 
     # Image manipulation
+
+    @property
+    def isLabelled(self) -> bool:
+        # Only if all images are labelled, we return True
+        for image in self.images:
+            if not image.isLabelled:
+                return False
+        return True
+
+    def labelMaskComponents(self):
+        for image in self.images:
+            image.labelMaskComponents()
+
+    def analyzeComponents(self):
+        for image in self.images:
+            image.analyzeComponents()
+
     def removeNoise(self):
         for image in self.images:
             image.removeNoise()
@@ -124,11 +141,6 @@ class ZStack(ImageCollection):
             raise ValueError("Images in z-stack are not all the same shape")
 
         self.__keepOriginal = keepOriginal
-        self.__masked = False
-        self.__labeled = False
-        self.originalZStack = None
-        self.maskedZStack = None
-        self.labeledZStack = None
         self.params = OrderedDict()
 
     @property

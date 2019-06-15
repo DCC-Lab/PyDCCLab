@@ -91,6 +91,22 @@ class Image:
         fmts = list(map( lambda cls: cls.supportedFormats, Image.supportedClasses))
         Image.supportedFormats = [item for sublist in fmts for item in sublist]
 
+    @property
+    def isLabelled(self) -> bool:
+        # Only if all channels are labelled, we return True
+        for channel in self.channels:
+            if not channel.isLabelled:
+                return False
+        return True
+
+    def labelMaskComponents(self):
+        for channel in self.channels:
+            channel.labelMaskComponents()
+
+    def analyzeComponents(self):
+        for channel in self.channels:
+            channel.analyzeComponents()
+
     def removeNoise(self):
         for channel in self.channels:
             channel.removeNoise()
