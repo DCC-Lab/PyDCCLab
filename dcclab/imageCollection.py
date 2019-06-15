@@ -160,7 +160,6 @@ class ZStack(ImageCollection):
                 return False
         return True
 
-    @property
     def asArray(self) -> np.ndarray:
         # An ZStack is always a 4D array
         # All images are the same size
