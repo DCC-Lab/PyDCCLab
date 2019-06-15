@@ -128,7 +128,6 @@ class Channel:
             centersOfMass = ndimage.center_of_mass(self.pixels, self.labelledComponents, range(1, self.numberOfComponents + 1))
             #centerOfMass = np.average(self.params["objectsCM"], axis=0, weights=self.params["objectsMass"])
             properties = dict()
-            # componentsProperties = 
             properties["objectsSize"] = maskSizes
             # properties["totalSize"] = np.sum(self.params["objectsSize"])
             # properties["objectsMass"] = self.__getObjectsMass()

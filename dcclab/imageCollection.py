@@ -29,8 +29,11 @@ class ImageCollection:
         return self.__images
 
     @property
-    def array(self) -> np.ndarray:
-        return np.dstack([ image.asArray() for image in self.images ])
+    def asArray(self) -> np.ndarray:
+        # An ImageCollection may not always be put into
+        # an array: if all images have different sizes, this will
+        # fail
+        return np.stack([ image.asArray() for image in self.images ], axis=3)
 
     def __getitem__(self, index):
         return self.images[index]
@@ -153,6 +156,12 @@ class ZStack(ImageCollection):
                 return False
         return True
 
+    @property
+    def asArray(self) -> np.ndarray:
+        # An ZStack is always a 4D array
+        # All images are the same size
+        return np.stack([ image.asArray() for image in self.images ], axis=3)
+
     # def removeNoise(self, erosion_size=2, dilation_size=2, closing_size=2):
     #     self.__checkOriginal()
     #     if self.__array is None:
@@ -274,10 +283,10 @@ class ZStack(ImageCollection):
             axes[i].set_title(key + "Stack")
         plt.show()
 
-    # def _stacksInMemory(self):
-    #     stacks = OrderedDict([("Original ", self.originalZStack), ("", self.__array), ("Mask ", self.maskedZStack), ("Label ", self.labeledZStack)])
-    #     stacksInMemory = {k: v for k, v in stacks.items() if v is not None}
-    #     return stacksInMemory
+    def _stacksInMemory(self):
+        stacks = OrderedDict([("Original ", self.originalZStack), ("", self.__array), ("Mask ", self.maskedZStack), ("Label ", self.labeledZStack)])
+        stacksInMemory = {k: v for k, v in stacks.items() if v is not None}
+        return stacksInMemory
 
 
 class LIFFile:
