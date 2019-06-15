@@ -216,10 +216,18 @@ class Channel:
     def getStandardDeviation(self):
         return np.std(self.pixels)
 
+    @deprecated("Renamed getShannonEntropy()")
     def getShannonEntropyOfPixels(self, base=2) -> float:
+        return self.getShannonEntropy()
+
+    def getShannonEntropy(self, base=2) -> float:
         return measure.shannon_entropy(self.pixels, base)
 
+    @deprecated("Renamed getExtrema()")
     def getExtremaValuesOfPixels(self) -> typing.Tuple[int, int]:
+        return self.getExtrema()
+
+    def getExtrema(self) -> typing.Tuple[int, int]:
         return np.min(self.pixels), np.max(self.pixels)
 
     def getPixelsOfIntensity(self, intensity: float) -> typing.List[tuple]:
@@ -231,11 +239,19 @@ class Channel:
         coordsList = coordsList[0]
         return coordsList
 
+    @deprecated("Renamed getMinimum()")
     def getMinimumIntensityPixels(self) -> typing.List[typing.Tuple[int, int]]:
+        return self.getMinimum()
+
+    def getMinimum(self) -> typing.List[typing.Tuple[int, int]]:
         minimum = self.getExtremaValuesOfPixels()[0]
         return self.getPixelsOfIntensity(minimum)
 
+    @deprecated("Renamed getMaximum()")
     def getMaximumIntensityPixels(self):
+        return self.getMaximum()
+
+    def getMaximum(self):
         maximum = self.getExtremaValuesOfPixels()[1]
         return self.getPixelsOfIntensity(maximum)
 
@@ -271,7 +287,11 @@ class Channel:
         sobelV = sobel_v(self.pixels)
         return Channel(sobelV.astype(np.float32))
 
+    @deprecated("Renamed getSobelFilter()")
     def getBothDirectionsSobelFilter(self):
+        return self.getSobelFilter()
+
+    def getSobelFilter(self):
         sobelHV = sobel(self.pixels)
         return Channel(sobelHV.astype(np.float32))
 
