@@ -117,6 +117,24 @@ class Image:
         for channel in self.channels:
             channel.threshold(value)
 
+    def setMask(self, mask:Channel):
+        if mask.isBinary:
+            for channel in self.channels:
+                channel.setMask(mask)
+        else:
+            raise ValueError("Mask must be binary")
+
+    def setMasks(self, masks:[Channel]):
+        if len(masks) == len(self.channels):
+            for mask in masks:
+                if mask.isBinary:
+                    for channel in self.channels:
+                        channel.setMask(mask)
+                else:
+                    raise ValueError("Mask must be binary")
+        else:
+            raise ValueError("Must provide one mask per channel")
+
     def setMaskFromThreshold(self, value = None):
         for channel in self.channels:
             channel.setMaskFromThreshold(value)

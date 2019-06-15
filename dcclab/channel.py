@@ -180,6 +180,12 @@ class Channel:
         else:
             self.applyThresholding()
 
+    def setMask(self, mask:Channel):
+        if mask.isBinary:
+            self.mask = mask
+        else:
+            raise NotImplementedError("Mask must be binary")
+
     def setMaskFromThreshold(self, value = None):
         if value is not None:
             binaryMask = self.pixels > value
