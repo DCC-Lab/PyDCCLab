@@ -186,7 +186,7 @@ class Channel:
         self.mask = Channel(pixels=binaryMask)
 
     def saveOriginal(self):
-        if self.__original == None:
+        if self.__original is None:
             self.__original = np.copy(self.pixels)
 
     def restoreOriginal(self):
@@ -213,12 +213,15 @@ class Channel:
         result = self.getGaussianFilter(sigma)
         self.__pixels = result.pixels
 
-    def applyThresholding(self):
-        self.applyIsodataThresholding()
+    def applyThresholding(self, value = None):
+        if value is None:
+            self.applyIsodataThresholding()
+        else:
+            self.applyGlobalThresholding(value)
 
-    def applyGlobalThresholding(self):
+    def applyGlobalThresholding(self, value):
         self.saveOriginal()
-        result = self.getGlobalThresholding()
+        result = self.getGlobalThresholding(value)
         self.__pixels = result.pixels
 
     def applyIsodataThresholding(self):
@@ -231,20 +234,20 @@ class Channel:
         result = self.getOtsuThresholding()
         self.__pixels = result.pixels
 
-    def applyOpening(self):
+    def applyOpening(self, size:int):
         self.saveOriginal()
         if self.isBinary:
-            result = self.getBinaryOpening()
+            result = self.getBinaryOpening(size)
         else:
-            result = self.getOpening()
+            result = self.getOpening(size)
         self.__pixels = result.pixels
 
-    def applyClosing(self):
+    def applyClosing(self, size:int):
         self.saveOriginal()
         if self.isBinary:
-            result = self.getBinaryClosing()
+            result = self.getBinaryClosing(size)
         else:
-            result = self.getClosing()
+            result = self.getClosing(size)
         self.__pixels = result.pixels
 
     def applyErosion(self, size:int = 2):
