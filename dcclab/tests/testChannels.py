@@ -179,10 +179,17 @@ class TestChannelsSegmentation(unittest.TestCase):
 
         expectedMask = np.array([[1, 0, 0, 0],[0, 1,1, 0],[0, 0, 0, 1]])
         expectedComponents = np.array([[0, 0, 0, 0],[0, 1,1, 0],[0, 0, 0, 2]])
-        self.assertTrue(channel.hasMask)
-        self.assertTrue(channel.mask.pixels.all() == expectedMask.all())
         self.assertTrue(channel.labelledComponents.all() == expectedComponents.all())
         self.assertTrue(channel.numberOfComponents == 2)
+
+    def testAnalyzeComponents(self):
+        array = np.array([[1, 0, 0, 0],[0, 2,2, 0],[0, 0,0, 3]])
+        channel = Channel(array)
+        channel.maskFromThreshold(1)
+        channel.labelMaskComponents()
+        properties = channel.analyzeComponents()
+        self.assertTrue(channel.numberOfComponents == 2)
+        self.assertIsNotNone(properties)
 
 if __name__ == '__main__':
     unittest.main()

@@ -7,6 +7,7 @@ from skimage.filters import *
 
 from scipy.signal import convolve2d
 from scipy.ndimage import label, sum, filters
+import scipy.ndimage as ndimage
 from .DCCExceptions import *
 
 import matplotlib.pyplot as plt
@@ -126,7 +127,7 @@ class Channel:
             sumValues = ndimage.sum(self.pixels, self.labelledComponents, range(1, self.numberOfComponents + 1))
             centersOfMass = ndimage.center_of_mass(self.pixels, self.labelledComponents, range(1, self.numberOfComponents + 1))
             #centerOfMass = np.average(self.params["objectsCM"], axis=0, weights=self.params["objectsMass"])
-            
+            properties = dict()
             # componentsProperties = 
             properties["objectsSize"] = maskSizes
             # properties["totalSize"] = np.sum(self.params["objectsSize"])
@@ -134,9 +135,10 @@ class Channel:
             # properties["totalMass"] = np.sum(self.params["objectsMass"])
             properties["objectsCM"] = centersOfMass
             # properties["totalCM"] = self.__getCenterOfMass()
+            self.componentsProperties = properties
             return properties
         else:
-            raise ValueError("Channel has no mask")
+            raise ValueError("Channel has not been labelled")
 
     def saveComponentsStatistics(self, filePath:str):
         properties = self.analyzeComponents()
