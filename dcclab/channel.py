@@ -180,7 +180,7 @@ class Channel:
         else:
             self.applyThresholding()
 
-    def setMask(self, mask:Channel):
+    def setMask(self, mask):
         if mask.isBinary:
             self.mask = mask
         else:
