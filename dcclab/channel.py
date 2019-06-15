@@ -209,7 +209,11 @@ class Channel:
     def getAverageValueOfPixels(self) -> float:
         return np.average(self.pixels)
 
-    def getStadardDeviationOfPixels(self):
+    @deprecated("Renamed getStandardDeviation()")
+    def getStandardDeviationOfPixels(self):
+        return self.getStandardDeviation()
+
+    def getStandardDeviation(self):
         return np.std(self.pixels)
 
     def getShannonEntropyOfPixels(self, base=2) -> float:

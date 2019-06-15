@@ -141,9 +141,13 @@ class TestChannels(unittest.TestCase):
         array = np.array([[0, 1, 2],[0, 1, 2],[0, 1, 2]])
         expected = 1.0
         result = Channel(pixels=array).getAverageValueOfPixels()
-        print(result)
         self.assertIsNotNone(channel)
         self.assertTrue(result == expected)
+
+    def testStddev(self):
+        array = np.array([[0, 1, 2],[0, 1, 2],[0, 1, 2]])
+        channel = Channel(pixels=array).getStandardDeviation()
+        self.assertIsNotNone(channel)
 
 if __name__ == '__main__':
     unittest.main()
