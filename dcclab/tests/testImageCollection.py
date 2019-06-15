@@ -7,13 +7,16 @@ class TestImageCollection(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         super(TestImageCollection, cls).setUpClass()
-        cls.large = ImageCollection()
-        for i in range(20):
+        cls.largeImmutable = ImageCollection()
+        for i in range(10):
             imageData = np.random.randint(low=0, high=255, size=(1024, 1024, 3))
-            cls.large.append(Image(imageData))
+            cls.largeImmutable.append(Image(imageData))
+        print("Large array is {0:.0f} MB".format(cls.largeImmutable.sizeInBytes/1000000))
+        cls.large = cls.largeImmutable
 
     """ https://hackernoon.com/timing-tests-in-python-for-fun-and-profit-1663144571 """
     def setUp(self):
+        self.large = self.largeImmutable
         self._started_at = time.time()
 
     def tearDown(self):
@@ -45,6 +48,14 @@ class TestImageCollection(unittest.TestCase):
 
     def testLargeImageCollectionAsArray(self):
         largeArray = self.large.asArray()
+
+    def testMaskFromThreshold(self):
+        self.large.setMaskFromThreshold(value=128)
+
+    def testLabelComponents(self):
+        self.large.setMaskFromThreshold(value=128)
+        self.large.labelMaskComponents()
+        self.large.analyzeComponents()
 
 
 if __name__ == '__main__':
