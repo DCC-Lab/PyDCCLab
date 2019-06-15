@@ -2,8 +2,10 @@ from dcclab.imageCollection import ZStack, ImageCollection
 from unittest.mock import Mock, patch
 import numpy as np
 import unittest
+import os
 
 # Fixme: only tested Zstacks with 3D Arrays : test zStack/ImageCollection from image files
+# Todo: I can prepare a small stack sample folder.
 
 
 class TestZStackFrom3DArray(unittest.TestCase):
@@ -87,6 +89,12 @@ class TestZStackFrom3DArray(unittest.TestCase):
         self.assertEqual(self.zStack.labeledZStack.dtype, np.dtype('int'))
         self.assertTrue(np.array_equal(self.zStack.labeledZStack[2:8, 2:8, 1:self.depth-1], onesRegion))
 
+    def testSetLabelSetNumberOfObjects(self):
+        self.zStack.setMask(maskClosing=1)
+        self.zStack.setLabel()
+
+        self.assertTrue(self.zStack.params["nbOfObjects"] == 1)
+
     def testSetLabelWithoutMask(self):
         with self.assertRaises(Exception):
             self.zStack.setLabel()
@@ -112,11 +120,41 @@ class TestZStackFrom3DArray(unittest.TestCase):
         self.assertIsInstance(self.zStack.originalZStack, np.ndarray)
         self.assertIsNone(self.zStack.labeledZStack)
 
-    def testAllStacksAreInMemory(self):
-        pass
+    def testNotReadyForParameterization(self):
+        self.zStack.setMask()
+
+        self.assertFalse(self.zStack._readyForParameterization())
+
+    def testReadyForParameterization(self):
+        self.zStack.setMask()
+        self.zStack.setLabel()
+
+        self.assertTrue(self.zStack._readyForParameterization())
+
+    def testStacksInMemory(self):
+        self.zStack.setMask()
+        self.zStack.setLabel()
+
+        self.assertTrue(len(self.zStack._stacksInMemory()) == 3)
+
+    """ TEST FAILS """
+    def testStacksInMemoryOrdered(self):
+        self.zStack.removeNoise()
+        self.zStack.setMask()
+        self.zStack.setLabel()
+
+        orderedKeys = ["Original ", "", "Mask ", "Label "]
+
+        for key, orderedKey in zip(self.zStack._stacksInMemory().keys(), orderedKeys):
+            self.assertEqual(key, orderedKey)
 
     def testParameterize(self):
-        pass
+        self.zStack.setMask(maskClosing=1)
+        self.zStack.setLabel()
+        params = self.zStack.parameterize()
+
+        self.assertTrue(len(params) == 7)
+        self.assertTrue(params["totalSize"] == 180)
 
     def testParamObjectsSize(self):
         pass
@@ -137,10 +175,26 @@ class TestZStackFrom3DArray(unittest.TestCase):
         pass
 
     def testSaveParamsToFile(self):
-        pass
+        self.zStack.setMask(maskClosing=1)
+        self.zStack.setLabel()
+        self.zStack.parameterize()
 
-    def testStacksInMemory(self):
-        pass
+        filepath = "$testParams$.json"
+        self.zStack.saveParamsToFile(filepath)
+
+        self.assertTrue(os.path.exists(filepath))
+        os.remove(filepath)
+
+    def testSaveParamsToBadFileExt(self):
+        self.zStack.setMask(maskClosing=1)
+        self.zStack.setLabel()
+        self.zStack.parameterize()
+
+        filepath = "$testParams$.txt"
+        self.zStack.saveParamsToFile(filepath)
+
+        self.assertTrue(os.path.exists(filepath + ".json"))
+        os.remove(filepath + ".json")
 
     @patch("matplotlib.pyplot.show", new=Mock)
     def testShow(self):

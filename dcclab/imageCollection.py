@@ -217,18 +217,18 @@ class ZStack(ImageCollection):
                 return self.__array
 
     def parameterize(self):
-        assert self._allStacksAreInMemory(), "Need all stacks in memory. Use setters method."
+        assert self._readyForParameterization(), "Need all stacks in memory. Use setters method."
         self.params["objectsSize"] = self.__getObjectsSize()
-        self.params["totalSize"] = sum(self.params["objectsSize"])
+        self.params["totalSize"] = np.sum(self.params["objectsSize"])
         self.params["objectsMass"] = self.__getObjectsMass()
-        self.params["totalMass"] = sum(self.params["objectsMass"])
+        self.params["totalMass"] = np.sum(self.params["objectsMass"])
         self.params["objectsCM"] = self.__getObjectsCenterOfMass()
         self.params["totalCM"] = self.__getCenterOfMass()
 
         return self.params
 
-    def _allStacksAreInMemory(self):
-        stacks = [self.originalZStack, self.maskedZStack, self.labeledZStack]
+    def _readyForParameterization(self):
+        stacks = [self.maskedZStack, self.labeledZStack]
         if any(stack is None for stack in stacks):
             return False
         else:
@@ -239,11 +239,21 @@ class ZStack(ImageCollection):
         return list(maskSizes)
 
     def __getObjectsMass(self):
-        sumValues = ndimage.sum(self.originalZStack, self.labeledZStack, range(1, self.params['nbOfObjects'] + 1))
+        if self.originalZStack is None:
+            originalZStack = self.__array
+        else:
+            originalZStack = self.originalZStack
+
+        sumValues = ndimage.sum(originalZStack, self.labeledZStack, range(1, self.params['nbOfObjects'] + 1))
         return list(sumValues)
 
     def __getObjectsCenterOfMass(self):
-        centersOfMass = ndimage.center_of_mass(self.originalZStack, self.labeledZStack, range(1, self.params['nbOfObjects'] + 1))
+        if self.originalZStack is None:
+            originalZStack = self.__array
+        else:
+            originalZStack = self.originalZStack
+
+        centersOfMass = ndimage.center_of_mass(originalZStack, self.labeledZStack, range(1, self.params['nbOfObjects'] + 1))
         return list(centersOfMass)
 
     def __getCenterOfMass(self):
@@ -252,8 +262,10 @@ class ZStack(ImageCollection):
 
     def saveParamsToFile(self, filepath):
         jsonParams = json.dumps(self.params, indent=4)
+        if filepath.split(".")[-1] != "json":
+            filepath += ".json"
 
-        with open(filepath+".json", "w+") as file:
+        with open(filepath, "w+") as file:
             file.write(jsonParams)
 
     def show(self, axis=-1):
