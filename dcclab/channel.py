@@ -173,6 +173,26 @@ class Channel:
             result = self.getClosing()
         self.__pixels = result.pixels
 
+    def applyErosion(self, size:int = 2):
+        self.saveOriginal()
+        result = self.getErosion(size)
+        self.__pixels = result.pixels
+
+    def applyDilation(self, size:int = 2):
+        self.saveOriginal()
+        result = self.getDilation(size)
+        self.__pixels = result.pixels
+
+    def applyNoiseFiltering(self, algorithm=None):
+        self.saveOriginal()
+        result = self.getNoiseFiltering(algorithm)
+        self.__pixels = result.pixels
+
+    def applyNoiseFilteringWithErosionDilation(self, erosion_size=2, dilation_size=2, closing_size=2):
+        self.saveOriginal()
+        result = self.getNoiseFilteringWithErosionDilation(erosion_size, dilation_size, closing_size)
+        self.__pixels = result.pixels
+
     def convolveWith(self, matrix: typing.Union[np.ndarray, list]):
         # todo test unitaire
         convolvedArray = convolve2d(self.pixels, matrix, mode="same", boundary="symm")
