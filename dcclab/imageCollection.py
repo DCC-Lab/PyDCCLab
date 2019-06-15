@@ -72,15 +72,12 @@ class ImageCollection:
             except:
                 pass
 
-    def collectionFromArray(self, array):
-        if array.ndim < 3:
-            raise EmptyDCCImageCollectionException  # fixme: better exception or redirect for error "image collection from single image"...
-
-        elif array.ndim == 3:
-            self.__images = [Image(array[:, :, i]) for i in range(array.shape[2])]
-
-        elif array.ndim > 3:  # Todo
-            raise NotImplementedError("ImageCollection from single channel 3D array only.")
+    def appendFromImagesArray(self, imagesArray):
+        if imagesArray.ndim == 4:
+            images = [Image(imagesArray[:, :,:, i]) for i in range(array.shape[3])]
+            self.append(images)
+        else:
+            raise NotImplementedError("ImageCollection from 4D arrays only.")
 
     def removeAt(self, index: int):
         self.images.pop(index)
@@ -108,14 +105,10 @@ class ImageCollection:
 
 
 class ZStack(ImageCollection):
-    def __init__(self, images: Union[List[Image], np.ndarray]=None, pathPattern: str=None, keepOriginal: bool=True):
+    def __init__(self, images:List[Image]=None, imagesArray:np.ndarray=None, pathPattern: str=None, keepOriginal: bool=True):
         super().__init__(images, pathPattern)
         if not self.imagesAreSimilar:
             raise ValueError("Images in z-stack are not all the same shape")
-
-        self.__array = None
-        if type(images) is np.ndarray:
-            self.__array = images
 
         self.__keepOriginal = keepOriginal
         self.__masked = False
