@@ -26,7 +26,7 @@ class Channel:
         if cls is Channel:
             if "float" in str(pixels.dtype):
                 return super(Channel, cls).__new__(ChannelFloat)
-            elif "int" in str(pixels.dtype):
+            elif "int" in str(pixels.dtype) or "bool" in str(pixels.dtype):
                 return super(Channel, cls).__new__(ChannelInt)
             else:
                 raise PixelTypeException("Can't read images of type {}".format(pixels.dtype))

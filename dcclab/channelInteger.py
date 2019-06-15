@@ -6,7 +6,12 @@ import warnings
 class ChannelInt(Channel):
 
     def __init__(self, pixels: np.ndarray):
-        Channel.__init__(self, pixels)
+        # FIXME: use bool directly?
+        if "bool" in str(pixels.dtype):
+            pixels = pixels.astype(int)
+
+        Channel.__init__(self, pixels)    
+        
         if "int" not in str(pixels.dtype):
             raise TypeError("Pixel type must be integer.")
         self._originalFactor = np.iinfo(self._originalDType).max
