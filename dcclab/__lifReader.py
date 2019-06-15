@@ -1,4 +1,7 @@
-from read_lif.read_lif import Reader, Serie
+try:
+    from read_lif.read_lif import Reader, Serie
+except:
+    exit("install read_lif module: pip install read-lif")
 import numpy as np
 import warnings
 import sys
