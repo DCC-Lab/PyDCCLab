@@ -10,7 +10,6 @@ from collections import OrderedDict
 
 class ImageCollection:
     def __init__(self, images:List[Image]=None, imagesArray:np.ndarray=None, pathPattern: str=None):
-        print("Here")
         self.__images = []
         if images is not None:
             if not all(isinstance(image, Image) for image in images):
@@ -29,6 +28,13 @@ class ImageCollection:
     def images(self):
         return self.__images
 
+    @property
+    def sizeInBytes(self):
+        sizeInBytes = 0
+        for image in self.images:
+            sizeInBytes += image.sizeInBytes
+        return sizeInBytes
+        
     @property
     def asArray(self) -> np.ndarray:
         # An ImageCollection may not always be put into
@@ -106,8 +112,6 @@ class ImageCollection:
             plt.imshow(self.images[i].asArray(), cmap=colorMap)
         plt.show()
         return imagesShown
-
-    # Image manipulation
 
     @property
     def isLabelled(self) -> bool:
