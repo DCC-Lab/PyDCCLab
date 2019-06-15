@@ -106,7 +106,7 @@ class ImageCollection:
 
 class ZStack(ImageCollection):
     def __init__(self, images:List[Image]=None, imagesArray:np.ndarray=None, pathPattern: str=None, keepOriginal: bool=True):
-        super().__init__(images, pathPattern)
+        super().__init__(images, imagesArray, pathPattern)
         if not self.imagesAreSimilar:
             raise ValueError("Images in z-stack are not all the same shape")
 
@@ -118,6 +118,7 @@ class ZStack(ImageCollection):
         self.labeledZStack = None
         self.params = OrderedDict()
 
+    @property
     def imagesAreSimilar(self) -> bool:
         shape = None
         for image in self.images:
@@ -126,37 +127,6 @@ class ZStack(ImageCollection):
             elif shape != image.shape:
                 return False
         return True
-
-    def __getitem__(self, index):
-        if self.__array is not None:
-            if self.__array.ndim == 3:
-                return self.__array[:, :, index]
-
-        return self.images[index]
-
-    def __len__(self) -> int:
-        if self.__array is not None:
-            return self.__array.shape[-1]
-        else:
-            return len(self.images)
-
-    @property
-    def shape(self):
-        if self.__array is not None:
-            return self.__array.shape
-        else:
-            imageShape = self[0].shape
-            depth = len(self)
-            return imageShape[0], imageShape[1], depth
-
-    def setArray(self):
-        if self.__array is None:
-            self.__array = np.dstack([im.asArray() for im in self.images])
-
-    @property
-    def array(self) -> np.ndarray:
-        self.setArray()
-        return self.__array
 
     def removeNoise(self, erosion_size=2, dilation_size=2, closing_size=2):
         self.__checkOriginal()
