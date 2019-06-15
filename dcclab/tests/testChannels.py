@@ -159,7 +159,7 @@ class TestChannelsSegmentation(unittest.TestCase):
     def testMaskFromThreshold(self):
         array = np.array([[0, 1, 2],[0, 1, 2],[0, 1, 2]])
         channel = Channel(array)
-        channel.maskFromThreshold(1)
+        channel.setMaskFromThreshold(1)
         self.assertTrue(channel.hasMask)
         self.assertTrue(channel.mask.pixels.all() == np.array([[0, 1, 1],[0, 1, 1],[0, 1, 1]]).all())
 
@@ -167,14 +167,14 @@ class TestChannelsSegmentation(unittest.TestCase):
         array = np.array([[1, 0, 0, 0],[0, 2,2, 0],[0, 0,0, 3]])
         expectedMask = np.array([[1, 0, 0, 0],[0, 1,1, 0],[0, 0, 0, 1]])
         channel = Channel(array)
-        channel.maskFromThreshold(0.5)
+        channel.setMaskFromThreshold(0.5)
         self.assertTrue(channel.hasMask)
         self.assertTrue(channel.mask.pixels.all() == expectedMask.all())
 
     def testLabelMask(self):
         array = np.array([[1, 0, 0, 0],[0, 2,2, 0],[0, 0,0, 3]])
         channel = Channel(array)
-        channel.maskFromThreshold(1)
+        channel.setMaskFromThreshold(1)
         channel.labelMaskComponents()
 
         expectedMask = np.array([[1, 0, 0, 0],[0, 1,1, 0],[0, 0, 0, 1]])
@@ -182,14 +182,29 @@ class TestChannelsSegmentation(unittest.TestCase):
         self.assertTrue(channel.labelledComponents.all() == expectedComponents.all())
         self.assertTrue(channel.numberOfComponents == 2)
 
+    def testLabelWithoutMaskFail(self):
+        array = np.array([[1, 0, 0, 0],[0, 2,2, 0],[0, 0,0, 3]])
+        channel = Channel(array)
+        with self.assertRaises(Exception):
+            channel.labelMaskComponents()
+
     def testAnalyzeComponents(self):
         array = np.array([[1, 0, 0, 0],[0, 2,2, 0],[0, 0,0, 3]])
         channel = Channel(array)
-        channel.maskFromThreshold(1)
+        channel.setMaskFromThreshold(1)
         channel.labelMaskComponents()
         properties = channel.analyzeComponents()
         self.assertTrue(channel.numberOfComponents == 2)
         self.assertIsNotNone(properties)
+        
+
+    # def testSaveComponents(self):
+    #     array = np.array([[1, 0, 0, 0],[0, 2,2, 0],[0, 0,0, 3]])
+    #     channel = Channel(array)
+    #     channel.setMaskFromThreshold(1)
+    #     channel.labelMaskComponents()
+    #     channel.analyzeComponents()
+    #     channel.saveComponentsStatistics("/tmp/test.json")
 
 if __name__ == '__main__':
     unittest.main()

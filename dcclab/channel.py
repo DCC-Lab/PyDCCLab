@@ -11,7 +11,7 @@ import scipy.ndimage as ndimage
 from .DCCExceptions import *
 
 import matplotlib.pyplot as plt
-
+import json
 import warnings
 
 try:
@@ -181,7 +181,7 @@ class Channel:
         else:
             self.applyThresholding()
 
-    def maskFromThreshold(self, value):
+    def setMaskFromThreshold(self, value):
         binaryMask = self.pixels > value
         self.mask = Channel(pixels=binaryMask)
 

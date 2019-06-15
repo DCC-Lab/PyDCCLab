@@ -129,9 +129,9 @@ class ImageCollection:
         for image in self.images:
             image.threshold(value)
 
-    def maskFromThreshold(self, value):
+    def setMaskFromThreshold(self, value):
         for image in self.images:
-            image.maskFromThreshold(value)
+            image.setMaskFromThreshold(value)
 
 
 class ZStack(ImageCollection):
