@@ -197,10 +197,10 @@ class TestChannelsSegmentation(unittest.TestCase):
         self.assertTrue(channel.numberOfComponents == 2)
         self.assertIsNotNone(properties)
         
-    def testRemoveNoise(self):
+    def testFilterNoise(self):
         array = np.array([[1, 0, 0, 0],[0, 2,2, 0],[0, 0,0, 3]])
         channel = Channel(array)
-        channel.removeNoise()
+        channel.filterNoise()
 
     def testThreshold(self):
         array = np.array([[1, 0, 0, 0],[0, 2,2, 0],[0, 0,0, 3]])

@@ -67,15 +67,13 @@ class Image:
 
     def asArray(self):
         channelArrays = self.asChannelsArray()
-        imageData = np.dstack(channelArrays) # even 1 needs to be a 3D stack
+        # An image is always 3D: width x height x channels,
+        # even when there is only one channel
+        imageData = np.dstack(channelArrays) 
         return imageData
 
     def save(self, filePath):
-        imageData = self.asArray()
-        imageData.squeeze() # If only one channel, save grayscale
-        imgFile = PIL.Image.open(filePath)
-        imgFile.save(file + ".thumbnail", "JPEG")
-    PIL.Image.save()
+        raise NotImplementedError()
 
     def display(self, colorMap=None):
         plt.imshow(self.asArray(), cmap=colorMap)

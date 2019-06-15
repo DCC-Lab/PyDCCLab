@@ -10,6 +10,7 @@ from collections import OrderedDict
 
 class ImageCollection:
     def __init__(self, images:List[Image]=None, imagesArray:np.ndarray=None, pathPattern: str=None):
+        print("Here")
         self.__images = []
         if images is not None:
             if not all(isinstance(image, Image) for image in images):
