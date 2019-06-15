@@ -113,7 +113,7 @@ class Channel:
     
     def labelMaskComponents(self):
         if self.hasMask:
-            labels, nbObjects = label(self.mask)
+            labels, nbObjects = label(self.mask.pixels)
             self.labelledComponents = labels
             self.numberOfComponents = nbObjects
         else:
@@ -122,7 +122,7 @@ class Channel:
 
     def analyzeComponents(self) -> dict:
         if self.isLabelled:
-            maskSizes = ndimage.sum(self.mask, self.labelledComponents, range(1, self.numberOfComponents + 1))
+            maskSizes = ndimage.sum(self.mask.pixels, self.labelledComponents, range(1, self.numberOfComponents + 1))
             sumValues = ndimage.sum(self.pixels, self.labelledComponents, range(1, self.numberOfComponents + 1))
             centersOfMass = ndimage.center_of_mass(self.pixels, self.labelledComponents, range(1, self.numberOfComponents + 1))
             #centerOfMass = np.average(self.params["objectsCM"], axis=0, weights=self.params["objectsMass"])
@@ -180,7 +180,8 @@ class Channel:
             self.applyThresholding()
 
     def maskFromThreshold(self, value):
-        self.mask = self.pixels > value
+        binaryMask = self.pixels > value
+        self.mask = Channel(pixels=binaryMask)
 
     def saveOriginal(self):
         if self.__original == None:

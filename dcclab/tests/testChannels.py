@@ -149,5 +149,40 @@ class TestChannels(unittest.TestCase):
         channel = Channel(pixels=array).getStandardDeviation()
         self.assertIsNotNone(channel)
 
+
+class TestChannelsSegmentation(unittest.TestCase):
+    def testNoMaskOnInit(self):
+        array = np.array([[0, 1, 2],[0, 1, 2],[0, 1, 2]])
+        channel = Channel(array)
+        self.assertFalse(channel.hasMask)
+
+    def testMaskFromThreshold(self):
+        array = np.array([[0, 1, 2],[0, 1, 2],[0, 1, 2]])
+        channel = Channel(array)
+        channel.maskFromThreshold(1)
+        self.assertTrue(channel.hasMask)
+        self.assertTrue(channel.mask.pixels.all() == np.array([[0, 1, 1],[0, 1, 1],[0, 1, 1]]).all())
+
+    def testMaskFromThreshold(self):
+        array = np.array([[1, 0, 0, 0],[0, 2,2, 0],[0, 0,0, 3]])
+        expectedMask = np.array([[1, 0, 0, 0],[0, 1,1, 0],[0, 0, 0, 1]])
+        channel = Channel(array)
+        channel.maskFromThreshold(0.5)
+        self.assertTrue(channel.hasMask)
+        self.assertTrue(channel.mask.pixels.all() == expectedMask.all())
+
+    def testLabelMask(self):
+        array = np.array([[1, 0, 0, 0],[0, 2,2, 0],[0, 0,0, 3]])
+        channel = Channel(array)
+        channel.maskFromThreshold(1)
+        channel.labelMaskComponents()
+
+        expectedMask = np.array([[1, 0, 0, 0],[0, 1,1, 0],[0, 0, 0, 1]])
+        expectedComponents = np.array([[0, 0, 0, 0],[0, 1,1, 0],[0, 0, 0, 2]])
+        self.assertTrue(channel.hasMask)
+        self.assertTrue(channel.mask.pixels.all() == expectedMask.all())
+        self.assertTrue(channel.labelledComponents.all() == expectedComponents.all())
+        self.assertTrue(channel.numberOfComponents == 2)
+
 if __name__ == '__main__':
     unittest.main()
