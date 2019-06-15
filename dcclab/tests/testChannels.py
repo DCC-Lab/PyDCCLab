@@ -94,24 +94,31 @@ class TestChannels(unittest.TestCase):
         array = np.random.randint(low=0, high=255, size=(100, 200))
         self.assertFalse(Channel(pixels=array).isBinary)
 
-    def testHistogramValues(self):
-        array = np.random.randint(low=0, high=2, size=(100, 200))
-        hist, bins = Channel(pixels=array).getHistogramValues(True)
-        self.assertAlmostEqual(sum(hist), 1, delta=1e-9)
+    # def testHistogramValues(self):
+    #     array = np.random.randint(low=0, high=2, size=(100, 200))
+    #     hist, bins = Channel(pixels=array).getHistogramValues(True)
+    #     self.assertAlmostEqual(sum(hist), 1, delta=1e-9)
 
-    def testHistogramValuesNotNormalized(self):
-        array = np.ones((5, 5), dtype=np.float32)
-        channel = Channel(pixels=array)
-        hist = [0, 25]
-        bins = [0, 1, 2]
-        self.assertTrue(np.alltrue(channel.getHistogramValues()[0] == hist) and np.alltrue(
-            channel.getHistogramValues()[-1] == bins))
+    # def testHistogramValuesNotNormalized(self):
+    #     array = np.ones((5, 5), dtype=np.float32)
+    #     channel = Channel(pixels=array)
+    #     hist = [0, 25]
+    #     bins = [0, 1, 2]
+    #     self.assertTrue(np.alltrue(channel.getHistogramValues()[0] == hist) and np.alltrue(
+    #         channel.getHistogramValues()[-1] == bins))
 
-    def testHistogramValuesNormalized(self):
-        array = np.ones((5, 5), dtype=np.float32)
-        channel = Channel(pixels=array)
-        hist, bins = channel.getHistogramValues(True)
-        self.assertAlmostEqual(sum(hist), 1, delta=1e-9)
-        
+    # def testHistogramValuesNormalized(self):
+    #     array = np.ones((5, 5), dtype=np.float32)
+    #     channel = Channel(pixels=array)
+    #     hist, bins = channel.getHistogramValues(True)
+    #     self.assertAlmostEqual(sum(hist), 1, delta=1e-9)
+       
+    def testConvolution(self):
+        array = np.random.randint(low=0, high=255, size=(100, 200))
+        kernel = [[-1, 0, 1],[1,0,1],[0,1,1]]
+        channel = Channel(pixels=array).convolveWith(kernel)
+        self.assertIsNotNone(channel)
+        self.assertTrue(channel.pixels.shape == array.shape)
+
 if __name__ == '__main__':
     unittest.main()
