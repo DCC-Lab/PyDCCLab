@@ -24,9 +24,9 @@ setuptools.setup(
     license='MIT',
     keywords='image analysis stack movies',
     packages=setuptools.find_packages(),
-    install_requires=['matplotlib','numpy','scikit-image','scipy','czifile','tifffile','read-lif'],
+    install_requires=['matplotlib','numpy','scikit-image','scipy','czifile','tifffile','read-lif','opencv-python'],
     python_requires='>=3',
-    package_data = {
+    package_data={
         # If any package contains *.txt or *.rst files, include them:
         '': ['*.png'],
         "doc": ['*.html']
@@ -40,7 +40,7 @@ setuptools.setup(
         'Topic :: Education',
 
         # Pick your license as you wish (should match "license" above)
-         'License :: OSI Approved :: MIT License',
+        'License :: OSI Approved :: MIT License',
 
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
