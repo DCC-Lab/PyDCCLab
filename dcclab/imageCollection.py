@@ -34,8 +34,7 @@ class ImageCollection:
         for image in self.images:
             sizeInBytes += image.sizeInBytes
         return sizeInBytes
-        
-    @property
+
     def asArray(self) -> np.ndarray:
         # An ImageCollection may not always be put into
         # an array: if all images have different sizes, this will

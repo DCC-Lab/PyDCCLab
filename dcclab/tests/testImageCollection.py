@@ -8,7 +8,7 @@ class TestImageCollection(unittest.TestCase):
     def setUpClass(cls):
         super(TestImageCollection, cls).setUpClass()
         cls.large = ImageCollection()
-        for i in range(10):
+        for i in range(20):
             imageData = np.random.randint(low=0, high=255, size=(1024, 1024, 3))
             cls.large.append(Image(imageData))
 
@@ -31,7 +31,6 @@ class TestImageCollection(unittest.TestCase):
         for i in range(100):
             imageData = np.random.randint(low=0, high=255, size=(100, 200, 3))
             collection.append(Image(imageData))
-
         collection.filterNoise()
 
     def testFilterNoiseImageCollection(self):
@@ -39,11 +38,14 @@ class TestImageCollection(unittest.TestCase):
         for i in range(100):
             imageData = np.random.randint(low=0, high=255, size=(100, 200, 3))
             collection.append(Image(imageData))
-
         collection.threshold(value=128)
 
-    def testLargeImageCollection(self):
+    def testThresholdLargeImageCollection(self):
         self.large.threshold(value=128)
+
+    def testLargeImageCollectionAsArray(self):
+        largeArray = self.large.asArray()
+
 
 if __name__ == '__main__':
     unittest.main()
