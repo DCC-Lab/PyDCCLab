@@ -114,11 +114,28 @@ class TestChannels(unittest.TestCase):
     #     self.assertAlmostEqual(sum(hist), 1, delta=1e-9)
        
     def testConvolution(self):
+        # FIXME: test result
         array = np.random.randint(low=0, high=255, size=(100, 200))
         kernel = [[-1, 0, 1],[1,0,1],[0,1,1]]
         channel = Channel(pixels=array).convolveWith(kernel)
         self.assertIsNotNone(channel)
         self.assertTrue(channel.pixels.shape == array.shape)
+
+    def testXDerivative(self):
+        array = np.array([[0, 0, 0],[1,1,1],[2,2,2]])
+        result = np.array([[0, 0, 0],[0, 0, 0],[0, 0, 0]])
+        channel = Channel(pixels=array).getXAxisDerivative()
+        self.assertIsNotNone(channel)
+        self.assertTrue(channel.pixels.shape == array.shape)
+        self.assertTrue(channel.pixels.all() == result.all())
+
+    def testYDerivative(self):
+        array = np.array([[0, 1, 2],[0, 1, 2],[0, 1, 2]])
+        result = np.array([[0, 0, 0],[0, 0, 0],[0, 0, 0]])
+        channel = Channel(pixels=array).getYAxisDerivative()
+        self.assertIsNotNone(channel)
+        self.assertTrue(channel.pixels.shape == array.shape)
+        self.assertTrue(channel.pixels.all() == result.all())
 
 if __name__ == '__main__':
     unittest.main()
