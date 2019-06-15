@@ -107,9 +107,9 @@ class Image:
         for channel in self.channels:
             channel.analyzeComponents()
 
-    def removeNoise(self):
+    def filterNoise(self):
         for channel in self.channels:
-            channel.removeNoise()
+            channel.filterNoise()
 
     def threshold(self, value = None):
         for channel in self.channels:

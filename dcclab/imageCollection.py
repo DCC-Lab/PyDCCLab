@@ -121,9 +121,9 @@ class ImageCollection:
         for image in self.images:
             image.analyzeComponents()
 
-    def removeNoise(self):
+    def filterNoise(self):
         for image in self.images:
-            image.removeNoise()
+            image.filterNoise()
 
     def threshold(self, value = None):
         for image in self.images:

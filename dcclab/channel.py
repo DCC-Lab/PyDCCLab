@@ -172,7 +172,7 @@ class Channel:
             floatArray = np.copy(self.pixels).astype(np.float32)
             self.__pixels = floatArray / self.__originalFactor
 
-    def removeNoise(self):
+    def filterNoise(self):
         self.applyNoiseFilter()
         
     def threshold(self, value = None):
