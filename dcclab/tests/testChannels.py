@@ -123,19 +123,27 @@ class TestChannels(unittest.TestCase):
 
     def testXDerivative(self):
         array = np.array([[0, 0, 0],[1,1,1],[2,2,2]])
-        result = np.array([[0, 0, 0],[0, 0, 0],[0, 0, 0]])
+        expected = np.array([[0, 0, 0],[0, 0, 0],[0, 0, 0]])
         channel = Channel(pixels=array).getXAxisDerivative()
         self.assertIsNotNone(channel)
         self.assertTrue(channel.pixels.shape == array.shape)
-        self.assertTrue(channel.pixels.all() == result.all())
+        self.assertTrue(channel.pixels.all() == expected.all())
 
     def testYDerivative(self):
         array = np.array([[0, 1, 2],[0, 1, 2],[0, 1, 2]])
-        result = np.array([[0, 0, 0],[0, 0, 0],[0, 0, 0]])
+        expected = np.array([[0, 0, 0],[0, 0, 0],[0, 0, 0]])
         channel = Channel(pixels=array).getYAxisDerivative()
         self.assertIsNotNone(channel)
         self.assertTrue(channel.pixels.shape == array.shape)
-        self.assertTrue(channel.pixels.all() == result.all())
+        self.assertTrue(channel.pixels.all() == expected.all())
+
+    def testAverage(self):
+        array = np.array([[0, 1, 2],[0, 1, 2],[0, 1, 2]])
+        expected = 1.0
+        result = Channel(pixels=array).getAverageValueOfPixels()
+        print(result)
+        self.assertIsNotNone(channel)
+        self.assertTrue(result == expected)
 
 if __name__ == '__main__':
     unittest.main()
