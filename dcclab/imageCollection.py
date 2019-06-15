@@ -9,15 +9,18 @@ from collections import OrderedDict
 
 
 class ImageCollection:
-    def __init__(self, images: Union[List[Image], np.ndarray]=None, pathPattern: str=None):
+    def __init__(self, images:List[Image]=None, imagesArray:np.ndarray=None, pathPattern: str=None):
         self.__images = []
         if images is not None:
-            if type(images) is np.ndarray:
-                self.collectionFromArray(images)
-            elif not all(isinstance(image, Image) for image in images):
+            if not all(isinstance(image, Image) for image in images):
                 raise NotDCCImageException
             else:
                 self.__images = images
+        elif imagesArray is not None:
+            if images.Array.ndim == 4:
+                self.collectionFromArray(images)
+            else:
+                raise ValueError("ImageCollection is initialized by a 4D numpy array: [width][height][channel][collection]")
         elif pathPattern is not None:
             self.appendMatchingFiles(pathPattern)
 
