@@ -170,6 +170,18 @@ class Channel:
             floatArray = np.copy(self.pixels).astype(np.float32)
             self.__pixels = floatArray / self.__originalFactor
 
+    def removeNoise(self):
+        self.applyNoiseFilter()
+        
+    def threshold(self, value = None):
+        if value is not None:
+            self.applyGlobalThresholding(value)
+        else:
+            self.applyThresholding()
+
+    def maskFromThreshold(self, value):
+        self.mask = self.pixels > value
+
     def saveOriginal(self):
         if self.__original == None:
             self.__original = np.copy(self.pixels)
@@ -200,6 +212,11 @@ class Channel:
 
     def applyThresholding(self):
         self.applyIsodataThresholding()
+
+    def applyGlobalThresholding(self):
+        self.saveOriginal()
+        result = self.getGlobalThresholding()
+        self.__pixels = result.pixels
 
     def applyIsodataThresholding(self):
         self.saveOriginal()
@@ -348,6 +365,10 @@ class Channel:
     def getSobelFilter(self):
         sobelHV = sobel(self.pixels)
         return Channel(sobelHV.astype(np.float32))
+
+    def getGlobalThresholding(self, value):
+        mask = self.pixels > value
+        return Channel(self.pixels * mask)
 
     def getIsodataThresholding(self):
         """

@@ -103,6 +103,19 @@ class ImageCollection:
         plt.show()
         return imagesShown
 
+    # Image manipulation
+    def removeNoise(self):
+        for image in self.images:
+            image.removeNoise()
+
+    def threshold(self, value = None):
+        for image in self.images:
+            image.threshold(value)
+
+    def maskFromThreshold(self, value):
+        for image in self.images:
+            image.maskFromThreshold(value)
+
 
 class ZStack(ImageCollection):
     def __init__(self, images:List[Image]=None, imagesArray:np.ndarray=None, pathPattern: str=None, keepOriginal: bool=True):

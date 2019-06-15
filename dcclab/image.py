@@ -90,3 +90,16 @@ class Image:
     def _getSupportedFormats(self):
         fmts = list(map( lambda cls: cls.supportedFormats, Image.supportedClasses))
         Image.supportedFormats = [item for sublist in fmts for item in sublist]
+
+    def removeNoise(self):
+        for channel in self.channels:
+            channel.removeNoise()
+
+    def threshold(self, value = None):
+        for channel in self.channels:
+            channel.threshold(value)
+
+    def maskFromThreshold(self, value):
+        for channel in self.channels:
+            channel.maskFromThreshold(value)
+
