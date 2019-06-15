@@ -129,7 +129,7 @@ class ImageCollection:
         for image in self.images:
             image.threshold(value)
 
-    def setMaskFromThreshold(self, value):
+    def setMaskFromThreshold(self, value = None):
         for image in self.images:
             image.setMaskFromThreshold(value)
 

@@ -115,7 +115,7 @@ class Image:
         for channel in self.channels:
             channel.threshold(value)
 
-    def setMaskFromThreshold(self, value):
+    def setMaskFromThreshold(self, value = None):
         for channel in self.channels:
             channel.setMaskFromThreshold(value)
 

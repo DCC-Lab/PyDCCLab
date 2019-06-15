@@ -181,9 +181,12 @@ class Channel:
         else:
             self.applyThresholding()
 
-    def setMaskFromThreshold(self, value):
-        binaryMask = self.pixels > value
-        self.mask = Channel(pixels=binaryMask)
+    def setMaskFromThreshold(self, value = None):
+        if value is not None:
+            binaryMask = self.pixels > value
+            self.mask = Channel(pixels=binaryMask)
+        else:
+            raise NotImplementedError("Mask requires a value for thresholding")
 
     def saveOriginal(self):
         if self.__original is None:
