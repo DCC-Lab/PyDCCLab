@@ -30,6 +30,12 @@ class Channel:
         self.__originalDType = pixels.dtype
         self.__original = None
 
+        # Segmentation @properties
+        self.mask = None # Channel(bool)?
+        self.labelledComponents = None
+        self.numberOfComponents = 0
+        self.componentsProperties = None
+
     @property
     def pixels(self):
         return self.__pixels
@@ -73,6 +79,12 @@ class Channel:
         # a int array should be only 0 and 1.
         return np.array_equal(self.pixels, self.pixels.astype(bool))
 
+    @property
+    def hasMask(self) -> bool:
+        if self.mask is not None:
+            return self.mask.isBinary
+        return False
+
     """ Display-related functions """
 
     def display(self, colorMap=None):
@@ -92,6 +104,48 @@ class Channel:
         plt.bar(bins[:-1], histogram, width=np.diff(bins), ec="k", align="edge", color="black", alpha=0.5)
         plt.show()
         return histogram, bins
+
+    """ High-level Image segmentation functions """
+
+    @property
+    def isLabelled(self) -> bool:
+        return self.labelledComponents is not None
+    
+    def labelMaskComponents(self):
+        if self.hasMask:
+            labels, nbObjects = label(self.mask)
+            self.labelledComponents = labels
+            self.numberOfComponents = nbObjects
+        else:
+            # FIXME: Should use pixels if isBinary ?
+            raise Exception("Channel has no mask")
+
+    def analyzeComponents(self) -> dict:
+        if self.isLabelled:
+            maskSizes = ndimage.sum(self.mask, self.labelledComponents, range(1, self.numberOfComponents + 1))
+            sumValues = ndimage.sum(self.pixels, self.labelledComponents, range(1, self.numberOfComponents + 1))
+            centersOfMass = ndimage.center_of_mass(self.pixels, self.labelledComponents, range(1, self.numberOfComponents + 1))
+            #centerOfMass = np.average(self.params["objectsCM"], axis=0, weights=self.params["objectsMass"])
+            
+            # componentsProperties = 
+            properties["objectsSize"] = maskSizes
+            # properties["totalSize"] = np.sum(self.params["objectsSize"])
+            # properties["objectsMass"] = self.__getObjectsMass()
+            # properties["totalMass"] = np.sum(self.params["objectsMass"])
+            properties["objectsCM"] = centersOfMass
+            # properties["totalCM"] = self.__getCenterOfMass()
+            return properties
+        else:
+            raise ValueError("Channel has no mask")
+
+    def saveComponentsStatistics(self, filePath:str):
+        properties = self.analyzeComponents()
+        jsonParams = json.dumps(properties, indent=4)
+        if filePath.split(".")[-1] != "json":
+            filePath += ".json"
+
+        with open(filePath, "w+") as file:
+            file.write(jsonParams)
 
     """ Manipulation-related functions """
 
@@ -183,12 +237,12 @@ class Channel:
         result = self.getDilation(size)
         self.__pixels = result.pixels
 
-    def applyNoiseFiltering(self, algorithm=None):
+    def applyNoiseFilter(self, algorithm=None):
         self.saveOriginal()
         result = self.getNoiseFiltering(algorithm)
         self.__pixels = result.pixels
 
-    def applyNoiseFilteringWithErosionDilation(self, erosion_size=2, dilation_size=2, closing_size=2):
+    def applyNoiseFilterWithErosionDilation(self, erosion_size=2, dilation_size=2, closing_size=2):
         self.saveOriginal()
         result = self.getNoiseFilteringWithErosionDilation(erosion_size, dilation_size, closing_size)
         self.__pixels = result.pixels
@@ -378,13 +432,6 @@ class Channel:
         binarClosed = morphology.binary_closing(self.pixels, np.ones((windowSize, windowSize))).astype(np.float32)
         return Channel(binarClosed)
 
-    def getConnectedComponents(self) -> tuple:
-        if not self.isBinary:
-            raise NotBinaryImageException
-        labeled, nbObjects = label(self.pixels)
-        sizes = sum(self.pixels, labeled, range(nbObjects + 1))
-        return Channel(labeled.astype(np.float32)), nbObjects, sizes
-
     def getErosion(self, size:int = 2):
         return Channel(ndimage.grey_erosion(self.pixels, size=size))
 
@@ -397,6 +444,9 @@ class Channel:
     def getNoiseFilteringWithErosionDilation(self, erosion_size=2, dilation_size=2, closing_size=2):
         workingChannel = self.getErosion(erosion_size)
         workingChannel.applyDilation(dilation_size)
-        workingChannel.applyClosing(windowSize = closing_size)
+        workingChannel.applyClosing(closing_size)
         return workingChannel
+
+
+
 

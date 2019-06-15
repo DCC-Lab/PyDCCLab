@@ -128,111 +128,111 @@ class ZStack(ImageCollection):
                 return False
         return True
 
-    def removeNoise(self, erosion_size=2, dilation_size=2, closing_size=2):
-        self.__checkOriginal()
-        if self.__array is None:
-            self.setArray()
-        self.__array = ndimage.grey_erosion(self, size=erosion_size)
-        self.__array = ndimage.grey_dilation(self, size=dilation_size)
-        self.__array = ndimage.grey_closing(self, size=closing_size)
+    # def removeNoise(self, erosion_size=2, dilation_size=2, closing_size=2):
+    #     self.__checkOriginal()
+    #     if self.__array is None:
+    #         self.setArray()
+    #     self.__array = ndimage.grey_erosion(self, size=erosion_size)
+    #     self.__array = ndimage.grey_dilation(self, size=dilation_size)
+    #     self.__array = ndimage.grey_closing(self, size=closing_size)
 
-    def setMask(self, maskClosing=3, _apply=False):  # todo: better mask options/algo
-        mask = self.__array > self.__array.max()/80
-        mask = ndimage.binary_opening(mask, iterations=maskClosing)
-        mask = ndimage.binary_closing(mask, iterations=maskClosing)
-        if _apply:
-            self.__checkOriginal()
-            self.__array = mask
-        else:
-            self.maskedZStack = mask
-        self.__masked = True
+    # def setMask(self, maskClosing=3, _apply=False):  # todo: better mask options/algo
+    #     mask = self.__array > self.__array.max()/80
+    #     mask = ndimage.binary_opening(mask, iterations=maskClosing)
+    #     mask = ndimage.binary_closing(mask, iterations=maskClosing)
+    #     if _apply:
+    #         self.__checkOriginal()
+    #         self.__array = mask
+    #     else:
+    #         self.maskedZStack = mask
+    #     self.__masked = True
 
-    def applyMask(self, maskClosing=3):
-        """
-        Precision/ambiguity : There's a difference between turning a Zstack
-        into a mask (what applyMask does right now) and applying a mask on
-        zStack to remove some pixels (which no methods here do).
-        """
-        self.setMask(maskClosing, _apply=True)
+    # def applyMask(self, maskClosing=3):
+    #     """
+    #     Precision/ambiguity : There's a difference between turning a Zstack
+    #     into a mask (what applyMask does right now) and applying a mask on
+    #     zStack to remove some pixels (which no methods here do).
+    #     """
+    #     self.setMask(maskClosing, _apply=True)
 
-    def setLabel(self, _apply=False):
-        mask = self.__checkMask()
-        labeledZStack, nbOfObjects = ndimage.label(mask)
-        self.params["nbOfObjects"] = nbOfObjects
-        if _apply:
-            self.__checkOriginal()
-            self.__array = labeledZStack
-        else:
-            self.labeledZStack = labeledZStack
-        self.__labeled = True
+    # def setLabel(self, _apply=False):
+    #     mask = self.__checkMask()
+    #     labeledZStack, nbOfObjects = ndimage.label(mask)
+    #     self.params["nbOfObjects"] = nbOfObjects
+    #     if _apply:
+    #         self.__checkOriginal()
+    #         self.__array = labeledZStack
+    #     else:
+    #         self.labeledZStack = labeledZStack
+    #     self.__labeled = True
 
-    def applyLabel(self):
-        self.setLabel(_apply=True)
+    # def applyLabel(self):
+    #     self.setLabel(_apply=True)
 
-    def __checkOriginal(self):
-        if (self.originalZStack is None) and self.__keepOriginal:
-            self.originalZStack = self.__array.copy()
+    # def __checkOriginal(self):
+    #     if (self.originalZStack is None) and self.__keepOriginal:
+    #         self.originalZStack = self.__array.copy()
 
-    def __checkMask(self):
-        if not self.__masked:
-            raise Exception("Cannot label without a mask reference.")
-        else:
-            if self.maskedZStack is not None:
-                return self.maskedZStack
-            else:
-                return self.__array
+    # def __checkMask(self):
+    #     if not self.__masked:
+    #         raise Exception("Cannot label without a mask reference.")
+    #     else:
+    #         if self.maskedZStack is not None:
+    #             return self.maskedZStack
+    #         else:
+    #             return self.__array
 
-    def parameterize(self):
-        assert self._readyForParameterization(), "Need all stacks in memory. Use setters method."
-        self.params["objectsSize"] = self.__getObjectsSize()
-        self.params["totalSize"] = np.sum(self.params["objectsSize"])
-        self.params["objectsMass"] = self.__getObjectsMass()
-        self.params["totalMass"] = np.sum(self.params["objectsMass"])
-        self.params["objectsCM"] = self.__getObjectsCenterOfMass()
-        self.params["totalCM"] = self.__getCenterOfMass()
+    # def parameterize(self):
+    #     assert self._readyForParameterization(), "Need all stacks in memory. Use setters method."
+    #     self.params["objectsSize"] = self.__getObjectsSize()
+    #     self.params["totalSize"] = np.sum(self.params["objectsSize"])
+    #     self.params["objectsMass"] = self.__getObjectsMass()
+    #     self.params["totalMass"] = np.sum(self.params["objectsMass"])
+    #     self.params["objectsCM"] = self.__getObjectsCenterOfMass()
+    #     self.params["totalCM"] = self.__getCenterOfMass()
 
-        return self.params
+    #     return self.params
 
-    def _readyForParameterization(self):
-        stacks = [self.maskedZStack, self.labeledZStack]
-        if any(stack is None for stack in stacks):
-            return False
-        else:
-            return True
+    # def _readyForParameterization(self):
+    #     stacks = [self.maskedZStack, self.labeledZStack]
+    #     if any(stack is None for stack in stacks):
+    #         return False
+    #     else:
+    #         return True
 
-    def __getObjectsSize(self):
-        maskSizes = ndimage.sum(self.maskedZStack, self.labeledZStack, range(1, self.params['nbOfObjects'] + 1))
-        return list(maskSizes)
+    # def __getObjectsSize(self):
+    #     maskSizes = ndimage.sum(self.maskedZStack, self.labeledZStack, range(1, self.params['nbOfObjects'] + 1))
+    #     return list(maskSizes)
 
-    def __getObjectsMass(self):
-        if self.originalZStack is None:
-            originalZStack = self.__array
-        else:
-            originalZStack = self.originalZStack
+    # def __getObjectsMass(self):
+    #     if self.originalZStack is None:
+    #         originalZStack = self.__array
+    #     else:
+    #         originalZStack = self.originalZStack
 
-        sumValues = ndimage.sum(originalZStack, self.labeledZStack, range(1, self.params['nbOfObjects'] + 1))
-        return list(sumValues)
+    #     sumValues = ndimage.sum(originalZStack, self.labeledZStack, range(1, self.params['nbOfObjects'] + 1))
+    #     return list(sumValues)
 
-    def __getObjectsCenterOfMass(self):
-        if self.originalZStack is None:
-            originalZStack = self.__array
-        else:
-            originalZStack = self.originalZStack
+    # def __getObjectsCenterOfMass(self):
+    #     if self.originalZStack is None:
+    #         originalZStack = self.__array
+    #     else:
+    #         originalZStack = self.originalZStack
 
-        centersOfMass = ndimage.center_of_mass(originalZStack, self.labeledZStack, range(1, self.params['nbOfObjects'] + 1))
-        return list(centersOfMass)
+    #     centersOfMass = ndimage.center_of_mass(originalZStack, self.labeledZStack, range(1, self.params['nbOfObjects'] + 1))
+    #     return list(centersOfMass)
 
-    def __getCenterOfMass(self):
-        centerOfMass = np.average(self.params["objectsCM"], axis=0, weights=self.params["objectsMass"])
-        return list(centerOfMass)
+    # def __getCenterOfMass(self):
+    #     centerOfMass = np.average(self.params["objectsCM"], axis=0, weights=self.params["objectsMass"])
+    #     return list(centerOfMass)
 
-    def saveParamsToFile(self, filepath):
-        jsonParams = json.dumps(self.params, indent=4)
-        if filepath.split(".")[-1] != "json":
-            filepath += ".json"
+    # def saveParamsToFile(self, filepath):
+    #     jsonParams = json.dumps(self.params, indent=4)
+    #     if filepath.split(".")[-1] != "json":
+    #         filepath += ".json"
 
-        with open(filepath, "w+") as file:
-            file.write(jsonParams)
+    #     with open(filepath, "w+") as file:
+    #         file.write(jsonParams)
 
     def show(self, axis=-1):
         plt.imshow(self.__array.mean(axis))
@@ -249,10 +249,10 @@ class ZStack(ImageCollection):
             axes[i].set_title(key + "Stack")
         plt.show()
 
-    def _stacksInMemory(self):
-        stacks = OrderedDict([("Original ", self.originalZStack), ("", self.__array), ("Mask ", self.maskedZStack), ("Label ", self.labeledZStack)])
-        stacksInMemory = {k: v for k, v in stacks.items() if v is not None}
-        return stacksInMemory
+    # def _stacksInMemory(self):
+    #     stacks = OrderedDict([("Original ", self.originalZStack), ("", self.__array), ("Mask ", self.maskedZStack), ("Label ", self.labeledZStack)])
+    #     stacksInMemory = {k: v for k, v in stacks.items() if v is not None}
+    #     return stacksInMemory
 
 
 class LIFFile:
