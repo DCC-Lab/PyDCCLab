@@ -388,7 +388,7 @@ class Channel:
         # We ignore warnings related to division by 0 since they give nan and we treat nan later.
         warnings.catch_warnings()
         warnings.simplefilter("ignore", category=RuntimeWarning)
-        if self.getExtremaValuesOfPixels()[0] == self.getExtremaValuesOfPixels()[1]:
+        if self.getExtrema()[0] == self.getExtrema()[1]:
             raise ValueError(
                 "This method only works for image with more than one \"color\" (i.e. more than one pixel value).")
         hist, bins = self.getHistogramValues()
