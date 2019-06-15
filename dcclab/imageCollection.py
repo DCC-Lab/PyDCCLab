@@ -17,8 +17,8 @@ class ImageCollection:
             else:
                 self.__images = images
         elif imagesArray is not None:
-            if images.Array.ndim == 4:
-                self.collectionFromArray(images)
+            if imagesArray.ndim == 4:
+                self.appendFromImagesArray(imagesArray)
             else:
                 raise ValueError("ImageCollection is initialized by a 4D numpy array: [width][height][channel][collection]")
         elif pathPattern is not None:
