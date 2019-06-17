@@ -20,7 +20,7 @@ class TestChannelFloat(unittest.TestCase):
         self.assertTrue(np.max(self.channelNotNormalized.pixels) == 1)
 
     def testGetHistogramValues(self):
-
+    	pass
 
 
 if __name__ == '__main__':
