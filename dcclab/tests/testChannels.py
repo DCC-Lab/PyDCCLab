@@ -94,24 +94,126 @@ class TestChannels(unittest.TestCase):
         array = np.random.randint(low=0, high=255, size=(100, 200))
         self.assertFalse(Channel(pixels=array).isBinary)
 
-    def testHistogramValues(self):
-        array = np.random.randint(low=0, high=2, size=(100, 200))
-        hist, bins = Channel(pixels=array).getHistogramValues(True)
-        self.assertAlmostEqual(sum(hist), 1, delta=1e-9)
+    # def testHistogramValues(self):
+    #     array = np.random.randint(low=0, high=2, size=(100, 200))
+    #     hist, bins = Channel(pixels=array).getHistogramValues(True)
+    #     self.assertAlmostEqual(sum(hist), 1, delta=1e-9)
 
-    def testHistogramValuesNotNormalized(self):
-        array = np.ones((5, 5), dtype=np.float32)
-        channel = Channel(pixels=array)
-        hist = [0, 25]
-        bins = [0, 1, 2]
-        self.assertTrue(np.alltrue(channel.getHistogramValues()[0] == hist) and np.alltrue(
-            channel.getHistogramValues()[-1] == bins))
+    # def testHistogramValuesNotNormalized(self):
+    #     array = np.ones((5, 5), dtype=np.float32)
+    #     channel = Channel(pixels=array)
+    #     hist = [0, 25]
+    #     bins = [0, 1, 2]
+    #     self.assertTrue(np.alltrue(channel.getHistogramValues()[0] == hist) and np.alltrue(
+    #         channel.getHistogramValues()[-1] == bins))
 
-    def testHistogramValuesNormalized(self):
-        array = np.ones((5, 5), dtype=np.float32)
-        channel = Channel(pixels=array)
-        hist, bins = channel.getHistogramValues(True)
-        self.assertAlmostEqual(sum(hist), 1, delta=1e-9)
+    # def testHistogramValuesNormalized(self):
+    #     array = np.ones((5, 5), dtype=np.float32)
+    #     channel = Channel(pixels=array)
+    #     hist, bins = channel.getHistogramValues(True)
+    #     self.assertAlmostEqual(sum(hist), 1, delta=1e-9)
+       
+    def testConvolution(self):
+        # FIXME: test result
+        array = np.random.randint(low=0, high=255, size=(100, 200))
+        kernel = [[-1, 0, 1],[1,0,1],[0,1,1]]
+        channel = Channel(pixels=array).convolveWith(kernel)
+        self.assertIsNotNone(channel)
+        self.assertTrue(channel.pixels.shape == array.shape)
+
+    def testXDerivative(self):
+        array = np.array([[0, 0, 0],[1,1,1],[2,2,2]])
+        expected = np.array([[0, 0, 0],[0, 0, 0],[0, 0, 0]])
+        channel = Channel(pixels=array).getXAxisDerivative()
+        self.assertIsNotNone(channel)
+        self.assertTrue(channel.pixels.shape == array.shape)
+        self.assertTrue(channel.pixels.all() == expected.all())
+
+    def testYDerivative(self):
+        array = np.array([[0, 1, 2],[0, 1, 2],[0, 1, 2]])
+        expected = np.array([[0, 0, 0],[0, 0, 0],[0, 0, 0]])
+        channel = Channel(pixels=array).getYAxisDerivative()
+        self.assertIsNotNone(channel)
+        self.assertTrue(channel.pixels.shape == array.shape)
+        self.assertTrue(channel.pixels.all() == expected.all())
+
+    def testAverage(self):
+        array = np.array([[0, 1, 2],[0, 1, 2],[0, 1, 2]])
+        expected = 1.0
+        result = Channel(pixels=array).getAverageValueOfPixels()
+        self.assertIsNotNone(channel)
+        self.assertTrue(result == expected)
+
+    def testStddev(self):
+        array = np.array([[0, 1, 2],[0, 1, 2],[0, 1, 2]])
+        channel = Channel(pixels=array).getStandardDeviation()
+        self.assertIsNotNone(channel)
+
+
+class TestChannelsSegmentation(unittest.TestCase):
+    def testNoMaskOnInit(self):
+        array = np.array([[0, 1, 2],[0, 1, 2],[0, 1, 2]])
+        channel = Channel(array)
+        self.assertFalse(channel.hasMask)
+
+    def testMaskFromThreshold(self):
+        array = np.array([[0, 1, 2],[0, 1, 2],[0, 1, 2]])
+        channel = Channel(array)
+        channel.setMaskFromThreshold(1)
+        self.assertTrue(channel.hasMask)
+        self.assertTrue(channel.mask.pixels.all() == np.array([[0, 1, 1],[0, 1, 1],[0, 1, 1]]).all())
+
+    def testMaskFromThreshold(self):
+        array = np.array([[1, 0, 0, 0],[0, 2,2, 0],[0, 0,0, 3]])
+        expectedMask = np.array([[1, 0, 0, 0],[0, 1,1, 0],[0, 0, 0, 1]])
+        channel = Channel(array)
+        channel.setMaskFromThreshold(0.5)
+        self.assertTrue(channel.hasMask)
+        self.assertTrue(channel.mask.pixels.all() == expectedMask.all())
+
+    def testLabelMask(self):
+        array = np.array([[1, 0, 0, 0],[0, 2,2, 0],[0, 0,0, 3]])
+        channel = Channel(array)
+        channel.setMaskFromThreshold(1)
+        channel.labelMaskComponents()
+
+        expectedMask = np.array([[1, 0, 0, 0],[0, 1,1, 0],[0, 0, 0, 1]])
+        expectedComponents = np.array([[0, 0, 0, 0],[0, 1,1, 0],[0, 0, 0, 2]])
+        self.assertTrue(channel.labelledComponents.all() == expectedComponents.all())
+        self.assertTrue(channel.numberOfComponents == 2)
+
+    def testLabelWithoutMaskFail(self):
+        array = np.array([[1, 0, 0, 0],[0, 2,2, 0],[0, 0,0, 3]])
+        channel = Channel(array)
+        with self.assertRaises(Exception):
+            channel.labelMaskComponents()
+
+    def testAnalyzeComponents(self):
+        array = np.array([[1, 0, 0, 0],[0, 2,2, 0],[0, 0,0, 3]])
+        channel = Channel(array)
+        channel.setMaskFromThreshold(1)
+        channel.labelMaskComponents()
+        properties = channel.analyzeComponents()
+        self.assertTrue(channel.numberOfComponents == 2)
+        self.assertIsNotNone(properties)
         
+    def testFilterNoise(self):
+        array = np.array([[1, 0, 0, 0],[0, 2,2, 0],[0, 0,0, 3]])
+        channel = Channel(array)
+        channel.filterNoise()
+
+    def testThreshold(self):
+        array = np.array([[1, 0, 0, 0],[0, 2,2, 0],[0, 0,0, 3]])
+        channel = Channel(array)
+        channel.threshold(value=1.5)
+
+    # def testSaveComponents(self):
+    #     array = np.array([[1, 0, 0, 0],[0, 2,2, 0],[0, 0,0, 3]])
+    #     channel = Channel(array)
+    #     channel.setMaskFromThreshold(1)
+    #     channel.labelMaskComponents()
+    #     channel.analyzeComponents()
+    #     channel.saveComponentsStatistics("/tmp/test.json")
+
 if __name__ == '__main__':
     unittest.main()

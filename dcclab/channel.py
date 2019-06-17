@@ -1,16 +1,17 @@
 import numpy as np
 import typing
 
-from skimage import measure, morphology, img_as_ubyte
+from skimage import measure, morphology
 from skimage.filters.rank import entropy
 from skimage.filters import *
 
 from scipy.signal import convolve2d
 from scipy.ndimage import label, sum, filters
+import scipy.ndimage as ndimage
 from .DCCExceptions import *
 
 import matplotlib.pyplot as plt
-
+import json
 import warnings
 
 try:
@@ -21,25 +22,42 @@ except:
 
 class Channel:
 
+    def __new__(cls, pixels: np.ndarray):
+        if cls is Channel:
+            if "float" in str(pixels.dtype):
+                return super(Channel, cls).__new__(ChannelFloat)
+            elif "int" in str(pixels.dtype) or "bool" in str(pixels.dtype):
+                return super(Channel, cls).__new__(ChannelInt)
+            else:
+                raise PixelTypeException("Can't read images of type {}".format(pixels.dtype))
+
     def __init__(self, pixels: np.ndarray):
         pixels.squeeze()
         if pixels.ndim != 2:
             raise DimensionException(pixels.ndim)
-        self.__pixels = np.copy(pixels)
-        self.__originalFactor = 1.0
-        self.__originalDType = pixels.dtype
+        self._pixels = np.copy(pixels)
+        self._originalDType = pixels.dtype
         self.__original = None
 
-    @property
-    def pixels(self):
-        return self.__pixels
+        # Segmentation @properties
+        self.mask = None  # Channel(bool)?
+        self.labelledComponents = None
+        self.numberOfComponents = 0
+        self.componentsProperties = None
+
+    def __str__(self) -> str:
+        return str(self.pixels)
 
     @property
-    def dimension(self):
+    def pixels(self) -> np.ndarray:
+        return self._pixels
+
+    @property
+    def dimension(self) -> int:
         return self.pixels.ndim
 
     @property
-    def shape(self):
+    def shape(self) -> typing.Tuple[int, int, int]:
         return self.pixels.shape
 
     @property
@@ -68,10 +86,13 @@ class Channel:
 
     @property
     def isBinary(self) -> bool:
-        # FIXME?: This function should return True as considered
-        # by morphology.binary_opening.  It appears that
-        # a int array should be only 0 and 1.
         return np.array_equal(self.pixels, self.pixels.astype(bool))
+
+    @property
+    def hasMask(self) -> bool:
+        if self.mask is not None:
+            return self.mask.isBinary
+        return False
 
     """ Display-related functions """
 
@@ -81,10 +102,6 @@ class Channel:
         return self
 
     def getHistogramValues(self, normed: bool = False) -> typing.Tuple[np.ndarray, np.ndarray]:
-        # array = (self.pixels * self.__originalFactor).astype(self.__originalDType).ravel()
-        # nbBins = len(np.bincount(array))
-        # hist, bins = np.histogram(array, nbBins, [0, nbBins], density=normed)
-        # return hist, bins
         pass
 
     def displayHistogram(self, normed: bool = False) -> typing.Tuple[np.ndarray, np.ndarray]:
@@ -93,90 +110,163 @@ class Channel:
         plt.show()
         return histogram, bins
 
+    """ High-level Image segmentation functions """
+
+    @property
+    def isLabelled(self) -> bool:
+        return self.labelledComponents is not None
+
+    def labelMaskComponents(self):
+        if self.hasMask:
+            labels, nbObjects = label(self.mask.pixels)
+            self.labelledComponents = labels
+            self.numberOfComponents = nbObjects
+        else:
+            # FIXME: Should use pixels if isBinary ?
+            raise Exception("Channel has no mask")
+
+    def analyzeComponents(self) -> dict:
+        if self.isLabelled:
+            maskSizes = ndimage.sum(self.mask.pixels, self.labelledComponents, range(1, self.numberOfComponents + 1))
+            sumValues = ndimage.sum(self.pixels, self.labelledComponents, range(1, self.numberOfComponents + 1))
+            centersOfMass = ndimage.center_of_mass(self.pixels, self.labelledComponents,
+                                                   range(1, self.numberOfComponents + 1))
+            # centerOfMass = np.average(self.params["objectsCM"], axis=0, weights=self.params["objectsMass"])
+            properties = dict()
+            properties["objectsSize"] = maskSizes
+            # properties["totalSize"] = np.sum(self.params["objectsSize"])
+            # properties["objectsMass"] = self.__getObjectsMass()
+            # properties["totalMass"] = np.sum(self.params["objectsMass"])
+            properties["objectsCM"] = centersOfMass
+            # properties["totalCM"] = self.__getCenterOfMass()
+            self.componentsProperties = properties
+            return properties
+        else:
+            raise ValueError("Channel has not been labelled")
+
+    def saveComponentsStatistics(self, filePath: str):
+        properties = self.analyzeComponents()
+        jsonParams = json.dumps(properties, indent=4)
+        if filePath.split(".")[-1] != "json":
+            filePath += ".json"
+
+        with open(filePath, "w+") as file:
+            file.write(jsonParams)
+
     """ Manipulation-related functions """
 
     def convertToNormalizedFloat(self):
-        if "float" in str(self.__originalDType):
-            # For a float array, we must determine if array is
-            # already normalized or not: we don't take the 
-            # maximum of float type, we take max of array
-            maxValue = np.max(np.max(self.pixels))
-            if maxValue <= 1.0:
-                # don't normalize an already normalized float array
-                self.__originalFactor = 1.0
-                self.__pixels = np.copy(self.pixels)
-            else:
-                # normalize a non-normalized float array
-                self.__originalFactor = maxValue
-                self.__pixels = np.copy(self.pixels) / maxValue
-        else:
-            # For a bound integer array, we take the maximum of the type
-            # and we convert the array to float
-            self.__originalFactor = np.iinfo(self.__originalDType).max
-            floatArray = np.copy(self.pixels).astype(np.float32)
-            self.__pixels = floatArray / self.__originalFactor
+        pass
 
-    def saveOriginal(self):
-        if self.__original == None:
+    def filterNoise(self):
+        self.applyNoiseFilter()
+
+    def threshold(self, value=None):
+        if value is not None:
+            self.applyGlobalThresholding(value)
+        else:
+            self.applyThresholding()
+
+    def setMask(self, mask):
+        if mask.isBinary:
+            self.mask = mask
+        else:
+            raise NotImplementedError("Mask must be binary")
+
+    def setMaskFromThreshold(self, value=None):
+        if value is not None:
+            binaryMask = self.pixels > value
+            self.mask = Channel(pixels=binaryMask)
+        else:
+            raise NotImplementedError("Mask requires a value for thresholding")
+
+    def saveOriginal(self) -> None:
+        if self.__original is None:
             self.__original = np.copy(self.pixels)
 
-    def restoreOriginal(self):
+    def restoreOriginal(self) -> None:
         if self.__original is not None:
-            self.__pixels = self.__original
+            self._pixels = self.__original
 
-    def applyConvolution(self, matrix: typing.Union[np.ndarray, list]):
+    def applyConvolution(self, matrix: typing.Union[np.ndarray, list]) -> None:
         self.saveOriginal()
         result = self.convolveWith(matrix)
-        self.__pixels = result.pixels
+        self._pixels = result.pixels
 
-    def applyXDerivative(self):
+    def applyXDerivative(self) -> None:
         self.saveOriginal()
         result = self.getXAxisDerivative()
-        self.__pixels = result.pixels
+        self._pixels = result.pixels
 
-    def applyYDerivative(self):
+    def applyYDerivative(self) -> None:
         self.saveOriginal()
         result = self.getYAxisDerivative()
-        self.__pixels = result.pixels
+        self._pixels = result.pixels
 
-    def applyGaussianFilter(self, sigma: float):
+    def applyGaussianFilter(self, sigma: float) -> None:
         self.saveOriginal()
         result = self.getGaussianFilter(sigma)
-        self.__pixels = result.pixels
+        self._pixels = result.pixels
 
-    def applyThresholding(self):
-        self.applyIsodataThresholding()
+    def applyThresholding(self, value=None) -> None:
+        if value is None:
+            self.applyIsodataThresholding()
+        else:
+            self.applyGlobalThresholding(value)
 
-    def applyIsodataThresholding(self):
+    def applyGlobalThresholding(self, value) -> None:
+        self.saveOriginal()
+        result = self.getGlobalThresholding(value)
+        self._pixels = result.pixels
+
+    def applyIsodataThresholding(self) -> None:
         self.saveOriginal()
         result = self.getIsodataThresholding()
-        self.__pixels = result.pixels
+        self._pixels = result.pixels
 
-    def applyOtsuThresholding(self):
+    def applyOtsuThresholding(self) -> None:
         self.saveOriginal()
         result = self.getOtsuThresholding()
-        self.__pixels = result.pixels
+        self._pixels = result.pixels
 
-    def applyOpening(self):
+    def applyOpening(self, size: int) -> None:
         self.saveOriginal()
         if self.isBinary:
-            result = self.getBinaryOpening()
+            result = self.getBinaryOpening(size)
         else:
-            result = self.getOpening()
-        self.__pixels = result.pixels
+            result = self.getOpening(size)
+        self._pixels = result.pixels
 
-    def applyClosing(self):
+    def applyClosing(self, size: int) -> None:
         self.saveOriginal()
         if self.isBinary:
-            result = self.getBinaryClosing()
+            result = self.getBinaryClosing(size)
         else:
-            result = self.getClosing()
-        self.__pixels = result.pixels
+            result = self.getClosing(size)
+        self._pixels = result.pixels
+
+    def applyErosion(self, size: int = 2):
+        self.saveOriginal()
+        result = self.getErosion(size)
+        self._pixels = result.pixels
+
+    def applyDilation(self, size: int = 2):
+        self.saveOriginal()
+        result = self.getDilation(size)
+        self._pixels = result.pixels
+
+    def applyNoiseFilter(self, algorithm=None):
+        self.saveOriginal()
+        result = self.getNoiseFiltering(algorithm)
+        self._pixels = result.pixels
+
+    def applyNoiseFilterWithErosionDilation(self, erosion_size=2, dilation_size=2, closing_size=2):
+        self.saveOriginal()
+        result = self.getNoiseFilteringWithErosionDilation(erosion_size, dilation_size, closing_size)
+        self._pixels = result.pixels
 
     def convolveWith(self, matrix: typing.Union[np.ndarray, list]):
-        # todo test unitaire
-        convolvedArray = convolve2d(self.pixels, matrix, mode="same", boundary="symm")
-        return Channel(convolvedArray.astype(np.float32))
+        pass
 
     def getXAxisDerivative(self):
         dxFilter = [[-1, 0, 1]]
@@ -189,13 +279,25 @@ class Channel:
     def getAverageValueOfPixels(self) -> float:
         return np.average(self.pixels)
 
-    def getStadardDeviationOfPixels(self):
+    @deprecated("Renamed getStandardDeviation()")
+    def getStandardDeviationOfPixels(self) -> float:
+        return self.getStandardDeviation()
+
+    def getStandardDeviation(self) -> float:
         return np.std(self.pixels)
 
+    @deprecated("Renamed getShannonEntropy()")
     def getShannonEntropyOfPixels(self, base=2) -> float:
+        return self.getShannonEntropy(base=base)
+
+    def getShannonEntropy(self, base=2) -> float:
         return measure.shannon_entropy(self.pixels, base)
 
+    @deprecated("Renamed getExtrema()")
     def getExtremaValuesOfPixels(self) -> typing.Tuple[int, int]:
+        return self.getExtrema()
+
+    def getExtrema(self) -> typing.Tuple[int, int]:
         return np.min(self.pixels), np.max(self.pixels)
 
     def getPixelsOfIntensity(self, intensity: float) -> typing.List[tuple]:
@@ -207,112 +309,59 @@ class Channel:
         coordsList = coordsList[0]
         return coordsList
 
+    @deprecated("Renamed getMinimum()")
     def getMinimumIntensityPixels(self) -> typing.List[typing.Tuple[int, int]]:
+        return self.getMinimum()
+
+    def getMinimum(self) -> typing.List[typing.Tuple[int, int]]:
         minimum = self.getExtremaValuesOfPixels()[0]
         return self.getPixelsOfIntensity(minimum)
 
-    def getMaximumIntensityPixels(self):
+    @deprecated("Renamed getMaximum()")
+    def getMaximumIntensityPixels(self) -> typing.List[tuple]:
+        return self.getMaximum()
+
+    def getMaximum(self) -> typing.List[tuple]:
         maximum = self.getExtremaValuesOfPixels()[1]
         return self.getPixelsOfIntensity(maximum)
 
-    def getEntropyFiltering(self, filterSize: int):
-        # We have to cast image in 8 bits uint because the algorithm semms to properly works only in this type
-        image = img_as_ubyte(self.pixels)
-        entropyFiltered = entropy(image, morphology.selem.square(filterSize, dtype=np.float32))
-        return Channel(entropyFiltered.astype(np.float32))
-
-    @deprecated(reason="Too slow. Use getStandardDeviationFilter")
-    def getStandardDeviationFilteringSlow(self, filterSize: int):
-        stdFiltered = filters.generic_filter(self.pixels, np.std, size=filterSize, mode="nearest")
-        return Channel(stdFiltered.astype(np.float32))
+    def getEntropyFilter(self, filterSize: int):
+        pass
 
     def getStandardDeviationFilter(self, filterSize: int):
-        stdDevFilter1 = filters.uniform_filter(self.pixels, filterSize, mode="nearest")
-        stdDevFilter2 = filters.uniform_filter(self.pixels * self.pixels, filterSize, mode="nearest")
-        stdFiltered = np.sqrt(stdDevFilter2 - stdDevFilter1 * stdDevFilter1).astype(np.float32)
-        if np.any(np.isnan(stdFiltered)):
-            warnings.warn("Nan values encountered! Replacing them with 0.", category=RuntimeWarning)
-            stdFiltered = np.nan_to_num(stdFiltered)
-        return Channel(stdFiltered)
+        pass
 
     def getGaussianFilter(self, sigma: float = 1):
-        gaussianFiltered = gaussian(self.pixels, sigma, mode="nearest", multichannel=False, preserve_range=True)
-        return Channel(gaussianFiltered.astype(np.float32))
+        pass
 
     def getHorizontalSobelFilter(self):
-        sobelH = sobel_h(self.pixels)
-        return Channel(sobelH.astype(np.float32))
+        pass
 
     def getVerticalSobelFilter(self):
-        sobelV = sobel_v(self.pixels)
-        return Channel(sobelV.astype(np.float32))
+        pass
 
+    @deprecated("Renamed getSobelFilter()")
     def getBothDirectionsSobelFilter(self):
-        sobelHV = sobel(self.pixels)
-        return Channel(sobelHV.astype(np.float32))
+        return self.getSobelFilter()
+
+    def getSobelFilter(self):
+        pass
+
+    def getGlobalThresholding(self, value):
+        mask = self.pixels > value
+        return Channel(self.pixels * mask)
 
     def getIsodataThresholding(self):
-        """
-        Adapted from skimage's isodata thresholding method.
-        Their version was not behaving properly with our image format (different than uint8).
-        :return: The thresholded Channel instance according to isodata method.
-        """
-        # We ignore warnings related to division by 0 since they give nan and we treat nan later.
-        warnings.catch_warnings()
-        warnings.simplefilter("ignore", category=RuntimeWarning)
-        hist, bins = self.getHistogramValues()
-
-        hist = np.array(hist, dtype=np.float32)
-        bins = np.array(bins)
-        binsCenters = np.array([(i + i + 1) / 2 for i in range(len(bins) - 1)])
-        pixelProbabilityThresholdOne = np.cumsum(hist)
-        pixelProbabilityThresholdTwo = np.cumsum(hist[::-1])[::-1] - hist
-        intensitySum = hist * binsCenters
-        pixelProbabilityThresholdTwo[-1] = 1
-        low = np.cumsum(intensitySum) / pixelProbabilityThresholdOne
-        high = (np.cumsum(intensitySum[::-1])[::-1] - intensitySum) / pixelProbabilityThresholdTwo
-        allMean = (low + high) / 2
-        binWidth = binsCenters[1] - binsCenters[0]
-        distances = allMean - binsCenters
-        thresh = 0
-        for i in range(len(distances)):
-            if distances[i] is not None and 0 <= distances[i] < binWidth:
-                thresh = binsCenters[i]
-        threshArray = self.pixels >= (thresh / self.__originalFactor)
-        return Channel(threshArray.astype(np.float32))
+        pass
 
     def getOtsuThresholding(self):
-        """
-        Adapted from skimage's Otsu thresholding method.
-        Their version was not behaving properly with our image format (different than uint8).
-        :return: The thresholded DCCImage instance according to Otsu's method.
-        """
-        # We ignore warnings related to division by 0 since they give nan and we treat nan later.
-        warnings.catch_warnings()
-        warnings.simplefilter("ignore", category=RuntimeWarning)
-        if self.getExtremaValuesOfPixels()[0] == self.getExtremaValuesOfPixels()[1]:
-            raise ValueError(
-                "This method only works for image with more than one \"color\" (i.e. more than one pixel value).")
-        hist, bins = self.getHistogramValues()
-        hist = np.array(hist, dtype=np.float32)
-        bins = np.array(bins)
-        binsCenters = np.array([(i + i + 1) / 2 for i in range(len(bins) - 1)])
-        pixelProbabilityGroupOne = np.cumsum(hist)
-        pixelProbabilityGroupTwo = np.cumsum(hist[::-1])[::-1]
-        pixelIntensityGroupOneMean = np.cumsum(hist * binsCenters) / pixelProbabilityGroupOne
-        pixelIntensityGroupTwoMean = (np.cumsum((hist * binsCenters)[::-1]) / pixelProbabilityGroupTwo[::-1])[::-1]
-        varianceTwoGroups = pixelProbabilityGroupOne[:-1] * pixelProbabilityGroupTwo[1:] * (
-                pixelIntensityGroupOneMean[:-1] - pixelIntensityGroupTwoMean[1:]) ** 2
-        index = np.nanargmax(varianceTwoGroups)
-        thresh = binsCenters[index]
-        threshArray = self.pixels >= (thresh / self.__originalFactor)
-        return Channel(threshArray.astype(np.float32))
+        pass
 
     def getAdaptiveThresholdMean(self, oddRegionSize: int = 3):
-        raise NotImplementedError
+        pass
 
     def getAdaptiveThresholdGaussian(self, oddRegionSize: int = 3):
-        raise NotImplementedError
+        pass
 
     def getOpening(self, windowSize: int = 3):
         opened = morphology.opening(self.pixels, np.ones((windowSize, windowSize)))
@@ -334,9 +383,46 @@ class Channel:
         binarClosed = morphology.binary_closing(self.pixels, np.ones((windowSize, windowSize))).astype(np.float32)
         return Channel(binarClosed)
 
-    def getConnectedComponents(self) -> tuple:
+    def getErosion(self, size: int = 2):
+        return Channel(ndimage.grey_erosion(self.pixels, size=size))
+
+    def getDilation(self, size: int = 2):
+        return Channel(ndimage.grey_dilation(self.pixels, size=size))
+
+    def getNoiseFiltering(self, algorithm=None):
+        return self.getNoiseFilteringWithErosionDilation()
+
+    def getNoiseFilteringWithErosionDilation(self, erosion_size=2, dilation_size=2, closing_size=2):
+        workingChannel = self.getErosion(erosion_size)
+        workingChannel.applyDilation(dilation_size)
+        workingChannel.applyClosing(closing_size)
+        return workingChannel
+
+    def getConnectedComponents(self, connectionStructure: np.ndarray = None) -> tuple:
         if not self.isBinary:
             raise NotBinaryImageException
-        labeled, nbObjects = label(self.pixels)
+        labeled, nbObjects = label(self.pixels, structure=connectionStructure)
         sizes = sum(self.pixels, labeled, range(nbObjects + 1))
-        return Channel(labeled.astype(np.float32)), nbObjects, sizes
+        return Channel(labeled), nbObjects, sizes
+
+    def convertTo16BitsUnsignedInteger(self):
+        pass
+
+    def convertTo8BitsUnsignedInteger(self):
+        pass
+
+    def _convertToUnsignedInt(self, dtype):
+        pass
+
+    @staticmethod
+    def multiChannelDisplay(channels: list):
+        nrows = int(np.ceil(len(channels) / 4))
+        ncols = len(channels) if len(channels) < 4 else 4
+        for i in range(len(channels)):
+            plt.subplot(nrows, ncols, i + 1)
+            plt.imshow(channels[i].pixels)
+        plt.show()
+
+
+from .channelFloat import ChannelFloat
+from .channelInteger import ChannelInt
