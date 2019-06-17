@@ -42,7 +42,7 @@ class Image:
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, Image):
-            return false
+            return False
         return np.array_equal(self.asArray(), other.asArray())
 
     @property
@@ -62,14 +62,18 @@ class Image:
             del self.channels[index]
 
     def asChannelsArray(self):
-        print(self.channels)
         channelsPixels = list(map(lambda c: c.pixels, self.channels))
         return channelsPixels
 
     def asArray(self):
         channelArrays = self.asChannelsArray()
-        imageData = np.dstack(channelArrays)
+        # An image is always 3D: width x height x channels,
+        # even when there is only one channel
+        imageData = np.dstack(channelArrays) 
         return imageData
+
+    def save(self, filePath):
+        raise NotImplementedError()
 
     def display(self, colorMap=None):
         plt.imshow(self.asArray(), cmap=colorMap)
@@ -77,7 +81,7 @@ class Image:
 
     def channelsFromImageData(self, imageData):
         if imageData.ndim == 2:
-            return (Channel(imageData))
+            return [Channel(imageData)]
         elif imageData.ndim == 3:
             channelsData = np.squeeze(np.dsplit(imageData, imageData.shape[2]))
             channels = list(map(lambda pix: Channel(pix), channelsData))
@@ -85,7 +89,53 @@ class Image:
         else:
             raise DimensionException(imageData.ndim)
 
-        return ()
     def _getSupportedFormats(self):
         fmts = list(map( lambda cls: cls.supportedFormats, Image.supportedClasses))
         Image.supportedFormats = [item for sublist in fmts for item in sublist]
+
+    @property
+    def isLabelled(self) -> bool:
+        # Only if all channels are labelled, we return True
+        for channel in self.channels:
+            if not channel.isLabelled:
+                return False
+        return True
+
+    def labelMaskComponents(self):
+        for channel in self.channels:
+            channel.labelMaskComponents()
+
+    def analyzeComponents(self):
+        for channel in self.channels:
+            channel.analyzeComponents()
+
+    def filterNoise(self):
+        for channel in self.channels:
+            channel.filterNoise()
+
+    def threshold(self, value = None):
+        for channel in self.channels:
+            channel.threshold(value)
+
+    def setMask(self, mask:Channel):
+        if mask.isBinary:
+            for channel in self.channels:
+                channel.setMask(mask)
+        else:
+            raise ValueError("Mask must be binary")
+
+    def setMasks(self, masks:[Channel]):
+        if len(masks) == len(self.channels):
+            for mask in masks:
+                if mask.isBinary:
+                    for channel in self.channels:
+                        channel.setMask(mask)
+                else:
+                    raise ValueError("Mask must be binary")
+        else:
+            raise ValueError("Must provide one mask per channel")
+
+    def setMaskFromThreshold(self, value = None):
+        for channel in self.channels:
+            channel.setMaskFromThreshold(value)
+
