@@ -39,7 +39,7 @@ class CZIMetadata:
     def asDict(self):
         channelsAsDict = {}
         for channel in self.channels:
-            channelsAsDict['{}'.format(channel.channelId)] = channel.asDict()
+            channelsAsDict['{}'.format(channel.channel)] = channel.asDict()
         metadataAsDict = {'path': self.path, 'microscope': self.microscope, 'objective': self.objective, 'x_size': self.xSize,
                 'y_size': self.ySize, 'x_scale': self.xScale, 'y_scale': self.yScale, 'x_scaled': self.xScaled,
                 'y_scaled': self.yScaled, 'name': self.name, 'mouse_id': self.mouseId,
