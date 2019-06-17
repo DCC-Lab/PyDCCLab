@@ -1,6 +1,9 @@
 from Database.ImageMetadata import CZIMetadata
 import os
-
+try:
+    import deprecated
+except:
+    exit("pip install deprecated")
 
 class ImageMetadata:
     supportedClasses = [CZIMetadata]
