@@ -1,14 +1,18 @@
 import xml.etree.ElementTree as ET
-from cziChannel import CZIChannel as chnnl
-from cziFilter import CZIFilter as fltr
+from .cziChannel import CZIChannel as chnnl
+from .cziFilter import CZIFilter as fltr
 from dcclab import readCziImage, extractMetadataFromCziFileObject
 import re
+import os
 
 
 class CZIMetadata:
-    def __init__(self, path, name=''):
-        self.name = name
+    def __init__(self, path, name=None):
         self.path = path
+        if name is not None:
+            self.name = name
+        else:
+            self.name = self.nameFromPath()
         self.root = self.createElementTreeRoot()
 
         # Filters and channels are lists of objects.
@@ -33,10 +37,20 @@ class CZIMetadata:
         return repr(self) == repr(other)
 
     def asDict(self):
-        return {'path': self.path, 'microscope': self.microscope, 'objective': self.objective, 'x_size': self.xSize,
+        channelsAsDict = {}
+        for channel in self.channels:
+            channelsAsDict['{}'.format(channel.channelId)] = channel.asDict()
+        metadataAsDict = {'path': self.path, 'microscope': self.microscope, 'objective': self.objective, 'x_size': self.xSize,
                 'y_size': self.ySize, 'x_scale': self.xScale, 'y_scale': self.yScale, 'x_scaled': self.xScaled,
                 'y_scaled': self.yScaled, 'name': self.name, 'mouse_id': self.mouseId,
                 'viral_vectors': self.viralVectors, 'injection_site': self.injectionSite, 'tags': self.tags}
+        return {'metadata': metadataAsDict, 'channels': channelsAsDict}
+
+    def nameFromPath(self):
+        try:
+            return os.path.basename(self.path)
+        except Exception:
+            return None
 
     def cziImageObjectFromPath(self):
         try:
