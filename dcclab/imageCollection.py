@@ -165,6 +165,7 @@ class ZStack(ImageCollection):
 
         self.__keepOriginal = keepOriginal
         self.params = OrderedDict()
+        self.processIn3D = True
 
     @property
     def imagesAreSimilar(self) -> bool:

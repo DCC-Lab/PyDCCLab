@@ -40,7 +40,7 @@ class Channel:
         self.__original = None
 
         # Segmentation @properties
-        self.mask = None # Channel(bool)?
+        self.mask = None  # Channel(bool)?
         self.labelledComponents = None
         self.numberOfComponents = 0
         self.componentsProperties = None
@@ -115,7 +115,7 @@ class Channel:
     @property
     def isLabelled(self) -> bool:
         return self.labelledComponents is not None
-    
+
     def labelMaskComponents(self):
         if self.hasMask:
             labels, nbObjects = label(self.mask.pixels)
@@ -129,8 +129,9 @@ class Channel:
         if self.isLabelled:
             maskSizes = ndimage.sum(self.mask.pixels, self.labelledComponents, range(1, self.numberOfComponents + 1))
             sumValues = ndimage.sum(self.pixels, self.labelledComponents, range(1, self.numberOfComponents + 1))
-            centersOfMass = ndimage.center_of_mass(self.pixels, self.labelledComponents, range(1, self.numberOfComponents + 1))
-            #centerOfMass = np.average(self.params["objectsCM"], axis=0, weights=self.params["objectsMass"])
+            centersOfMass = ndimage.center_of_mass(self.pixels, self.labelledComponents,
+                                                   range(1, self.numberOfComponents + 1))
+            # centerOfMass = np.average(self.params["objectsCM"], axis=0, weights=self.params["objectsMass"])
             properties = dict()
             properties["objectsSize"] = maskSizes
             # properties["totalSize"] = np.sum(self.params["objectsSize"])
@@ -143,7 +144,7 @@ class Channel:
         else:
             raise ValueError("Channel has not been labelled")
 
-    def saveComponentsStatistics(self, filePath:str):
+    def saveComponentsStatistics(self, filePath: str):
         properties = self.analyzeComponents()
         jsonParams = json.dumps(properties, indent=4)
         if filePath.split(".")[-1] != "json":
@@ -159,8 +160,8 @@ class Channel:
 
     def filterNoise(self):
         self.applyNoiseFilter()
-        
-    def threshold(self, value = None):
+
+    def threshold(self, value=None):
         if value is not None:
             self.applyGlobalThresholding(value)
         else:
@@ -172,7 +173,7 @@ class Channel:
         else:
             raise NotImplementedError("Mask must be binary")
 
-    def setMaskFromThreshold(self, value = None):
+    def setMaskFromThreshold(self, value=None):
         if value is not None:
             binaryMask = self.pixels > value
             self.mask = Channel(pixels=binaryMask)
@@ -207,7 +208,7 @@ class Channel:
         result = self.getGaussianFilter(sigma)
         self._pixels = result.pixels
 
-    def applyThresholding(self, value = None) -> None:
+    def applyThresholding(self, value=None) -> None:
         if value is None:
             self.applyIsodataThresholding()
         else:
@@ -216,7 +217,7 @@ class Channel:
     def applyGlobalThresholding(self, value) -> None:
         self.saveOriginal()
         result = self.getGlobalThresholding(value)
-        self.__pixels = result.pixels
+        self._pixels = result.pixels
 
     def applyIsodataThresholding(self) -> None:
         self.saveOriginal()
@@ -228,41 +229,41 @@ class Channel:
         result = self.getOtsuThresholding()
         self._pixels = result.pixels
 
-    def applyOpening(self, size:int) -> None:
+    def applyOpening(self, size: int) -> None:
         self.saveOriginal()
         if self.isBinary:
             result = self.getBinaryOpening(size)
         else:
             result = self.getOpening(size)
-        self.__pixels = result.pixels
+        self._pixels = result.pixels
 
-    def applyClosing(self, size:int) -> None:
+    def applyClosing(self, size: int) -> None:
         self.saveOriginal()
         if self.isBinary:
             result = self.getBinaryClosing(size)
         else:
             result = self.getClosing(size)
-        self.__pixels = result.pixels
+        self._pixels = result.pixels
 
-    def applyErosion(self, size:int = 2):
+    def applyErosion(self, size: int = 2):
         self.saveOriginal()
         result = self.getErosion(size)
-        self.__pixels = result.pixels
+        self._pixels = result.pixels
 
-    def applyDilation(self, size:int = 2):
+    def applyDilation(self, size: int = 2):
         self.saveOriginal()
         result = self.getDilation(size)
-        self.__pixels = result.pixels
+        self._pixels = result.pixels
 
     def applyNoiseFilter(self, algorithm=None):
         self.saveOriginal()
         result = self.getNoiseFiltering(algorithm)
-        self.__pixels = result.pixels
+        self._pixels = result.pixels
 
     def applyNoiseFilterWithErosionDilation(self, erosion_size=2, dilation_size=2, closing_size=2):
         self.saveOriginal()
         result = self.getNoiseFilteringWithErosionDilation(erosion_size, dilation_size, closing_size)
-        self.__pixels = result.pixels
+        self._pixels = result.pixels
 
     def convolveWith(self, matrix: typing.Union[np.ndarray, list]):
         pass
@@ -287,7 +288,7 @@ class Channel:
 
     @deprecated("Renamed getShannonEntropy()")
     def getShannonEntropyOfPixels(self, base=2) -> float:
-        return self.getShannonEntropy()
+        return self.getShannonEntropy(base=base)
 
     def getShannonEntropy(self, base=2) -> float:
         return measure.shannon_entropy(self.pixels, base)
@@ -382,14 +383,14 @@ class Channel:
         binarClosed = morphology.binary_closing(self.pixels, np.ones((windowSize, windowSize))).astype(np.float32)
         return Channel(binarClosed)
 
-    def getErosion(self, size:int = 2):
+    def getErosion(self, size: int = 2):
         return Channel(ndimage.grey_erosion(self.pixels, size=size))
 
-    def getDilation(self, size:int = 2):
+    def getDilation(self, size: int = 2):
         return Channel(ndimage.grey_dilation(self.pixels, size=size))
 
     def getNoiseFiltering(self, algorithm=None):
-        return self.getNoiseFilteringWithErosionDilation() 
+        return self.getNoiseFilteringWithErosionDilation()
 
     def getNoiseFilteringWithErosionDilation(self, erosion_size=2, dilation_size=2, closing_size=2):
         workingChannel = self.getErosion(erosion_size)
@@ -404,10 +405,10 @@ class Channel:
         sizes = sum(self.pixels, labeled, range(nbObjects + 1))
         return Channel(labeled), nbObjects, sizes
 
-    def convertTo16BitsInteger(self):
+    def convertTo16BitsUnsignedInteger(self):
         pass
 
-    def convertTo8BitsInteger(self):
+    def convertTo8BitsUnsignedInteger(self):
         pass
 
     def _convertToUnsignedInt(self, dtype):
@@ -421,6 +422,7 @@ class Channel:
             plt.subplot(nrows, ncols, i + 1)
             plt.imshow(channels[i].pixels)
         plt.show()
+
 
 from .channelFloat import ChannelFloat
 from .channelInteger import ChannelInt
