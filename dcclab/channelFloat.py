@@ -6,7 +6,7 @@ class ChannelFloat(Channel):
     def __init__(self, pixels: np.ndarray):
         if "float" not in str(pixels.dtype):
             raise TypeError("Pixel type must be float.")
-        maxValue = np.max(pixels)
+        maxValue = np.nanmax(pixels)
         if maxValue <= 1.0:
             self.__originalFactor = 1.0
             normalizedPixels = np.copy(pixels)
@@ -49,18 +49,22 @@ class ChannelFloat(Channel):
         return Channel(stdFiltered)
 
     def getIsodataThresholding(self):
+        warnings.warn("Converting to 8-bits integer before computing threshold.")
         integerChannel = self.convertTo8BitsUnsignedInteger()
         return integerChannel.getIsodataThresholding()
 
     def getOtsuThresholding(self):
+        warnings.warn("Converting to 8-bits integer before computing threshold")
         integerChannel = self.convertTo8BitsUnsignedInteger()
         return integerChannel.getOtsuThresholding()
 
     def getAdaptiveThresholdMean(self, oddRegionSize: int = 3):
+        warnings.warn("Converting to 8-bits integer before computing threshold")
         integerChannel = self.convertTo8BitsUnsignedInteger()
         return integerChannel.getAdaptiveThresholdMean(oddRegionSize)
 
     def getAdaptiveThresholdGaussian(self, oddRegionSize: int = 3):
+        warnings.warn("Converting to 8-bits integer before computing threshold")
         integerChannel = self.convertTo8BitsUnsignedInteger()
         return integerChannel.getAdaptiveThresholdGaussian(oddRegionSize)
 
