@@ -405,10 +405,10 @@ class Channel:
         sizes = sum(self.pixels, labeled, range(nbObjects + 1))
         return Channel(labeled), nbObjects, sizes
 
-    def convertTo16BitsInteger(self):
+    def convertTo16BitsUnsignedInteger(self):
         pass
 
-    def convertTo8BitsInteger(self):
+    def convertTo8BitsUnsignedInteger(self):
         pass
 
     def _convertToUnsignedInt(self, dtype):
