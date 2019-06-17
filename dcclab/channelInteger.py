@@ -147,12 +147,12 @@ class ChannelInt(Channel):
         threshArray = cv.adaptiveThreshold(self.convertTo8BitsInteger().pixels, 256, cv.ADAPTIVE_THRESH_MEAN_C,
                                            cv.THRESH_BINARY,
                                            oddRegionSize, 0)
-        return Channel(threshArray.astype(np.uint8))
+        return Channel(threshArray.astype(np.uint8)/255)
 
     def getAdaptiveThresholdGaussian(self, oddRegionSize: int = 3) -> Channel:
         threshArray = cv.adaptiveThreshold(self.convertTo8BitsInteger().pixels, 256, cv.ADAPTIVE_THRESH_GAUSSIAN_C,
                                            cv.THRESH_BINARY, oddRegionSize, 0)
-        return Channel(threshArray.astype(np.uint8))
+        return Channel(threshArray.astype(np.uint8)/255)
 
     def convertTo8BitsInteger(self) -> Channel:
         return self._convertToUnsignedInt(np.uint8)
