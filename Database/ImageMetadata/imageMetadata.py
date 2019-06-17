@@ -27,14 +27,23 @@ class ImageMetadata:
             self.__fileObject = None
 
     @property
-    def getMetadata(self) -> dict:
+    def metadata(self) -> dict:
         if isinstance(self.__fileObject, CZIMetadata):
             return self.__fileObject.asDict().get('metadata')
         else:
             return {}
 
+    @deprecated("Renamed metadata: a property is never named getXXX")
+    @property
+    def getMetadata(self) -> dict:
+        return metadata
+
+    @deprecated("Renamed channels: a property is never named getXXX")
     @property
     def getChannels(self) -> dict:
+
+    @property
+    def channels(self) -> dict:
         if isinstance(self.__fileObject, CZIMetadata):
             return self.__fileObject.asDict().get('channels')
         else:
