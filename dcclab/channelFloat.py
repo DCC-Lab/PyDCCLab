@@ -37,7 +37,6 @@ class ChannelFloat(Channel):
                                     preserve_range=True)
         return Channel(gaussianFiltered)
 
-
     def getStandardDeviationFilter(self, filterSize: int):
         pixels = self.pixels
         stdDevFilter1 = filters.uniform_filter(pixels, filterSize, mode="nearest")
@@ -76,7 +75,7 @@ class ChannelFloat(Channel):
         sobelV = sobel_v(self.pixels)
         return Channel(sobelV)
 
-    def getBothDirectionsSobelFilter(self):
+    def getSobelFilter(self) -> Channel:
         sobelHV = sobel(self.pixels)
         return Channel(sobelHV)
 
