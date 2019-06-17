@@ -1,21 +1,45 @@
 from .image import *
 import numpy as np
+import json
 import matplotlib.pyplot as plt
-import typing
+from typing import List, Union
+from .__lifReader import LifReader
+from scipy import ndimage
+from collections import OrderedDict
+
 
 class ImageCollection:
-    def __init__(self, images: typing.List[Image] = None, pathPattern:str=None):
+    def __init__(self, images:List[Image]=None, imagesArray:np.ndarray=None, pathPattern: str=None):
         self.__images = []
         if images is not None:
             if not all(isinstance(image, Image) for image in images):
                 raise NotDCCImageException
-            self.__images = images
+            else:
+                self.__images = images
+        elif imagesArray is not None:
+            if imagesArray.ndim == 4:
+                self.appendFromImagesArray(imagesArray)
+            else:
+                raise ValueError("ImageCollection is initialized by a 4D numpy array: [width][height][channel][collection]")
         elif pathPattern is not None:
             self.appendMatchingFiles(pathPattern)
 
     @property
     def images(self):
         return self.__images
+
+    @property
+    def sizeInBytes(self):
+        sizeInBytes = 0
+        for image in self.images:
+            sizeInBytes += image.sizeInBytes
+        return sizeInBytes
+
+    def asArray(self) -> np.ndarray:
+        # An ImageCollection may not always be put into
+        # an array: if all images have different sizes, this will
+        # fail
+        return np.stack([ image.asArray() for image in self.images ], axis=3)
 
     def __getitem__(self, index):
         return self.images[index]
@@ -29,7 +53,7 @@ class ImageCollection:
 
     def indexOf(self, image) -> int:
         if not isinstance(image, Image):
-            raise NotDCCImageException
+            return None
 
         for (i, imageInList) in enumerate(self.images):
             if image == imageInList:
@@ -52,10 +76,17 @@ class ImageCollection:
         paths.sort()
         for path in paths:
             try:
-                image = Image(path)
+                image = Image(path=path)
                 self.__images.append(image)
             except:
                 pass
+
+    def appendFromImagesArray(self, imagesArray):
+        if imagesArray.ndim == 4:
+            images = [Image(imagesArray[:, :,:, i]) for i in range(array.shape[3])]
+            self.append(images)
+        else:
+            raise NotImplementedError("ImageCollection from 4D arrays only.")
 
     def removeAt(self, index: int):
         self.images.pop(index)
@@ -63,9 +94,6 @@ class ImageCollection:
     def remove(self, image: Image):
         index = self.indexOf(image)
         del self.images[index]
-
-    def asArray(self) -> np.ndarray:
-        return np.array(self.images)
 
     def showAllSequentially(self, showInGray: object = True):
         for image in self.images:
@@ -84,13 +112,61 @@ class ImageCollection:
         plt.show()
         return imagesShown
 
+    @property
+    def isLabelled(self) -> bool:
+        # Only if all images are labelled, we return True
+        for image in self.images:
+            if not image.isLabelled:
+                return False
+        return True
+
+    def labelMaskComponents(self):
+        for image in self.images:
+            image.labelMaskComponents()
+
+    def analyzeComponents(self):
+        for image in self.images:
+            image.analyzeComponents()
+
+    def filterNoise(self):
+        for image in self.images:
+            image.filterNoise()
+
+    def threshold(self, value = None):
+        for image in self.images:
+            image.threshold(value)
+
+    def setMask(self, mask:Channel):
+        if mask.isBinary:
+            for image in self.images:
+                image.setMask(mask)
+        else:
+            raise ValueError("Mask must be binary")
+
+    def setMasks(self, masks:[Channel]):
+        if len(masks) == len(self.images):
+            # We have one mask per image
+            for mask in masks:
+                for image in self.images:
+                    image.setMask(mask)
+        else:
+            raise NotImplementedError("Must provide one mask per channel for each image, may be different")
+
+    def setMaskFromThreshold(self, value = None):
+        for image in self.images:
+            image.setMaskFromThreshold(value)
+
 
 class ZStack(ImageCollection):
-    def __init__(self, images: typing.List[Image] = None, pathPattern:str=None):
-        ImageCollection.__init__(images, pathPattern)
+    def __init__(self, images:List[Image]=None, imagesArray:np.ndarray=None, pathPattern: str=None, keepOriginal: bool=True):
+        super().__init__(images, imagesArray, pathPattern)
         if not self.imagesAreSimilar:
             raise ValueError("Images in z-stack are not all the same shape")
 
+        self.__keepOriginal = keepOriginal
+        self.params = OrderedDict()
+
+    @property
     def imagesAreSimilar(self) -> bool:
         shape = None
         for image in self.images:
@@ -100,6 +176,29 @@ class ZStack(ImageCollection):
                 return False
         return True
 
-    def show(self):
-        # TODO: Do something nicer with z-stack
-        self.showAllSequentially()
+    def asArray(self) -> np.ndarray:
+        # An ZStack is always a 4D array
+        # All images are the same size
+        return np.stack([ image.asArray() for image in self.images ], axis=3)
+
+    def show(self, axis=-1):
+        stack4DArray = self.asArray()
+        plt.imshow(stack4DArray.mean(axis))
+        plt.show()
+
+    def showAllStacks(self, axis=-1):
+        stacks = self._stacksInMemory()
+        fig, axes = plt.subplots(1, len(stacks))
+        for i, (key, stack) in enumerate(stacks.items()):
+            if key in ["Original ", ""]:
+                axes[i].imshow(stack.mean(axis))
+            else:
+                axes[i].imshow(stack.max(axis))
+            axes[i].set_title(key + "Stack")
+        plt.show()
+
+    def _stacksInMemory(self):
+        stacks = OrderedDict([("Original ", self.originalZStack), ("", self.__array), ("Mask ", self.maskedZStack), ("Label ", self.labeledZStack)])
+        stacksInMemory = {k: v for k, v in stacks.items() if v is not None}
+        return stacksInMemory
+
