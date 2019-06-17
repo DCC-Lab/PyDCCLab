@@ -14,12 +14,9 @@ class TestChannelInteger(unittest.TestCase):
         valid = np.ones((10, 10), dtype=np.uint8)
         self.assertIsInstance(Channel(valid), ChannelInt)
 
-    def testConvertToNormalizedFloat(self):
-        nonNormalized = np.ones((1000, 1000), dtype=np.uint8) * 201
-        channel = Channel(nonNormalized)
-        normalizedAndFloat = channel.convertToNormalizedFloat()
-        self.assertTrue(
-            np.alltrue(np.max(normalizedAndFloat.pixels) == 201 / 255) and isinstance(normalizedAndFloat, ChannelFloat))
+    def testValidBoolImage(self):
+        valid = np.ones((100, 100), dtype=bool)
+        self.assertIsInstance(Channel(valid), ChannelInt)
 
     def testGetHistogramValuesNotNormed(self):
         array = np.zeros((5, 5), dtype=np.uint8)
@@ -93,7 +90,7 @@ class TestChannelInteger(unittest.TestCase):
             with self.assertRaises(UserWarning):
                 self.channelUint16.getEntropyFilter(2)
 
-    def testGetStandardDeviationSlow(self):
+    def testGetStandardDeviation(self):
         array = np.zeros((5, 5), dtype=np.uint16)
         # Padded array (internally happens when computing convolution with another matrix)
         paddedArray = np.zeros((7, 7))
@@ -109,7 +106,7 @@ class TestChannelInteger(unittest.TestCase):
                     Channel(np.array([paddedArray[i][j:j + 3], paddedArray[i + 1][j:j + 3],
                                       paddedArray[i + 2][j:j + 3]], dtype=np.float32)))
                 # Compute the standard deviation of the smaller arrays
-        resultArray = np.array([channel.getStandardDeviationOfPixels() for channel in listOfChannels],
+        resultArray = np.array([channel.getStandardDeviation() for channel in listOfChannels],
                                dtype=np.float32).reshape((5, 5))
         with warnings.catch_warnings():
             warnings.simplefilter('ignore', category=UserWarning)
@@ -196,8 +193,74 @@ class TestChannelInteger(unittest.TestCase):
         handCalculatedThresholdedImage = Channel((array >= thresholding).astype("uint"))
         self.assertTrue(channel.getOtsuThresholding() == handCalculatedThresholdedImage)
 
-    def testMulti(self):
-        pass
+    def testAdaptiveThresholdMean(self):
+        array = np.zeros((5, 5), dtype=np.uint8)
+        array[1:4, 1:4] = 5
+        threshArray = np.zeros_like(array)
+        threshArray[1:4, 1:4] = 1
+        threshArray[2, 2] = 0
+        self.assertTrue(np.array_equal(Channel(array).getAdaptiveThresholdMean(3).pixels, threshArray))
+
+    def testAdaptiveThresholdGaussian(self):
+        array = np.arange(0, 25).reshape((5, 5)).astype(np.uint8)
+        channel = Channel(array)
+        self.assertTrue(channel.getAdaptiveThresholdGaussian(3).isBinary)
+
+    def testConvertTo8BitsUint(self):
+        array = np.arange(0, 1000).reshape((10, 100)).astype(np.uint16)
+        self.assertTrue(Channel(array).convertTo8BitsUnsignedInteger().pixels.dtype == np.uint8)
+
+    def testConvertTo8BitsUintCheckValues(self):
+        array = np.ones((5, 5), dtype=np.uint16)
+        array[2, 2] = 1023
+        self.assertTrue(np.array_equal(Channel(array).convertTo8BitsUnsignedInteger().pixels,
+                                       (array / (2 ** 16 - 1) * 255).astype(np.uint8)))
+
+    def testConvertTo8BitsUintFrom8BitsUint(self):
+        array = np.ones((100, 100), dtype=np.uint8) * 25
+        self.assertTrue(np.array_equal(Channel(array).convertTo8BitsUnsignedInteger().pixels, array))
+
+    def testConvertTo16BitsUint(self):
+        array = np.ones((100, 100), dtype=np.uint8) * 201
+        self.assertTrue(Channel(array).convertTo16BitsUnsignedInteger().pixels.dtype == np.uint16)
+
+    def testConvertTo16BitsUintCheckValues(self):
+        array = np.ones((5, 5), dtype=np.uint8) * 151
+        self.assertTrue(np.array_equal(Channel(array).convertTo16BitsUnsignedInteger().pixels,
+                                       (array / 255 * (2 ** 16 - 1)).astype(np.uint16)))
+
+    def testConvertTo16BitsUintFrom16BitsUint(self):
+        array = np.ones((1000, 1000), dtype=np.uint16) * 22222
+        self.assertTrue(np.array_equal(Channel(array).convertTo16BitsUnsignedInteger().pixels, array))
+
+    def testConvertToNormalizedFloat(self):
+        array = np.ones((10000, 1000), dtype=np.uint8) * 250
+        self.assertIsInstance(Channel(array).convertToNormalizedFloat(), ChannelFloat)
+
+    def testConvertToNormalizedFloatValues(self):
+        array = np.ones((100, 100), dtype=np.uint8) * 78
+        self.assertTrue(np.array_equal(Channel(array).convertToNormalizedFloat().pixels, array / 255))
+
+    def testConvertToNormalizedFloatFromUint16(self):
+        array = np.ones((10000, 1000), dtype=np.uint16) * 2500
+        self.assertIsInstance(Channel(array).convertToNormalizedFloat(), ChannelFloat)
+
+    def testConvertToNormalizedFloatFromUint16Values(self):
+        array = np.ones((100, 100), dtype=np.uint16) * 7800
+        self.assertTrue(np.array_equal(Channel(array).convertToNormalizedFloat().pixels, array / (2 ** 16 - 1)))
+
+    def testOtsuThreshError(self):
+        array = np.ones((100, 100), dtype=np.uint16)
+        with self.assertRaises(ValueError):
+            Channel(array).getOtsuThresholding()
+
+    def testApplyXDeriv(self):
+        self.channelUint16.applyXDerivative()
+        self.assertIsInstance(self.channelUint16, ChannelInt)
+
+    def testApplyYDeriv(self):
+        self.channelUint16.applyYDerivative()
+        self.assertIsInstance(self.channelUint16, ChannelInt)
 
 
 if __name__ == '__main__':

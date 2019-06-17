@@ -6,7 +6,7 @@ class ChannelFloat(Channel):
     def __init__(self, pixels: np.ndarray):
         if "float" not in str(pixels.dtype):
             raise TypeError("Pixel type must be float.")
-        maxValue = np.max(pixels)
+        maxValue = np.nanmax(pixels)
         if maxValue <= 1.0:
             self.__originalFactor = 1.0
             normalizedPixels = np.copy(pixels)
@@ -16,7 +16,7 @@ class ChannelFloat(Channel):
         Channel.__init__(self, normalizedPixels)
 
     def getHistogramValues(self, normed: bool = False) -> typing.Tuple[np.ndarray, np.ndarray]:
-        pixels = self.convertTo8BitsInteger().pixels
+        pixels = self.convertTo8BitsUnsignedInteger().pixels
         array = pixels.ravel()
         nbBins = len(np.bincount(array))
         hist, bins = np.histogram(array, nbBins, [0, nbBins], density=normed)
@@ -24,7 +24,7 @@ class ChannelFloat(Channel):
 
     def getEntropyFilter(self, filterSize: int):
         warnings.warn("Converting to uint8.")
-        pixels = self.convertTo8BitsInteger().pixels
+        pixels = self.convertTo8BitsUnsignedInteger().pixels
         entropyFiltered = entropy(pixels, morphology.selem.square(filterSize, dtype=np.float32))
         return Channel(entropyFiltered.astype(np.float32))
 
@@ -37,7 +37,6 @@ class ChannelFloat(Channel):
                                     preserve_range=True)
         return Channel(gaussianFiltered)
 
-
     def getStandardDeviationFilter(self, filterSize: int):
         pixels = self.pixels
         stdDevFilter1 = filters.uniform_filter(pixels, filterSize, mode="nearest")
@@ -49,19 +48,23 @@ class ChannelFloat(Channel):
         return Channel(stdFiltered)
 
     def getIsodataThresholding(self):
-        integerChannel = self.convertTo8BitsInteger()
+        warnings.warn("Converting to 8-bits integer before computing threshold.")
+        integerChannel = self.convertTo8BitsUnsignedInteger()
         return integerChannel.getIsodataThresholding()
 
     def getOtsuThresholding(self):
-        integerChannel = self.convertTo8BitsInteger()
+        warnings.warn("Converting to 8-bits integer before computing threshold")
+        integerChannel = self.convertTo8BitsUnsignedInteger()
         return integerChannel.getOtsuThresholding()
 
     def getAdaptiveThresholdMean(self, oddRegionSize: int = 3):
-        integerChannel = self.convertTo8BitsInteger()
+        warnings.warn("Converting to 8-bits integer before computing threshold")
+        integerChannel = self.convertTo8BitsUnsignedInteger()
         return integerChannel.getAdaptiveThresholdMean(oddRegionSize)
 
     def getAdaptiveThresholdGaussian(self, oddRegionSize: int = 3):
-        integerChannel = self.convertTo8BitsInteger()
+        warnings.warn("Converting to 8-bits integer before computing threshold")
+        integerChannel = self.convertTo8BitsUnsignedInteger()
         return integerChannel.getAdaptiveThresholdGaussian(oddRegionSize)
 
     def getHorizontalSobelFilter(self):
@@ -72,14 +75,14 @@ class ChannelFloat(Channel):
         sobelV = sobel_v(self.pixels)
         return Channel(sobelV)
 
-    def getBothDirectionsSobelFilter(self):
+    def getSobelFilter(self) -> Channel:
         sobelHV = sobel(self.pixels)
         return Channel(sobelHV)
 
-    def convertTo8BitsInteger(self):
+    def convertTo8BitsUnsignedInteger(self):
         return self._convertToUnsignedInt(np.uint8)
 
-    def convertTo16BitsInteger(self):
+    def convertTo16BitsUnsignedInteger(self):
         return self._convertToUnsignedInt(np.uint16)
 
     def _convertToUnsignedInt(self, dtype):
