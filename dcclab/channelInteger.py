@@ -10,8 +10,8 @@ class ChannelInt(Channel):
         if "bool" in str(pixels.dtype):
             pixels = pixels.astype(int)
 
-        Channel.__init__(self, pixels)    
-        
+        Channel.__init__(self, pixels)
+
         if "int" not in str(pixels.dtype):
             raise TypeError("Pixel type must be integer.")
         self._originalFactor = np.iinfo(self._originalDType).max
@@ -144,15 +144,15 @@ class ChannelInt(Channel):
         return Channel(threshArray.astype(np.uint8))
 
     def getAdaptiveThresholdMean(self, oddRegionSize: int = 3) -> Channel:
-        threshArray = cv.adaptiveThreshold(self.convertTo8BitsInteger().pixels, 256, cv.ADAPTIVE_THRESH_MEAN_C,
+        threshArray = cv.adaptiveThreshold(self.convertTo8BitsInteger().pixels, 1, cv.ADAPTIVE_THRESH_MEAN_C,
                                            cv.THRESH_BINARY,
                                            oddRegionSize, 0)
-        return Channel(threshArray.astype(np.uint8)/255)
+        return Channel(threshArray.astype(np.uint8))
 
     def getAdaptiveThresholdGaussian(self, oddRegionSize: int = 3) -> Channel:
-        threshArray = cv.adaptiveThreshold(self.convertTo8BitsInteger().pixels, 256, cv.ADAPTIVE_THRESH_GAUSSIAN_C,
+        threshArray = cv.adaptiveThreshold(self.convertTo8BitsInteger().pixels, 1, cv.ADAPTIVE_THRESH_GAUSSIAN_C,
                                            cv.THRESH_BINARY, oddRegionSize, 0)
-        return Channel(threshArray.astype(np.uint8)/255)
+        return Channel(threshArray.astype(np.uint8))
 
     def convertTo8BitsInteger(self) -> Channel:
         return self._convertToUnsignedInt(np.uint8)
