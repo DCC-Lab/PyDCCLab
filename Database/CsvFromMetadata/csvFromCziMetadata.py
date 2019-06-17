@@ -1,5 +1,8 @@
 from dcclab import findAllCziFiles
-from Database.MetadataFromCzi.cziMetadata import CZIMetadata as mtdt
+from Database.ImageMetadata.cziMetadata.cziMetadata import CZIMetadata as mtdt
+from Database.ImageMetadata.imageMetadata import ImageMetadata as imgMtdt
+import os
+import fnmatch
 
 
 def createCSVFromCZIMetadata(path):
@@ -120,8 +123,23 @@ def getMetadataFromCzi(name, path):
         print('An entry in the XML could not be reached or returned none.')
 
 
+def findFiles(directory, extension) -> list:
+    filesFound = []
+    for root, directories, files in os.walk(os.path.normpath(directory)):
+        for file in files:
+            if fnmatch.fnmatch(file, extension):
+                filesFound.append(os.path.join(root, file))
+    return filesFound
+
+
 if __name__ == '__main__':
-    path = 'P:\\injection AAV\\résultats bruts'
-    #path = 'P:\\injection AAV\\résultats bruts\\AAV\\AAV498AAV455'
-    createCSVFromCZIMetadata(path)
-    print('Finished')
+    extension = '*.czi'
+    #path = 'P:\\injection AAV\\résultats bruts'
+    path = 'P:\\injection AAV\\résultats bruts\\AAV\\AAV498AAV455'
+    #createCSVFromCZIMetadata(path)
+    #print('Finished')
+    for file in findFiles(path, extension):
+        object = imgMtdt(file)
+        print(object.getMetadata)
+        for key, value in object.getChannels.items():
+            print(value)

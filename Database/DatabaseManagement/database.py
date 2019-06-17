@@ -3,6 +3,7 @@ import urllib.parse as parse
 import pathlib
 import platform
 
+
 class Database:
     def __init__(self, path, readOnly=False):
         self.path = path
@@ -129,17 +130,11 @@ def ListAllTables(cursor):
 
 def pathToURI(path, mode='ro'):  # TODO MacOS and Linux will have to be added eventually.
     path = pathlib.Path(path)
-    if findingOS() == 'Windows':
+    if platform.system() == 'Windows':
         return 'file:' + parse.quote(path.as_posix(), safe=':/') + '?mode=' + mode
-    if findingOS() == 'Darwin':
+    if platform.system() == 'Darwin':
         pass
-    if findingOS() == 'Linux':
+    if platform.system() == 'Linux':
         pass
     if path.is_absolute():
         return path.as_uri() + '?mode=' + mode
-
-
-# 'Windows' for windows, 'Linux' for linux or 'Darwin' for mac.
-# Currently not very useful but will be in the future.
-def findingOS():
-    return platform.system()
