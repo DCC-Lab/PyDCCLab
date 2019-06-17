@@ -1,6 +1,6 @@
 class CZIChannel:
     def __init__(self, channelInformation, filters, root):
-        self.channelId = channelInformation[0]
+        self.channelId = str(channelInformation[2]) + ';' + str(channelInformation[0])
         self.channelName = channelInformation[1]
         self.fileId = channelInformation[2]
         self.root = root

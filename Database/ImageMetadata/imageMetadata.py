@@ -39,16 +39,3 @@ class ImageMetadata:
             return self.__fileObject.asDict().get('channels')
         else:
             return {}
-
-
-if __name__ == '__main__':
-    # Some scratch tests :  # TODO To delete when the class is completed. This is only for quick tests.
-    path = 'P:\\injection AAV\\résultats bruts\\AAV\\AAV498AAV455\\AAV498AAV455_S94\\AAV498-455_S94_C.czi'
-    mdata = ImageMetadata(path)
-    for key, value in mdata.getMetadata.items():
-        print(key, value)
-
-    for key, value in mdata.getChannels.items():
-        print(key, value)
-        for subkey, subvalue in value.items():
-            print(subkey, subvalue)

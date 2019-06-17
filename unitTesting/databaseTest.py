@@ -8,70 +8,41 @@ class TestDatabase(unittest.TestCase):
     def setUp(self):
         self.directory = os.path.dirname(os.path.dirname(__file__))
         self.filePath = os.path.join(self.directory, 'testData', 'test.db')
-        self.wrongFile = os.path.join(self.directory, 'testData', 'tst.db')
+        self.wrongFile = os.path.join(self.directory, 'testData', 'wrongfile.db')
 
-    def test_createConnection_connected(self):
-        database = db.Database(self.filePath, 'test.db')
-        self.assertEqual(database.createConnection(), 'connected')
-        database.closeConnection()
+    def test_connect_Connected(self):
+        database = db.Database(self.filePath)
+        self.assertTrue(database.connect())
 
-    def test_createConnection_AlreadyConnected(self):
-        database = db.Database(self.filePath, 'test.db')
-        self.assertEqual(database.createConnection(), 'connected')
-        database.closeConnection()
+    def test_connect_cantConnect(self):
+        database = db.Database(self.wrongFile)
+        self.assertFalse(database.connect())
 
-        database = db.Database(self.filePath, 'test.db')
-        database.createConnection()
-        with self.assertRaises(ConnectionError): database.createConnection()
+    def test_connect_wrongMode(self):
+        database = db.Database(self.filePath, 'wrongmode')
+        self.assertFalse(database.connect())
 
-    def test_createConnection_CantConnect(self):
-        database = db.Database(self.wrongFile, 'test.db')
-        with self.assertRaises(lite.OperationalError): database.createConnection()
+    def test_disconnect(self):
+        database = db.Database(self.filePath)
+        database.connect()
+        database.disconnect()
+        self.assertIsNone(database.connection)
 
-    def test_closeConnection_disconnected(self):
-        database = db.Database(self.filePath, 'test.db')
-        database.createConnection()
-        self.assertEqual(database.closeConnection(), 'disconnected')
+    def test_isConnected_Connected(self):
+        database = db.Database(self.filePath)
+        database.connect()
+        self.assertTrue(database.isConnected)
 
-    def test_closeConnection_NoConnection(self):
-        database = db.Database(self.filePath, 'test.db')
+    def test_isConnected_notConnected(self):
+        database = db.Database(self.filePath)
+        self.assertFalse(database.isConnected)
 
-        with self.assertRaises(ConnectionError): database.closeConnection()
-
-    def test_closeConnection_CursorExists(self):
-        database = db.Database(self.filePath, 'test.db')
-        database.createConnection()
-        database.createCursor()
-        with self.assertRaises(AttributeError): database.closeConnection()
-
-    def test_checkIfIsConnected_IsConnected(self):
-        database = db.Database(self.filePath, 'test.db')
-        database.createConnection()
-        self.assertTrue(database.checkIfIsConnected())
-
-    def test_checkIfIsConnected_IsNotConnected(self):
-        database = db.Database(self.filePath, 'test.db')
-        database.createConnection()
-        database.closeConnection()
-
-        self.assertFalse(database.checkIfIsConnected())
-
-    def test_changeConnectionMode_NoConnection(self):
-        database = db.Database(self.filePath, 'test.db')
-
-        self.assertFalse(database.changeConnectionMode('rw'))
-
-    def test_changeConnectionMode_ModeChanged(self):
-        database = db.Database(self.filePath, 'test.db')
-
-        database.createConnection()
-        self.assertTrue(database.changeConnectionMode('rw'))
-
-    def test_changeConnectionMode_InvalidMode(self):
-        database = db.Database(self.filePath, 'test.db')
-        database.createConnection()
-
-        with self.assertRaises(lite.OperationalError): database.changeConnectionMode('abcd')
+    def test_modifyConnection_modeChanged(self):
+        database = db.Database(self.filePath)
+        database.connect()
+        mode_1 = database.mode
+        database.modifyConnection('rw')
+        self.assertNotEqual(mode_1, database.mode)
 
     def test_pathToURI_ReadOnlyMode(self):
         self.assertEqual(db.pathToURI('test.db'), 'file:test.db?mode=ro')

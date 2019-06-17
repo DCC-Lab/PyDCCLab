@@ -193,7 +193,7 @@ class CZIMetadata:
             channels = self.root.find('./Metadata/Information/Image/Dimensions/Channels')
             if self.checkIfElementHasChildren(channels):
                 for channel in channels:
-                    channelInformation = [channel.attrib['Id'], channel.attrib['Name'], self.name]
+                    channelInformation = [channel.attrib['Id'], channel.attrib['Name'], self.path]
                     newChannels.append(chnnl(channelInformation, self.filters, self.root))
             return newChannels
         except Exception:
