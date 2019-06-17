@@ -80,7 +80,7 @@ class ChannelInt(Channel):
         floatChannel = self.convertToNormalizedFloat()
         return floatChannel.getVerticalSobelFilter()
 
-    def getBothDirectionsSobelFilter(self) -> Channel:
+    def getSobelFilter(self) -> Channel:
         warnings.warn("Converting to float32.")
         floatChannel = self.convertToNormalizedFloat()
         return floatChannel.getBothDirectionsSobelFilter()
