@@ -95,6 +95,10 @@ class ImageCollection:
         index = self.indexOf(image)
         del self.images[index]
 
+    def removeChannels(self, channels: list):
+        for image in self.images:
+            image.removeChannels(channels)
+
     def showAllSequentially(self, showInGray: object = True):
         for image in self.images:
             image.display()
