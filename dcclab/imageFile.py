@@ -71,14 +71,24 @@ class MATLABFile(ImageFile):
         dataset = sio.loadmat(self.path)
         if self.variable is not None:
             array = dataset[self.variable]
-            if array.ndim == 2 or array.ndim == 3:
+            if array.ndim == 3:
                 return array
-            elif array.ndim != 3:
+            elif array.ndim == 2:
+                return np.expand_dims(array,2) # always return 3D
+            else:
                 raise ValueError("Not an image variable")
         else:
+            # Try 3D matrices first
             for name in dataset.keys():
                 variable = dataset[name]
                 if isinstance(variable, np.ndarray):
-                    if variable.ndim == 2 or variable.ndim == 3:
+                    if variable.ndim == 3:
                         return variable
+            # We haven't found any 3D variable. Let's try 2D
+            for name in dataset.keys():
+                variable = dataset[name]
+                if isinstance(variable, np.ndarray):
+                    if variable.ndim == 2:
+                        return variable
+
         return None
