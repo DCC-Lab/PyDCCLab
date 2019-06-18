@@ -6,6 +6,7 @@ namespace because it is simpler for everyone """
 from .image import *
 from .channel import *
 from .imageCollection import *
+from .timeSeries import *
 from .DCCExceptions import *
 from .channelInteger import *
 from .channelFloat import *

@@ -1,3 +1,4 @@
+from .imageCollection import *
 import cv2
 
 class TimeSeries(ImageCollection):
@@ -26,8 +27,13 @@ class TimeSeries(ImageCollection):
 
     def save(self, path):
         pattern = PathPattern(path)
+        if path.extension == 'avi':
+            self.saveAsAVI(path)
+            
         if pattern.isWritePattern:
-            if pattern.numberOfFormatGroups == 0
+            if pattern.numberOfFormatGroups == 0:
+                self.saveAsAVI(path)
+
                 
     def saveAsAVI(self, path):
         height, width, channels = self.images[0].shape
