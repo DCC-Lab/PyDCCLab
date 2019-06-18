@@ -310,17 +310,29 @@ class ZStack(ImageCollection):
     def applyDilation(self, size: int=2):
         self.apply3DFilter(ndimage.grey_dilation, size)
 
-    def applyNoiseFilter(self, algorithm=None):
-        if self.processIn3D:
-            raise NotImplementedError()
+    def applyNoiseFilter(self, algorithm: str='ErosionDilation', *filterArgs):
+        # fixme: filterArgs hidden from user
+        if algorithm == 'ErosionDilation':
+            self.applyNoiseFilterWithErosionDilation(*filterArgs)
         else:
-            super().applyNoiseFilter(size)
+            raise NotImplementedError()
 
     def applyNoiseFilterWithErosionDilation(self, erosion_size=2, dilation_size=2, closing_size=2):
-        if self.processIn3D:
-            raise NotImplementedError()
+        # todo: maybe try to implement multiple function with args call inside self.apply3DFilter(s)
+        if self.processIn3D is None:
+            raise ZStackProcessDimensionIsNotDefined
+        elif self.processIn3D:
+            filteredArrays = []
+            for channel in list(range(self.numberOfChannels)):
+                array = self.asSingleChannelArray(channel)
+                array = ndimage.grey_erosion(array, erosion_size)
+                array = ndimage.grey_dilation(array, dilation_size)
+                array = ndimage.grey_closing(array, closing_size)
+                filteredArrays.append(array)
+            newStack = np.stack(filteredArrays, axis=2)
+            self.fromArray(newStack)
         else:
-            super().applyNoiseFilterWithErosionDilation(size)
+            super().applyNoiseFilterWithErosionDilation(erosion_size, dilation_size, closing_size)
 
     def show(self, axis=-1):
         stack4DArray = self.asArray()
