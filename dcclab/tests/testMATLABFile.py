@@ -49,5 +49,13 @@ class TestMATLABFile(unittest.TestCase):
         self.assertTrue(isinstance(data, np.ndarray))
         self.assertEqual(data.ndim, 3)
 
+    def testImageDataWithoutVariableWith2DChannelData(self):
+        image = Image(path="./test.mat")
+        self.assertIsNotNone(image)
+        self.assertIsNotNone(image.channels[0])
+        pixels = image.channels[0].pixels
+        self.assertTrue(isinstance(pixels, np.ndarray))
+        self.assertEqual(pixels.ndim, 2)
+
 if __name__ == '__main__':
     unittest.main()
