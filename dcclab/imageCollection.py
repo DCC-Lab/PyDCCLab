@@ -31,7 +31,6 @@ class ImageCollection:
         if pattern.isWritePattern:
             for (i, image) in enumerate(self.images):
                 path = pattern.filePathWithIndex(i)
-                print(path)
                 image.save(path)
         else:
             raise ValueError("To save files in ImageCollection, use a Python format-string such as Image-{0:03d}.tiff")            
