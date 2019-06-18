@@ -72,6 +72,9 @@ class Image:
         imageData = np.dstack(channelArrays) 
         return imageData
 
+    def replaceFromArray(self, array):
+        self.channels = self.channelsFromArray(array)
+
     def save(self, filePath):
         raise NotImplementedError()
 
