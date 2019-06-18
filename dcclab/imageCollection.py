@@ -117,6 +117,7 @@ class ImageCollection:
         del self.images[index]
 
     def removeChannels(self, channels: list):
+        """ These functions 'can' crash if images don't have the same numberOfChannels"""
         for image in self.images:
             image.removeChannels(channels)
 
@@ -263,8 +264,15 @@ class ZStack(ImageCollection):
                 return False
         return True
 
+    @property
+    def numberOfChannels(self):
+        """ Can be moved to ImageCollection [addressing the issue in removeChannels()] """
+        """ Not clean, but it works since imagesAreSimilar... """
+        """ Coulf be stored as a property variable in init instead """
+        return self.images[0].shape[2]
+
     def asArray(self) -> np.ndarray:
-        # A ZStack is always a 4D array
+        # A ZStack is always a 4D array of shape (X, Y, C, Z)
         # All images are the same size
         return np.stack([image.asArray() for image in self.images], axis=3)
 
