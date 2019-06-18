@@ -16,7 +16,7 @@ class ImageFile(object):
         return
 
 
-class CZIFile(ImageFile):
+class CZIFile_(ImageFile):
     supportedFormats = ['czi']
 
     def __init__(self, path: str):
