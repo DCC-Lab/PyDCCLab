@@ -83,8 +83,9 @@ class ImageCollection:
 
     def appendFromImagesArray(self, imagesArray):
         if imagesArray.ndim == 4:
-            images = [Image(imagesArray[:, :,:, i]) for i in range(array.shape[3])]
-            self.append(images)
+            images = [Image(imagesArray[:, :,:, i]) for i in range(imagesArray.shape[3])]
+            for image in images:
+                self.append(image)
         else:
             raise NotImplementedError("ImageCollection from 4D arrays only.")
 
