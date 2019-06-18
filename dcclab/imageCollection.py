@@ -40,6 +40,16 @@ class ImageCollection:
         return self.__images
 
     @property
+    def imagesAreSimilar(self) -> bool:
+        shape = None
+        for image in self.images:
+            if shape is None:
+                shape = image.shape
+            elif shape != image.shape:
+                return False
+        return True
+
+    @property
     def sizeInBytes(self):
         sizeInBytes = 0
         for image in self.images:
@@ -86,19 +96,26 @@ class ImageCollection:
 
         self.images.append(image)
 
+
+    def extend(self, images: List[Image]):
+        for image in images:
+            if self.contains(image):
+                raise ImageAlreadyInCollectionException
+            self.images.append(image)
+
     def appendMatchingFiles(self, pattern):
         paths = PathPattern(pattern)
         for path in paths.matchingFiles():
             try:
                 image = Image(path=path)
-                self.__images.append(image)
+                self.append(image)
             except:
                 pass
 
     def appendFromImagesArray(self, imagesArray):
         if imagesArray.ndim == 4:
-            images = [Image(imagesArray[:, :,:, i]) for i in range(array.shape[3])]
-            self.append(images)
+            images = [Image(imagesArray[:, :,:, i]) for i in range(imagesArray.shape[3])]
+            self.extend(images)
         else:
             raise NotImplementedError("ImageCollection from 4D arrays only.")
 
