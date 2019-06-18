@@ -83,7 +83,7 @@ class ImageCollection:
 
     def appendFromImagesArray(self, imagesArray):
         if imagesArray.ndim == 4:
-            images = [Image(imagesArray[:, :,:, i]) for i in range(imagesArray.shape[3])]
+            images = [Image(imagesArray[:, :, :, i]) for i in range(imagesArray.shape[3])]
             for image in images:
                 self.append(image)
         else:
@@ -218,8 +218,9 @@ class ImageCollection:
         for image in self.images:
             image.applyNoiseFilterWithErosionDilation(erosion_size, dilation_size, closing_size)
 
+
 class ZStack(ImageCollection):
-    def __init__(self, images:List[Image]=None, imagesArray:np.ndarray=None, pathPattern: str=None, keepOriginal: bool=True):
+    def __init__(self, images: List[Image]=None, imagesArray: np.ndarray=None, pathPattern: str=None, keepOriginal: bool=True):
         super().__init__(images, imagesArray, pathPattern)
         if not self.imagesAreSimilar:
             raise ValueError("Images in z-stack are not all the same shape")
@@ -241,11 +242,11 @@ class ZStack(ImageCollection):
     def asArray(self) -> np.ndarray:
         # A ZStack is always a 4D array
         # All images are the same size
-        return np.stack([ image.asArray() for image in self.images ], axis=3)
+        return np.stack([image.asArray() for image in self.images], axis=3)
 
     def asSingleChannelArray(self, channel) -> np.ndarray:
         imagesArray = self.asArray()
-        singleChannel = imagesArray(:,:,channel,:)
+        singleChannel = imagesArray[:, :, channel, :]
         np.squeeze(singleChannel)
         return singleChannel
 
