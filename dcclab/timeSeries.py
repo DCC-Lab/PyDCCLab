@@ -7,16 +7,6 @@ class TimeSeries(ImageCollection):
         if not self.imagesAreSimilar:
             raise ValueError("Images in TimeSeries are not all the same shape")
 
-    @property
-    def imagesAreSimilar(self) -> bool:
-        shape = None
-        for image in self.images:
-            if shape is None:
-                shape = image.shape
-            elif shape != image.shape:
-                return False
-        return True
-
     def asArray(self) -> np.ndarray:
         return np.stack([ image.asArray() for image in self.images ], axis=3)
 
