@@ -1,4 +1,5 @@
 from .imageCollection import *
+from .pathPattern import *
 import cv2
 
 class TimeSeries(ImageCollection):
@@ -17,12 +18,17 @@ class TimeSeries(ImageCollection):
 
     def save(self, path):
         pattern = PathPattern(path)
-        if path.extension == 'avi':
+        if pattern.extension == 'avi':
             self.saveAsAVI(path)
             
         if pattern.isWritePattern:
             if pattern.numberOfFormatGroups == 0:
                 self.saveAsAVI(path)
+            elif pattern.numberOfFormatGroups == 1:
+                try:
+                    super().save(path)
+                except:
+                    raise NotImplementedError("Save not implemented yet for ImageCollection")
 
                 
     def saveAsAVI(self, path):

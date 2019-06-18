@@ -32,7 +32,6 @@ class ImageCollection:
     def imagesAreSimilar(self) -> bool:
         shape = None
         for image in self.images:
-            print(image)
             if shape is None:
                 shape = image.shape
             elif shape != image.shape:
