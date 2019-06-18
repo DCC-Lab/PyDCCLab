@@ -3,6 +3,7 @@ from .channel import *
 import PIL.Image
 import scipy.io as sio
 
+
 class ImageFile(object):
     supportedFormats = []
 
@@ -26,20 +27,26 @@ class CZIFile(ImageFile):
         cziObj = readCziImage(self.path)
         mosaic, self.__tilesWithChannelNumber = decodeImages(cziObj)
         mosaic = np.squeeze(mosaic)
-        self.__numberOFChannels = mosaic.shape[-3]
+        print(mosaic.shape)
+        axes = cziObj.axes
+        try:
+            cIndex = axes.index("C")
+        except ValueError:
+            cIndex = -1
+        self.__numberOFChannels = mosaic.shape[cIndex]
         closeCziFileObject(cziObj)
         wholeImage = mosaic.transpose((1, 2, 0)) if mosaic.ndim == 3 else mosaic
         return wholeImage
 
 
 class TIFFFile(ImageFile):
-    supportedFormats = ['tif','tiff']
+    supportedFormats = ['tif', 'tiff']
 
     def __init__(self, path):
         ImageFile.__init__(self, path)
 
     def imageDataFromPath(self) -> np.ndarray:
-        #todo better method that return every images if multipage
+        # todo better method that return every images if multipage
         tiffFileObject = tifffile.TiffFile(self.path)
         imageAsArray = tiffFileObject.asarray().astype(dtype="float32")
         self.__metadata = tiffFileObject.ome_metadata
@@ -60,10 +67,11 @@ class PILFile(ImageFile):
         imageAsArray = np.array(image)
         return imageAsArray
 
+
 class MATLABFile(ImageFile):
     supportedFormats = ['mat']
 
-    def __init__(self, path, variable = None):
+    def __init__(self, path, variable=None):
         ImageFile.__init__(self, path)
         self.variable = variable
 
@@ -74,7 +82,7 @@ class MATLABFile(ImageFile):
             if array.ndim == 3:
                 return array
             elif array.ndim == 2:
-                return np.expand_dims(array,2) # always return 3D
+                return np.expand_dims(array, 2)  # always return 3D
             else:
                 raise ValueError("Not an image variable")
         else:
@@ -89,6 +97,6 @@ class MATLABFile(ImageFile):
                 variable = dataset[name]
                 if isinstance(variable, np.ndarray):
                     if variable.ndim == 2:
-                        return np.expand_dims(variable,2) # always return 3D
+                        return np.expand_dims(variable, 2)  # always return 3D
 
         return None
