@@ -136,7 +136,7 @@ class TesImageCollectionMethods(unittest.TestCase):
     def setUp(self) -> None:
         self.imageList = []
         for i in range(5):
-            array = (i+1)*np.ones((3,4,3), dtype=np.int8)
+            array = (i+1)*np.ones((100,100,3), dtype=np.int8)
             image = Image(array)
             self.assertIsNotNone(image)
             self.imageList.append(image)
@@ -258,7 +258,11 @@ class TesImageCollectionMethods(unittest.TestCase):
         listOfImage = ImageCollection([image])
         self.assertTrue(listOfImage[0] == image)
 
-
+    def testSaveCollection(self):
+        self.collection.save('/tmp/test-{0:03d}.gif')
+        self.collection.save('/tmp/test-{0:03d}.png')
+        self.collection.save('/tmp/test-{0:03d}.jpg')
+        self.collection.save('/tmp/test-{0:03d}.tif')
 
 if __name__ == '__main__':
     unittest.main()

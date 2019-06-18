@@ -25,6 +25,17 @@ class ImageCollection:
         elif pathPattern is not None:
             self.appendMatchingFiles(pathPattern)
 
+
+    def save(self, pathOrPattern:str):
+        pattern = PathPattern(pathOrPattern)
+        if pattern.isWritePattern:
+            for (i, image) in enumerate(self.images):
+                path = pattern.filePathWithIndex(i)
+                print(path)
+                image.save(path)
+        else:
+            raise ValueError("To save files in ImageCollection, use a Python format-string such as Image-{0:03d}.tiff")            
+
     @property
     def images(self):
         return self.__images

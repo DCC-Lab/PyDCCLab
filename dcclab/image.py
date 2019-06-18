@@ -74,7 +74,12 @@ class Image:
 
     def save(self, filePath):
         imageAsArray = self.asArray()
-        pilImage = PIL.Image.fromarray(imageAsArray)
+
+        if len(self.channels) == 1:
+            mode = 'L'
+        elif len(self.channels) == 3:
+            mode = 'RGB'
+        pilImage = PIL.Image.fromarray(imageAsArray,mode=mode)
         pilImage.save(filePath)
 
     def display(self, colorMap=None):
