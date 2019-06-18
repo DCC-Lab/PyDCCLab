@@ -139,3 +139,60 @@ class Image:
         for channel in self.channels:
             channel.setMaskFromThreshold(value)
 
+    def applyConvolution(self, matrix: typing.Union[np.ndarray, list]) -> None:
+        for channel in self.channels:
+            channel.applyConvolution(matrix)
+
+    def applyXDerivative(self) -> None:
+        for channel in self.channels:
+            channel.applyXDerivative()
+
+    def applyYDerivative(self) -> None:
+        for channel in self.channels:
+            channel.applyYDerivative()
+
+    def applyGaussianFilter(self, sigma: float) -> None:
+        for channel in self.channels:
+            channel.applyGaussianFilter(sigma)
+
+    def applyThresholding(self, value=None) -> None:
+        if value is None:
+            self.applyIsodataThresholding()
+        else:
+            self.applyGlobalThresholding(value)
+
+    def applyGlobalThresholding(self, value) -> None:
+        for channel in self.channels:
+            channel.applyGlobalThresholding(value)
+
+    def applyIsodataThresholding(self) -> None:
+        for channel in self.channels:
+            channel.applyIsodataThresholding()
+
+    def applyOtsuThresholding(self) -> None:
+        for channel in self.channels:
+            channel.applyOtsuThresholding()
+
+    def applyOpening(self, size: int) -> None:
+        for channel in self.channels:
+            channel.applyOpening(size)
+
+    def applyClosing(self, size: int) -> None:
+        for channel in self.channels:
+            channel.applyClosing(size)
+
+    def applyErosion(self, size: int = 2):
+        for channel in self.channels:
+            channel.applyErosion(size)
+
+    def applyDilation(self, size: int = 2):
+        for channel in self.channels:
+            channel.applyDilation(size)
+
+    def applyNoiseFilter(self, algorithm=None):
+        for channel in self.channels:
+            channel.applyNoiseFilter(algorithm)
+
+    def applyNoiseFilterWithErosionDilation(self, erosion_size=2, dilation_size=2, closing_size=2):
+        for channel in self.channels:
+            channel.applyNoiseFilterWithErosionDilation(algorithm)

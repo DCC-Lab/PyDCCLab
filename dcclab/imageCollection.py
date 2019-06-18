@@ -156,6 +156,62 @@ class ImageCollection:
         for image in self.images:
             image.setMaskFromThreshold(value)
 
+    def applyConvolution(self, matrix: typing.Union[np.ndarray, list]) -> None:
+        for image in self.images:
+            image.applyConvolution(matrix)
+
+    def applyXDerivative(self) -> None:
+        for image in self.images:
+            image.applyXDerivative()
+
+    def applyYDerivative(self) -> None:
+        for image in self.images:
+            image.applyYDerivative()
+
+    def applyGaussianFilter(self, sigma: float) -> None:
+        for image in self.images:
+            image.applyGaussianFilter(sigma)
+
+    def applyThresholding(self, value=None) -> None:
+        if value is None:
+            self.applyIsodataThresholding()
+        else:
+            self.applyGlobalThresholding(value)
+
+    def applyGlobalThresholding(self, value) -> None:
+        for image in self.images:
+            image.applyGlobalThresholding(value)
+
+    def applyIsodataThresholding(self) -> None:
+        for image in self.images:
+            image.applyIsodataThresholding()
+
+    def applyOtsuThresholding(self) -> None:
+        for image in self.images:
+            image.applyOtsuThresholding()
+
+    def applyOpening(self, size: int) -> None:
+        for image in self.images:
+            image.applyOpening(size)
+
+    def applyClosing(self, size: int) -> None:
+        for image in self.images:
+            image.applyClosing(size)
+
+    def applyErosion(self, size: int = 2):
+        for image in self.images:
+            image.applyErosion(size)
+
+    def applyDilation(self, size: int = 2):
+        for image in self.images:
+            image.applyDilation(size)
+
+    def applyNoiseFilter(self, algorithm=None):
+        self.applyNoiseFilterWithErosionDilation()
+
+    def applyNoiseFilterWithErosionDilation(self, erosion_size=2, dilation_size=2, closing_size=2):
+        for image in self.images:
+            image.applyNoiseFilterWithErosionDilation(erosion_size, dilation_size, closing_size)
 
 class ZStack(ImageCollection):
     def __init__(self, images:List[Image]=None, imagesArray:np.ndarray=None, pathPattern: str=None, keepOriginal: bool=True):
@@ -202,4 +258,40 @@ class ZStack(ImageCollection):
         stacks = OrderedDict([("Original ", self.originalZStack), ("", self.__array), ("Mask ", self.maskedZStack), ("Label ", self.labeledZStack)])
         stacksInMemory = {k: v for k, v in stacks.items() if v is not None}
         return stacksInMemory
+
+    def applyOpening(self, size: int) -> None:
+        if self.processIn3D:
+            raise NotImplementedError()
+        else:
+            super().applyOpening(size)
+
+    def applyClosing(self, size: int) -> None:
+        if self.processIn3D:
+            raise NotImplementedError()
+        else:
+            super().applyClosing(size)
+
+    def applyErosion(self, size: int = 2):
+        if self.processIn3D:
+            raise NotImplementedError()
+        else:
+            super().applyErosion(size)
+
+    def applyDilation(self, size: int = 2):
+        if self.processIn3D:
+            raise NotImplementedError()
+        else:
+            super().applyDilation(size)
+
+    def applyNoiseFilter(self, algorithm=None):
+        if self.processIn3D:
+            raise NotImplementedError()
+        else:
+            super().applyNoiseFilter(size)
+
+    def applyNoiseFilterWithErosionDilation(self, erosion_size=2, dilation_size=2, closing_size=2):
+        if self.processIn3D:
+            raise NotImplementedError()
+        else:
+            super().applyNoiseFilterWithErosionDilation(size)
 
