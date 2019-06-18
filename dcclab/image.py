@@ -9,8 +9,10 @@ import re
 from typing import List, Union
 
 class Image:
-    supportedClasses = [CZIFile, TIFFFile, PILFile]
-    supportedFormats:List[str] = []
+
+    supportedClasses = [CZIFile, TIFFFile, PILFile, MATLABFile]
+    supportedFormats = []
+
 
     def __init__(self, imageData:np.ndarray = None, path: str = None):
         self._getSupportedFormats() #FIXME
