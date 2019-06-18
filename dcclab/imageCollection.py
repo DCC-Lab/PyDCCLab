@@ -120,6 +120,10 @@ class ImageCollection:
         for image in self.images:
             image.removeChannels(channels)
 
+    def keepChannel(self, channel: int):
+        for image in self.images:
+            image.keepChannel(channel)
+
     def showAllSequentially(self, showInGray: object = True):
         for image in self.images:
             image.display()

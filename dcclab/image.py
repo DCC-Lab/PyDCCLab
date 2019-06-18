@@ -61,6 +61,12 @@ class Image:
         for index in channels:
             del self.channels[index]
 
+    def keepChannel(self, channel: int):
+        allIndexes = list(range(0, len(self.channels)))
+        for index in allIndexes:
+            if index != channel:
+                del self.channels[index]
+
     def asChannelsArray(self):
         channelsPixels = list(map(lambda c: c.pixels, self.channels))
         return channelsPixels
