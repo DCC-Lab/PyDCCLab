@@ -18,6 +18,11 @@ class PathPattern:
         return os.path.basename(self.pattern)
 
     @property
+    def extension(self):
+        dummy, extensionWithPeriod = os.path.splitext(self.pattern)
+        return extensionWithPeriod[1:]
+
+    @property
     def hasCaptureGroups(self) -> bool:
         if re.search(r"\(.+\)", self.pattern):
             return True
