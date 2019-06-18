@@ -12,9 +12,13 @@ class CZIFile(ImageFile):
         self.__shape = self.__cziObj.shape
         self.__axes = self.__cziObj.axes
         self.__axesDimAndIndex = self.__findAxesDimAndIndex()
+        self.__isZStack = False if self.__axesDimAndIndex["Z"][0] is None else True
+        self.__isTimeSeries = False if self.__axesDimAndIndex["T"][0] is None else True
         self.__numberOfChannel = self.__axesDimAndIndex["C"][0]
+        if len(self.__tilesDirectory) % self.__numberOfChannel != 0:
+            raise Exception("The number of tiles for each channel is not the same.")
         self.__mosaics = self.__mosaicMaps()
-        self.tilesAt(1, 1, 1)
+        self.__images = self.__getImages()
 
     def __findAxesDimAndIndex(self):
         def findValue(key):
@@ -39,9 +43,26 @@ class CZIFile(ImageFile):
             tileChannel = index[self.__axesDimAndIndex["C"][1]].start
             xSlice = index[self.__axesDimAndIndex["X"][1]]
             ySlice = index[self.__axesDimAndIndex["Y"][1]]
-            mapKey = (range(xSlice.start, xSlice.stop), range(ySlice.start, ySlice.stop))
+            if self.__isZStack:
+                zIndex = index[self.__axesDimAndIndex["Z"][1]].start
+            else:
+                zIndex = None
+            if self.__isTimeSeries:
+                tIndex = index[self.__axesDimAndIndex["T"][1]].start
+            else:
+                tIndex = None
+            mapKey = (range(xSlice.start, xSlice.stop), range(ySlice.start, ySlice.stop), zIndex, tIndex)
             channelsDict[tileChannel][mapKey] = Channel(np.squeeze(tile))
+        print(channelsDict)
         return channelsDict
+
+    def __getImages(self) -> typing.List[typing.List[np.ndarray]]:
+        listOfChannels = [np.squeeze(channel.data_segment().data()) for channel in self.__tilesDirectory]
+        listOfImages = [listOfChannels[x:x + self.__numberOfChannel] for x in
+                        range(0, len(listOfChannels), self.__numberOfChannel)]
+        plt.imshow(listOfImages[1][0])
+        plt.show()
+        return listOfImages
 
     def __del__(self):
         if self.__cziObj is not None:
