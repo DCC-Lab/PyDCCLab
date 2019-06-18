@@ -4,6 +4,7 @@ from .cziUtil import *
 import tifffile
 import PIL
 from .imageFile import *
+from .cziFile import CZIFile
 
 import re
 
