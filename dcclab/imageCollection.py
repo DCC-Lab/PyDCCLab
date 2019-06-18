@@ -274,27 +274,6 @@ class ZStack(ImageCollection):
         np.squeeze(singleChannel)
         return singleChannel
 
-    def show(self, axis=-1):
-        stack4DArray = self.asArray()
-        plt.imshow(stack4DArray.mean(axis))
-        plt.show()
-
-    def showAllStacks(self, axis=-1):
-        stacks = self.stacksInMemory()
-        fig, axes = plt.subplots(1, len(stacks))
-        for i, (key, stack) in enumerate(stacks.items()):
-            if key in ["Original ", ""]:
-                axes[i].imshow(stack.mean(axis))
-            else:
-                axes[i].imshow(stack.max(axis))
-            axes[i].set_title(key + "Stack")
-        plt.show()
-
-    def stacksInMemory(self):
-        stacks = OrderedDict([("Original ", self.originalZStack), ("", self.__array), ("Mask ", self.maskedZStack), ("Label ", self.labeledZStack)])
-        stacksInMemory = {k: v for k, v in stacks.items() if v is not None}
-        return stacksInMemory
-
     def applyOpening(self, size: int) -> None:
         if self.processIn3D is None:
             raise ZStackProcessDimensionIsNotDefined
@@ -333,3 +312,23 @@ class ZStack(ImageCollection):
         else:
             super().applyNoiseFilterWithErosionDilation(size)
 
+    def show(self, axis=-1):
+        stack4DArray = self.asArray()
+        plt.imshow(stack4DArray.mean(axis))
+        plt.show()
+
+    def showAllStacks(self, axis=-1):
+        stacks = self.stacksInMemory()
+        fig, axes = plt.subplots(1, len(stacks))
+        for i, (key, stack) in enumerate(stacks.items()):
+            if key in ["Original ", ""]:
+                axes[i].imshow(stack.mean(axis))
+            else:
+                axes[i].imshow(stack.max(axis))
+            axes[i].set_title(key + "Stack")
+        plt.show()
+
+    def stacksInMemory(self):
+        stacks = OrderedDict([("Original ", self.originalZStack), ("", self.__array), ("Mask ", self.maskedZStack), ("Label ", self.labeledZStack)])
+        stacksInMemory = {k: v for k, v in stacks.items() if v is not None}
+        return stacksInMemory
