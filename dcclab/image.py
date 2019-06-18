@@ -79,15 +79,15 @@ class Image:
         plt.imshow(self.asArray(), cmap=colorMap)
         plt.show()
 
-    def channelsFromImageData(self, imageData):
-        if imageData.ndim == 2:
-            return [Channel(imageData)]
-        elif imageData.ndim == 3:
-            channelsData = np.squeeze(np.dsplit(imageData, imageData.shape[2]))
+    def channelsFromArray(self, array):
+        if array.ndim == 2:
+            return [Channel(array)]
+        elif array.ndim == 3:
+            channelsData = np.squeeze(np.dsplit(array, array.shape[2]))
             channels = list(map(lambda pix: Channel(pix), channelsData))
             return channels
         else:
-            raise DimensionException(imageData.ndim)
+            raise DimensionException(array.ndim)
 
     def _getSupportedFormats(self):
         fmts = list(map( lambda cls: cls.supportedFormats, Image.supportedClasses))
