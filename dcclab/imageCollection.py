@@ -282,23 +282,28 @@ class ZStack(ImageCollection):
         np.squeeze(singleChannel)
         return singleChannel
 
+    def apply3DFilter(self, filterFunc, *args):
+        """ These Functions should be processed over one Channel at a time"""
+        filteredArrays = []
+        for channel in list(range(self.numberOfChannels)):
+            array = self.asSingleChannelArray(channel)
+            filteredArrays.append(filterFunc(array, *args))
+        newStack = np.stack(filteredArrays, axis=2)
+        self.fromArray(newStack)
+
     def applyOpening(self, size: int) -> None:
         if self.processIn3D is None:
             raise ZStackProcessDimensionIsNotDefined
-        if self.processIn3D:
-            """ These filters should be processed over one Channel at a time"""
-            filteredArrays = []
-            for channel in list(range(self.numberOfChannels)):
-                array = self.asSingleChannelArray(channel)
-                filteredArrays.append(ndimage.grey_opening(array, size))
-            newStack = np.stack(filteredArrays, axis=2)
-            self.fromArray(newStack)
+        elif self.processIn3D:
+            self.apply3DFilter(ndimage.grey_opening, size)
         else:
             super().applyOpening(size)
 
     def applyClosing(self, size: int) -> None:
-        if self.processIn3D:
-            raise NotImplementedError()
+        if self.processIn3D is None:
+            raise ZStackProcessDimensionIsNotDefined
+        elif self.processIn3D:
+            self.apply3DFilter(ndimage.grey_closing, size)
         else:
             super().applyClosing(size)
 
