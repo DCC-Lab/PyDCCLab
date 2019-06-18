@@ -36,6 +36,9 @@ class ImageCollection:
             sizeInBytes += image.sizeInBytes
         return sizeInBytes
 
+    def clear(self):
+        self.__images = []
+
     def asArray(self) -> np.ndarray:
         # An ImageCollection may not always be put into
         # an array: if all images have different sizes, this will
@@ -68,6 +71,9 @@ class ImageCollection:
     def append(self, image: Image):
         if self.contains(image):
             raise ImageAlreadyInCollectionException
+        if not isinstance(image, Image):
+            raise NotImageException
+
         self.images.append(image)
 
     def appendMatchingFiles(self, pattern):
@@ -90,7 +96,12 @@ class ImageCollection:
         self.images.pop(index)
 
     def remove(self, image: Image):
+        if not isinstance(image, Image):
+            raise NotImageException
+
         index = self.indexOf(image)
+        if index is None:
+            raise ImageNotInCollectionException
         del self.images[index]
 
     def showAllSequentially(self, showInGray: object = True):
