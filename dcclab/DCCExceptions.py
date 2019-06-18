@@ -14,8 +14,8 @@ class DimensionException(Exception):
 
 
 class PixelTypeException(Exception):
-    def __init__(self):
-        Exception.__init__(self, "Pixels type must be 32 bits float.")
+    def __init__(self, msg):
+        Exception.__init__(self, msg)
 
 
 class InvalidEqualityTestException(Exception):
@@ -23,9 +23,12 @@ class InvalidEqualityTestException(Exception):
         Exception.__init__(self, "Can't compare equality of a DCCImage instance and {}.".format(otherType))
 
 
-class NotDCCImageException(Exception):
+class NotImageException(Exception):
     def __init__(self):
-        Exception.__init__(self, "Attribute must be a DCCImage instance.")
+        Exception.__init__(self, "Attribute must be an Image() instance.")
+
+class NotDCCImageException(NotImageException):
+    pass
 
 
 class InvalidImageNameException(Exception):
@@ -47,6 +50,10 @@ class NotBinaryImageException(Exception):
     def __init__(self):
         Exception.__init__(self, "The image must be in binary format (only black and white pixels).")
 
-class EmptyDCCImageCollectionException(Exception):
+class EmptyImageCollectionException(Exception):
     def __init__(self):
         Exception.__init__(self, "There are no images in the collection.")
+
+class EmptyDCCImageCollectionException(EmptyImageCollectionException):
+    pass
+

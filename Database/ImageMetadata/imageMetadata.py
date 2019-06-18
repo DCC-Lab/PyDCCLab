@@ -1,5 +1,9 @@
 from Database.ImageMetadata import CZIMetadata
 import os
+try:
+    import deprecated
+except:
+    exit("pip install deprecated")
 
 
 class ImageMetadata:
@@ -27,15 +31,28 @@ class ImageMetadata:
             self.__fileObject = None
 
     @property
-    def getMetadata(self) -> dict:
+    def metadata(self) -> dict:
         if isinstance(self.__fileObject, CZIMetadata):
             return self.__fileObject.asDict().get('metadata')
         else:
             return {}
 
     @property
-    def getChannels(self) -> dict:
+    def channels(self) -> dict:
         if isinstance(self.__fileObject, CZIMetadata):
             return self.__fileObject.asDict().get('channels')
         else:
             return {}
+
+
+if __name__ == '__main__':
+    # Some scratch tests :  # TODO To delete when the class is completed. This is only for quick tests.
+    path = 'P:\\injection AAV\\résultats bruts\\AAV\\AAV498AAV455\\AAV498AAV455_S94\\AAV498-455_S94_C.czi'
+    mdata = ImageMetadata(path)
+    for key, value in mdata.metadata.items():
+        print(key, value)
+
+    for key, value in mdata.channels.items():
+        print(key, value)
+        for subkey, subvalue in value.items():
+            print(subkey, subvalue)

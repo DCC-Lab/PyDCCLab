@@ -161,7 +161,7 @@ if __name__ == '__main__':
     '''
     lstKeys = []
     lstKeysType = []
-    for key, value in metadata.getMetadata.items():
+    for key, value in metadata.metadata.items():
         lstKeys.append(key)
         if key == 'path':
             lstKeysType.append('TEXT PRIMARY KEY')
@@ -170,7 +170,7 @@ if __name__ == '__main__':
 
     lstChannelKeys = []
     lstChannelKeysType = []
-    channels = metadata.getChannels
+    channels = metadata.channels
     aChannelKey = list(channels.keys())[0]
     for key, value in channels[aChannelKey].items():
         lstChannelKeys.append(key)
@@ -219,9 +219,9 @@ if __name__ == '__main__':
     for file in filesList:
         print('Processing : ', file)
         metadata = imgMtdt(file)
-        testDB.insert('czimetadata', metadata.getMetadata)
+        testDB.insert('czimetadata', metadata.metadata)
         testDB.commit()
 
-        for channelid, channel in metadata.getChannels.items():
+        for channelid, channel in metadata.channels.items():
             testDB.insert('czichannel', channel)
             testDB.commit()

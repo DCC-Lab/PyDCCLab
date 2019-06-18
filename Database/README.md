@@ -1,5 +1,4 @@
 # Overview
-The database folder contains everything relative to the database programming and the management of metadata sources which must then be added to the database.
-* DatabaseManagement contains the files related to the management of access, connections, commits, executes and handling of anything related to the database itself. It also contains the files that enables reading from csv files and translating those to a table entry in the database.
-* CziMetadataManagement contains the files related to the conversion of metadata from a Carl Zeiss Image format file to a metadata object.
-* MetadataToCsvManagement contains the files related to turning a metadata object to a csv file, which can then be passed onto the database object and into a table of the database itself.
+The database mdoule contains code used to handle metadata/data as well as managing a sqlite3 database.
+* In the subfolder `DatabaseManagement`,  you will find the `database` object, which is meant to handle creation, connection, insertions and queries to a sqlite database. When inserting into a database, the `insert` function of the `database` object assumes to be given a `dict` type object. It also returns `sqlite.row` type objects when it can, `list` type objects otherwise.
+* In the subfolder `ImageMetadata`, you will find the `imageMetadata` object, which is meant to handle the extraction of metadata from files. The metadata can then be extracted as `dict` type objects from imageMetadata. Right now, only `.czi` files are supported. `imageMetadata` was coded with the idea that a person should not have to do any special operations to get metadata from a file. The object should handle the file type and the extraction by itself so it is quick and simple to use.
