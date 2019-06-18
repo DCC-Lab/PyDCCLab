@@ -47,6 +47,9 @@ class Image:
             return False
         return np.array_equal(self.asArray(), other.asArray())
 
+    def __getitem__(self, index):
+        return self.channels[index]
+
     @property
     def shape(self):
         if len(self.channels) != 0:

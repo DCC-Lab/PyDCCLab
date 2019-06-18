@@ -30,5 +30,11 @@ class TestTimeSeries(unittest.TestCase):
             file = pattern.filePathWithIndex(i)
             self.assertTrue(os.path.exists(file),"{0} does not exist".format(file))
 
+    def testSeriesSave(self):
+        imageData = np.random.randint(low=0, high=255, size=(100, 200,3,10))
+        series = TimeSeries(imagesArray=imageData)
+        series.save("/tmp/test.avi")
+        self.assertTrue(os.path.exists("/tmp/test.avi"))
+
 if __name__ == '__main__':
     unittest.main()

@@ -8,6 +8,17 @@ class TimeSeries(ImageCollection):
         if not self.imagesAreSimilar:
             raise ValueError("Images in TimeSeries are not all the same shape")
 
+    @property
+    def width(self):
+        if self.imagesAreSimilar:
+            return self.images[0][0].width
+
+    @property
+    def height(self):
+        if self.imagesAreSimilar:
+            return self.images[0][0].height
+    
+
     def asArray(self) -> np.ndarray:
         return np.stack([ image.asArray() for image in self.images ], axis=3)
 
@@ -32,14 +43,12 @@ class TimeSeries(ImageCollection):
 
                 
     def saveAsAVI(self, path):
-        height, width, channels = self.images[0].shape
-
         # Define the codec and create VideoWriter object
         # fourcc = cv2.VideoWriter_fourcc(*'DIB ') 
         # use fourcc = 0 for uncompressed.
-        out = cv2.VideoWriter(path, 0, 20.0, (width, height))
+        out = cv2.VideoWriter(path, 0, 20.0, (self.width, self.height))
         for image in self.images:
-            out.write(image.asArray())
+            out.write(image.asArray().astype(np.uint8))
         out.release()
 
 
