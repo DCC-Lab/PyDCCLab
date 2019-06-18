@@ -274,6 +274,8 @@ class ZStack(ImageCollection):
         return stacksInMemory
 
     def applyOpening(self, size: int) -> None:
+        if self.processIn3D is None:
+            raise ZStackProcessDimensionIsNotDefined
         if self.processIn3D:
             raise NotImplementedError()
         else:
