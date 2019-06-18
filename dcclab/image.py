@@ -9,7 +9,7 @@ import re
 
 
 class Image:
-    supportedClasses = [CZIFile, TIFFFile, PILFile]
+    supportedClasses = [CZIFile, TIFFFile, PILFile, MATLABFile]
     supportedFormats = []
 
     def __init__(self, imageData:np.ndarray = None, path: str = None):
