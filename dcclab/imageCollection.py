@@ -1,6 +1,7 @@
 from .image import *
 import numpy as np
 import json
+import inspect
 import matplotlib.pyplot as plt
 from typing import List, Union
 from .__lifReader import LifReader
@@ -250,7 +251,7 @@ class ZStack(ImageCollection):
         if not self.imagesAreSimilar:
             raise ValueError("Images in z-stack are not all the same shape")
 
-        self.__keepOriginal = keepOriginal
+        self.__keepOriginal = keepOriginal  # todo : init Channel Objects with keepOriginal flag. + Define ZStack.original ?
         self.params = OrderedDict()
         self.processIn3D = True
 
@@ -282,42 +283,32 @@ class ZStack(ImageCollection):
         np.squeeze(singleChannel)
         return singleChannel
 
-    def apply3DFilter(self, filterFunc, *args):
+    def apply3DFilter(self, filterFunc, *filterArgs):  # todo: maybe multiple functions
         """ These Functions should be processed over one Channel at a time"""
-        filteredArrays = []
-        for channel in list(range(self.numberOfChannels)):
-            array = self.asSingleChannelArray(channel)
-            filteredArrays.append(filterFunc(array, *args))
-        newStack = np.stack(filteredArrays, axis=2)
-        self.fromArray(newStack)
-
-    def applyOpening(self, size: int) -> None:
         if self.processIn3D is None:
             raise ZStackProcessDimensionIsNotDefined
         elif self.processIn3D:
-            self.apply3DFilter(ndimage.grey_opening, size)
+            filteredArrays = []
+            for channel in list(range(self.numberOfChannels)):
+                array = self.asSingleChannelArray(channel)
+                filteredArrays.append(filterFunc(array, *filterArgs))
+            newStack = np.stack(filteredArrays, axis=2)
+            self.fromArray(newStack)
         else:
-            super().applyOpening(size)
+            callerFunction = inspect.stack()[1].function
+            getattr(super(), callerFunction)()
 
-    def applyClosing(self, size: int) -> None:
-        if self.processIn3D is None:
-            raise ZStackProcessDimensionIsNotDefined
-        elif self.processIn3D:
-            self.apply3DFilter(ndimage.grey_closing, size)
-        else:
-            super().applyClosing(size)
+    def applyOpening(self, size: int=2) -> None:
+        self.apply3DFilter(ndimage.grey_opening, size)
 
-    def applyErosion(self, size: int = 2):
-        if self.processIn3D:
-            raise NotImplementedError()
-        else:
-            super().applyErosion(size)
+    def applyClosing(self, size: int=2) -> None:
+        self.apply3DFilter(ndimage.grey_closing, size)
 
-    def applyDilation(self, size: int = 2):
-        if self.processIn3D:
-            raise NotImplementedError()
-        else:
-            super().applyDilation(size)
+    def applyErosion(self, size: int=2):
+        self.apply3DFilter(ndimage.grey_erosion, size)
+
+    def applyDilation(self, size: int=2):
+        self.apply3DFilter(ndimage.grey_dilation, size)
 
     def applyNoiseFilter(self, algorithm=None):
         if self.processIn3D:
