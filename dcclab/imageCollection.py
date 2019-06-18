@@ -296,7 +296,7 @@ class ZStack(ImageCollection):
             self.fromArray(newStack)
         else:
             callerFunction = inspect.stack()[1].function
-            getattr(super(), callerFunction)()
+            getattr(super(), callerFunction)(*filterArgs)
 
     def applyOpening(self, size: int=2) -> None:
         self.apply3DFilter(ndimage.grey_opening, size)
