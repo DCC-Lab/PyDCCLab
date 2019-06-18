@@ -174,7 +174,7 @@ class ImageCollection:
         else:
             raise ValueError("Mask must be binary")
 
-    def setMasks(self, masks:[Channel]):
+    def setMasks(self, masks: [Channel]):
         if len(masks) == len(self.images):
             # We have one mask per image
             for mask in masks:
@@ -333,6 +333,18 @@ class ZStack(ImageCollection):
             self.fromArray(newStack)
         else:
             super().applyNoiseFilterWithErosionDilation(erosion_size, dilation_size, closing_size)
+
+    # Mask operations are defined in ImageCollection. each images we have has a Channel.mask array
+    # add a method to get a channel's masks as one array for labelling
+    def getMaskArray(self, channel=None):
+        raise NotImplementedError
+
+    def labelMaskComponents(self):
+        """ Labelling always need to be processed in 3D ? """
+        raise NotImplementedError
+
+    def analyzeComponents(self):
+        raise NotImplementedError
 
     def show(self, axis=-1):
         stack4DArray = self.asArray()
