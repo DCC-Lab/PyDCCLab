@@ -1,4 +1,5 @@
 from .image import *
+from .pathPattern import *
 import numpy as np
 import json
 import inspect
@@ -25,9 +26,29 @@ class ImageCollection:
         elif pathPattern is not None:
             self.appendMatchingFiles(pathPattern)
 
+
+    def save(self, pathOrPattern:str):
+        pattern = PathPattern(pathOrPattern)
+        if pattern.isWritePattern:
+            for (i, image) in enumerate(self.images):
+                path = pattern.filePathWithIndex(i)
+                image.save(path)
+        else:
+            raise ValueError("To save files in ImageCollection, use a Python format-string such as Image-{0:03d}.tiff")            
+
     @property
     def images(self):
         return self.__images
+
+    @property
+    def imagesAreSimilar(self) -> bool:
+        shape = None
+        for image in self.images:
+            if shape is None:
+                shape = image.shape
+            elif shape != image.shape:
+                return False
+        return True
 
     @property
     def sizeInBytes(self):
@@ -35,6 +56,9 @@ class ImageCollection:
         for image in self.images:
             sizeInBytes += image.sizeInBytes
         return sizeInBytes
+
+    def clear(self):
+        self.__images = []
 
     def asArray(self) -> np.ndarray:
         # An ImageCollection may not always be put into
@@ -68,17 +92,24 @@ class ImageCollection:
     def append(self, image: Image):
         if self.contains(image):
             raise ImageAlreadyInCollectionException
+        if not isinstance(image, Image):
+            raise NotImageException
+
         self.images.append(image)
 
-    def appendMatchingFiles(self, pathPattern):
-        directory = os.path.dirname(pathPattern)
-        basePattern = os.path.basename(pathPattern)
-        paths = [os.path.join(directory,f) for f in os.listdir(directory) if re.match(basePattern, f)]
-        paths.sort()
-        for path in paths:
+
+    def extend(self, images: List[Image]):
+        for image in images:
+            if self.contains(image):
+                raise ImageAlreadyInCollectionException
+            self.images.append(image)
+
+    def appendMatchingFiles(self, pattern):
+        paths = PathPattern(pattern)
+        for path in paths.matchingFiles():
             try:
                 image = Image(path=path)
-                self.__images.append(image)
+                self.append(image)
             except:
                 pass
 
@@ -114,7 +145,12 @@ class ImageCollection:
         self.images.pop(index)
 
     def remove(self, image: Image):
+        if not isinstance(image, Image):
+            raise NotImageException
+
         index = self.indexOf(image)
+        if index is None:
+            raise ImageNotInCollectionException
         del self.images[index]
 
     def removeChannels(self, channels: list):
