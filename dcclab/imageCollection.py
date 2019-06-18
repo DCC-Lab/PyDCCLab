@@ -251,11 +251,16 @@ class ZStack(ImageCollection):
         return singleChannel
 
     def fromSingleChannelArray(self, channelArray, channel):
-        # Take array, put back into channel
+        """ fixme: if its a single channel 4D array, then fromArray works...
+            and if we use 'from' we mean to define all the collection as a single channel,
+            so no need to specify which channel it is...
+            unless to function is called something like replaceChannelFromArray(array, channnel)"""
         raise NotImplementedError()
 
     def fromArray(self, imagesArray):
-        # Take array, put back into all channels
+        """ FIXME: fromSingleChannelArray and fromArray should only be defined inside ImageCollection.
+            but ImageCollection already has appendFromImagesArray. but the method doesn't overwrite
+            self.images ... """
         raise NotImplementedError()
 
     def show(self, axis=-1):
