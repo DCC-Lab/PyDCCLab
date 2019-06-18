@@ -30,5 +30,24 @@ class TestMATLABFile(unittest.TestCase):
         with self.assertRaises(ValueError):
             data = file.imageDataFromPath()
 
+    def testImageDataWithoutVariableWithImageData(self):
+        file = MATLABFile("./test.mat")
+        data = file.imageDataFromPath()
+        self.assertIsNotNone(data)
+        self.assertTrue(isinstance(data, np.ndarray))
+        self.assertEqual(data.ndim, 3)
+
+    def testImageDataWithoutVariableWithoutImageData(self):
+        file = MATLABFile("./nothing.mat")
+        data = file.imageDataFromPath()
+        self.assertIsNone(data)
+
+    def testImageDataWithoutVariableWith2DChannelData(self):
+        file = MATLABFile("./2dArray.mat")
+        data = file.imageDataFromPath()
+        self.assertIsNotNone(data)
+        self.assertTrue(isinstance(data, np.ndarray))
+        self.assertEqual(data.ndim, 3)
+
 if __name__ == '__main__':
     unittest.main()

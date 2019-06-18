@@ -89,6 +89,6 @@ class MATLABFile(ImageFile):
                 variable = dataset[name]
                 if isinstance(variable, np.ndarray):
                     if variable.ndim == 2:
-                        return variable
+                        return np.expand_dims(variable,2) # always return 3D
 
         return None
