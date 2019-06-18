@@ -89,6 +89,26 @@ class ImageCollection:
         else:
             raise NotImplementedError("ImageCollection from 4D arrays only.")
 
+    def fromSingleChannelArray(self, channelArray, channel):
+        """ fixme: if its a single channel 4D array, then fromArray works...
+            and if we use 'from' we mean to define all the collection as a single channel,
+            so no need to specify which channel it is...
+            unless to function is called something like replaceChannelFromArray(array, channnel)"""
+        raise NotImplementedError()
+
+    def fromArray(self, imagesArray):
+        """ FIXME: fromSingleChannelArray and fromArray should only be defined inside ImageCollection.
+            but ImageCollection already has appendFromImagesArray. but the method doesn't overwrite
+            self.images ... """
+
+        self.__images = []  # fromArray redefines ?
+        if imagesArray.ndim == 4:
+            images = [Image(imagesArray[:, :, :, i]) for i in range(imagesArray.shape[3])]
+            for image in images:
+                self.__images.append(image)
+        else:
+            raise NotImplementedError("ImageCollection from 4D arrays only.")
+
     def removeAt(self, index: int):
         self.images.pop(index)
 
@@ -249,19 +269,6 @@ class ZStack(ImageCollection):
         singleChannel = imagesArray[:, :, channel, :]
         np.squeeze(singleChannel)
         return singleChannel
-
-    def fromSingleChannelArray(self, channelArray, channel):
-        """ fixme: if its a single channel 4D array, then fromArray works...
-            and if we use 'from' we mean to define all the collection as a single channel,
-            so no need to specify which channel it is...
-            unless to function is called something like replaceChannelFromArray(array, channnel)"""
-        raise NotImplementedError()
-
-    def fromArray(self, imagesArray):
-        """ FIXME: fromSingleChannelArray and fromArray should only be defined inside ImageCollection.
-            but ImageCollection already has appendFromImagesArray. but the method doesn't overwrite
-            self.images ... """
-        raise NotImplementedError()
 
     def show(self, axis=-1):
         stack4DArray = self.asArray()
