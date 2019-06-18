@@ -238,6 +238,20 @@ class ZStack(ImageCollection):
         # All images are the same size
         return np.stack([ image.asArray() for image in self.images ], axis=3)
 
+    def asSingleChannelArray(self, channel) -> np.ndarray:
+        imagesArray = self.asArray()
+        singleChannel = imagesArray(:,:,channel,:)
+        np.squeeze(singleChannel)
+        return singleChannel
+
+    def fromSingleChannelArray(self, channelArray, channel):
+        # Take array, put back into channel
+        raise NotImplementedError()
+
+    def fromArray(self, imagesArray):
+        # Take array, put back into all channels
+        raise NotImplementedError()
+
     def show(self, axis=-1):
         stack4DArray = self.asArray()
         plt.imshow(stack4DArray.mean(axis))
