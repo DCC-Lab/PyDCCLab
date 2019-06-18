@@ -234,7 +234,7 @@ class ZStack(ImageCollection):
         return True
 
     def asArray(self) -> np.ndarray:
-        # An ZStack is always a 4D array
+        # A ZStack is always a 4D array
         # All images are the same size
         return np.stack([ image.asArray() for image in self.images ], axis=3)
 
@@ -258,7 +258,7 @@ class ZStack(ImageCollection):
         plt.show()
 
     def showAllStacks(self, axis=-1):
-        stacks = self._stacksInMemory()
+        stacks = self.stacksInMemory()
         fig, axes = plt.subplots(1, len(stacks))
         for i, (key, stack) in enumerate(stacks.items()):
             if key in ["Original ", ""]:
@@ -268,7 +268,7 @@ class ZStack(ImageCollection):
             axes[i].set_title(key + "Stack")
         plt.show()
 
-    def _stacksInMemory(self):
+    def stacksInMemory(self):
         stacks = OrderedDict([("Original ", self.originalZStack), ("", self.__array), ("Mask ", self.maskedZStack), ("Label ", self.labeledZStack)])
         stacksInMemory = {k: v for k, v in stacks.items() if v is not None}
         return stacksInMemory
