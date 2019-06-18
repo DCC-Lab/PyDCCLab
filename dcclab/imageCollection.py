@@ -286,7 +286,13 @@ class ZStack(ImageCollection):
         if self.processIn3D is None:
             raise ZStackProcessDimensionIsNotDefined
         if self.processIn3D:
-            raise NotImplementedError()
+            """ These filters should be processed over one Channel at a time"""
+            filteredArrays = []
+            for channel in list(range(self.numberOfChannels)):
+                array = self.asSingleChannelArray(channel)
+                filteredArrays.append(ndimage.grey_opening(array, size))
+            newStack = np.stack(filteredArrays, axis=2)
+            self.fromArray(newStack)
         else:
             super().applyOpening(size)
 
