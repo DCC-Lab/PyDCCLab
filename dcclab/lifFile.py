@@ -1,7 +1,6 @@
-from typing import List, Union
+from typing import Union
 from .__lifReader import LifReader
-from scipy import ndimage
-from collections import OrderedDict
+
 
 class LIFFile:
     def __init__(self, path: str):
