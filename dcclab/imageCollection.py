@@ -286,7 +286,7 @@ class ZStack(ImageCollection):
             raise ValueError("Images in z-stack are not all the same shape")
 
         self.__keepOriginal = keepOriginal  # todo : init Channel Objects with keepOriginal flag. + Define ZStack.original ?
-        self.params = OrderedDict()
+        self.componentsProperties = OrderedDict()
         self.processIn3D = True
 
     @property
@@ -368,17 +368,38 @@ class ZStack(ImageCollection):
         else:
             super().applyNoiseFilterWithErosionDilation(erosion_size, dilation_size, closing_size)
 
-    # Mask operations are defined in ImageCollection. each images we have has a Channel.mask array
-    # add a method to get a channel's masks as one array for labelling
     def getMaskArray(self, channel: int):
-        maskArray = np.stack([image.channels[channel].mask.pixels for image in self.images], axis=3)
-        return maskArray
+        maskStackArray = np.stack([image.channels[channel].mask.pixels for image in self.images], axis=3)
+        return maskStackArray
+
+    def getLabelArray(self, channel: int):
+        labelStackArray = np.stack([image.channels[channel].labelledComponents for image in self.images], axis=3)
+        return labelStackArray
 
     def labelMaskComponents(self):
         """ Labelling always need to be processed in 3D ? """
-        raise NotImplementedError
+        for channel in list(range(self.numberOfChannels)):
+            maskStackArray = self.getMaskArray(channel)
+            labelStackArray, nbObjects = label(maskStackArray)
+            self.componentsProperties["Channel {}".format(channel)]["nbOfObjects"] = nbObjects
+
+            self.channelLabelsFromArray(channel, labelStackArray)
+
+    def channelLabelsFromArray(self, channel, labelStackArray):
+        for i, labelArray in enumerate(labelStackArray):
+            self.images[i].channels[channel].labelledComponents = labelArray
+
+    """ Ouh là, ca devient lourd. Ce back-propagation de toujours aller redéfinir les couches 2D intérieures
+        après avoir appliqué une méthode 3D. Ce serait nice de garder en mémoire le mask et label 4D 
+        (et stack original) mais bon je suppose que cest moins object-oriented..."""
 
     def analyzeComponents(self):
+        for channel in list(range(self.numberOfChannels)):
+            stackArray = self.asSingleChannelArray(channel)
+            maskArray = self.getMaskArray(channel)
+            labelArray = self.getLabelArray(channel)
+            # Compute components properties
+            # Append components properties dictionary
         raise NotImplementedError
 
     def show(self, axis=-1):
