@@ -100,6 +100,7 @@ def decodeImages(cziObj, max_workers=None):
 
     This is based on the czifil asarray method except it is modified so the data extraction is only done once.
     """
+    print(cziObj.axes)
     maxSize = len(cziObj.filtered_subblock_directory)
     print("Reading the pixel values of {} images. This may take a few minutes.".format(maxSize))
     imagesQueue = multiprocessing.Queue(maxsize=maxSize)
@@ -140,7 +141,7 @@ def decodeImages(cziObj, max_workers=None):
     returnList = []
     while imagesQueue.qsize() != 0:
         returnList.append(np.squeeze(imagesQueue.get()))
-    return np.squeeze(out), returnList
+    return out, returnList
 
 
 def showImagesFromCziFileObject(cziObject):
