@@ -35,7 +35,8 @@ class LifSerie(Serie):
             channels = list(channels)
 
         channelStacks = []
-        for channel in channels:
+        for i, channel in enumerate(channels):
+            print("... Loading channel {}/{}".format(i+1, len(channels)))
             channelStacks.append(self.__getStackChannel(channel))
 
         return np.stack(channelStacks, axis=2)

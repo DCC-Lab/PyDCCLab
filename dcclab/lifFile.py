@@ -54,7 +54,8 @@ class LIFFile:
         series = self[seriesIndices]
 
         zStacks = []
-        for serie in series:
+        for i, serie in enumerate(series):
+            print("... Loading serie {}/{}".format(i+1, len(series)))
             zStack = ZStack(imagesArray=serie.getStack(channelIndices))
             zStacks.append(zStack)
 
