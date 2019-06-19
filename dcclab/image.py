@@ -53,7 +53,8 @@ class Image:
     @property
     def shape(self):
         if len(self.channels) != 0:
-            return self.channels[0].shape
+            x, y = self.channels[0].shape
+            return x, y, len(self.channels)
 
     @property
     def sizeInBytes(self) -> int:
