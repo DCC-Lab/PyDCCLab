@@ -1,5 +1,6 @@
 from typing import Union
 from .__lifReader import LifReader
+from .imageCollection import ZStack
 
 
 class LIFFile:
@@ -52,9 +53,9 @@ class LIFFile:
 
         series = self[seriesIndices]
 
-        stacks = []
+        zStacks = []
         for serie in series:
-            # TODO: create ZStackCollection Object with array
-            stacks.append(serie.getStack(channels))  # numpy array
+            zStack = ZStack(imagesArray=serie.getStack(channels))
+            zStacks.append(zStack)
 
-        return stacks
+        return zStacks
