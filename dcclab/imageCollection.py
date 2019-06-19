@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from typing import List, Union
 from scipy import ndimage
 from collections import OrderedDict
+from PIL import Image as PILImage
 import sys
 
 
@@ -468,3 +469,23 @@ def progressBar(value, endvalue, bar_length=20):
 
         sys.stdout.write("\r   [{0}] {1}%".format(arrow + spaces, int(round(percent * 100))))
         sys.stdout.flush()
+
+
+# FIXME: temporary, merge with pathPattern logic inside ZStack init
+def getZStackFromFolder(inputDir, channelsToSegment=[0]):
+    files = list(os.walk(inputDir))[0][2]
+
+    channelStacks = []
+    for i, channel in enumerate(channelsToSegment):
+        print("... Loading channel {}/{}".format(i+1, len(channelsToSegment)))
+        channelFilePaths = [os.path.join(inputDir, f) for f in files if str(channel+1) in f.split("_")[-1]]
+
+        channelImages = []
+        for filePath in channelFilePaths:
+            channelImages.append(np.array(PILImage.open(filePath)))
+        stack = np.stack(channelImages, axis=-1)
+        channelStacks.append(stack)
+
+    stackArray = np.stack(channelStacks, axis=2)
+
+    return ZStack(imagesArray=stackArray, cropAtInit=True)
