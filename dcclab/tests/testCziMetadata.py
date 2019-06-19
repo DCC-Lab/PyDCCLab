@@ -1,4 +1,4 @@
-from Database.ImageMetadata import CZIMetadata as mtdt
+from dcclab import CZIMetadata as mtdt
 from dcclab import readCziImage
 import xml.etree.ElementTree as ET
 import unittest
@@ -7,17 +7,12 @@ import os
 
 class TestMetadata(unittest.TestCase):
     def setUp(self):
-        self.directory = os.path.dirname(os.path.dirname(__file__))
-        self.testPath = os.path.join(self.directory, 'testData', 'testCziFile.czi')
-        self.wrongFilePath = os.path.join(self.directory, 'testData', 'wrongfilename.czi')
-        self.wrongFileType = os.path.join(self.directory, 'testData', 'wrongFile.txt')
-        self.missingEntriesPath = os.path.join(self.directory, 'testData', 'MissingEntries.xml')
-        self.missingKeysPath = os.path.join(self.directory, 'testData', 'MissingKeys.xml')
-
-    @deprecated("What is this? see https://github.com/DCC-Lab/Documentation/blob/master/HOWTO-CodingStyle.md")
-    def test_cziImageObjectFromPath_isCziImageObject(self):
-        mdata = mtdt(self.testPath)
-        self.assertIs(type(mdata.cziImageObjectFromPath()), type(readCziImage(self.testPath)))
+        self.directory = os.path.dirname(__file__)
+        self.testPath = os.path.join(self.directory, 'testCziFile.czi')
+        self.wrongFilePath = os.path.join(self.directory, 'wrongfilename.czi')
+        self.wrongFileType = os.path.join(self.directory, 'wrongFile.txt')
+        self.missingEntriesPath = os.path.join(self.directory, 'MissingEntries.xml')
+        self.missingKeysPath = os.path.join(self.directory, 'MissingKeys.xml')
 
     def testCziImageObjectFromPathIsCziImageObject(self):
         mdata = mtdt(self.testPath)
@@ -171,7 +166,7 @@ class TestMetadata(unittest.TestCase):
 
     def testFindChannelsInRootReturnsListOfChannels(self):
         mdata = mtdt(self.testPath)
-        testChannels = ['Channel:0', 'Channel:1']
+        testChannels = [self.testPath + ';Channel:0', self.testPath + ';Channel:1']
         for channel, testChannel in zip(mdata.findChannelsInRoot(), testChannels):
             self.assertEqual(channel.channelId, testChannel)
 
@@ -200,55 +195,55 @@ class TestMetadata(unittest.TestCase):
 
     def testAsDictExpectedValue(self):
         mdata = mtdt(self.testPath)
-        expectedValue = {
-            'path': 'C:\\Users\\MathieuLaptop\\Documents\\Ulaval\\ProgPython\\Projets\\BigData-ImageAnalysis\\testData\\testCziFile.czi',
-            'microscope': 'Axio Observer.Z1 / 7', 'objective': 'LD A-Plan 5x/0.15 Ph1', 'x_size': '1936',
-            'y_size': '1460', 'x_scale': '9.08E-07', 'y_scale': '9.08E-07', 'x_scaled': 0.001757888,
-            'y_scaled': 0.00132568, 'name': 'testCziFile.czi', 'mouse_id': None, 'viral_vectors': '', 'injection_site': None, 'tags': ''}
-        self.assertEqual(mdata.asDict(), expectedValue)
+        expectedValue = {'path': self.testPath, 'microscope': 'Axio Observer.Z1 / 7',
+                         'objective': 'LD A-Plan 5x/0.15 Ph1', 'x_size': '1936', 'y_size': '1460',
+                         'x_scale': '9.08E-07', 'y_scale': '9.08E-07', 'x_scaled': 0.001757888, 'y_scaled': 0.00132568,
+                         'name': 'testCziFile.czi', 'mouse_id': None, 'viral_vectors': '', 'injection_site': None,
+                         'tags': ''}
+        self.assertEqual(mdata.asDict()['metadata'], expectedValue)
 
-    def testSetMouseId_upperCase(self):
+    def testSetMouseIdUpperCase(self):
         mdata = mtdt(self.testPath, 'S123_test_czi')
         self.assertEqual(mdata.setMouseId(), '123')
 
-    def testSetMouseId_lowerCase(self):
+    def testSetMouseIdLowerCase(self):
         mdata = mtdt(self.testPath, 's123_test_czi')
         self.assertEqual(mdata.setMouseId(), '123')
 
-    def testSetMouseId_lessDigits(self):
+    def testSetMouseIdLessDigits(self):
         mdata = mtdt(self.testPath, 's1_test_czi')
         self.assertEqual(mdata.setMouseId(), '1')
 
-    def testSetMouseId_moreDigits(self):
+    def testSetMouseIdMoreDigits(self):
         mdata = mtdt(self.testPath, 's1234_test_czi')
         self.assertEqual(mdata.setMouseId(), '1234')
 
-    def testSetMouseId_noIdFound(self):
+    def testSetMouseIdNoIdFound(self):
         mdata = mtdt(self.testPath, 'test_czi')
         self.assertIsNone(mdata.setMouseId())
 
-    def testFindRabVectors_upperCase(self):
+    def testFindRabVectorsUpperCase(self):
         mdata = mtdt(self.testPath, 'RAB1.2_RABV3.2_czi')
         self.assertEqual(mdata.findRabVectors(), 'RAB1.2;RABV3.2')
 
-    def testFindRabVectors_lowerCase(self):
+    def testFindRabVectorsLowerCase(self):
         mdata = mtdt(self.testPath, 'rab1.2_rabv3.2_czi')
         self.assertEqual(mdata.findRabVectors(), 'rab1.2;rabv3.2')
 
-    def testFindRabVectors_expectedValues(self):
+    def testFindRabVectorsExpectedValues(self):
         mdata = mtdt(self.testPath, 'rab1_rabv1_RAB1.1_rabv1.1_czi')
         self.assertEqual(mdata.findRabVectors(), 'rab1;rabv1;RAB1.1;rabv1.1')
 
-    def testFindRabVectors_noVectorsFound(self):
+    def testFindRabVectorsNoVectorsFound(self):
         mdata = mtdt(self.testPath, 'test_czi')
         self.assertFalse(mdata.findRabVectors())
 
-    def testFindRabVectors_wrongValue(self):
+    def testFindRabVectorsWrongValue(self):
         mdata = mtdt(self.testPath, 'test_czi')
         mdata.name = 0
         self.assertIsNone(mdata.findRabVectors())
 
-    def testFindAAVVectors_upperCase(self):
+    def testFindAAVVectorsUpperCase(self):
         mdata = mtdt(self.testPath, 'AAV123_czi')
         self.assertEqual(mdata.findAAVVectors(), 'AAV123')
 
