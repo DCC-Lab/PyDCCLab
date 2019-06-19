@@ -1,38 +1,34 @@
 import sqlite3 as lite
 import urllib.parse as parse
 import pathlib
-import platform
 
 
 class Database:
     def __init__(self, path, mode='ro'):
         # Possible modes are 'ro', 'rw', and 'rwc'. Default should be 'ro'.
-        self.mode = mode
+        self.__mode = mode
         self.__path = path
-        self.connection = None
+        self.__connection = None
         self.cursor = None
 
     def __del__(self):
         self.disconnect()
 
     @property
-    def path(self):  # TODO MacOS and Linux will have to be added eventually.
+    def path(self):
         path = pathlib.Path(self.__path)
-        if platform.system() == 'Windows':
-            return 'file:' + parse.quote(path.as_posix(), safe=':/') + '?mode=' + self.mode
-        if platform.system() == 'Darwin':
-            pass
-        if platform.system() == 'Linux':
-            pass
-        if path.is_absolute():
-            return path.as_uri() + '?mode=' + self.mode
+        return 'file:{}?mode={}'.format(parse.quote(path.as_posix(), safe=':/'), self.mode)
+
+    @property
+    def mode(self):
+        return self.__mode
 
     def connect(self):
         try:
             if not self.isConnected:
-                self.connection = lite.connect(self.path, uri=True)
-                self.connection.row_factory = lite.Row
-                self.cursor = self.connection.cursor()
+                self.__connection = lite.connect(self.path, uri=True)
+                self.__connection.row_factory = lite.Row
+                self.cursor = self.__connection.cursor()
                 return True
         except:
             return False
@@ -40,27 +36,27 @@ class Database:
     def disconnect(self):
         if self.isConnected:
             self.commit()
-            self.connection.close()
-            self.connection = None
+            self.__connection.close()
+            self.__connection = None
             self.cursor = None
 
     @property
     def isConnected(self):
-        return self.connection is not None
+        return self.__connection is not None
 
-    def modifyConnection(self, mode):
-        if not self.isConnected:
+    def changeConnectionMode(self, mode):
+        if self.isConnected:
             self.disconnect()
-        self.mode = mode
+        self.__mode = mode
         self.connect()
 
     def commit(self):
         if self.isConnected:
-            self.connection.commit()
+            self.__connection.commit()
 
     def rollback(self):
         if self.isConnected:
-            self.connection.rollback()
+            self.__connection.rollback()
 
     def execute(self, statement) -> lite.Row:
         if self.isConnected:
@@ -101,7 +97,7 @@ class Database:
             lstValues = []
             for key in values.keys():
                 lstKeys.append(str(key))
-                lstValues.append('"' + str(values[key]) + '"')
+                lstValues.append('"{}"'.format(str(values[key])))
             keys = ','.join(lstKeys)
             values = ','.join(lstValues)
             statement = 'INSERT OR REPLACE INTO {} ({}) VALUES ({})'.format(table, keys, values)
@@ -132,22 +128,6 @@ def FindATable(cursor, tableName):
         return False
     except connect.lite.OperationalError:
         raise Exception("An unforseen error has occurred.")
-
-
-def ListAllTables(cursor):
-    try:
-        listTables = cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
-        formatedNamesList = []
-        for name in listTables:
-            formatedName = name
-            formatedName = str(formatedName).replace('(', '')
-            formatedName = formatedName.replace("'", "")
-            formatedName = formatedName.replace(')', '')
-            formatedName = formatedName.replace(',', '')
-            formatedNamesList.append(formatedName)
-        return formatedNamesList
-    except connect.lite.OperationalError:
-        raise Exception("An unforseen error has occurred.")
 '''
 
 if __name__ == '__main__':
@@ -175,7 +155,7 @@ if __name__ == '__main__':
     '''
     # If we want to insert into the database, we proceed as follow :
     # We connect to a database.
-    dbPath = 'C:\\Users\\MathieuLaptop\\Documents\\Ulaval\\ProgPython\\Projets\\BigData-ImageAnalysis\\testData\\test.db'
+    dbPath = 'C:\\Users\\MathieuLaptop\\Documents\\Ulaval\\ProgPython\\Projets\\BigData-ImageAnalysis\\dcclab\\tests\\test.db'
     testDB = Database(dbPath, 'rw')
     testDB.connect()
 
@@ -199,7 +179,7 @@ if __name__ == '__main__':
             testDB.insert('cziChannels', channel)
             testDB.commit()
     '''
-
+    '''
     # Query test.
     rows = testDB.select('cziChannels', 'channel_id', "channel_name='mCher'")
     newRows = []
@@ -210,3 +190,4 @@ if __name__ == '__main__':
     for row in newRows:
         line = '{},{}\n'.format(row[0], row[1].lstrip('Channel:'))
         file.write(line)
+    '''

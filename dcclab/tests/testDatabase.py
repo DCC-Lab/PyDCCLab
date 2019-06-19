@@ -1,115 +1,97 @@
-import dcclab.database as db
+from dcclab import database as db
 import unittest
 import os
 
 
 class TestDatabase(unittest.TestCase):
     def setUp(self):
-        self.directory = os.path.dirname(os.path.dirname(__file__))
-        self.filePath = os.path.join(self.directory, 'testData', 'test.db')
-        self.wrongFile = os.path.join(self.directory, 'testData', 'wrongfile.db')
+        self.directory = os.path.dirname(__file__)
+        self.filePath = os.path.join(self.directory, 'test.db')
+        self.wrongFile = os.path.join(self.directory, 'wrongfile.db')
 
-    def test_connect_Connected(self):
+    def testConnectSuccesfull(self):
         database = db.Database(self.filePath)
         self.assertTrue(database.connect())
 
-    def test_connect_cantConnect(self):
+    def testConnectUnsuccesfull(self):
         database = db.Database(self.wrongFile)
         self.assertFalse(database.connect())
 
-    def test_connect_wrongMode(self):
+    def testConnectWithWrongMode(self):
         database = db.Database(self.filePath, 'wrongmode')
         self.assertFalse(database.connect())
 
-    def test_disconnect(self):
+    def testConnectCreatesCursor(self):
+        database = db.Database(self.filePath)
+        database.connect()
+        self.assertIsNotNone(database.cursor)
+
+    def testDisconnectSuccesfull(self):
         database = db.Database(self.filePath)
         database.connect()
         database.disconnect()
-        self.assertIsNone(database.connection)
+        self.assertFalse(database.isConnected)
 
-    def test_isConnected_Connected(self):
+    def testDisconnectRemovesCursor(self):
+        database = db.Database(self.filePath)
+        database.connect()
+        database.disconnect()
+        self.assertIsNone(database.cursor)
+
+    def testIsConnected(self):
         database = db.Database(self.filePath)
         database.connect()
         self.assertTrue(database.isConnected)
 
-    def test_isConnected_notConnected(self):
+    def testIsNotConnected(self):
         database = db.Database(self.filePath)
         self.assertFalse(database.isConnected)
 
-    def test_modifyConnection_modeChanged(self):
-        database = db.Database(self.filePath)
+    def testChangeConnectionModeToValidMode(self):
+        database = db.Database(self.filePath, 'ro')
         database.connect()
-        mode_1 = database.mode
-        database.modifyConnection('rw')
-        self.assertNotEqual(mode_1, database.mode)
+        database.changeConnectionMode('rw')
+        self.assertNotEqual(database.mode, 'ro')
 
-    def test_pathToURI_ReadOnlyMode(self):
-        self.assertEqual(db.pathToURI('test.db'), 'file:test.db?mode=ro')
+    def testPathReadOnlyMode(self):
+        database = db.Database('test.db', 'ro')
+        self.assertEqual(database.path, 'file:test.db?mode=ro')
 
-    def test_pathToURI_ReadOrWrite(self):
-        self.assertEqual(db.pathToURI('test.db', 'rw'), 'file:test.db?mode=rw')
+    def testWindowsPathToPosix(self):
+        database = db.Database(r'C:\sqlite3\Database\test.db', 'rwc')
+        self.assertEqual(database.path, 'file:C:/sqlite3/Database/test.db?mode=rwc')
 
-    def test_pathToURI_AbsoluteReadOnlyMode(self):
-        self.assertEqual(db.pathToURI(r'C:\sqlite3\Database\test.db'), 'file:C:/sqlite3/obsolete/test.db?mode=ro')
+    # How to test database.commit()?
+    def testCommit(self):
+        pass
 
-    def test_pathToURI_AbsoluteReadOrWrite(self):
-        self.assertEqual(db.pathToURI(r'C:\sqlite3\Database\test.db', 'rw'), 'file:C:/sqlite3/obsolete/test.db?mode=rw')
+    # How to test database.rollback()?
+    def testRollback(self):
+        pass
 
-    def test_findingOS(self):
-        # Only for windows for now.
-        self.assertEqual(db.findingOS(), 'Windows')
+    # How to test database.execute()?
+    def testExecute(self):
+        pass
 
-    def test_createCursor_NoConnection(self):
-        database = db.Database(self.filePath, 'test.db')
+    # How to test database.tables?
+    def testTables(self):
+        pass
 
-        with self.assertRaises(ConnectionError): database.createCursor()
+    # How to test database.select()?
+    def testSelect(self):
+        pass
 
-    def test_createCursor_Connected(self):
-        database = db.Database(self.filePath, 'test.db')
-        database.createConnection()
-        self.assertTrue(database.createCursor())
+    # How to test database.createTable()?
+    def testCreateTable(self):
+        pass
 
-    def test_createCursor_CursorAlreadyExist(self):
-        database = db.Database(self.filePath, 'test.db')
-        database.createConnection()
-        database.createCursor()
-        with self.assertRaises(AttributeError): database.createCursor()
+    # How to test database.dropTable()?
+    def testDropTable(self):
+        pass
 
-    def test_checkIfCursorExists_DoesExist(self):
-        database = db.Database(self.filePath, 'test.db')
-        database.createConnection()
-        database.createCursor()
-        self.assertTrue(database.checkIfCursorExists())
-
-    def test_checkIfCursorExists_DoesNotExist(self):
-        database = db.Database(self.filePath, 'test.db')
-        database.createConnection()
-        self.assertFalse(database.checkIfCursorExists())
-
-    def test_closeCursor_closed(self):
-        database = db.Database(self.filePath, 'test.db')
-        database.createConnection()
-        database.createCursor()
-        self.assertTrue(database.closeCursor())
-
-    def test_closeCursor_cantClose(self):
-        database = db.Database(self.filePath, 'test.db')
-        self.assertFalse(database.closeCursor())
-
-    def test_commit_notConnected(self):
-        database = db.Database(self.filePath, 'test.db')
-        with self.assertRaises(ConnectionError): database.commit()
-
-    def test_commit_noCursor(self):
-        database = db.Database(self.filePath, 'test.db')
-        database.createConnection()
-        with self.assertRaises(AttributeError): database.commit()
-
-    def test_commit_canCommit(self):
-        database = db.Database(self.filePath, 'test.db')
-        database.createConnection()
-        database.createCursor()
-        self.assertTrue(database.commit())
+    # How to test database.insert()?
+    def testInsert(self):
+        pass
 
     '''
     def test_CreateTable(self):
