@@ -12,19 +12,23 @@ class TestDatabase(unittest.TestCase):
     def testConnectSuccesfull(self):
         database = db.Database(self.filePath)
         self.assertTrue(database.connect())
+        database.disconnect()
 
     def testConnectUnsuccesfull(self):
         database = db.Database(self.wrongFile)
         self.assertFalse(database.connect())
+        database.disconnect()
 
     def testConnectWithWrongMode(self):
         database = db.Database(self.filePath, 'wrongmode')
         self.assertFalse(database.connect())
+        database.disconnect()
 
     def testConnectCreatesCursor(self):
         database = db.Database(self.filePath)
         database.connect()
         self.assertIsNotNone(database.cursor)
+        database.disconnect()
 
     def testDisconnectSuccesfull(self):
         database = db.Database(self.filePath)
@@ -42,6 +46,7 @@ class TestDatabase(unittest.TestCase):
         database = db.Database(self.filePath)
         database.connect()
         self.assertTrue(database.isConnected)
+        database.disconnect()
 
     def testIsNotConnected(self):
         database = db.Database(self.filePath)
@@ -52,6 +57,7 @@ class TestDatabase(unittest.TestCase):
         database.connect()
         database.changeConnectionMode('rw')
         self.assertNotEqual(database.mode, 'ro')
+        database.disconnect()
 
     def testPathReadOnlyMode(self):
         database = db.Database('test.db', 'ro')

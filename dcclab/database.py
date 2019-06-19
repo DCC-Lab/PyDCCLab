@@ -58,10 +58,17 @@ class Database:
         if self.isConnected:
             self.__connection.rollback()
 
-    def execute(self, statement) -> lite.Row:
+    def execute(self, statement):
         if self.isConnected:
             self.cursor.execute(statement)
+
+    def fetchall(self):
+        if self.isConnected:
             return self.cursor.fetchall()
+
+    def fetone(self):
+        if self.isConnected:
+            return self.cursor.fetchone()
 
     @property
     def tables(self) -> list:
