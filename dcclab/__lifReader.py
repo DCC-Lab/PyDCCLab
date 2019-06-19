@@ -38,10 +38,7 @@ class LifSerie(Serie):
         for channel in channels:
             channelStacks.append(self.__getStackChannel(channel))
 
-        if len(channelStacks) == 1:
-            return channelStacks[0]
-        else:
-            return np.stack(channelStacks)
+        return np.stack(channelStacks, axis=2)
 
     def __getStackChannel(self, channel=0, T=0, dtype=np.uint8):
         """ Renamed custom version of getFrame """
