@@ -318,7 +318,7 @@ class ZStack(ImageCollection):
         # All images are the same size
         return np.stack([image.asArray() for image in self.images], axis=3)
 
-    def asSingleChannelArray(self, channel) -> np.ndarray:
+    def asChannelArray(self, channel) -> np.ndarray:
         imagesArray = self.asArray()
         singleChannel = imagesArray[:, :, channel, :]
         np.squeeze(singleChannel)
@@ -331,7 +331,7 @@ class ZStack(ImageCollection):
         elif self.processIn3D:
             filteredArrays = []
             for channel in list(range(self.numberOfChannels)):
-                array = self.asSingleChannelArray(channel)
+                array = self.asChannelArray(channel)
                 filteredArrays.append(filterFunc(array, *filterArgs))
             newStack = np.stack(filteredArrays, axis=2)
             self.fromArray(newStack)
@@ -365,7 +365,7 @@ class ZStack(ImageCollection):
         elif self.processIn3D:
             filteredArrays = []
             for channel in list(range(self.numberOfChannels)):
-                array = self.asSingleChannelArray(channel)
+                array = self.asChannelArray(channel)
                 array = ndimage.grey_erosion(array, erosion_size)
                 array = ndimage.grey_dilation(array, dilation_size)
                 array = ndimage.grey_closing(array, closing_size)
@@ -403,7 +403,7 @@ class ZStack(ImageCollection):
     def analyzeComponents(self):
         for channel in list(range(self.numberOfChannels)):
             properties = self.componentsProperties['Channel {}'.format(channel)]
-            stackArray = self.asSingleChannelArray(channel)
+            stackArray = self.asChannelArray(channel)
             maskArray = self.getChannelMaskArray(channel)
             labelArray = self.getChannelLabelArray(channel)
             nbOfObjects = properties['nbOfObjects']
