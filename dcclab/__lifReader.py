@@ -27,7 +27,6 @@ class LifSerie(Serie):
         super().__init__(*args, **kwargs)
 
     def getStack(self, channels=None):
-        timeStart = time.time()
         if channels is None:
             channelInfos = self.getChannels()
             channels = [int(c.getAttribute("ChannelTag")) for c in channelInfos]
@@ -41,7 +40,6 @@ class LifSerie(Serie):
             print("... Loading channel {}/{}".format(i+1, len(channels)))
             channelStacks.append(self.__getStackChannel(channel))
 
-        print("... Took {}s".format(int(time.time() - timeStart)))
         return np.stack(channelStacks, axis=2)
 
     def __getStackChannel(self, channel=0, T=0, dtype=np.uint8):

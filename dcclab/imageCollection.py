@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 from typing import List, Union
 from scipy import ndimage
 from collections import OrderedDict
-import time
 import sys
 
 
@@ -131,14 +130,12 @@ class ImageCollection:
 
         self.__images = []
         if imagesArray.ndim == 4:
-            print("... Loading collection from array")
-            timeStart = time.time()
             nbOfImages = imagesArray.shape[3]
             for i in range(nbOfImages):
                 progressBar(i, nbOfImages-1)
                 image = Image(imagesArray[:, :, :, i])
                 self.__images.append(image)
-            print("... Took {}s".format(int(time.time() - timeStart)))
+            print("\n")
         else:
             raise NotImplementedError("ImageCollection from 4D arrays only.")
 
