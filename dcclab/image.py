@@ -32,6 +32,8 @@ class Image:
                         self.channels = self.channelsFromImageData(imageData)
                         self.__fileObject = fileObject
                     break
+                except NotImplementedError as e:
+                    raise e
                 except:
                     continue
             if self.__fileObject is None:
