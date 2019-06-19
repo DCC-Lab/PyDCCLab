@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, List
 from .__lifReader import LifReader
 from .imageCollection import ZStack
 
@@ -47,7 +47,7 @@ class LIFFile:
 
         return metadata
 
-    def getZStacks(self, seriesIndices=None, channelIndices=None):
+    def getZStacks(self, seriesIndices=None, channelIndices=None) -> List[ZStack]:
         if type(seriesIndices) is int:
             seriesIndices = [seriesIndices]
 
@@ -56,7 +56,9 @@ class LIFFile:
         zStacks = []
         for i, serie in enumerate(series):
             print("... Loading serie {}/{}".format(i+1, len(series)))
-            zStack = ZStack(imagesArray=serie.getStack(channelIndices))
+            stackArray = serie.getStack(channelIndices)
+            print("... Loading ZStack Collection".format(i+1, len(series)))
+            zStack = ZStack(imagesArray=stackArray)
             zStacks.append(zStack)
 
         return zStacks
