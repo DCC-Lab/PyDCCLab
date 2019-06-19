@@ -257,11 +257,11 @@ class ImageCollection:
         for image in self.images:
             image.applyOtsuThresholding()
 
-    def applyOpening(self, size: int) -> None:
+    def applyOpening(self, size: int = 2) -> None:
         for image in self.images:
             image.applyOpening(size)
 
-    def applyClosing(self, size: int) -> None:
+    def applyClosing(self, size: int = 2) -> None:
         for image in self.images:
             image.applyClosing(size)
 
@@ -279,6 +279,12 @@ class ImageCollection:
     def applyNoiseFilterWithErosionDilation(self, erosion_size=2, dilation_size=2, closing_size=2):
         for image in self.images:
             image.applyNoiseFilterWithErosionDilation(erosion_size, dilation_size, closing_size)
+
+    def applyOpeningToMask(self, size: int = 2):
+        raise NotImplementedError
+
+    def applyClosingToMask(self, size: int = 2):
+        raise NotImplementedError
 
 
 class ZStack(ImageCollection):
