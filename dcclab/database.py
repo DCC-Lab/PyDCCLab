@@ -2,8 +2,6 @@ import sqlite3 as lite
 import urllib.parse as parse
 import pathlib
 import platform
-from Database.ImageMetadata.imageMetadata import ImageMetadata as imgMtdt
-from Database.databaseUtilities import findFiles
 
 
 class Database:
@@ -155,13 +153,13 @@ def ListAllTables(cursor):
 if __name__ == '__main__':
     # If we want to create new tables in our database we proceed as follow :
     # We start with creating a proper ImageMetadata object.
-    path = 'P:\\injection AAV\\résultats bruts\\AAV\\AAV498AAV455\\AAV498AAV455_S94\\AAV498-455_S94_C.czi'
-    metadata = imgMtdt(path)
+    #path = 'P:\\injection AAV\\résultats bruts\\AAV\\AAV498AAV455\\AAV498AAV455_S94\\AAV498-455_S94_C.czi'
+    #metadata = imgMtdt(path)
 
     # We connect to a database.
-    dbPath = 'C:\\Users\\MathieuLaptop\\Documents\\Ulaval\\ProgPython\\Projets\\BigData-ImageAnalysis\\testData\\test.db'
-    testDB = Database(dbPath, 'rw')
-    testDB.connect()
+    #dbPath = 'C:\\Users\\MathieuLaptop\\Documents\\Ulaval\\ProgPython\\Projets\\BigData-ImageAnalysis\\testData\\test.db'
+    #testDB = obsolete(dbPath, 'rw')
+    #testDB.connect()
 
     # Drop the old tables.
     '''
@@ -182,14 +180,15 @@ if __name__ == '__main__':
     testDB.connect()
 
     # We find all of the files/metadata that we want to process.
-    directories = [r'P:\injection AAV\résultats bruts\AAV', r'P:\injection AAV\résultats bruts\RABV']
-    filesList = findFiles(directories[0], '*.czi') + findFiles(directories[1], '*.czi')
+    #directories = [r'P:\injection AAV\résultats bruts\AAV', r'P:\injection AAV\résultats bruts\RABV']
+    #filesList = findFiles(directories[0], '*.czi') + findFiles(directories[1], '*.czi')
 
     # Smaller directories for faster tests
     #directories = [r'P:\injection AAV\résultats bruts\AAV\AAV2 retro janelia\AAV2retro_S45']
     #filesList = findFiles(directories[0], '*.czi')
 
     # We process it.
+    '''
     for file in filesList:
         print('Processing : ', file)
         metadata = imgMtdt(file)
@@ -199,3 +198,15 @@ if __name__ == '__main__':
         for channelid, channel in metadata.channels.items():
             testDB.insert('cziChannels', channel)
             testDB.commit()
+    '''
+
+    # Query test.
+    rows = testDB.select('cziChannels', 'channel_id', "channel_name='mCher'")
+    newRows = []
+    for row in rows:
+        newRows.append(row[0].split(';'))
+
+    file = open('querry_mcher.csv', 'w', encoding='UTF-8')
+    for row in newRows:
+        line = '{},{}\n'.format(row[0], row[1].lstrip('Channel:'))
+        file.write(line)

@@ -12,9 +12,14 @@ def findFiles(directory, extension) -> list:
     return filesFound
 
 
-def zip(path, file):
+def appendToZip(path, file):
     try:
         with zipfile.ZipFile(path, 'a') as zip:
             zip.write(file)
     except:
         pass
+
+
+if __name__ == '__main__':
+
+    pass

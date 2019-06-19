@@ -1,4 +1,4 @@
-from Database.ImageMetadata.cziMetadata.cziMetadata import CZIMetadata as mtdt
+from dcclab import CZIMetadata as mtdt
 from dcclab import readCziImage
 import xml.etree.ElementTree as ET
 import unittest
@@ -7,12 +7,12 @@ import os
 
 class TestMetadata(unittest.TestCase):
     def setUp(self):
-        self.directory = os.path.dirname(os.path.dirname(__file__))
-        self.testPath = os.path.join(self.directory, 'testData', 'testCziFile.czi')
-        self.wrongFilePath = os.path.join(self.directory, 'testData', 'wrongfilename.czi')
-        self.wrongFileType = os.path.join(self.directory, 'testData', 'wrongFile.txt')
-        self.missingEntriesPath = os.path.join(self.directory, 'testData', 'MissingEntries.xml')
-        self.missingKeysPath = os.path.join(self.directory, 'testData', 'MissingKeys.xml')
+        self.directory = os.path.dirname(__file__)
+        self.testPath = os.path.join(self.directory, 'testCziFile.czi')
+        self.wrongFilePath = os.path.join(self.directory, 'wrongfilename.czi')
+        self.wrongFileType = os.path.join(self.directory, 'wrongFile.txt')
+        self.missingEntriesPath = os.path.join(self.directory, 'MissingEntries.xml')
+        self.missingKeysPath = os.path.join(self.directory, 'MissingKeys.xml')
 
     def testCziImageObjectFromPathIsCziImageObject(self):
         mdata = mtdt(self.testPath)

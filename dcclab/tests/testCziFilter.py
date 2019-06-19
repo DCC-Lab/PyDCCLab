@@ -1,5 +1,5 @@
-from Database.ImageMetadata.cziMetadata.cziFilter import CZIFilter as fltr
-from Database.ImageMetadata.cziMetadata.cziMetadata import CZIMetadata as mtdt
+from dcclab import CZIFilter as fltr
+from dcclab import CZIMetadata as mtdt
 import xml.etree.ElementTree as ET
 import unittest
 import os
@@ -7,9 +7,9 @@ import os
 
 class TestFilter(unittest.TestCase):
     def setUp(self):
-        self.directory = os.path.dirname(os.path.dirname(__file__))
-        self.testPath = os.path.join(self.directory, 'testData', 'testCziFile.czi')
-        self.missingEntriesPath = os.path.join(self.directory, 'testData', 'MissingEntries.xml')
+        self.directory = os.path.dirname(__file__)
+        self.testPath = os.path.join(self.directory, 'testCziFile.czi')
+        self.missingEntriesPath = os.path.join(self.directory, 'MissingEntries.xml')
         self.meta = mtdt(self.testPath)
 
     def testSetFilterSetIdAndTypeExpectedValues(self):

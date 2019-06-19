@@ -1,5 +1,6 @@
-from Database.ImageMetadata.cziMetadata.cziChannel import CZIChannel as chnnl
-from Database.ImageMetadata.cziMetadata.cziMetadata import CZIMetadata as mtdt
+import env
+from dcclab import CZIChannel as chnnl
+from dcclab import CZIMetadata as mtdt
 import xml.etree.ElementTree as ET
 import unittest
 import os
@@ -7,10 +8,10 @@ import os
 
 class TestCziChannel(unittest.TestCase):
     def setUp(self):
-        self.directory = os.path.dirname(os.path.dirname(__file__))
-        self.testPath = os.path.join(self.directory, 'testData', 'testCziFile.czi')
-        self.missingEntriesPath = os.path.join(self.directory, 'testData', 'MissingEntries.xml')
-        self.missingKeysPath = os.path.join(self.directory, 'testData', 'MissingKeys.xml')
+        self.directory = os.path.dirname(__file__)
+        self.testPath = os.path.join(self.directory, 'testCziFile.czi')
+        self.missingEntriesPath = os.path.join(self.directory, 'MissingEntries.xml')
+        self.missingKeysPath = os.path.join(self.directory, 'MissingKeys.xml')
         self.meta = mtdt(self.testPath, 'testCziFile.czi')
 
     def testSetExWavelengthFilterExpectedValue(self):

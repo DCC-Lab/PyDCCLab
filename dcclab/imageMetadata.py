@@ -1,4 +1,4 @@
-from Database.ImageMetadata import CZIMetadata
+from .cziMetadata import CZIMetadata
 import os
 try:
     import deprecated

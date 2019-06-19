@@ -1,4 +1,4 @@
-import Database.database as db
+import dcclab.database as db
 import unittest
 import os
 
@@ -50,10 +50,10 @@ class TestDatabase(unittest.TestCase):
         self.assertEqual(db.pathToURI('test.db', 'rw'), 'file:test.db?mode=rw')
 
     def test_pathToURI_AbsoluteReadOnlyMode(self):
-        self.assertEqual(db.pathToURI(r'C:\sqlite3\Database\test.db'), 'file:C:/sqlite3/Database/test.db?mode=ro')
+        self.assertEqual(db.pathToURI(r'C:\sqlite3\Database\test.db'), 'file:C:/sqlite3/obsolete/test.db?mode=ro')
 
     def test_pathToURI_AbsoluteReadOrWrite(self):
-        self.assertEqual(db.pathToURI(r'C:\sqlite3\Database\test.db', 'rw'), 'file:C:/sqlite3/Database/test.db?mode=rw')
+        self.assertEqual(db.pathToURI(r'C:\sqlite3\Database\test.db', 'rw'), 'file:C:/sqlite3/obsolete/test.db?mode=rw')
 
     def test_findingOS(self):
         # Only for windows for now.
@@ -117,7 +117,7 @@ class TestDatabase(unittest.TestCase):
         # Would very much like to simplify it.
         directory = os.path.dirname(__file__)
         fileName = os.path.join(directory, 'testData', 'test.db')
-        database = db.Database(fileName, 'test.db')
+        database = db.obsolete(fileName, 'test.db')
 
         #database.createConnection()
         #database.createCursor()
