@@ -8,13 +8,13 @@ import os
 import re
 from typing import List, Union
 
+
 class Image:
 
     supportedClasses = [CZIFile, TIFFFile, PILFile, MATLABFile]
     supportedFormats = []
 
-
-    def __init__(self, imageData:np.ndarray = None, path: str = None):
+    def __init__(self, imageData: np.ndarray = None, path: str = None):
         self._getSupportedFormats() #FIXME
 
         if path is not None:
@@ -22,14 +22,14 @@ class Image:
                 raise ValueError("Cannot load '{0}': file does not exist".format(path))
 
             self.path = path
-            self.channels:List[Channel] = []
+            self.channels = []
             self.__fileObject = None
             for supportedClass in Image.supportedClasses:
                 try:
                     fileObject = supportedClass(path)
                     imageData = fileObject.imageDataFromPath()
                     if imageData.nbytes != 0:
-                        self.channels = self.channelsFromImageData(imageData)
+                        self.channels = self.channelsFromArray(imageData)
                         self.__fileObject = fileObject
                     break
                 except:
@@ -40,7 +40,7 @@ class Image:
         else:
             self.path = None
             self.__fileObject = None
-            self.channels = self.channelsFromImageData(imageData)
+            self.channels = self.channelsFromArray(imageData)
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, Image):
