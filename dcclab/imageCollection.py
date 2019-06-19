@@ -380,7 +380,7 @@ class ZStack(ImageCollection):
         return maskStackArray
 
     def getChannelLabelArray(self, channel: int):
-        labelStackArray = np.stack([image.channels[channel].labelledComponents for image in self.images], axis=3)
+        labelStackArray = np.stack([image.channels[channel].labelledComponents for image in self.images], axis=2)
         return labelStackArray
 
     def labelMaskComponents(self):
@@ -393,7 +393,8 @@ class ZStack(ImageCollection):
             self.channelLabelsFromArray(channel, labelStackArray)
 
     def channelLabelsFromArray(self, channel, labelStackArray):
-        for i, labelArray in enumerate(labelStackArray):
+        for i in range(labelStackArray.shape[2]):
+            labelArray = labelStackArray[:, :, i]
             self.images[i].channels[channel].labelledComponents = labelArray
 
     """ Ouh là, ca devient lourd. Ce back-propagation de toujours aller redéfinir les couches 2D intérieures
