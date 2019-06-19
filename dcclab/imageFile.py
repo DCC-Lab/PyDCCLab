@@ -26,16 +26,24 @@ class CZIFile(ImageFile):
     def imageDataFromPath(self) -> np.ndarray:
         cziObj = readCziImage(self.path)
         mosaic, self.__tilesWithChannelNumber = decodeImages(cziObj)
-        mosaic = np.squeeze(mosaic)
-        print(mosaic.shape)
+        print(cziObj.shape)
         axes = cziObj.axes
+        if axes not in ["BCYX0", "BSCYX0"]:
+            raise NotImplementedError(axes)
         try:
             cIndex = axes.index("C")
         except ValueError:
             cIndex = -1
         self.__numberOFChannels = mosaic.shape[cIndex]
+        mosaic = mosaic.squeeze()
         closeCziFileObject(cziObj)
-        wholeImage = mosaic.transpose((1, 2, 0)) if mosaic.ndim == 3 else mosaic
+        if axes == "YX0":
+            wholeImage = mosaic
+        elif mosaic.ndim == 3:
+            wholeImage = mosaic.transpose((1, 2, 0))
+        else:
+            wholeImage = mosaic
+        # wholeImage = mosaic.transpose((1, 2, 0)) if mosaic.ndim == 3 and axes != "YX0" else mosaic
         return wholeImage
 
 

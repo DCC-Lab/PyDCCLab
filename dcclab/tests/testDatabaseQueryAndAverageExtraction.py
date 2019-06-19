@@ -22,9 +22,10 @@ if __name__ == '__main__':
         path, channelNumber = line.split(",")
         pathChanged = path.replace("P", "A", 1)  # Change the P drive to A for my computer
         ok = ""
-        if os.stat(pathChanged).st_size > 200 * 1024 * 1024:
+        size = os.stat(pathChanged).st_size
+        if size > 200 * 1024 * 1024:
             while ok not in ["Y", "N"]:
-                ok = input("Heavy file. Continue? (Y/N)").upper()
+                ok = input("Heavy file ({}). Continue? (Y/N)".format(size)).upper()
         if ok in ["Y", ""]:
             try:
                 image = Image(path=pathChanged)
