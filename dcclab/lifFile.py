@@ -47,7 +47,7 @@ class LIFFile:
 
         return metadata
 
-    def getZStacks(self, seriesIndices=None, channelIndices=None) -> List[ZStack]:
+    def getZStacks(self, seriesIndices=None, channelIndices=None, crop=False) -> List[ZStack]:
         if type(seriesIndices) is int:
             seriesIndices = [seriesIndices]
 
@@ -58,7 +58,7 @@ class LIFFile:
             print("... Loading serie {}/{}".format(i+1, len(series)))
             stackArray = serie.getStack(channelIndices)
             print("... Loading ZStack Collection".format(i+1, len(series)))
-            zStack = ZStack(imagesArray=stackArray)
+            zStack = ZStack(imagesArray=stackArray, cropAtInit=crop)
             zStacks.append(zStack)
 
         return zStacks

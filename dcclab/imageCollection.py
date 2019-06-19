@@ -280,7 +280,8 @@ class ImageCollection:
 
 
 class ZStack(ImageCollection):
-    def __init__(self, images: List[Image]=None, imagesArray: np.ndarray=None, pathPattern: str=None, keepOriginal: bool=True):
+    def __init__(self, images: List[Image]=None, imagesArray: np.ndarray=None, pathPattern: str=None, keepOriginal: bool=True,
+                 cropAtInit=False):
         super().__init__(images, imagesArray, pathPattern)
         if not self.imagesAreSimilar:
             raise ValueError("Images in z-stack are not all the same shape")
