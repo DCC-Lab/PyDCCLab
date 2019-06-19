@@ -4,6 +4,7 @@ import numpy as np
 import json
 import inspect
 import matplotlib.pyplot as plt
+from matplotlib.widgets import RectangleSelector
 from typing import List, Union
 from scipy import ndimage
 from collections import OrderedDict
@@ -283,6 +284,14 @@ class ImageCollection:
 class ZStack(ImageCollection):
     def __init__(self, images: List[Image]=None, imagesArray: np.ndarray=None, pathPattern: str=None, keepOriginal: bool=True,
                  cropAtInit=False):
+        self.cropX, self.cropY = [], []
+        self.cropFig = None
+        self.cropRect = None
+
+        if cropAtInit:
+            print(imagesArray.shape)
+            imagesArray = self.crop4DArray(imagesArray)
+            print(imagesArray.shape)
         super().__init__(images, imagesArray, pathPattern)
         if not self.imagesAreSimilar:
             raise ValueError("Images in z-stack are not all the same shape")
@@ -437,6 +446,44 @@ class ZStack(ImageCollection):
 
         with open(filePath, "w+") as file:
             file.write(jsonParams)
+
+    # todo: clean method
+    def crop4DArray(self, array, axis=-1, bothAxis=True):
+        self.cropY = [0, array.shape[axis+1]]
+        if axis == 0:
+            self.cropX = [0, array.shape[3]]
+        else:
+            self.cropX = [0, array.shape[axis+2]]
+
+        figure, self.cropFig = plt.subplots()
+        self.cropFig.imshow(array.mean(2).mean(axis), aspect="auto")  # mean(axis)
+        rs = RectangleSelector(self.cropFig, self.__drawRectangleCallback,
+                               drawtype='box', useblit=False, button=[1],
+                               minspanx=5, minspany=5, spancoords='pixels',
+                               interactive=True)
+        plt.title("Select ROI", fontsize=18)
+        plt.show()
+
+        if axis == -1 and bothAxis:
+            array = array[self.cropY[0]: self.cropY[1], self.cropX[0]: self.cropX[1]]
+            if bothAxis:
+                return self.crop4DArray(array, axis=0)
+            else:
+                return array
+        else:
+            array = array[:, self.cropY[0]: self.cropY[1], :, self.cropX[0]: self.cropX[1]]
+            return array
+
+    def __drawRectangleCallback(self, clickEvent, releaseEvent):
+        x1, y1 = clickEvent.xdata, clickEvent.ydata
+        x2, y2 = releaseEvent.xdata, releaseEvent.ydata
+
+        if self.cropRect is not None:
+            self.cropRect.remove()
+        self.cropRect = plt.Rectangle((min(x1, x2), min(y1, y2)), np.abs(x1-x2), np.abs(y1-y2), fill=False)
+        self.cropFig.add_patch(self.cropRect)
+        self.cropX = [int(x1), int(x2)]
+        self.cropY = [int(y1), int(y2)]
 
     def show(self, axis=-1):
         stack4DArray = self.asArray()
