@@ -416,6 +416,14 @@ class ZStack(ImageCollection):
         centersOfMass = ndimage.center_of_mass(originalStack, label, range(1, nbOfObjects + 1))
         return list(centersOfMass)
 
+    def saveComponentsProperties(self, filePath: str):
+        jsonParams = json.dumps(self.componentsProperties, indent=4)
+        if filePath.split(".")[-1] != "json":
+            filePath += ".json"
+
+        with open(filePath, "w+") as file:
+            file.write(jsonParams)
+
     def show(self, axis=-1):
         stack4DArray = self.asArray()
         plt.imshow(stack4DArray.mean(axis))
