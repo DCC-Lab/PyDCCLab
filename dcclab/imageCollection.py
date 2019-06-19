@@ -5,7 +5,6 @@ import json
 import inspect
 import matplotlib.pyplot as plt
 from typing import List, Union
-from .__lifReader import LifReader
 from scipy import ndimage
 from collections import OrderedDict
 
@@ -19,10 +18,7 @@ class ImageCollection:
             else:
                 self.__images = images
         elif imagesArray is not None:
-            if imagesArray.ndim == 4:
-                self.appendFromImagesArray(imagesArray)
-            else:
-                raise ValueError("ImageCollection is initialized by a 4D numpy array: [width][height][channel][collection]")
+            self.appendFromImagesArray(imagesArray)
         elif pathPattern is not None:
             self.appendMatchingFiles(pathPattern)
 
@@ -63,7 +59,7 @@ class ImageCollection:
         # An ImageCollection may not always be put into
         # an array: if all images have different sizes, this will
         # fail
-        return np.stack([ image.asArray() for image in self.images ], axis=3)
+        return np.stack([image.asArray() for image in self.images], axis=3)
 
     def __getitem__(self, index):
         return self.images[index]
@@ -117,7 +113,7 @@ class ImageCollection:
             for image in images:
                 self.append(image)
         else:
-            raise NotImplementedError("ImageCollection from 4D arrays only.")
+            raise NotImplementedError("ImageCollection from 4D arrays only: [width][height][channel][collection]")
 
     def fromSingleChannelArray(self, channelArray, channel):
         """ fixme: if its a single channel 4D array, then fromArray works.
@@ -131,7 +127,7 @@ class ImageCollection:
             but ImageCollection already has appendFromImagesArray. but the method doesn't overwrite
             self.images """
 
-        self.__images = []  # fromArray redefines ?
+        self.__images = []
         if imagesArray.ndim == 4:
             images = [Image(imagesArray[:, :, :, i]) for i in range(imagesArray.shape[3])]
             for image in images:
