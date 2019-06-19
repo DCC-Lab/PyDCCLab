@@ -47,7 +47,7 @@ class LIFFile:
 
         return metadata
 
-    def getZStacks(self, seriesIndices=None, channels=None):
+    def getZStacks(self, seriesIndices=None, channelIndices=None):
         if type(seriesIndices) is int:
             seriesIndices = [seriesIndices]
 
@@ -55,7 +55,7 @@ class LIFFile:
 
         zStacks = []
         for serie in series:
-            zStack = ZStack(imagesArray=serie.getStack(channels))
+            zStack = ZStack(imagesArray=serie.getStack(channelIndices))
             zStacks.append(zStack)
 
         return zStacks

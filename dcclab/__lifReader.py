@@ -52,6 +52,7 @@ class LifSerie(Serie):
             yx = yx.reshape(self.get2DShape())
             cyx.append(yx)
             zcyx.append(cyx)
+        print('\n')  # Leave progress bar inline update
         zcyx = np.array(zcyx)
         xzcy = np.moveaxis(zcyx, -1, 0)
         xyzc = np.moveaxis(xzcy, -1, 1)
