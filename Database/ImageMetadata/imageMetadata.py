@@ -44,6 +44,13 @@ class ImageMetadata:
         else:
             return {}
 
+    @property
+    def keys(self) -> dict:
+        if isinstance(self.__fileObject, CZIMetadata):
+            return self.__fileObject.keys
+        else:
+            return {}
+
 
 if __name__ == '__main__':
     # Some scratch tests :  # TODO To delete when the class is completed. This is only for quick tests.

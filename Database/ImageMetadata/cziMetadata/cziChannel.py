@@ -42,6 +42,14 @@ class CZIChannel:
                 'imaging_device': self.imagingDevice, 'camera_adapter': self.cameraAdapter,
                 'exposure_time': self.exposureTime, 'binning_mode': self.binningMode}
 
+    @property
+    def keys(self):
+        return {'file_id': 'TEXT', 'channel_id': 'TEXT', 'channel_name': 'TEXT', 'ex_wavelength_filter': 'TEXT',
+                'em_wavelength_filter': 'TEXT', 'beamsplitter': 'INTEGER', 'reflector': 'TEXT',
+                'contrast_method': 'TEXT', 'light_source': 'TEXT', 'light_source_intensity': 'TEXT', 'dye_name': 'TEXT',
+                'channel_color': 'TEXT', 'ex_wavelength': 'INTEGER', 'em_wavelength': 'INTEGER', 'effective_na': 'REAL',
+                'imaging_device': 'TEXT', 'camera_adapter': 'TEXT', 'exposure_time': 'TEXT', 'binning_mode': 'REAL'}
+
     def setExWavelengthFilter(self, filters):
         try:
             for filter in filters:

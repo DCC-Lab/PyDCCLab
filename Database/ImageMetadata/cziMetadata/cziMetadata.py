@@ -46,6 +46,17 @@ class CZIMetadata:
                 'viral_vectors': self.viralVectors, 'injection_site': self.injectionSite, 'tags': self.tags}
         return {'metadata': metadataAsDict, 'channels': channelsAsDict}
 
+    @property
+    def keys(self):
+        channelsKeys = {}
+        if self.channels:
+            channelsKeys = self.channels[0].keys
+        metadataKeys = {'path': 'TEXT', 'microscope': 'TEXT', 'objective': 'TEXT', 'x_size': 'INTEGER',
+                        'y_size': 'INTEGER', 'x_scale': 'REAL', 'y_scale': 'REAL', 'x_scaled': 'REAL',
+                        'y_scaled': 'REAL', 'name': 'TEXT', 'mouse_id': 'INTEGER', 'viral_vectors': 'TEXT',
+                        'injection_site': 'TEXT', 'tags': 'TEXT'}
+        return {'cziMetadata': metadataKeys, 'cziChannels': channelsKeys}
+
     def nameFromPath(self):
         try:
             return os.path.basename(self.path)

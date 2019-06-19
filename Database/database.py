@@ -3,7 +3,7 @@ import urllib.parse as parse
 import pathlib
 import platform
 from Database.ImageMetadata.imageMetadata import ImageMetadata as imgMtdt
-from Database.ImageMetadata.filesReader import findFiles
+from Database.databaseUtilities import findFiles
 
 
 class Database:
@@ -82,14 +82,15 @@ class Database:
             rows = self.execute("SELECT {0} FROM {1} WHERE {2}".format(columns, table, condition))
         return rows
 
-    def createTable(self, table: str, keys: list, keysType: list):
+    def createTable(self, metadata: dict):
         if self.isConnected:
-            statement = "CREATE TABLE IF NOT EXISTS {} (".format(table)
-            attributes = []
-            for key, keyType in zip(keys, keysType):
-                attributes.append("{} {}".format(key, keyType))
-            statement += ",".join(attributes) + ")"
-            self.cursor.execute(statement)
+            for table, keys in metadata.items():
+                statement = "CREATE TABLE IF NOT EXISTS {} (".format(table)
+                attributes = []
+                for key, keyType in keys.items():
+                    attributes.append("{} {}".format(key, keyType))
+                statement += ",".join(attributes) + ")"
+                self.cursor.execute(statement)
 
     def dropTable(self, table: str):
         if self.isConnected:
@@ -154,36 +155,13 @@ def ListAllTables(cursor):
 if __name__ == '__main__':
     # If we want to create new tables in our database we proceed as follow :
     # We start with creating a proper ImageMetadata object.
-    #path = 'P:\\injection AAV\\résultats bruts\\AAV\\AAV498AAV455\\AAV498AAV455_S94\\AAV498-455_S94_C.czi'
-    #metadata = imgMtdt(path)
-
-    # We extract its keys.
-    '''
-    lstKeys = []
-    lstKeysType = []
-    for key, value in metadata.metadata.items():
-        lstKeys.append(key)
-        if key == 'path':
-            lstKeysType.append('TEXT PRIMARY KEY')
-        else:
-            lstKeysType.append('TEXT')
-
-    lstChannelKeys = []
-    lstChannelKeysType = []
-    channels = metadata.channels
-    aChannelKey = list(channels.keys())[0]
-    for key, value in channels[aChannelKey].items():
-        lstChannelKeys.append(key)
-        if key == 'channel_id':  # channel_id should be changed for something like file_id+channel_id
-            lstChannelKeysType.append('TEXT PRIMARY KEY')
-        else:
-            lstChannelKeysType.append('TEXT')
-    '''
+    path = 'P:\\injection AAV\\résultats bruts\\AAV\\AAV498AAV455\\AAV498AAV455_S94\\AAV498-455_S94_C.czi'
+    metadata = imgMtdt(path)
 
     # We connect to a database.
-    #dbPath = 'C:\\Users\\MathieuLaptop\\Documents\\Ulaval\\ProgPython\\Projets\\BigData-ImageAnalysis\\testData\\test.db'
-    #testDB = Database(dbPath, 'rw')
-    #testDB.connect()
+    dbPath = 'C:\\Users\\MathieuLaptop\\Documents\\Ulaval\\ProgPython\\Projets\\BigData-ImageAnalysis\\testData\\test.db'
+    testDB = Database(dbPath, 'rw')
+    testDB.connect()
 
     # Drop the old tables.
     '''
@@ -192,15 +170,11 @@ if __name__ == '__main__':
     testDB.dropTable('czichannel')
     testDB.commit()
 
-    testDB.createTable('czimetadata', lstKeys, lstKeysType)
-    testDB.commit()
-
-    testDB.createTable('czichannel', lstChannelKeys, lstChannelKeysType)
+    testDB.createTable(metadata.keys)
     testDB.commit()
     
     testDB.disconnect()
     '''
-
     # If we want to insert into the database, we proceed as follow :
     # We connect to a database.
     dbPath = 'C:\\Users\\MathieuLaptop\\Documents\\Ulaval\\ProgPython\\Projets\\BigData-ImageAnalysis\\testData\\test.db'
@@ -219,9 +193,9 @@ if __name__ == '__main__':
     for file in filesList:
         print('Processing : ', file)
         metadata = imgMtdt(file)
-        testDB.insert('czimetadata', metadata.metadata)
+        testDB.insert('cziMetadata', metadata.metadata)
         testDB.commit()
 
         for channelid, channel in metadata.channels.items():
-            testDB.insert('czichannel', channel)
+            testDB.insert('cziChannels', channel)
             testDB.commit()

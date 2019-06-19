@@ -1,5 +1,4 @@
-import Database.DatabaseManagement.database as db
-import sqlite3 as lite
+import Database.database as db
 import unittest
 import os
 

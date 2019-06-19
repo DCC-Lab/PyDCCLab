@@ -1,5 +1,6 @@
 import os
 import fnmatch
+import zipfile
 
 
 def findFiles(directory, extension) -> list:
@@ -9,3 +10,11 @@ def findFiles(directory, extension) -> list:
             if fnmatch.fnmatch(file, extension):
                 filesFound.append(os.path.join(root, file))
     return filesFound
+
+
+def zip(path, file):
+    try:
+        with zipfile.ZipFile(path, 'a') as zip:
+            zip.write(file)
+    except:
+        pass
