@@ -388,6 +388,7 @@ class ZStack(ImageCollection):
         for channel in list(range(self.numberOfChannels)):
             maskStackArray = self.getChannelMaskArray(channel)
             labelStackArray, nbObjects = label(maskStackArray)
+            self.componentsProperties["Channel {}".format(channel)] = OrderedDict()
             self.componentsProperties["Channel {}".format(channel)]["nbOfObjects"] = nbObjects
 
             self.channelLabelsFromArray(channel, labelStackArray)
@@ -410,11 +411,11 @@ class ZStack(ImageCollection):
             nbOfObjects = properties['nbOfObjects']
 
             properties["objectsSize"] = self.getObjectsSize(maskArray, labelArray, nbOfObjects)
-            properties["totalSize"] = sum(properties["objectsSize"])
+            properties["totalSize"] = np.sum(properties["objectsSize"]).tolist()
             properties["objectsMass"] = self.getObjectsMass(stackArray, labelArray, nbOfObjects)
-            properties["totalMass"] = sum(properties["objectsMass"])
+            properties["totalMass"] = np.sum(properties["objectsMass"]).tolist()
             properties["objectsCM"] = self.getObjectsCenterOfMass(stackArray, labelArray, nbOfObjects)
-            properties["totalCM"] = np.average(properties["objectsCM"], axis=0, weights=properties["objectsMass"])
+            properties["totalCM"] = np.average(properties["objectsCM"], axis=0, weights=properties["objectsMass"]).tolist()
 
     def getObjectsSize(self, mask, label, nbOfObjects):
         maskSizes = ndimage.sum(mask, label, range(1, nbOfObjects + 1))
