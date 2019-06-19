@@ -39,6 +39,9 @@ class CZIFile(ImageFile):
         closeCziFileObject(cziObj)
         if axes == "YX0":
             wholeImage = mosaic
+        if axes == "BSCYX0":
+            if mosaic.shape[1] != 1:
+                raise NotImplementedError("Multiple scene")
         elif mosaic.ndim == 3:
             wholeImage = mosaic.transpose((1, 2, 0))
         else:
