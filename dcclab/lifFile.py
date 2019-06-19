@@ -30,6 +30,8 @@ class LIFFile:
 
     def keepSeries(self, indices):
         self.series = self[indices]
+        if type(self.series) is not list:
+            self.series = [self.series]
 
     def removeAt(self, index: int):
         self.series.pop(index)
