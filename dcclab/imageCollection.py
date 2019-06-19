@@ -302,6 +302,12 @@ class ZStack(ImageCollection):
         """ Could be stored as a property variable in init instead """
         return self.images[0].shape[2]
 
+    @property
+    def shape(self):
+        x, y, c = self.images[0].shape
+        z = len(self)
+        return x, y, c, z
+
     def asArray(self) -> np.ndarray:
         # A ZStack is always a 4D array of shape (X, Y, C, Z)
         # All images are the same size
