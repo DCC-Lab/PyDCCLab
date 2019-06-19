@@ -57,7 +57,7 @@ class Channel:
         return self.pixels.ndim
 
     @property
-    def shape(self) -> typing.Tuple[int, int, int]:
+    def shape(self) -> typing.Tuple[int, int]:
         return self.pixels.shape
 
     @property
