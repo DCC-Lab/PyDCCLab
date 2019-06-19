@@ -26,7 +26,6 @@ class ImageCollection:
         elif pathPattern is not None:
             self.appendMatchingFiles(pathPattern)
 
-
     def save(self, pathOrPattern:str):
         pattern = PathPattern(pathOrPattern)
         if pattern.isWritePattern:
@@ -97,7 +96,6 @@ class ImageCollection:
 
         self.images.append(image)
 
-
     def extend(self, images: List[Image]):
         for image in images:
             if self.contains(image):
@@ -122,16 +120,16 @@ class ImageCollection:
             raise NotImplementedError("ImageCollection from 4D arrays only.")
 
     def fromSingleChannelArray(self, channelArray, channel):
-        """ fixme: if its a single channel 4D array, then fromArray works...
+        """ fixme: if its a single channel 4D array, then fromArray works.
             and if we use 'from' we mean to define all the collection as a single channel,
             so no need to specify which channel it is...
-            unless to function is called something like replaceChannelFromArray(array, channnel)"""
+            unless the function is called something like replaceChannelFromArray(array, channnel)"""
         raise NotImplementedError()
 
     def fromArray(self, imagesArray):
         """ FIXME: fromSingleChannelArray and fromArray should only be defined inside ImageCollection.
             but ImageCollection already has appendFromImagesArray. but the method doesn't overwrite
-            self.images ... """
+            self.images """
 
         self.__images = []  # fromArray redefines ?
         if imagesArray.ndim == 4:
@@ -305,7 +303,7 @@ class ZStack(ImageCollection):
     def numberOfChannels(self):
         """ Can be moved to ImageCollection [addressing the issue in removeChannels()] """
         """ Not clean, but it works since imagesAreSimilar... """
-        """ Coulf be stored as a property variable in init instead """
+        """ Could be stored as a property variable in init instead """
         return self.images[0].shape[2]
 
     def asArray(self) -> np.ndarray:
@@ -372,8 +370,9 @@ class ZStack(ImageCollection):
 
     # Mask operations are defined in ImageCollection. each images we have has a Channel.mask array
     # add a method to get a channel's masks as one array for labelling
-    def getMaskArray(self, channel=None):
-        raise NotImplementedError
+    def getMaskArray(self, channel: int):
+        maskArray = np.stack([image.channels[channel].mask.pixels for image in self.images], axis=3)
+        return maskArray
 
     def labelMaskComponents(self):
         """ Labelling always need to be processed in 3D ? """
