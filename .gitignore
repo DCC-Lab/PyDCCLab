@@ -121,3 +121,14 @@ test.py
 
 # PyCharm
 .idea/
+*.pyi
+*.ninja
+*.imports
+.pytype/.ninja_deps
+.pytype/.ninja_log
+.pytype/imports/dcclab.channel.imports-1
+.pytype/imports/dcclab.channelFloat.imports-1
+.pytype/imports/dcclab.channelInteger.imports-1
+.pytype/pyi/dcclab/channel.pyi-1
+.pytype/pyi/dcclab/channelFloat.pyi-1
+.pytype/pyi/dcclab/channelInteger.pyi-1
