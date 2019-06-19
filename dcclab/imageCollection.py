@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from typing import List, Union
 from scipy import ndimage
 from collections import OrderedDict
+import sys
 
 
 class ImageCollection:
@@ -18,7 +19,7 @@ class ImageCollection:
             else:
                 self.__images = images
         elif imagesArray is not None:
-            self.appendFromImagesArray(imagesArray)
+            self.fromArray(imagesArray)
         elif pathPattern is not None:
             self.appendMatchingFiles(pathPattern)
 
@@ -129,8 +130,11 @@ class ImageCollection:
 
         self.__images = []
         if imagesArray.ndim == 4:
-            images = [Image(imagesArray[:, :, :, i]) for i in range(imagesArray.shape[3])]
-            for image in images:
+            print("... Loading collection from array")
+            nbOfImages = imagesArray.shape[3]
+            for i in range(nbOfImages):
+                progressBar(i, nbOfImages-1)
+                image = Image(imagesArray[:, :, :, i])
                 self.__images.append(image)
         else:
             raise NotImplementedError("ImageCollection from 4D arrays only.")
@@ -451,3 +455,13 @@ class ZStack(ImageCollection):
         stacks = OrderedDict([("Original ", self.originalZStack), ("", self.__array), ("Mask ", self.maskedZStack), ("Label ", self.labeledZStack)])
         stacksInMemory = {k: v for k, v in stacks.items() if v is not None}
         return stacksInMemory
+
+
+def progressBar(value, endvalue, bar_length=20):
+
+        percent = float(value) / endvalue
+        arrow = '-' * int(round(percent * bar_length)-1) + '>'
+        spaces = ' ' * (bar_length - len(arrow))
+
+        sys.stdout.write("\r   [{0}] {1}%".format(arrow + spaces, int(round(percent * 100))))
+        sys.stdout.flush()
