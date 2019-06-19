@@ -37,7 +37,7 @@ if __name__ == '__main__':
                 average = "-"
         else:
             average = "-"
-        writeResults.write("{},{},{}".format(path, channelNumber, average))
+        writeResults.write("{0},{1},{2}".format(path, channelNumber, average))
         currentNumber += 1
         print("{} / {} files read".format(currentNumber, numberOfFiles))
 
