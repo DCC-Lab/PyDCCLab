@@ -1,0 +1,85 @@
+WARNING: The czi file reader is only capable of properly reading single image (mutli or mono channel). If it is a z-stack or a time serie, only one image will be taken.P:\injection AAV\résultats bruts\AAV\AAV2 retro janelia\AAV2retro_S46\S46-02.czi,1
+,502.54496525812294P:\injection AAV\résultats bruts\AAV\AAV2 retro janelia\AAV2retro_S46\S46-03.czi,1
+,434.75861082021964P:\injection AAV\résultats bruts\AAV\AAV2 retro janelia\AAV2retro_S46\S46-04.czi,1
+,435.1155390297747P:\injection AAV\résultats bruts\AAV\AAV2 retro janelia\AAV2retro_S46\S46-05.czi,2
+,768.4141461706103P:\injection AAV\résultats bruts\AAV\AAV2 retro janelia\AAV2retro_S46\S46-06.czi,2
+,490.42553987886333P:\injection AAV\résultats bruts\AAV\AAV213\2018-04-09\AAV544_213_S135-02.czi,2
+,1167.423534260727P:\injection AAV\résultats bruts\AAV\AAV213\2018-04-09\AAV544_213_S135-03.czi,2
+,2080.669728220876P:\injection AAV\résultats bruts\AAV\AAV213\2018-04-09\AAV544_213_S135-04.czi,2
+,1339.250262863693P:\injection AAV\résultats bruts\AAV\AAV213\2018-04-09\AAV544_213_S135.czi,2
+,551.6524545737575P:\injection AAV\résultats bruts\AAV\AAV213\2018-04-09\AAV544_213_S136-02.czi,2
+,509.7917312917469P:\injection AAV\résultats bruts\AAV\AAV213\2018-04-09\AAV544_213_S136-03.czi,2
+,511.01608881467223P:\injection AAV\résultats bruts\AAV\AAV213\2018-04-09\AAV544_213_S136-04.czi,2
+,1404.5607225744368P:\injection AAV\résultats bruts\AAV\AAV213\2018-04-09\AAV544_213_S136-05.czi,2
+,2238.337317799728P:\injection AAV\résultats bruts\AAV\AAV213\2018-04-09\AAV544_213_S136.czi,2
+,252.26145279067134P:\injection AAV\résultats bruts\AAV\AAV213\2018-04-09\AAV544_213_S137-02.czi,2
+,417.206200823616P:\injection AAV\résultats bruts\AAV\AAV213\2018-04-09\AAV544_213_S137-03.czi,2
+,550.726214904336P:\injection AAV\résultats bruts\AAV\AAV213\2018-04-09\AAV544_213_S137-04.czi,2
+,709.1538789199592P:\injection AAV\résultats bruts\AAV\AAV213\2018-04-09\AAV544_213_S137.czi,2
+,240.31601310426808P:\injection AAV\résultats bruts\AAV\AAV213\2018-04-09\AAV544_213_S138-02.czi,2
+,644.7527896099853P:\injection AAV\résultats bruts\AAV\AAV213\2018-04-09\AAV544_213_S138-03.czi,2
+,943.4796278869014P:\injection AAV\résultats bruts\AAV\AAV213\2018-04-09\AAV544_213_S138-04.czi,2
+,881.3259637156119P:\injection AAV\résultats bruts\AAV\AAV213\2018-04-09\AAV544_213_S138.czi,2
+,451.0575788237292P:\injection AAV\résultats bruts\AAV\AAV233\AAV233_S72\S72-02.czi,2
+,130.29569193648817P:\injection AAV\résultats bruts\AAV\AAV233\AAV233_S72\S72-03.czi,2
+,129.04072795199818P:\injection AAV\résultats bruts\AAV\AAV233\AAV233_S72\S72-04.czi,2
+,145.49435285293785P:\injection AAV\résultats bruts\AAV\AAV233\AAV233_S72\S72-05.czi,2
+,145.5880204205819P:\injection AAV\résultats bruts\AAV\AAV233\AAV233_S72\S72-06.czi,2
+,122.29759637156118P:\injection AAV\résultats bruts\AAV\AAV233\AAV233_S72\S72-11.czi,2
+,-P:\injection AAV\résultats bruts\AAV\AAV233\AAV233_S72\S72.czi,2
+,356.6744243886562P:\injection AAV\résultats bruts\AAV\AAV335AAV185\AAV335AAV185_S27\S-27-04.czi,1
+,88.6284896279499P:\injection AAV\résultats bruts\AAV\AAV335AAV185\AAV335AAV185_S27\S-27-05.czi,1
+,122.86559418602083P:\injection AAV\résultats bruts\AAV\AAV335AAV185\AAV335AAV185_S30\S-30 copie\S-30 (2).czi,1
+,-P:\injection AAV\résultats bruts\AAV\AAV335AAV185\AAV335AAV185_S30\S-30 copie\S-30.czi,1
+,-P:\injection AAV\résultats bruts\AAV\AAV336\AAV336_S40\S40-02.czi,1
+,1569.447449549983P:\injection AAV\résultats bruts\AAV\AAV336\AAV336_S40\S40-03.czi,0
+,-P:\injection AAV\résultats bruts\AAV\AAV336\AAV336_S40\S40.czi,0
+,1676.9027804115249P:\injection AAV\résultats bruts\AAV\AAV396\AAV396_BB1\AAV396_BB1_sep-11_coeur-02.czi,2
+,-P:\injection AAV\résultats bruts\AAV\AAV396\AAV396_BB1\AAV396_BB1_sep-11_coeur-03.czi,2
+,-P:\injection AAV\résultats bruts\AAV\AAV396\AAV396_BB1\AAV396_BB1_sep-11_coeur.czi,2
+,-P:\injection AAV\résultats bruts\AAV\AAV396\AAV396_BB1\AAV396_BB1_sep-11_poumon-02.czi,2
+,-P:\injection AAV\résultats bruts\AAV\AAV396\AAV396_BB1\AAV396_BB1_sep-11_poumon.czi,2
+,-P:\injection AAV\résultats bruts\AAV\AAV396\AAV396_BB1\AAV396_BB1_sep11_B-02.czi,2
+,-P:\injection AAV\résultats bruts\AAV\AAV396\AAV396_BB1\AAV396_BB1_sep11_B-03.czi,2
+,-P:\injection AAV\résultats bruts\AAV\AAV396\AAV396_BB1\AAV396_BB1_sep11_B.czi,2
+,-P:\injection AAV\résultats bruts\AAV\AAV396\AAV396_S102\AAV396_S102_coeur-02.czi,2
+,193.7997320773481P:\injection AAV\résultats bruts\AAV\AAV396\AAV396_S102\AAV396_S102_coeur.czi,2
+,172.58974889779472P:\injection AAV\résultats bruts\AAV\AAV396\AAV396_S103_coeur\AAV396_S103_coeur.czi,2
+,164.10402414623496P:\injection AAV\résultats bruts\AAV\AAV396\AAV396_S49\S49-06.czi,1
+,209.57909437620287P:\injection AAV\résultats bruts\AAV\AAV396\AAV396_S49\S49-07.czi,1
+,161.6617266217593P:\injection AAV\résultats bruts\AAV\AAV396\AAV396_S49\S49-08.czi,1
+,193.6486230612476P:\injection AAV\résultats bruts\AAV\AAV396\AAV396_S49\S49-09.czi,1
+,174.83594935186233P:\injection AAV\résultats bruts\AAV\AAV396\AAV396_S49\S49-1.czi,1
+,-P:\injection AAV\résultats bruts\AAV\AAV396\AAV396_S49\S49-2.czi,1
+,-P:\injection AAV\résultats bruts\AAV\AAV396\AAV396_S49\S49-3.czi,1
+,208.54153883165404P:\injection AAV\résultats bruts\AAV\AAV396\AAV396_S49\S49.czi,1
+,-P:\injection AAV\résultats bruts\AAV\AAV396\AAV396_S50\S50-02.czi,2
+,300.7182476225518P:\injection AAV\résultats bruts\AAV\AAV396\AAV396_S50\S50-03.czi,2
+,213.1192962470282P:\injection AAV\résultats bruts\AAV\AAV396\AAV396_S50\S50-04.czi,2
+,295.18207998415033P:\injection AAV\résultats bruts\AAV\AAV396\AAV396_S50\S50-05.czi,1
+,-P:\injection AAV\résultats bruts\AAV\AAV400-401\2019-03-06\AAV400+995_S238_antimCherry_M_A-02.czi,2
+,-P:\injection AAV\résultats bruts\AAV\AAV400-401\2019-03-06\AAV400+995_S238_antimCherry_M_A-03.czi,2
+,671.4173617400656P:\injection AAV\résultats bruts\AAV\AAV400-401\2019-03-06\AAV400+995_S238_antimCherry_M_A-04.czi,2
+,431.9127140410959P:\injection AAV\résultats bruts\AAV\AAV400-401\2019-03-06\AAV400+995_S238_antimCherry_M_A.czi,2
+,401.9629493094079P:\injection AAV\résultats bruts\AAV\AAV400-401\2019-03-06\AAV400_AAV995_S238_SC_B.czi,2
+,410.33130448318803P:\injection AAV\résultats bruts\AAV\AAV400-401\2019-03-06\AAV400_S237_antimCherry_M_A-01.czi,2
+,395.68245146043245P:\injection AAV\résultats bruts\AAV\AAV400-401\2019-03-06\AAV400_S237_antimCherry_M_A.czi,2
+,469.38571443733724P:\injection AAV\résultats bruts\AAV\AAV400-401\2019-03-06\AAV400_S237_antimCherry_M_B.czi,2
+,399.8576075012337P:\injection AAV\résultats bruts\AAV\AAV400-401\2019-03-06\AAV401_S239_antimCherry_M_A-02.czi,2
+,350.32139420080546P:\injection AAV\résultats bruts\AAV\AAV400-401\2019-03-06\AAV401_S239_antimCherry_M_A-03.czi,2
+,397.2470388033511P:\injection AAV\résultats bruts\AAV\AAV400-401\2019-03-06\AAV401_S239_antimCherry_M_A.czi,2
+,455.4112111541945P:\injection AAV\résultats bruts\AAV\AAV400-401\2019-03-07\AAV410+995_S240_antimCherry_M_A.czi,2
+,1118.340833734292P:\injection AAV\résultats bruts\AAV\AAV400-401\2019-03-07\AAV554_patte_2.czi,2
+,467.6528478989509P:\injection AAV\résultats bruts\AAV\AAV400-401\2019-03-29\AAV400+CRE_neurones_anti rabbit-03.czi,2
+,199.8863774340541P:\injection AAV\résultats bruts\AAV\AAV400-401\2019-03-29\AAV400+CRE_neurones_anti rabbit-04.czi,2
+,198.69004195913053P:\injection AAV\résultats bruts\AAV\AAV400-401\2019-03-29\AAV400+CRE_neurones_anti rabbit.czi,2
+,200.2691363353334P:\injection AAV\résultats bruts\AAV\AAV400-401\2019-03-29\AAV400+CRE_neurones_antimCherry_anti rabbit-02.czi,2
+,198.4389438044832P:\injection AAV\résultats bruts\AAV\AAV400-401\2019-03-29\AAV400+CRE_neurones_antimCherry_anti rabbit-04.czi,2
+,201.58137417921432P:\injection AAV\résultats bruts\AAV\AAV400-401\2019-03-29\AAV400+CRE_neurones_antimCherry_anti rabbit.czi,2
+,198.36791329389789P:\injection AAV\résultats bruts\AAV\AAV400-401\2019-03-29\AAV400+CRE_neurones_ctrlneg.czi,2
+,199.30401583550324P:\injection AAV\résultats bruts\AAV\AAV400-401\2019-03-29\AAV400_neurones_anti rabbit.czi,2
+,196.98087463206159P:\injection AAV\résultats bruts\AAV\AAV400-401\2019-03-29\AAV400_neurones_antimCherry_anti rabbit-02.czi,2
+,200.77871051737802P:\injection AAV\résultats bruts\AAV\AAV400-401\2019-03-29\AAV400_neurones_antimCherry_anti rabbit-03.czi,2
+,201.27049593852598P:\injection AAV\résultats bruts\AAV\AAV400-401\2019-03-29\AAV400_neurones_ctrlneg.czi,2
+,197.98075505207743P:\injection AAV\résultats bruts\AAV\AAV400-401\2019-03-29\AAV401+CRE_neurones_anti rabbit .czi,2
+,204.25059683855994
