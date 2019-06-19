@@ -374,18 +374,18 @@ class ZStack(ImageCollection):
         else:
             super().applyNoiseFilterWithErosionDilation(erosion_size, dilation_size, closing_size)
 
-    def getMaskArray(self, channel: int):
-        maskStackArray = np.stack([image.channels[channel].mask.pixels for image in self.images], axis=3)
+    def getChannelMaskArray(self, channel: int):
+        maskStackArray = np.stack([image.channels[channel].mask.pixels for image in self.images], axis=2)
         return maskStackArray
 
-    def getLabelArray(self, channel: int):
+    def getChannelLabelArray(self, channel: int):
         labelStackArray = np.stack([image.channels[channel].labelledComponents for image in self.images], axis=3)
         return labelStackArray
 
     def labelMaskComponents(self):
         """ Labelling always need to be processed in 3D ? """
         for channel in list(range(self.numberOfChannels)):
-            maskStackArray = self.getMaskArray(channel)
+            maskStackArray = self.getChannelMaskArray(channel)
             labelStackArray, nbObjects = label(maskStackArray)
             self.componentsProperties["Channel {}".format(channel)]["nbOfObjects"] = nbObjects
 
@@ -403,8 +403,8 @@ class ZStack(ImageCollection):
         for channel in list(range(self.numberOfChannels)):
             properties = self.componentsProperties['Channel {}'.format(channel)]
             stackArray = self.asSingleChannelArray(channel)
-            maskArray = self.getMaskArray(channel)
-            labelArray = self.getLabelArray(channel)
+            maskArray = self.getChannelMaskArray(channel)
+            labelArray = self.getChannelLabelArray(channel)
             nbOfObjects = properties['nbOfObjects']
 
             properties["objectsSize"] = self.getObjectsSize(maskArray, labelArray, nbOfObjects)
