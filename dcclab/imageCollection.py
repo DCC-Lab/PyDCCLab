@@ -395,12 +395,30 @@ class ZStack(ImageCollection):
 
     def analyzeComponents(self):
         for channel in list(range(self.numberOfChannels)):
+            properties = self.componentsProperties['Channel {}'.format(channel)]
             stackArray = self.asSingleChannelArray(channel)
             maskArray = self.getMaskArray(channel)
             labelArray = self.getLabelArray(channel)
-            # Compute components properties
-            # Append components properties dictionary
-        raise NotImplementedError
+            nbOfObjects = properties['nbOfObjects']
+
+            properties["objectsSize"] = self.getObjectsSize(maskArray, labelArray, nbOfObjects)
+            properties["totalSize"] = sum(properties["objectsSize"])
+            properties["objectsMass"] = self.getObjectsMass(stackArray, labelArray, nbOfObjects)
+            properties["totalMass"] = sum(properties["objectsMass"])
+            properties["objectsCM"] = self.getObjectsCenterOfMass(stackArray, labelArray, nbOfObjects)
+            properties["totalCM"] = np.average(properties["objectsCM"], axis=0, weights=properties["objectsMass"])
+
+    def getObjectsSize(self, mask, label, nbOfObjects):
+        maskSizes = ndimage.sum(mask, label, range(1, nbOfObjects + 1))
+        return list(maskSizes)
+
+    def getObjectsMass(self, originalStack, label, nbOfObjects):
+        sumValues = ndimage.sum(originalStack, label, range(1, nbOfObjects + 1))
+        return list(sumValues)
+
+    def getObjectsCenterOfMass(self, originalStack, label, nbOfObjects):
+        centersOfMass = ndimage.center_of_mass(originalStack, label, range(1, nbOfObjects + 1))
+        return list(centersOfMass)
 
     def show(self, axis=-1):
         stack4DArray = self.asArray()
@@ -419,6 +437,7 @@ class ZStack(ImageCollection):
         plt.show()
 
     def stacksInMemory(self):
+        raise NotImplementedError
         stacks = OrderedDict([("Original ", self.originalZStack), ("", self.__array), ("Mask ", self.maskedZStack), ("Label ", self.labeledZStack)])
         stacksInMemory = {k: v for k, v in stacks.items() if v is not None}
         return stacksInMemory
