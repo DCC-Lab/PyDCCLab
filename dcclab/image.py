@@ -105,6 +105,9 @@ class Image:
             return [Channel(array)]
         elif array.ndim == 3:
             channelsData = np.squeeze(np.dsplit(array, array.shape[2]))
+            # fixme: (temp fix) : channelsData is only 2D if input array has only one channel (shape (x, y, 1))
+            if channelsData.ndim == 2:
+                channelsData = np.expand_dims(channelsData, axis=0)
             channels = list(map(lambda pix: Channel(pix), channelsData))
             return channels
         else:
