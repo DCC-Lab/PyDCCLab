@@ -471,8 +471,16 @@ class ZStack(ImageCollection):
         with open(filePath, "w+") as file:
             file.write(jsonParams)
 
+    def crop(self):
+        # Cropping will not keep original content since cropping Z axis will change self.numberOfImages
+        # => using fromArray(), not replaceFromArray()
+        cropArray = self.crop4DArray(self.asArray())
+        self.fromArray(cropArray)
+
     # todo: clean method
     def crop4DArray(self, array, axis=-1, bothAxis=True):
+        """ Static method to crop any 4D Arrays """
+
         self.cropY = [0, array.shape[axis+1]]
         if axis == 0:
             self.cropX = [0, array.shape[3]]
@@ -480,7 +488,7 @@ class ZStack(ImageCollection):
             self.cropX = [0, array.shape[axis+2]]
 
         figure, self.cropFig = plt.subplots()
-        self.cropFig.imshow(array.mean(2).mean(axis), aspect="auto")  # mean(axis)
+        self.cropFig.imshow(array.mean(2).mean(axis), aspect="auto")
         rs = RectangleSelector(self.cropFig, self.__drawRectangleCallback,
                                drawtype='box', useblit=False, button=[1],
                                minspanx=5, minspany=5, spancoords='pixels',
