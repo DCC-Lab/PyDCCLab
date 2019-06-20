@@ -40,7 +40,7 @@ class Channel:
         self.__original = None
 
         # Segmentation @properties
-        self.mask = None  # Channel(bool)?
+        self.mask = None  # type: Channel
         self.labelledComponents = None
         self.numberOfComponents = 0
         self.componentsProperties = None
@@ -244,6 +244,23 @@ class Channel:
         else:
             result = self.getClosing(size)
         self._pixels = result.pixels
+
+    def applyNdImageBinaryOpening(self, size: int=None, iterations: int = 1):
+        # fixme: mask.applyOpening already exist: but ndimage method differs from morphology
+        if not self.isBinary:
+            raise TypeError("Channel has to be binary")
+        struct = None
+        if size is not None:
+            struct = np.ones((size, size))
+        self._pixels = ndimage.binary_opening(self.pixels, struct, iterations=iterations)
+
+    def applyNdImageBinaryClosing(self, size: int=None, iterations: int = 1):
+        if not self.isBinary:
+            raise TypeError("Channel has to be binary")
+        struct = None
+        if size is not None:
+            struct = np.ones((size, size))
+        self._pixels = ndimage.binary_closing(self.pixels, struct, iterations=iterations)
 
     def applyErosion(self, size: int = 2):
         self.saveOriginal()
