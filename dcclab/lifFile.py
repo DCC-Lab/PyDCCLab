@@ -1,6 +1,7 @@
 from typing import Union, List
 from .__lifReader import LifReader
 from .imageCollection import ZStack
+import json
 
 
 class LIFFile:
@@ -37,14 +38,16 @@ class LIFFile:
     def removeAt(self, index: int):
         self.series.pop(index)
 
-    def getMetadata(self, serieIndex: int=None):
+    def getMetadata(self, serieIndex: int=None, asJson: bool=False):
         if serieIndex is None:
             metadata = []
-            for serie in self.series:
-                metadata.append(serie.getMetadata())
+            for i, serie in enumerate(self.series):
+                metadata.append({'serie %i' % i: serie.getMetadata()})
         else:
             metadata = self.series[serieIndex].getMetadata()
 
+        if asJson:
+            return json.dumps(metadata, indent=4)
         return metadata
 
     def getZStacks(self, seriesIndices=None, channelIndices=None, crop=False) -> List[ZStack]:
