@@ -9,7 +9,7 @@ class CSVMetadata:
             return file.readlines()[:2]
 
     @property
-    def readCSV(self) -> list:
+    def body(self) -> list:
         with open(self.path, 'r') as file:
             return file.readlines()[2:]
 
@@ -27,7 +27,7 @@ class CSVMetadata:
 
     @property
     def lines(self) -> list:
-        csvLines = self.readCSV
+        csvLines = self.body
 
         formattedLines = []
         for line in csvLines:
