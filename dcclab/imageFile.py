@@ -25,11 +25,14 @@ class CZIFile(ImageFile):
 
     def imageDataFromPath(self) -> np.ndarray:
         cziObj = readCziImage(self.path)
-        mosaic, self.__tilesWithChannelNumber = decodeImages(cziObj)
-        print(cziObj.shape)
         axes = cziObj.axes
+        if axes == "BSCYX0":
+            if cziObj.shape[1] != 1:
+                raise NotImplementedError("Multiple scenes")
         if axes not in ["BCYX0", "BSCYX0"]:
             raise NotImplementedError(axes)
+        mosaic, self.__tilesWithChannelNumber = decodeImages(cziObj)
+        print(cziObj.shape)
         try:
             cIndex = axes.index("C")
         except ValueError:
@@ -39,9 +42,6 @@ class CZIFile(ImageFile):
         closeCziFileObject(cziObj)
         if axes == "YX0":
             wholeImage = mosaic
-        if axes == "BSCYX0":
-            if mosaic.shape[1] != 1:
-                raise NotImplementedError("Multiple scene")
         elif mosaic.ndim == 3:
             wholeImage = mosaic.transpose((1, 2, 0))
         else:
