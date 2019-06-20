@@ -101,7 +101,7 @@ def decodeImages(cziObj, max_workers=None):
     This is based on the czifil asarray method except it is modified so the data extraction is only done once.
     """
     maxSize = len(cziObj.filtered_subblock_directory)
-    print("Reading the pixel values of {} images. This may take a few minutes.".format(maxSize))
+    print("Reading the pixel lines of {} images. This may take a few minutes.".format(maxSize))
     imagesQueue = multiprocessing.Queue(maxsize=maxSize)
     out = tifffile.create_output(None, cziObj.shape, cziObj.dtype)
 

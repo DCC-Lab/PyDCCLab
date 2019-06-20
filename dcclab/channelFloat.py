@@ -43,7 +43,7 @@ class ChannelFloat(Channel):
         stdDevFilter2 = filters.uniform_filter(pixels * pixels, filterSize, mode="nearest")
         stdFiltered = np.sqrt(stdDevFilter2 - stdDevFilter1 * stdDevFilter1)
         if np.any(np.isnan(stdFiltered)):
-            warnings.warn("Nan values encountered! Replacing them with 0.", category=RuntimeWarning)
+            warnings.warn("Nan lines encountered! Replacing them with 0.", category=RuntimeWarning)
             stdFiltered = np.nan_to_num(stdFiltered)
         return Channel(stdFiltered)
 

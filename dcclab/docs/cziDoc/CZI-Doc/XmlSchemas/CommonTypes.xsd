@@ -488,9 +488,9 @@
       <!--LOOKUPTABLE-->
       <!--[Gamma,Brightness,Contrast] Array with the exponents for gamma correction for the channels.-->
       <xs:element name="Gamma" type="xs:long"/>
-      <!--[Gamma,Brightness,Contrast] Array with the brightness values in the range 0..1 the channels.-->
+      <!--[Gamma,Brightness,Contrast] Array with the brightness lines in the range 0..1 the channels.-->
       <xs:element name="Brightness" type="xs:long"/>
-      <!--[Gamma,Brightness,Contrast] Array with the contrast values in the range 0..1 for the channels.-->
+      <!--[Gamma,Brightness,Contrast] Array with the contrast lines in the range 0..1 for the channels.-->
       <xs:element name="Contrast" type="xs:long"/>
       <xs:element name="Knots">
         <xs:complexType>

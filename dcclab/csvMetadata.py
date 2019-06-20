@@ -1,7 +1,3 @@
-import os
-import re
-
-
 class CSVMetadata:
     def __init__(self, path, name=None):
         self.path = path
@@ -13,20 +9,41 @@ class CSVMetadata:
             return file.readlines()[:2]
 
     @property
-    def read(self) -> list:
+    def readCSV(self) -> list:
         with open(self.path, 'r') as file:
             return file.readlines()[2:]
 
+    @property
+    def keys(self) -> dict:
+        csvHeader = self.header
+        keys = csvHeader[0].rstrip('\n').split(',')
+        types = csvHeader[1].rstrip('\n').split(',')
 
+        csvHeaderAsDict = {}
+        for key, type in zip(keys, types):
+            csvHeaderAsDict[key] = type
 
+        return csvHeaderAsDict
 
-if __name__ == '__main__':
-    mtdt = CSVMetadata(r'C:\Users\MathieuLaptop\Documents\Ulaval\ProgPython\Projets\BigData-ImageAnalysis\suivi utilisation des animaux_2018\Data-souris.csv')
+    @property
+    def lines(self) -> list:
+        csvLines = self.readCSV
 
-    headerLines = mtdt.header
-    for line in headerLines:
-        print(repr(line))
+        formattedLines = []
+        for line in csvLines:
+            formattedLines.append(line.rstrip('\n').split(','))
 
-    lines = mtdt.read
-    for line in lines:
-        print(repr(line))
+        return formattedLines
+
+    @property
+    def asDict(self) -> dict:
+        keys = self.header[0].rstrip('\n').split(',')
+        dictio = {}
+        iter = 0
+        for line in self.lines:
+            metadataAsDict = {}
+            for key, value in zip(keys, line):
+                metadataAsDict[key] = value
+            dictio[iter] = metadataAsDict
+            iter += 1
+        return dictio
