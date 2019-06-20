@@ -478,9 +478,14 @@ class ZStack(ImageCollection):
         self.fromArray(cropArray)
 
     # todo: clean method
-    def crop4DArray(self, array, axis=-1, bothAxis=True):
-        """ Static method to crop any 4D Arrays """
-
+    def crop4DArray(self, array, axis=-1, bothAxis=True, viewChannelIndex: int=None):
+        """ Static method to crop any 4D Arrays
+            Careful: this method can be time and memory intensive if array has multiple channels with size around 1 GigaPixel
+            :param viewChannelIndex to quickly load crop window of specified channelIndex, while still cropping all channels.
+            :param bothAxis to crop both 3D planes
+        """
+        # todo: maybe add warning if viewChannelIndex=None and array has more than one channel and each channel is around or over 1 Gigapixel
+        print("... Loading crop figure")
         self.cropY = [0, array.shape[axis+1]]
         if axis == 0:
             self.cropX = [0, array.shape[3]]
@@ -488,7 +493,16 @@ class ZStack(ImageCollection):
             self.cropX = [0, array.shape[axis+2]]
 
         figure, self.cropFig = plt.subplots()
-        self.cropFig.imshow(array.mean(2).mean(axis), aspect="auto")
+        if array.shape[2] == 1:
+            # Skip useless and slow numpy conversion (a = a + 0.0) of np.mean if theres nothing to average
+            image = array[:, :, 0, :]
+        elif viewChannelIndex is not None:
+            image = array[:, :, viewChannelIndex, :]
+        else:
+            # Careful : numpy.mean gets exponentially slower with array shape and can easily lead to MemoryError
+            image = array.mean(2)
+        image = image.mean(axis)
+        self.cropFig.imshow(image, aspect="auto")
         rs = RectangleSelector(self.cropFig, self.__drawRectangleCallback,
                                drawtype='box', useblit=False, button=[1],
                                minspanx=5, minspany=5, spancoords='pixels',
