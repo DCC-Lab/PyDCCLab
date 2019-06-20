@@ -120,9 +120,22 @@ class Image:
 
     @property
     def isLabelled(self) -> bool:
-        # Only if all channels are labelled, we return True
         for channel in self.channels:
             if not channel.isLabelled:
+                return False
+        return True
+
+    @property
+    def hasMask(self) -> bool:
+        for channel in self.channels:
+            if channel.mask is None:
+                return False
+        return True
+
+    @property
+    def hasOriginal(self) -> bool:
+        for channel in self.channels:
+            if not channel.hasOriginal:
                 return False
         return True
 

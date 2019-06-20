@@ -188,6 +188,17 @@ class Channel:
         if self.__original is not None:
             self._pixels = self.__original
 
+    @property
+    def originalPixels(self) -> np.ndarray:
+        if self.__original is not None:
+            return self.__original
+
+    @property
+    def hasOriginal(self) -> bool:
+        if self.__original is not None:
+            return True
+        return False
+
     def applyConvolution(self, matrix: typing.Union[np.ndarray, list]) -> None:
         self.saveOriginal()
         result = self.convolveWith(matrix)
@@ -247,6 +258,7 @@ class Channel:
 
     def applyNdImageBinaryOpening(self, size: int=None, iterations: int = 1):
         # fixme: mask.applyOpening already exist: but ndimage method differs from morphology
+        self.saveOriginal()
         if not self.isBinary:
             raise TypeError("Channel has to be binary")
         struct = None
@@ -255,6 +267,7 @@ class Channel:
         self._pixels = ndimage.binary_opening(self.pixels, struct, iterations=iterations)
 
     def applyNdImageBinaryClosing(self, size: int=None, iterations: int = 1):
+        self.saveOriginal()
         if not self.isBinary:
             raise TypeError("Channel has to be binary")
         struct = None

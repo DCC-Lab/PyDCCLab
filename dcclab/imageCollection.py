@@ -55,6 +55,27 @@ class ImageCollection:
             sizeInBytes += image.sizeInBytes
         return sizeInBytes
 
+    @property
+    def isLabelled(self) -> bool:
+        for image in self.images:
+            if not image.isLabelled:
+                return False
+        return True
+
+    @property
+    def hasMask(self) -> bool:
+        for image in self.images:
+            if not image.hasMask:
+                return False
+        return True
+
+    @property
+    def hasOriginal(self) -> bool:
+        for image in self.images:
+            if not image.hasOriginal:
+                return False
+        return True
+
     def clear(self):
         self.__images = []
 
@@ -178,14 +199,6 @@ class ImageCollection:
             plt.imshow(self.images[i].asArray(), cmap=colorMap)
         plt.show()
         return imagesShown
-
-    @property
-    def isLabelled(self) -> bool:
-        # Only if all images are labelled, we return True
-        for image in self.images:
-            if not image.isLabelled:
-                return False
-        return True
 
     def labelMaskComponents(self):
         for image in self.images:
