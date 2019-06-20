@@ -533,11 +533,16 @@ class ZStack(ImageCollection):
             axes[i].set_title(key + "Stack")
         plt.show()
 
-    def stacksInMemory(self):
-        raise NotImplementedError
-        stacks = OrderedDict([("Original ", self.originalZStack), ("", self.__array), ("Mask ", self.maskedZStack), ("Label ", self.labeledZStack)])
-        stacksInMemory = {k: v for k, v in stacks.items() if v is not None}
-        return stacksInMemory
+    def channelStacksInMemory(self, channel) -> dict:
+        stacks = OrderedDict()
+        if self.hasOriginal:
+            stacks["Original "] = self.asOriginalChannelArray(channel)
+        stacks[""] = self.asChannelArray(channel)
+        if self.hasMask:
+            stacks["Mask "] = self.getChannelMaskArray(channel)
+        if self.isLabelled:
+            stacks["Label "] = self.getChannelLabelArray(channel)
+        return stacks
 
 
 def progressBar(value, endvalue, bar_length=20):
