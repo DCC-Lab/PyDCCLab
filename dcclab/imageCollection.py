@@ -353,7 +353,7 @@ class ZStack(ImageCollection):
         return originalArray[:, :, channel, :]
 
     def apply3DFilter(self, filterFunc, *filterArgs):  # todo: maybe multiple functions
-        """ These Functions should be processed over one Channel at a time"""
+        """ These Functions should be processed over one Channel at a time """
         if self.processIn3D is None:
             raise ZStackProcessDimensionIsNotDefined
         elif self.processIn3D:
@@ -362,7 +362,7 @@ class ZStack(ImageCollection):
                 array = self.asChannelArray(channel)
                 filteredArrays.append(filterFunc(array, *filterArgs))
             newStack = np.stack(filteredArrays, axis=2)
-            self.fromArray(newStack)
+            self.replaceFromArray(newStack)
         else:
             callerFunction = inspect.stack()[1].function
             getattr(super(), callerFunction)(*filterArgs)
@@ -388,6 +388,9 @@ class ZStack(ImageCollection):
 
     def applyNoiseFilterWithErosionDilation(self, erosion_size=2, dilation_size=2, closing_size=2):
         # todo: maybe try to implement multiple function with args call inside self.apply3DFilter(s)
+        # this function actually doesnt really make any sense,
+        # its only through specific data noise filtering that such a combo happenned to be effective,
+        # I guess this could be removed from the API, but I will look for a way to easily execute multiple filters in one call
         if self.processIn3D is None:
             raise ZStackProcessDimensionIsNotDefined
         elif self.processIn3D:
@@ -399,7 +402,7 @@ class ZStack(ImageCollection):
                 array = ndimage.grey_closing(array, closing_size)
                 filteredArrays.append(array)
             newStack = np.stack(filteredArrays, axis=2)
-            self.fromArray(newStack)
+            self.replaceFromArray(newStack)
         else:
             super().applyNoiseFilterWithErosionDilation(erosion_size, dilation_size, closing_size)
 
