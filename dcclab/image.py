@@ -79,13 +79,15 @@ class Image:
 
     def asArray(self):
         channelArrays = self.asChannelsArray()
-        # An image is always 3D: width x height x channels,
-        # even when there is only one channel
         imageData = np.dstack(channelArrays) 
         return imageData
 
-    def replaceFromArray(self, array):
-        self.channels = self.channelsFromArray(array)
+
+    def replaceFromArray(self, imageArray):
+        assert len(self.channels) == imageArray.shape[2], "Array has to contain the same number of channels."
+
+        for i, channel in enumerate(self.channels):
+            channel.replaceFromArray(imageArray[:, :, i])
 
     def save(self, filePath):
         imageAsArray = self.asArray()
@@ -102,11 +104,12 @@ class Image:
         plt.show()
 
     def channelsFromArray(self, array):
+        """ Creates new Channel Objects """
         if array.ndim == 2:
             return [Channel(array)]
         elif array.ndim == 3:
             channelsData = np.squeeze(np.dsplit(array, array.shape[2]))
-            # fixme: (temp fix) : channelsData is only 2D if input array has only one channel (shape (x, y, 1))
+            # (temp fix) : channelsData is only 2D if input array has only one channel (shape (x, y, 1))
             if channelsData.ndim == 2:
                 channelsData = np.expand_dims(channelsData, axis=0)
             channels = list(map(lambda pix: Channel(pix), channelsData))

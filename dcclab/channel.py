@@ -199,6 +199,11 @@ class Channel:
             return True
         return False
 
+    def replaceFromArray(self, channelArray):
+        assert channelArray.ndim == 2
+        self.saveOriginal()
+        self._pixels = channelArray
+
     def applyConvolution(self, matrix: typing.Union[np.ndarray, list]) -> None:
         self.saveOriginal()
         result = self.convolveWith(matrix)

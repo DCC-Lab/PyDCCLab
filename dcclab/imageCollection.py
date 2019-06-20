@@ -139,17 +139,9 @@ class ImageCollection:
         else:
             raise NotImplementedError("ImageCollection from 4D arrays only: [width][height][channel][collection]")
 
-    def fromSingleChannelArray(self, channelArray, channel):
-        """ fixme: if its a single channel 4D array, then fromArray works.
-            and if we use 'from' we mean to define all the collection as a single channel,
-            so no need to specify which channel it is...
-            unless the function is called something like replaceChannelFromArray(array, channnel)"""
-        raise NotImplementedError()
-
     def fromArray(self, imagesArray):
-        """ FIXME: fromSingleChannelArray and fromArray should only be defined inside ImageCollection.
-            but ImageCollection already has appendFromImagesArray. but the method doesn't overwrite
-            self.images """
+        """ Intentiate self.__images from an Array."""
+        # FIXME (?) : ImageCollection already has appendFromImagesArray. but the method doesn't overwrite self.__images
 
         self.__images = []
         if imagesArray.ndim == 4:
@@ -161,6 +153,12 @@ class ImageCollection:
             print("\n")
         else:
             raise NotImplementedError("ImageCollection from 4D arrays only.")
+
+    def replaceFromArray(self, imagesArray):
+        assert self.numberOfImages == imagesArray.shape[3], "Array has to contain the same number of images."
+
+        for i, image in enumerate(self.images):
+            image.replaceFromArray(imagesArray[:, :, :, i])
 
     def removeAt(self, index: int):
         self.images.pop(index)
