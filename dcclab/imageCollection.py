@@ -341,11 +341,10 @@ class ZStack(ImageCollection):
     def asArray(self) -> np.ndarray:
         return np.stack([image.asArray() for image in self.images], axis=3)
 
-    def asChannelArray(self, channel) -> np.ndarray:
+    def asChannelArray(self, channel: int) -> np.ndarray:
         imagesArray = self.asArray()
-        singleChannel = imagesArray[:, :, channel, :]
-        np.squeeze(singleChannel)
-        return singleChannel
+        return imagesArray[:, :, channel, :]
+
     def asOriginalArray(self) -> np.ndarray:
         return np.stack([image.asOriginalArray() for image in self.images], axis=3)
 
