@@ -280,11 +280,13 @@ class ImageCollection:
         for image in self.images:
             image.applyNoiseFilterWithErosionDilation(erosion_size, dilation_size, closing_size)
 
-    def applyOpeningToMask(self, size: int = 2):
-        raise NotImplementedError
+    def applyOpeningToMask(self, size: int=None, iterations: int = 1):
+        for image in self.images:
+            image.applyOpeningToMask(size, iterations)
 
-    def applyClosingToMask(self, size: int = 2):
-        raise NotImplementedError
+    def applyClosingToMask(self, size: int=None, iterations: int = 1):
+        for image in self.images:
+            image.applyClosingToMask(size, iterations)
 
 
 class ZStack(ImageCollection):

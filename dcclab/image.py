@@ -160,7 +160,7 @@ class Image:
         else:
             raise ValueError("Must provide one mask per channel")
 
-    def setMaskFromThreshold(self, value = None):
+    def setMaskFromThreshold(self, value=None):
         for channel in self.channels:
             channel.setMaskFromThreshold(value)
 
@@ -220,4 +220,12 @@ class Image:
 
     def applyNoiseFilterWithErosionDilation(self, erosion_size=2, dilation_size=2, closing_size=2):
         for channel in self.channels:
-            channel.applyNoiseFilterWithErosionDilation(algorithm)
+            channel.applyNoiseFilterWithErosionDilation(erosion_size, dilation_size, closing_size)
+
+    def applyOpeningToMask(self, size: int=None, iterations: int = 1):
+        for channel in self.channels:
+            channel.mask.applyNdImageBinaryOpening(size, iterations)
+
+    def applyClosingToMask(self, size: int=None, iterations: int = 1):
+        for channel in self.channels:
+            channel.mask.applyNdImageBinaryClosing(size, iterations)
