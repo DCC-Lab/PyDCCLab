@@ -436,16 +436,19 @@ class ZStack(ImageCollection):
     def analyzeComponents(self):
         for channel in list(range(self.numberOfChannels)):
             properties = self.componentsProperties['Channel {}'.format(channel)]
-            stackArray = self.asChannelArray(channel)
+            if self.hasOriginal:
+                originalArray = self.asOriginalChannelArray(channel)
+            else:
+                originalArray = self.asChannelArray(channel)
             maskArray = self.getChannelMaskArray(channel)
             labelArray = self.getChannelLabelArray(channel)
             nbOfObjects = properties['nbOfObjects']
 
             properties["objectsSize"] = self.getObjectsSize(maskArray, labelArray, nbOfObjects)
             properties["totalSize"] = np.sum(properties["objectsSize"]).tolist()
-            properties["objectsMass"] = self.getObjectsMass(stackArray, labelArray, nbOfObjects)
+            properties["objectsMass"] = self.getObjectsMass(originalArray, labelArray, nbOfObjects)
             properties["totalMass"] = np.sum(properties["objectsMass"]).tolist()
-            properties["objectsCM"] = self.getObjectsCenterOfMass(stackArray, labelArray, nbOfObjects)
+            properties["objectsCM"] = self.getObjectsCenterOfMass(originalArray, labelArray, nbOfObjects)
             properties["totalCM"] = np.average(properties["objectsCM"], axis=0, weights=properties["objectsMass"]).tolist()
 
     def getObjectsSize(self, mask, label, nbOfObjects):
