@@ -9,6 +9,7 @@ if __name__ == '__main__':
 
     readQuery = open(r"C:\Users\goubi\PycharmProjects\BigData-ImageAnalysis\dcclab\tests\querry_mcher.csv", "r",
                      encoding="utf-8")
+
     writeResults = open(r"C:\Users\goubi\PycharmProjects\BigData-ImageAnalysis\dcclab\tests\querry_mcher_results.csv",
                         "a", encoding="utf-8")
 
