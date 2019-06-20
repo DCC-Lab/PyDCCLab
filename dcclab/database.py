@@ -113,33 +113,6 @@ class Database:
             statement = 'INSERT OR REPLACE INTO {} ({}) VALUES ({})'.format(table, keys, values)
             self.execute(statement)
 
-
-# TODO Below is stuff to do eventually.
-'''
-def CreateNewDatabase(self):
-    try:
-        self.connection.connect(self.path, 'rwc')
-        self.disconnect()
-    except lite.OperationalError as error:
-        raise error
-
-
-def FindATable(cursor, tableName):
-    try:
-        listTables = cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
-        for name in listTables:
-            FormatedName = name
-            FormatedName = str(FormatedName).replace('(', '')
-            FormatedName = FormatedName.replace("'", "")
-            FormatedName = FormatedName.replace(')', '')
-            FormatedName = FormatedName.replace(',', '')
-            if FormatedName == tableName:
-                return True
-        return False
-    except connect.lite.OperationalError:
-        raise Exception("An unforseen error has occurred.")
-'''
-
 if __name__ == '__main__':
     # If we want to create new tables in our database we proceed as follow :
     # We start with creating a proper ImageMetadata object.
