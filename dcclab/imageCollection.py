@@ -572,7 +572,7 @@ def progressBar(value, endvalue, bar_length=20):
 
 
 # FIXME: temporary, merge with pathPattern logic inside ZStack init
-def getZStackFromFolder(inputDir, channelsToSegment=[0]):
+def getZStackFromFolder(inputDir, channelsToSegment=[0], crop=True):
     files = list(os.walk(inputDir))[0][2]
 
     channelStacks = []
@@ -588,4 +588,4 @@ def getZStackFromFolder(inputDir, channelsToSegment=[0]):
 
     stackArray = np.stack(channelStacks, axis=2)
 
-    return ZStack(imagesArray=stackArray, cropAtInit=True)
+    return ZStack(imagesArray=stackArray, cropAtInit=crop)
