@@ -82,6 +82,10 @@ class Image:
         imageData = np.dstack(channelArrays) 
         return imageData
 
+    def asOriginalArray(self):
+        # or call asArray on an original Image Object (currently Channel.original is only np.ndarray)
+        originalChannelArrays = list(map(lambda c: c.originalPixels, self.channels))
+        return np.dstack(originalChannelArrays)
 
     def replaceFromArray(self, imageArray):
         assert len(self.channels) == imageArray.shape[2], "Array has to contain the same number of channels."

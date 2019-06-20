@@ -301,21 +301,17 @@ class ImageCollection:
 
 
 class ZStack(ImageCollection):
-    def __init__(self, images: List[Image]=None, imagesArray: np.ndarray=None, pathPattern: str=None, keepOriginal: bool=True,
-                 cropAtInit=False):
+    def __init__(self, images: List[Image]=None, imagesArray: np.ndarray=None, pathPattern: str=None, cropAtInit=False):
         self.cropX, self.cropY = [], []
         self.cropFig = None
         self.cropRect = None
 
         if cropAtInit:
-            print(imagesArray.shape)
             imagesArray = self.crop4DArray(imagesArray)
-            print(imagesArray.shape)
         super().__init__(images, imagesArray, pathPattern)
         if not self.imagesAreSimilar:
             raise ValueError("Images in z-stack are not all the same shape")
 
-        self.__keepOriginal = keepOriginal  # todo : init Channel Objects with keepOriginal flag. + Define ZStack.original ?
         self.componentsProperties = OrderedDict()
         self.processIn3D = True
 
@@ -343,8 +339,6 @@ class ZStack(ImageCollection):
         return x, y, c, z
 
     def asArray(self) -> np.ndarray:
-        # A ZStack is always a 4D array of shape (X, Y, C, Z)
-        # All images are the same size
         return np.stack([image.asArray() for image in self.images], axis=3)
 
     def asChannelArray(self, channel) -> np.ndarray:
@@ -352,6 +346,12 @@ class ZStack(ImageCollection):
         singleChannel = imagesArray[:, :, channel, :]
         np.squeeze(singleChannel)
         return singleChannel
+    def asOriginalArray(self) -> np.ndarray:
+        return np.stack([image.asOriginalArray() for image in self.images], axis=3)
+
+    def asOriginalChannelArray(self, channel: int) -> np.ndarray:
+        originalArray = self.asOriginalArray()
+        return originalArray[:, :, channel, :]
 
     def apply3DFilter(self, filterFunc, *filterArgs):  # todo: maybe multiple functions
         """ These Functions should be processed over one Channel at a time"""
