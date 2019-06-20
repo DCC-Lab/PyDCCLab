@@ -522,10 +522,12 @@ class ZStack(ImageCollection):
         plt.imshow(stack4DArray.mean(axis))
         plt.show()
 
-    def showAllStacks(self, axis=-1):
-        stacks = self.stacksInMemory()
-        fig, axes = plt.subplots(1, len(stacks))
-        for i, (key, stack) in enumerate(stacks.items()):
+    def showAllStacks(self, channel: int=None, axis=-1):
+        if channel is None:
+            raise NotImplementedError("Can only plot single channel stacks.")  # TODO
+        stacksDict = self.channelStacksInMemory(channel)
+        fig, axes = plt.subplots(1, len(stacksDict))
+        for i, (key, stack) in enumerate(stacksDict.items()):
             if key in ["Original ", ""]:
                 axes[i].imshow(stack.mean(axis))
             else:
