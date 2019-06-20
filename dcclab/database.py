@@ -62,11 +62,11 @@ class Database:
         if self.isConnected:
             self.cursor.execute(statement)
 
-    def fetchall(self):
+    def fetchAll(self):
         if self.isConnected:
             return self.cursor.fetchall()
 
-    def fetone(self):
+    def fetchOne(self):
         if self.isConnected:
             return self.cursor.fetchone()
 
