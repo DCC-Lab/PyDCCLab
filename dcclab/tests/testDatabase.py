@@ -14,14 +14,14 @@ class TestDatabase(unittest.TestCase):
         self.database = db.Database(self.filePath, 'rwc')
         self.database.connect()
 
-        testTable = {'test_table_1': {'column_1': 'INTEGER PRIMARY KEY', 'column_2': 'TEXT', 'column_3': 'REAL'}}
+        testTable = {'test_table': {'column_1': 'INTEGER PRIMARY KEY', 'column_2': 'TEXT', 'column_3': 'REAL'}}
         self.database.createTable(testTable)
         self.database.commit()
 
-        testValue1Table1 = {'column_1': 1234, 'column_2': 'abcd', 'column_3': 0.1234}
-        testValue2Table1 = {'column_1': 5678, 'column_2': 'efgh', 'column_3': 0.5678}
-        self.database.insert('test_table_1', testValue1Table1)
-        self.database.insert('test_table_1', testValue2Table1)
+        frstValue = {'column_1': 1234, 'column_2': 'abcd', 'column_3': 0.1234}
+        scndValue = {'column_1': 5678, 'column_2': 'efgh', 'column_3': 0.5678}
+        self.database.insert('test_table', frstValue)
+        self.database.insert('test_table', scndValue)
         self.database.commit()
         self.database.disconnect()
 
@@ -79,21 +79,35 @@ class TestDatabase(unittest.TestCase):
         database.disconnect()
 
     def testPathReadOnlyMode(self):
-        database = db.Database('test.db', 'ro')
-        self.assertEqual(database.path, 'file:test.db?mode=ro')
+        database = db.Database('unittest.db', 'ro')
+        self.assertEqual(database.path, 'file:unittest.db?mode=ro')
 
     def testWindowsPathToPosix(self):
         database = db.Database(r'C:\sqlite3\Database\test.db', 'rwc')
         self.assertEqual(database.path, 'file:C:/sqlite3/Database/test.db?mode=rwc')
 
-    # How to test database.commit()?
-    def testCommit(self):
+    def testCommit(self):  # TODO Is there anything else we could test for Commit?
+        database = db.Database(self.filePath, 'rw')
+        database.connect()
+        testValue = {'column_1': 9101, 'column_2': 'plop', 'column_3': 0.9101}
+        database.insert('test_table', testValue)
+        database.commit()
 
-        pass
+        row = database.select('test_table', 'column_1', 'column_1=9101')
+        self.assertEqual(row[0]['column_1'], 9101)
+        database.disconnect()
 
-    # How to test database.rollback()?
-    def testRollback(self):
-        pass
+    def testRollback(self):  # TODO Is there anything else we could test for Rollback?
+        database = db.Database(self.filePath, 'rw')
+        database.connect()
+        testValue = {'column_1': 9101, 'column_2': 'plop', 'column_3': 0.9101}
+        database.insert('test_table', testValue)
+        database.rollback()
+        database.commit()
+
+        row = database.select('test_table', 'column_1', 'column_1=9101')
+        self.assertFalse(row)
+        database.disconnect()
 
     # How to test database.execute()?
     def testExecute(self):
