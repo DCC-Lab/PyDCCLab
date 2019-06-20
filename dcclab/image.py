@@ -15,7 +15,7 @@ class Image:
     supportedFormats = []
 
     def __init__(self, imageData: np.ndarray = None, path: str = None):
-        self._getSupportedFormats() #FIXME
+        self._getSupportedFormats()  # FIXME
 
         if path is not None:
             if not os.path.exists(path):
@@ -100,7 +100,7 @@ class Image:
             mode = 'L'
         elif len(self.channels) == 3:
             mode = 'RGB'
-        pilImage = PIL.Image.fromarray(imageAsArray,mode=mode)
+        pilImage = PIL.Image.fromarray(imageAsArray, mode=mode)
         pilImage.save(filePath)
 
     def display(self, colorMap=None):
@@ -108,7 +108,7 @@ class Image:
         plt.show()
 
     def channelsFromArray(self, array):
-        """ Creates new Channel Objects """
+        # This (static) method creates new Channel Objects
         if array.ndim == 2:
             return [Channel(array)]
         elif array.ndim == 3:
@@ -122,7 +122,7 @@ class Image:
             raise DimensionException(array.ndim)
 
     def _getSupportedFormats(self):
-        fmts = list(map( lambda cls: cls.supportedFormats, Image.supportedClasses))
+        fmts = list(map(lambda cls: cls.supportedFormats, Image.supportedClasses))
         Image.supportedFormats = [item for sublist in fmts for item in sublist]
 
     @property
@@ -158,11 +158,11 @@ class Image:
         for channel in self.channels:
             channel.filterNoise()
 
-    def threshold(self, value = None):
+    def threshold(self, value=None):
         for channel in self.channels:
             channel.threshold(value)
 
-    def setMask(self, mask:Channel):
+    def setMask(self, mask: Channel):
         if mask.isBinary:
             for channel in self.channels:
                 channel.setMask(mask)

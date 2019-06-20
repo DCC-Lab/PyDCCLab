@@ -150,7 +150,7 @@ class ImageCollection:
                 progressBar(i, nbOfImages-1)
                 image = Image(imagesArray[:, :, :, i])
                 self.__images.append(image)
-            print("\n")
+            print("\n")  # end progress bar
         else:
             raise NotImplementedError("ImageCollection from 4D arrays only.")
 
@@ -210,11 +210,11 @@ class ImageCollection:
         for image in self.images:
             image.filterNoise()
 
-    def threshold(self, value = None):
+    def threshold(self, value=None):
         for image in self.images:
             image.threshold(value)
 
-    def setMask(self, mask:Channel):
+    def setMask(self, mask: Channel):
         if mask.isBinary:
             for image in self.images:
                 image.setMask(mask)
@@ -223,14 +223,13 @@ class ImageCollection:
 
     def setMasks(self, masks: [Channel]):
         if len(masks) == len(self.images):
-            # We have one mask per image
             for mask in masks:
                 for image in self.images:
                     image.setMask(mask)
         else:
             raise NotImplementedError("Must provide one mask per channel for each image, may be different")
 
-    def setMaskFromThreshold(self, value = None):
+    def setMaskFromThreshold(self, value=None):
         for image in self.images:
             image.setMaskFromThreshold(value)
 
@@ -313,7 +312,7 @@ class ZStack(ImageCollection):
             raise ValueError("Images in z-stack are not all the same shape")
 
         self.componentsProperties = OrderedDict()
-        self.processIn3D = True
+        self.processIn3D = True  # default None ?
 
     @property
     def imagesAreSimilar(self) -> bool:
@@ -327,9 +326,9 @@ class ZStack(ImageCollection):
 
     @property
     def numberOfChannels(self):
-        """ Can be moved to ImageCollection [addressing the issue in removeChannels()] """
-        """ Not clean, but it works since imagesAreSimilar... """
-        """ Could be stored as a property variable in init instead """
+        # Can be moved to ImageCollection [addressing the issue in removeChannels()]
+        # Not clean, but it works since imagesAreSimilar...
+        # Could be stored as a property variable in init instead
         return self.images[0].shape[2]
 
     @property
@@ -352,7 +351,7 @@ class ZStack(ImageCollection):
         originalArray = self.asOriginalArray()
         return originalArray[:, :, channel, :]
 
-    def apply3DFilter(self, filterFunc, *filterArgs):  # todo: maybe multiple functions
+    def apply3DFilter(self, filterFunc, *filterArgs):
         """ These Functions should be processed over one Channel at a time """
         if self.processIn3D is None:
             raise ZStackProcessDimensionIsNotDefined
@@ -415,7 +414,7 @@ class ZStack(ImageCollection):
         return labelStackArray
 
     def labelMaskComponents(self):
-        """ Labelling always need to be processed in 3D ? """
+        """ Labelling always need to be processed in 3D """
         for channel in list(range(self.numberOfChannels)):
             maskStackArray = self.getChannelMaskArray(channel)
             labelStackArray, nbObjects = label(maskStackArray)
@@ -428,10 +427,6 @@ class ZStack(ImageCollection):
         for i in range(labelStackArray.shape[2]):
             labelArray = labelStackArray[:, :, i]
             self.images[i].channels[channel].labelledComponents = labelArray
-
-    """ Ouh là, ca devient lourd. Ce back-propagation de toujours aller redéfinir les couches 2D intérieures
-        après avoir appliqué une méthode 3D. Ce serait nice de garder en mémoire le mask et label 4D 
-        (et stack original) mais bon je suppose que cest moins object-oriented..."""
 
     def analyzeComponents(self):
         for channel in list(range(self.numberOfChannels)):
@@ -572,6 +567,7 @@ def progressBar(value, endvalue, bar_length=20):
 
 
 # FIXME: temporary, merge with pathPattern logic inside ZStack init
+# notice that the folder contains one 2Dimage per channel per layer
 def getZStackFromFolder(inputDir, channelsToSegment=[0], crop=True):
     files = list(os.walk(inputDir))[0][2]
 

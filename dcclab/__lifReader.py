@@ -7,8 +7,6 @@ import warnings
 import time
 import sys
 
-# TODO: hide/move this library wrapper out of dcclab module
-
 
 class LifReader(Reader):
     def __init__(self, *args, **kwargs):
