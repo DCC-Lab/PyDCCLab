@@ -1,6 +1,6 @@
 from dcclab import findAllCziFiles
-from Database.ImageMetadata.cziMetadata.cziMetadata import CZIMetadata as mtdt
-from Database.ImageMetadata.imageMetadata import ImageMetadata as imgMtdt
+from dcclab.cziMetadata import CZIMetadata as mtdt
+from dcclab.imageMetadata import ImageMetadata as imgMtdt
 import os
 import fnmatch
 

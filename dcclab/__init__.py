@@ -12,6 +12,14 @@ from .channelInteger import *
 from .channelFloat import *
 from .pathPattern import *
 from .lifFile import *
+
+from .database import *
+from .databaseUtilities import *
+from .imageMetadata import *
+from .cziMetadata import *
+from .cziFilter import *
+from .cziChannel import *
 from typing import List, Union
+
 __version__ = "0.9.0"
 __author__ = "Daniel Cote <dccote@cervo.ulaval.ca>"
