@@ -73,17 +73,17 @@ class Database:
     @property
     def tables(self) -> list:
         self.execute("SELECT name FROM sqlite_master WHERE type='table'")
-        rows = self.fetchall()
+        rows = self.fetchAll()
         results = list(map(lambda row: row['name'], rows))
         return results
 
     def select(self, table, columns='*', condition=None) -> lite.Row:
         if condition is None:
             self.execute("SELECT {0} FROM {1}".format(columns, table))
-            rows = self.fetchall()
+            rows = self.fetchAll()
         else:
             self.execute("SELECT {0} FROM {1} WHERE {2}".format(columns, table, condition))
-            rows = self.fetchall()
+            rows = self.fetchAll()
         return rows
 
     def createTable(self, metadata: dict):
@@ -94,12 +94,12 @@ class Database:
                 for key, keyType in keys.items():
                     attributes.append("{} {}".format(key, keyType))
                 statement += ",".join(attributes) + ")"
-                self.cursor.execute(statement)
+                self.execute(statement)
 
     def dropTable(self, table: str):
         if self.isConnected:
             statement = "DROP TABLE IF EXISTS {}".format(table)
-            self.cursor.execute(statement)
+            self.execute(statement)
 
     def insert(self, table: str, values: dict):
         if self.isConnected:
@@ -111,7 +111,7 @@ class Database:
             keys = ','.join(lstKeys)
             values = ','.join(lstValues)
             statement = 'INSERT OR REPLACE INTO {} ({}) VALUES ({})'.format(table, keys, values)
-            self.cursor.execute(statement)
+            self.execute(statement)
 
 
 # TODO Below is stuff to do eventually.

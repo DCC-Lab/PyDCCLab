@@ -6,8 +6,27 @@ import os
 class TestDatabase(unittest.TestCase):
     def setUp(self):
         self.directory = os.path.dirname(__file__)
-        self.filePath = os.path.join(self.directory, 'test.db')
+        self.filePath = os.path.join(self.directory, 'unittest.db')
         self.wrongFile = os.path.join(self.directory, 'wrongfile.db')
+
+        # For testing purpose, a fake database has to be built.
+        # We have to create a fake table and add fake data into it.
+        self.database = db.Database(self.filePath, 'rwc')
+        self.database.connect()
+
+        testTable = {'test_table_1': {'column_1': 'INTEGER PRIMARY KEY', 'column_2': 'TEXT', 'column_3': 'REAL'}}
+        self.database.createTable(testTable)
+        self.database.commit()
+
+        testValue1Table1 = {'column_1': 1234, 'column_2': 'abcd', 'column_3': 0.1234}
+        testValue2Table1 = {'column_1': 5678, 'column_2': 'efgh', 'column_3': 0.5678}
+        self.database.insert('test_table_1', testValue1Table1)
+        self.database.insert('test_table_1', testValue2Table1)
+        self.database.commit()
+        self.database.disconnect()
+
+    def tearDown(self):
+        os.remove(self.filePath)
 
     def testConnectSuccesfull(self):
         database = db.Database(self.filePath)
