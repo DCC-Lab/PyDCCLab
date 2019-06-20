@@ -69,6 +69,7 @@ class TestDatabase(unittest.TestCase):
 
     # How to test database.commit()?
     def testCommit(self):
+
         pass
 
     # How to test database.rollback()?

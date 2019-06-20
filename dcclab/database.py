@@ -72,15 +72,18 @@ class Database:
 
     @property
     def tables(self) -> list:
-        rows = self.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        self.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        rows = self.fetchall()
         results = list(map(lambda row: row['name'], rows))
         return results
 
     def select(self, table, columns='*', condition=None) -> lite.Row:
         if condition is None:
-            rows = self.execute("SELECT {0} FROM {1}".format(columns, table))            
+            self.execute("SELECT {0} FROM {1}".format(columns, table))
+            rows = self.fetchall()
         else:
-            rows = self.execute("SELECT {0} FROM {1} WHERE {2}".format(columns, table, condition))
+            self.execute("SELECT {0} FROM {1} WHERE {2}".format(columns, table, condition))
+            rows = self.fetchall()
         return rows
 
     def createTable(self, metadata: dict):
