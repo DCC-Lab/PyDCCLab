@@ -19,6 +19,7 @@ from .imageMetadata import *
 from .cziMetadata import *
 from .cziFilter import *
 from .cziChannel import *
+from .csvMetadata import *
 from typing import List, Union
 
 __version__ = "0.9.0"

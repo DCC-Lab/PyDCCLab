@@ -1,4 +1,5 @@
 from .cziMetadata import CZIMetadata
+from .csvMetadata import CSVMetadata
 import os
 try:
     import deprecated
