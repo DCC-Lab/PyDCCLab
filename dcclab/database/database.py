@@ -113,10 +113,14 @@ class Database:
             statement = 'INSERT OR REPLACE INTO "{}" ({}) VALUES ({})'.format(table, keys, values)
             self.execute(statement)
 
+    # Warning! This speeds up the writing speed in the database.
+    # But it has the potential of having the database file go corrupt if there is an os crash or power outage.
     def asynchronous(self):
         if self.isConnected:
             self.execute('PRAGMA synchronous = OFF')
 
+    # Use this function to specify when a transaction begins so you can control your transaction/seconds.
+    # It can speed up the writing process.
     def beginTransaction(self):
         if self.isConnected:
             self.execute('BEGIN TRANSACTION')
