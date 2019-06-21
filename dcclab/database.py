@@ -72,15 +72,18 @@ class Database:
 
     @property
     def tables(self) -> list:
-        rows = self.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        self.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        rows = self.fetchAll()
         results = list(map(lambda row: row['name'], rows))
         return results
 
     def select(self, table, columns='*', condition=None) -> lite.Row:
         if condition is None:
-            rows = self.execute("SELECT {0} FROM {1}".format(columns, table))            
+            self.execute("SELECT {0} FROM {1}".format(columns, table))
+            rows = self.fetchAll()
         else:
-            rows = self.execute("SELECT {0} FROM {1} WHERE {2}".format(columns, table, condition))
+            self.execute("SELECT {0} FROM {1} WHERE {2}".format(columns, table, condition))
+            rows = self.fetchAll()
         return rows
 
     def createTable(self, metadata: dict):
@@ -91,12 +94,12 @@ class Database:
                 for key, keyType in keys.items():
                     attributes.append("{} {}".format(key, keyType))
                 statement += ",".join(attributes) + ")"
-                self.cursor.execute(statement)
+                self.execute(statement)
 
     def dropTable(self, table: str):
         if self.isConnected:
             statement = "DROP TABLE IF EXISTS {}".format(table)
-            self.cursor.execute(statement)
+            self.execute(statement)
 
     def insert(self, table: str, values: dict):
         if self.isConnected:
@@ -108,34 +111,7 @@ class Database:
             keys = ','.join(lstKeys)
             values = ','.join(lstValues)
             statement = 'INSERT OR REPLACE INTO {} ({}) VALUES ({})'.format(table, keys, values)
-            self.cursor.execute(statement)
-
-
-# TODO Below is stuff to do eventually.
-'''
-def CreateNewDatabase(self):
-    try:
-        self.connection.connect(self.path, 'rwc')
-        self.disconnect()
-    except lite.OperationalError as error:
-        raise error
-
-
-def FindATable(cursor, tableName):
-    try:
-        listTables = cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
-        for name in listTables:
-            FormatedName = name
-            FormatedName = str(FormatedName).replace('(', '')
-            FormatedName = FormatedName.replace("'", "")
-            FormatedName = FormatedName.replace(')', '')
-            FormatedName = FormatedName.replace(',', '')
-            if FormatedName == tableName:
-                return True
-        return False
-    except connect.lite.OperationalError:
-        raise Exception("An unforseen error has occurred.")
-'''
+            self.execute(statement)
 
 if __name__ == '__main__':
     # If we want to create new tables in our database we proceed as follow :
