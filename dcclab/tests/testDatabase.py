@@ -6,8 +6,29 @@ import os
 class TestDatabase(unittest.TestCase):
     def setUp(self):
         self.directory = os.path.dirname(__file__)
-        self.filePath = os.path.join(self.directory, 'test.db')
+        self.filePath = os.path.join(self.directory, 'unittest.db')
         self.wrongFile = os.path.join(self.directory, 'wrongfile.db')
+
+        # For testing purpose, a fake database has to be built.
+        self.database = db.Database(self.filePath, 'rwc')
+        self.database.connect()
+
+        # We create a fake table.
+        testTable = {'test_table': {'column_1': 'INTEGER PRIMARY KEY', 'column_2': 'TEXT', 'column_3': 'REAL'}}
+        self.database.createTable(testTable)
+        self.database.commit()
+
+        # We create fake data and insert it into the table.
+        frstValue = {'column_1': 1234, 'column_2': 'abcd', 'column_3': 0.1234}
+        scndValue = {'column_1': 5678, 'column_2': 'efgh', 'column_3': 0.5678}
+        self.database.insert('test_table', frstValue)
+        self.database.insert('test_table', scndValue)
+        self.database.commit()
+        self.database.disconnect()
+
+    def tearDown(self):
+        # At the end of the test, we delete the database.
+        os.remove(self.filePath)
 
     def testConnectSuccesfull(self):
         database = db.Database(self.filePath)
@@ -60,137 +81,130 @@ class TestDatabase(unittest.TestCase):
         database.disconnect()
 
     def testPathReadOnlyMode(self):
-        database = db.Database('test.db', 'ro')
-        self.assertEqual(database.path, 'file:test.db?mode=ro')
+        database = db.Database('unittest.db', 'ro')
+        self.assertEqual(database.path, 'file:unittest.db?mode=ro')
 
     def testWindowsPathToPosix(self):
         database = db.Database(r'C:\sqlite3\Database\test.db', 'rwc')
         self.assertEqual(database.path, 'file:C:/sqlite3/Database/test.db?mode=rwc')
 
-    # How to test database.commit()?
-    def testCommit(self):
-        pass
+    def testCommit(self):  # TODO Is there anything else we could test for Commit?
+        database = db.Database(self.filePath, 'rw')
+        database.connect()
 
-    # How to test database.rollback()?
-    def testRollback(self):
-        pass
+        testValue = {'column_1': 9101, 'column_2': 'plop', 'column_3': 0.9101}
+        database.insert('test_table', testValue)
+        database.commit()
 
-    # How to test database.execute()?
+        row = database.select('test_table', 'column_1', 'column_1=9101')
+        self.assertEqual(row[0]['column_1'], 9101)
+        database.disconnect()
+
+    def testRollback(self):  # TODO Is there anything else we could test for Rollback?
+        database = db.Database(self.filePath, 'rw')
+        database.connect()
+
+        testValue = {'column_1': 9101, 'column_2': 'plop', 'column_3': 0.9101}
+        database.insert('test_table', testValue)
+        database.rollback()
+        database.commit()
+
+        row = database.select('test_table', 'column_1', 'column_1=9101')
+        self.assertFalse(row)
+        database.disconnect()
+
     def testExecute(self):
-        pass
+        database = db.Database(self.filePath, 'rw')
+        database.connect()
 
-    # How to test database.tables?
+        statement = 'DROP TABLE IF EXISTS test_table'
+        database.execute(statement)
+        database.commit()
+
+        self.assertFalse(database.tables)
+        database.disconnect()
+
     def testTables(self):
-        pass
+        database = db.Database(self.filePath)
+        database.connect()
 
-    # How to test database.select()?
-    def testSelect(self):
-        pass
+        self.assertEqual(database.tables[0], 'test_table')
 
-    # How to test database.createTable()?
+    def testSelectResultsFound(self):
+        database = db.Database(self.filePath)
+        database.connect()
+
+        rows = database.select('test_table', 'column_1', 'column_3<1')
+        for row in rows:
+            self.assertTrue(row['column_1'] == 1234 or 5678)
+
+    def testSelectNoResultsFound(self):
+        database = db.Database(self.filePath)
+        database.connect()
+
+        rows = database.select('test_table', 'column_1', 'column_2="aaaa"')
+        self.assertFalse(rows)
+
     def testCreateTable(self):
-        pass
+        database = db.Database(self.filePath, 'rw')
+        database.connect()
 
-    # How to test database.dropTable()?
+        newTable = {'new_table': {'column_1': 'INTEGER PRIMARY KEY', 'column_2': 'TEXT'}}
+        database.createTable(newTable)
+        database.commit()
+
+        self.assertTrue(database.tables.index('new_table'))
+
     def testDropTable(self):
-        pass
+        database = db.Database(self.filePath, 'rw')
+        database.connect()
 
-    # How to test database.insert()?
+        database.dropTable('test_table')
+        database.commit()
+
+        self.assertFalse(database.tables)
+
     def testInsert(self):
-        pass
+        database = db.Database(self.filePath, 'rw')
+        database.connect()
 
-    '''
-    def test_CreateTable(self):
-        # This is one of the more complex test.
-        # Would very much like to simplify it.
-        directory = os.path.dirname(__file__)
-        fileName = os.path.join(directory, 'testData', 'test.db')
-        database = db.obsolete(fileName, 'test.db')
+        testValue = {'column_1': 1121, 'column_2': 'bleh', 'column_3': 0.1121}
+        database.insert('test_table', testValue)
+        database.commit()
 
-        #database.createConnection()
-        #database.createCursor()
+        row = database.select('test_table', 'column_1', 'column_1=1121')
+        self.assertEqual(row[0]['column_1'], 1121)
+        database.disconnect()
 
-        # Setting up the test.
-        connection_test = db.CreateConnection('test.db', 'rw')
-        cursor_test = db.CreateCursor(connection_test)
-        name_test = "persons"
-        paramList_test = [["id", "INT(20)", "PRIMARY KEY"], ["firstname", "TEXT(30)", ""], ["lastname", "TEXT(30)", ""]]
+    def testMode(self):
+        database = db.Database(self.filePath, 'rw')
+        database.connect()
 
-        self.assertTrue(db.CreateTable(cursor_test, name_test, paramList_test))     # Table does not exist.
-        db.CommitConnection(connection_test)
+        self.assertEqual(database.mode, 'rw')
 
-        self.assertTrue(db.CreateTable(cursor_test, name_test, paramList_test))     # Table does exist.
-        db.CommitConnection(connection_test)
-        db.DropTable(cursor_test, name_test)
-        db.CommitConnection(connection_test)
-        db.CloseConnection(connection_test)
+    def testFetchAll(self):
+        database = db.Database(self.filePath)
+        database.connect()
 
-        connection_test = db.CreateConnection('test.db', 'ro')
-        cursor_test = db.CreateCursor(connection_test)
-        with self.assertRaises(Exception): db.CreateTable(cursor_test, name_test, paramList_test)   # Wrong mode.
-        db.DropTable(cursor_test, name_test)
-        db.CommitConnection(connection_test)
-        db.CloseConnection(connection_test)
+        database.execute('SELECT * FROM test_table')
+        rows = database.fetchAll()
+        for row in rows:
+            self.assertTrue(row['column_1'] == 1234 or 5678)
 
-    def test_DropTable(self):
-        connection_test = db.CreateConnection('test.db', 'rw')
-        cursor_test = db.CreateCursor(connection_test)
-        name_test = "persons"
-        paramList_test = [["id", "INT(20)", "PRIMARY KEY"], ["firstname", "TEXT(30)", ""], ["lastname", "TEXT(30)", ""]]
-        db.CreateTable(cursor_test, name_test, paramList_test)
-        db.CommitConnection(connection_test)
-        db.CloseConnection(connection_test)
+    def testFetchOne(self):
+        database = db.Database(self.filePath)
+        database.connect()
 
-        connection_test = db.CreateConnection('test.db', 'ro')
-        cursor_test = db.CreateCursor(connection_test)
-        with self.assertRaises(Exception): db.DropTable(cursor_test, name_test)  # Wrong mode.
-        db.CommitConnection(connection_test)
-        db.CloseConnection(connection_test)
+        database.execute('SELECT * FROM test_table')
+        row = database.fetchOne()
+        self.assertTrue(row['column_1'] == 1234)
 
-        connection_test = db.CreateConnection('test.db', 'rw')
-        cursor_test = db.CreateCursor(connection_test)
-        self.assertTrue(db.DropTable(cursor_test, name_test))   # Table does exist.
-        db.CommitConnection(connection_test)
+        row = database.fetchOne()
+        self.assertTrue(row['column_1'] == 5678)
 
-        self.assertTrue(db.DropTable(cursor_test, name_test))   # Table des not exist.
-        db.CommitConnection(connection_test)
-        db.CloseConnection(connection_test)
-
-    def test_ListAllTables(self):
-        connection_test = db.CreateConnection('test.db')
-        cursor_test = db.CreateCursor(connection_test)
-
-        self.assertGreater(len(db.ListAllTables(cursor_test)), 0)
-    '''
+        row = database.fetchOne()
+        self.assertFalse(row)
 
 
 if __name__ == '__main__':
     unittest.main()
-
-    # cursor.execute('CREATE TABLE table_1 (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT(30))')
-    # cursor.execute('CREATE TABLE table_2 (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT(30))')
-    # cursor.execute('CREATE TABLE table_3 (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT(30), age INTEGER(3))')
-    #cursor.execute("DROP TABLE 'sqlite_sequence'")
-    #connection.commit()
-
-    # Extracting table names
-    '''
-    tableNames = cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
-    tables = []
-    for name in tableNames:
-        newname = name
-        newname = str(newname).replace('(', '')
-        newname = newname.replace("'", "")
-        newname = newname.replace(')', '')
-        newname = newname.replace(',', '')
-        tables.append(newname)
-    '''
-
-    # Extracting columns name in a table
-    '''
-    for table in tables:
-        reader = cursor.execute("SELECT * FROM {}".format(table))
-        for x in reader.description:
-            print(x[0])
-    connection.close()
-    '''
