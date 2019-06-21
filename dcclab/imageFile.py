@@ -29,7 +29,7 @@ class CZIFile(ImageFile):
         if axes == "BSCYX0":
             if cziObj.shape[1] != 1:
                 raise NotImplementedError("Multiple scenes")
-        if axes not in ["BCYX0", "BSCYX0"]:
+        if axes not in ["BCYX0", "BSCYX0", "YX0"]:
             raise NotImplementedError(axes)
         mosaic, self.__tilesWithChannelNumber = decodeImages(cziObj)
         try:
