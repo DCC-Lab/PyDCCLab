@@ -1,4 +1,5 @@
 from .cziMetadata import CZIMetadata
+from .csvMetadata import CSVMetadata
 import os
 try:
     import deprecated
@@ -7,8 +8,8 @@ except:
 
 
 class ImageMetadata:
-    supportedClasses = [CZIMetadata]
-    supportedFormats = ['CZI']
+    supportedClasses = [CZIMetadata, CSVMetadata]
+    supportedFormats = ['CZI', 'CSV']
 
     def __init__(self, path: str):
         if path is not None:
@@ -34,6 +35,8 @@ class ImageMetadata:
     def metadata(self) -> dict:
         if isinstance(self.__fileObject, CZIMetadata):
             return self.__fileObject.asDict().get('metadata')
+        elif isinstance(self.__fileObject, CSVMetadata):
+            return self.__fileObject.asDict
         else:
             return {}
 
@@ -48,18 +51,7 @@ class ImageMetadata:
     def keys(self) -> dict:
         if isinstance(self.__fileObject, CZIMetadata):
             return self.__fileObject.keys
+        elif isinstance(self.__fileObject, CSVMetadata):
+            return self.__fileObject.keys
         else:
             return {}
-
-
-if __name__ == '__main__':
-    # Some scratch tests :  # TODO To delete when the class is completed. This is only for quick tests.
-    path = 'P:\\injection AAV\\résultats bruts\\AAV\\AAV498AAV455\\AAV498AAV455_S94\\AAV498-455_S94_C.czi'
-    mdata = ImageMetadata(path)
-    for key, value in mdata.metadata.items():
-        print(key, value)
-
-    for key, value in mdata.channels.items():
-        print(key, value)
-        for subkey, subvalue in value.items():
-            print(subkey, subvalue)

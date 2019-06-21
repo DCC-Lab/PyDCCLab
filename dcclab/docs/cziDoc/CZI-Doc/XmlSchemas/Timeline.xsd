@@ -245,7 +245,7 @@
 
   <xs:complexType name="IncubationRecordingEvent">
     <xs:annotation>
-      <xs:documentation>Record current incubation values.</xs:documentation>
+      <xs:documentation>Record current incubation lines.</xs:documentation>
     </xs:annotation>
     <xs:all>
       <xs:element name="Components" type="IncubationComponents" minOccurs="0"/>
@@ -254,7 +254,7 @@
 
   <xs:complexType name="LinkamRecordingEvent">
     <xs:annotation>
-      <xs:documentation>Record current Linkam heating stage values.</xs:documentation>
+      <xs:documentation>Record current Linkam heating stage lines.</xs:documentation>
     </xs:annotation>
     <xs:all>
       <xs:element name="Temperature" type="xs:double" minOccurs="0"/>

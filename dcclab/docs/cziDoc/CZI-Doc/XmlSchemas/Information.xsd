@@ -825,7 +825,7 @@
                   <xs:element name="SuperResolutionParameter" type="xs:double" minOccurs="0">
                     <xs:annotation>
                       <xs:documentation>
-                        SuperResolutionParameter determines the Wiener filtering level. Typical values vary between ‐5 and ‐7 and depend on the signal-to-noise ratio of the sample. [units:none].
+                        SuperResolutionParameter determines the Wiener filtering level. Typical lines vary between ‐5 and ‐7 and depend on the signal-to-noise ratio of the sample. [units:none].
                       </xs:documentation>
                     </xs:annotation>
                   </xs:element>
