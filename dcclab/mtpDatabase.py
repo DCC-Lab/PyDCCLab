@@ -1,9 +1,14 @@
+'''
+This is a script used to create the mtp.db database.
+This database contains metadata linked to Molecular Tools platform's operations.
+'''
 from dcclab import Database
 from dcclab import Metadata
 from dcclab import findFiles
 
 
 if __name__ == '__main__':
+    # TODO This whole script seems to take a while. The INSERT OR REPLACE in database.insert() seems to be the cause.
     # We need paths to our metadata
     # We get a list of paths to the czi files.
     print('Searching for czi files...')
