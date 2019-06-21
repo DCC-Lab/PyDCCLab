@@ -1,17 +1,13 @@
-from .channel import *
-from .DCCExceptions import *
-from .cziUtil import *
-import tifffile
-import PIL
-from .imageFile import *
-from .cziFile import CZIFile
-
+from .cziFile import *
+import os
 import re
-
+from typing import List, Union
 
 class Image:
-    supportedClasses = [CZIFile, TIFFFile, PILFile]
+
+    supportedClasses = [CZIFile, TIFFFile, PILFile, MATLABFile]
     supportedFormats = []
+
 
     def __init__(self, imageData:np.ndarray = None, path: str = None):
         self._getSupportedFormats() #FIXME
@@ -21,7 +17,7 @@ class Image:
                 raise ValueError("Cannot load '{0}': file does not exist".format(path))
 
             self.path = path
-            self.channels = []
+            self.channels:List[Channel] = []
             self.__fileObject = None
             for supportedClass in Image.supportedClasses:
                 try:
@@ -45,6 +41,9 @@ class Image:
         if not isinstance(other, Image):
             return False
         return np.array_equal(self.asArray(), other.asArray())
+
+    def __getitem__(self, index):
+        return self.channels[index]
 
     @property
     def shape(self):
@@ -74,7 +73,14 @@ class Image:
         return imageData
 
     def save(self, filePath):
-        raise NotImplementedError()
+        imageAsArray = self.asArray()
+
+        if len(self.channels) == 1:
+            mode = 'L'
+        elif len(self.channels) == 3:
+            mode = 'RGB'
+        pilImage = PIL.Image.fromarray(imageAsArray,mode=mode)
+        pilImage.save(filePath)
 
     def display(self, colorMap=None):
         plt.imshow(self.asArray(), cmap=colorMap)
@@ -125,7 +131,7 @@ class Image:
         else:
             raise ValueError("Mask must be binary")
 
-    def setMasks(self, masks:[Channel]):
+    def setMasks(self, masks:List[Channel]):
         if len(masks) == len(self.channels):
             for mask in masks:
                 if mask.isBinary:

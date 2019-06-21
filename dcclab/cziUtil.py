@@ -64,7 +64,7 @@ def extractMetadataFromCziFileObject(cziObject, saveFileName=None):
     save the metadata.
     :return: The metadata in XML formated string.
     """
-    meta = cziObject.metadata
+    meta = cziObject.metadata()
     if saveFileName is not None:
         file_xml = open("{}.xml".format(saveFileName), "w", encoding="utf-8")
         file_xml.write(meta)

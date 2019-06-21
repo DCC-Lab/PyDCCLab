@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 from .cziChannel import CZIChannel as chnnl
 from .cziFilter import CZIFilter as fltr
-from dcclab import readCziImage, extractMetadataFromCziFileObject
+from dcclab.cziUtil import readCziImage, extractMetadataFromCziFileObject
 import re
 import os
 
@@ -39,12 +39,23 @@ class CZIMetadata:
     def asDict(self):
         channelsAsDict = {}
         for channel in self.channels:
-            channelsAsDict['{}'.format(channel.channelId)] = channel.asDict()
+            channelsAsDict['{}'.format(channel.channel)] = channel.asDict()
         metadataAsDict = {'path': self.path, 'microscope': self.microscope, 'objective': self.objective, 'x_size': self.xSize,
                 'y_size': self.ySize, 'x_scale': self.xScale, 'y_scale': self.yScale, 'x_scaled': self.xScaled,
                 'y_scaled': self.yScaled, 'name': self.name, 'mouse_id': self.mouseId,
                 'viral_vectors': self.viralVectors, 'injection_site': self.injectionSite, 'tags': self.tags}
         return {'metadata': metadataAsDict, 'channels': channelsAsDict}
+
+    @property
+    def keys(self):
+        channelsKeys = {}
+        if self.channels:
+            channelsKeys = self.channels[0].keys
+        metadataKeys = {'path': 'TEXT', 'microscope': 'TEXT', 'objective': 'TEXT', 'x_size': 'INTEGER',
+                        'y_size': 'INTEGER', 'x_scale': 'REAL', 'y_scale': 'REAL', 'x_scaled': 'REAL',
+                        'y_scaled': 'REAL', 'name': 'TEXT', 'mouse_id': 'INTEGER', 'viral_vectors': 'TEXT',
+                        'injection_site': 'TEXT', 'tags': 'TEXT'}
+        return {'cziMetadata': metadataKeys, 'cziChannels': channelsKeys}
 
     def nameFromPath(self):
         try:
@@ -193,7 +204,7 @@ class CZIMetadata:
             channels = self.root.find('./Metadata/Information/Image/Dimensions/Channels')
             if self.checkIfElementHasChildren(channels):
                 for channel in channels:
-                    channelInformation = [channel.attrib['Id'], channel.attrib['Name'], self.name]
+                    channelInformation = [channel.attrib['Id'], channel.attrib['Name'], self.path]
                     newChannels.append(chnnl(channelInformation, self.filters, self.root))
             return newChannels
         except Exception:
