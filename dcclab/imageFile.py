@@ -28,8 +28,10 @@ class CZIFile(ImageFile):
         axes = cziObj.axes
         if axes == "BSCYX0":
             if cziObj.shape[1] != 1:
+                closeCziFileObject(cziObj)
                 raise NotImplementedError("Multiple scenes")
         if axes not in ["BCYX0", "BSCYX0", "YX0"]:
+            closeCziFileObject(cziObj)
             raise NotImplementedError(axes)
         mosaic, self.__tilesWithChannelNumber = decodeImages(cziObj)
         try:
@@ -45,7 +47,6 @@ class CZIFile(ImageFile):
             wholeImage = mosaic.transpose((1, 2, 0))
         else:
             wholeImage = mosaic
-        # wholeImage = mosaic.transpose((1, 2, 0)) if mosaic.ndim == 3 and axes != "YX0" else mosaic
         return wholeImage
 
 
