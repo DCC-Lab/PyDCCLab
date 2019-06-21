@@ -3,9 +3,13 @@ import unittest
 from dcclab import CZIFile
 import czifile
 import numpy as np
+import os
 
 
 class TestCZIFile(unittest.TestCase):
+    def setUp(self) -> None:
+        if "tests" not in os.getcwd():
+            os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
     def testAxesNotSupported(self):
         czi = CZIFile("testCziAxesNotYetSupported.czi")
@@ -24,7 +28,10 @@ class TestCZIFile(unittest.TestCase):
             self.assertEqual(str(e), "Multiple scenes")
 
     def testMosaicOutputOneChannel(self):
-        array = czifile.imread("testCziOneChannel.czi").squeeze()
+        obj = czifile.CziFile("testCziOneChannel.czi")
+        array = obj.asarray(max_workers=1)
+        array = array.squeeze()
+        obj.close()
         czi = CZIFile("testCziOneChannel.czi")
         image = czi.imageDataFromPath()
         self.assertTrue(np.array_equal(array, image))
@@ -48,6 +55,16 @@ class TestCZIFile(unittest.TestCase):
         image = czi.imageDataFromPath()
         self.assertTrue(np.array_equal(array, image))
 
+    def testMosaicOutputYX0Axes(self):
+        obj = czifile.CziFile("testCziFileYX0Axes.czi")
+        array = obj.asarray(max_workers=1)
+        array = array.squeeze()
+        obj.close()
+        czi = CZIFile("testCziFileYX0Axes.czi")
+        image = czi.imageDataFromPath()
+        self.assertTrue(np.array_equal(array, image))
+
 
 if __name__ == '__main__':
+    print(os.path.dirname(__file__))
     unittest.main()
