@@ -24,9 +24,7 @@ class TestCZIFile(unittest.TestCase):
             self.assertEqual(str(e), "Multiple scenes")
 
     def testMosaicOutputOneChannel(self):
-        cziObj = czifile.CziFile("testCziOneChannel.czi")
-        array = np.squeeze(cziObj.asarray())
-        cziObj.close()
+        array = czifile.imread("testCziOneChannel.czi").squeeze()
         czi = CZIFile("testCziOneChannel.czi")
         image = czi.imageDataFromPath()
         self.assertTrue(np.array_equal(array, image))
