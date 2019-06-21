@@ -496,7 +496,7 @@ class TestImageMethods(unittest.TestCase):
     #     gaussianBlurredArray = np.zeros_like(array)
     #     # Because of the nature of the discrete convolution used in the gaussian filter
     #     # and because of the nature of the input array (which contains only 0s except for the middle pixel):
-    #     # We must multiply the resulting array by that non zero digit. In cases where there are more non zero lines:
+    #     # We must multiply the resulting array by that non zero digit. In cases where there are more non zero values:
     #     # It would be more complicated. (In the case of filters, convolution of two matrix (a and b) is represented
     #     # by a (or b) "moving over" b (or a) and the elements of the resulting matrix would be the sum of the 1-1
     #     # product of each element of a and b (a11*b11+a12*b12+...). Since we only have one non zero element

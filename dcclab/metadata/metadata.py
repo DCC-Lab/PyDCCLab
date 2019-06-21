@@ -7,7 +7,7 @@ except:
     exit("pip install deprecated")
 
 
-class ImageMetadata:
+class Metadata:
     supportedClasses = [CZIMetadata, CSVMetadata]
     supportedFormats = ['CZI', 'CSV']
 
@@ -18,14 +18,14 @@ class ImageMetadata:
 
             self.path = path
             self.__fileObject = None
-            for supportedClass in ImageMetadata.supportedClasses:
+            for supportedClass in Metadata.supportedClasses:
                 try:
                     self.__fileObject = supportedClass(path)
                     break
                 except:
                     continue
             if self.__fileObject is None:
-                message = "Cannot read '{0}': not a recognized image format ({1})".format(self.path, ImageMetadata.supportedFormats)
+                message = "Cannot read '{0}': not a recognized image format ({1})".format(self.path, Metadata.supportedFormats)
                 raise TypeError(message)
         else:
             self.path = None

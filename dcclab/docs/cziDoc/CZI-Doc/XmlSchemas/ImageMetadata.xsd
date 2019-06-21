@@ -603,14 +603,14 @@
           <xs:documentation>
             Defines the stage X and stage Y orientation.
             If the acquisition is not directed to the image center, the offset to the image center needs to be added to the stage position.
-            Before adding, the offsets need to be multiplied with the stage orientation lines.
-            Typical lines: LM: X=-1, Y=-1. SEM: X=1, Y=-1.
+            Before adding, the offsets need to be multiplied with the stage orientation values.
+            Typical values: LM: X=-1, Y=-1. SEM: X=1, Y=-1.
           </xs:documentation>
         </xs:annotation>
         <xs:complexType>
           <xs:attribute name="X">
             <xs:annotation>
-              <xs:documentation>Stage X axis orientation. Possible lines: 1, -1.</xs:documentation>
+              <xs:documentation>Stage X axis orientation. Possible values: 1, -1.</xs:documentation>
             </xs:annotation>
             <xs:simpleType>
               <xs:restriction base="xs:integer">
@@ -621,7 +621,7 @@
           </xs:attribute>
           <xs:attribute name="Y">
             <xs:annotation>
-              <xs:documentation>Stage Y axis orientation. Possible lines: 1, -1.</xs:documentation>
+              <xs:documentation>Stage Y axis orientation. Possible values: 1, -1.</xs:documentation>
             </xs:annotation>
             <xs:simpleType>
               <xs:restriction base="xs:integer">
@@ -704,7 +704,7 @@
     <xs:annotation>
       <xs:documentation>
         The SEM parameters have informational character, e.g. to be displayed as info in applications.
-        Hence, all parameters are stored as strings, not as numerical lines.
+        Hence, all parameters are stored as strings, not as numerical values.
       </xs:documentation>
     </xs:annotation>
     <xs:all>
@@ -778,7 +778,7 @@
       <xs:annotation>
         <xs:documentation>
           The name of the system.
-          Possible lines: Evo, Supra, Ultra, Sigma, Merlin, Delta, XB, NVision, Neon, Auriga.
+          Possible values: Evo, Supra, Ultra, Sigma, Merlin, Delta, XB, NVision, Neon, Auriga.
         </xs:documentation>
       </xs:annotation>
     </xs:attribute>
@@ -788,7 +788,7 @@
   <xs:element name="SIMData">
     <xs:annotation>
       <xs:documentation>
-        This data contains the initial parameter lines for SIM Plugin viewers, as defined by the user for the SIM experiment.
+        This data contains the initial parameter values for SIM Plugin viewers, as defined by the user for the SIM experiment.
       </xs:documentation>
     </xs:annotation>
     <xs:complexType>
@@ -809,7 +809,7 @@
   <xs:complexType name="SIMProcessingSettings">
     <xs:annotation>
       <xs:documentation>
-        This data contains the initial parameter lines for SIM Plugin viewers, as defined by the user for the SIM experiment.
+        This data contains the initial parameter values for SIM Plugin viewers, as defined by the user for the SIM experiment.
       </xs:documentation>
     </xs:annotation>
     <xs:all>
