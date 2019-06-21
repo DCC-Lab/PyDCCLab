@@ -27,7 +27,7 @@
             <xs:element name="MultiplexType" minOccurs="0" maxOccurs="1" >
               <xs:annotation>
                 <xs:documentation>
-                  Specifies at which event a track switch has been performed. Possible lines are:
+                  Specifies at which event a track switch has been performed. Possible values are:
                   Line      - after each scan line
                   Frame     - after each frame
                   FrameFast - after each frame without movement of slow hardware and
@@ -200,7 +200,7 @@
                   The direction of the axis may either be “from specimen to objective” or “from objective to specimen”. 
                   In this coordinate system the specimen is at a fixed position. Note that the origin of the coordinate 
                   system is _not_ defined here.
-                  Possible lines are: FromSpecimenToObjective, FromObjectiveToSpecimen and undefined.
+                  Possible values are: FromSpecimenToObjective, FromObjectiveToSpecimen and undefined.
                   Undefined is the default (and to be assumed if this element is not present).
                   
                   Note that the coordinate system defined here is different to the one defined with "XYZHandedness".
@@ -365,7 +365,7 @@
             <xs:element name="Positions" type="PositionDefinition" minOccurs="0" maxOccurs="1">
               <xs:annotation>
                 <xs:documentation>
-                  Definition of the illumination lines for each I index. [unit: none]
+                  Definition of the illumination values for each I index. [unit: none]
                 </xs:documentation>
               </xs:annotation>
             </xs:element>
@@ -396,7 +396,7 @@
                   however the scaling must be the same for x-y- and z-direction.
                   A rotation around the y-axis corresponds to "0 1 0", rotation
                   around the x-axis corresponds to "1 0 0".
-                  For the time being, only these two lines are expected.
+                  For the time being, only these two values are expected.
                   If this parameter is not given, we default to "rotation around y-axis ("0 1 0").
                 </xs:documentation>
               </xs:annotation>
@@ -955,7 +955,7 @@
         <xs:annotation>
           <xs:documentation>
             The method of illumination used to capture the channel.
-            Possible lines:
+            Possible values:
             Transmitted
             Epifluorescence
             Oblique
@@ -983,7 +983,7 @@
         <xs:annotation>
           <xs:documentation>
             ContrastMethod describes the technique used to achieve contrast for each channel.
-            Possible lines:
+            Possible values:
             Brightfield
             Phase
             DIC                      - Differential Interference Contrast
@@ -1305,7 +1305,7 @@
           <xs:documentation>
             The type of an online calculation where the channel is the destination.
 
-            The following lines are possible:
+            The following values are possible:
 
             NoOnlineCalculation    - The data channel receives raw scan data.
             OnlineRatio            - (S1+C1)/(S2+C2)*C3+C4
@@ -1475,7 +1475,7 @@
             The rotation angle of the scan coordinates relative to the microscope coordinates in degrees. This value is used for rotated scans.
             [unit:degrees]
             Note: The subblock metadata contains a corresponding element (name: RoiRotation).
-            Ensure to keep the lines synchronized if possible.
+            Ensure to keep the values synchronized if possible.
           </xs:documentation>
         </xs:annotation>
       </xs:element>
@@ -1486,7 +1486,7 @@
             X-scanner-offset of the center of the scanned image relative to the center for the maximum possible scan field.
             [unit:microns]
             Note: The subblock metadata contains a corresponding element (name: RoiCenterOffsetX).
-            Ensure to keep the lines synchronized if possible.
+            Ensure to keep the values synchronized if possible.
           </xs:documentation>
         </xs:annotation>
       </xs:element>
@@ -1497,7 +1497,7 @@
             Y-scanner-offset of the center of the scanned image relative to the center for the maximum possible scan field.
             [unit:microns]
             Note: The subblock metadata contains a corresponding element (name: RoiCenterOffsetY).
-            Ensure to keep the lines synchronized if possible.
+            Ensure to keep the values synchronized if possible.
           </xs:documentation>
         </xs:annotation>
       </xs:element>
@@ -1651,7 +1651,7 @@
       <xs:element name="PhotonConversionFactor" type="xs:double" minOccurs="0" maxOccurs="1">
         <xs:annotation>
           <xs:documentation>
-            The PhotonConversionFactor (PCF) allows to recalculate the number of detected photons out of the grey lines.
+            The PhotonConversionFactor (PCF) allows to recalculate the number of detected photons out of the grey values.
             PCF is defined as the number of photons at scale maximum (1.). In order to get the number of photons per gray scale value (digit)
             it should be normalized (divided) to the maximum gray value (U16->65535).
             Potential dependencies: gain (EMGain, Master Gain, digital Gain / Bitshift), Averaging Mode. [units:none]
@@ -1693,7 +1693,7 @@
         <xs:annotation>
           <xs:documentation>
             The brightness and contrast correction for stacks and z-scans was active
-            during acquisition and is defined by sets of variable lines for AOTF power,
+            during acquisition and is defined by sets of variable values for AOTF power,
             PMT gain and detector amplifier gain and offset for the positions of the focus drive.
           </xs:documentation>
         </xs:annotation>
@@ -1709,7 +1709,7 @@
       <xs:element name="PixelAccuracy" type="xs:double" minOccurs="0">
         <xs:annotation>
           <xs:documentation>
-            The pixel accuracy. This is a normalized value calculated as (1.0 / possible number of lines).
+            The pixel accuracy. This is a normalized value calculated as (1.0 / possible number of values).
           </xs:documentation>
         </xs:annotation>
       </xs:element>
@@ -2062,7 +2062,7 @@
           <xs:annotation>
             <xs:appinfo>AiryScan Draft</xs:appinfo>
             <xs:documentation>
-              The Airy-scan mode. Possible lines are "SuperResolution", "VirtualPinhole" and "MultiBeam".
+              The Airy-scan mode. Possible values are "SuperResolution", "VirtualPinhole" and "MultiBeam".
             </xs:documentation>
           </xs:annotation>
           <xs:restriction base="xs:string">
