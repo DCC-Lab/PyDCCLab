@@ -29,6 +29,25 @@ class TestCZIFile(unittest.TestCase):
         image = czi.imageDataFromPath()
         self.assertTrue(np.array_equal(array, image))
 
+    def testMosaicOutputTwoChannels(self):
+        obj = czifile.CziFile("testCziFileTwoChannels.czi")
+        array = obj.asarray(max_workers=1)
+        array = array.squeeze().transpose((1, 2, 0))
+        obj.close()
+        czi = CZIFile("testCziFileTwoChannels.czi")
+        image = czi.imageDataFromPath()
+        print(image.shape, array.shape)
+        self.assertTrue(np.array_equal(array, image))
+
+    def testMosaicOutputThreeChannels(self):
+        obj = czifile.CziFile("testCziThreeChannelsOneScene.czi")
+        array = obj.asarray(max_workers=1)
+        array = array.squeeze().transpose((1, 2, 0))
+        obj.close()
+        czi = CZIFile("testCziThreeChannelsOneScene.czi")
+        image = czi.imageDataFromPath()
+        self.assertTrue(np.array_equal(array, image))
+
 
 if __name__ == '__main__':
     unittest.main()
