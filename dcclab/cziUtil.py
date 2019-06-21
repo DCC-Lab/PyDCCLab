@@ -111,8 +111,7 @@ def decodeImages(cziObj):
 
         index = tuple(slice(i - j, i - j + k) for i, j, k in
                       zip(directory_entry.start, start, tile.shape))
-        channel = index[-4].stop - 1
-        returnList.append((np.squeeze(tile), channel))
+        returnList.append(np.squeeze(tile))
         print("{} / {} images read".format(len(returnList), maxSize))
         try:
             out[index] = tile
