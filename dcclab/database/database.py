@@ -112,3 +112,17 @@ class Database:
             values = ','.join(lstValues)
             statement = 'INSERT OR REPLACE INTO "{}" ({}) VALUES ({})'.format(table, keys, values)
             self.execute(statement)
+
+    def asynchronous(self):
+        if self.isConnected:
+            self.execute('PRAGMA synchronous = OFF')
+
+    def beginTransaction(self):
+        if self.isConnected:
+            self.execute('BEGIN TRANSACTION')
+
+    def update(self, table: str, value: dict):
+        pass
+
+    def upsert(self, table: str, value: dict):
+        pass
