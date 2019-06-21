@@ -608,7 +608,7 @@
         Required elements include the lens numerical aperture,
         and the magnification, both of which are floating
         point (real) numbers.
-        The lines are those that are fixed for a particular
+        The values are those that are fixed for a particular
         objective: either because it has been manufactured to
         this specification or the value has been measured on
         this particular objective.
@@ -645,7 +645,7 @@
           <xs:documentation>
             This is the type of immersion medium the lens is designed to work with.
             It is not the same as 'Medium' in Information/Image/ObjectiveSettings
-            (a single type) as here Immersion can have compound lines like 'Multi'.
+            (a single type) as here Immersion can have compound values like 'Multi'.
           </xs:documentation>
         </xs:annotation>
         <xs:simpleType>
@@ -703,7 +703,7 @@
         <xs:annotation>
           <xs:documentation>
             Records what type of phase-rings ("Phasenringe") the objective has.
-            Possible lines:
+            Possible values:
             Circular   - Circular geometry
             Annular    - Annular geometry
             PhaseRing0 - Phase ring 0 geometry
@@ -1147,7 +1147,7 @@
       <!--
       COMMENT:
       The following parameters are processing parameters actually, no physical parameters of a SIM device.
-      Those parameters are only necessary to fulfill the requirement that the SIM plugin viewer has some default lines set
+      Those parameters are only necessary to fulfill the requirement that the SIM plugin viewer has some default values set
       and that - when reopening the image - the latest plugin settings for this document are restored.
       So, this would be VIEWER METADATA actually...
       -->
@@ -1315,8 +1315,8 @@
         <xs:annotation>
           <xs:documentation>
             A description of a correction controller operating mode used for the lens.
-            Depending on the mode, either lines of CorrectionCollar and CorrectionCollar2,
-            or lines of CorrectionControllerBottomThickness and CorrectionControllerImagingDepth are available.
+            Depending on the mode, either values of CorrectionCollar and CorrectionCollar2,
+            or values of CorrectionControllerBottomThickness and CorrectionControllerImagingDepth are available.
           </xs:documentation>
         </xs:annotation>
       </xs:element>
