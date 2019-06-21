@@ -32,7 +32,6 @@ class CZIFile(ImageFile):
         if axes not in ["BCYX0", "BSCYX0"]:
             raise NotImplementedError(axes)
         mosaic, self.__tilesWithChannelNumber = decodeImages(cziObj)
-        print(cziObj.shape)
         try:
             cIndex = axes.index("C")
         except ValueError:
