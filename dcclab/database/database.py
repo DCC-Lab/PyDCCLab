@@ -89,10 +89,10 @@ class Database:
     def createTable(self, metadata: dict):
         if self.isConnected:
             for table, keys in metadata.items():
-                statement = "CREATE TABLE IF NOT EXISTS {} (".format(table)
+                statement = 'CREATE TABLE IF NOT EXISTS "{}" ('.format(table)
                 attributes = []
                 for key, keyType in keys.items():
-                    attributes.append("{} {}".format(key, keyType))
+                    attributes.append('{} {}'.format(key, keyType))
                 statement += ",".join(attributes) + ")"
                 self.execute(statement)
 
@@ -106,11 +106,11 @@ class Database:
             lstKeys = []
             lstValues = []
             for key in values.keys():
-                lstKeys.append(str(key))
+                lstKeys.append('"{}"'.format(str(key)))
                 lstValues.append('"{}"'.format(str(values[key])))
             keys = ','.join(lstKeys)
             values = ','.join(lstValues)
-            statement = 'INSERT OR REPLACE INTO {} ({}) VALUES ({})'.format(table, keys, values)
+            statement = 'INSERT OR REPLACE INTO "{}" ({}) VALUES ({})'.format(table, keys, values)
             self.execute(statement)
 
 

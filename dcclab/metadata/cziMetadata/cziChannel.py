@@ -44,7 +44,7 @@ class CZIChannel:
 
     @property
     def keys(self):
-        return {'file_id': 'TEXT', 'channel_id': 'TEXT', 'channel_name': 'TEXT', 'ex_wavelength_filter': 'TEXT',
+        return {'file_id': 'TEXT', 'channel_id': 'TEXT PRIMARY KEY', 'channel_name': 'TEXT', 'ex_wavelength_filter': 'TEXT',
                 'em_wavelength_filter': 'TEXT', 'beamsplitter': 'INTEGER', 'reflector': 'TEXT',
                 'contrast_method': 'TEXT', 'light_source': 'TEXT', 'light_source_intensity': 'TEXT', 'dye_name': 'TEXT',
                 'channel_color': 'TEXT', 'ex_wavelength': 'INTEGER', 'em_wavelength': 'INTEGER', 'effective_na': 'REAL',

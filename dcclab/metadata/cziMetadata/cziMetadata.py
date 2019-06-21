@@ -51,7 +51,7 @@ class CZIMetadata:
         channelsKeys = {}
         if self.channels:
             channelsKeys = self.channels[0].keys
-        metadataKeys = {'path': 'TEXT', 'microscope': 'TEXT', 'objective': 'TEXT', 'x_size': 'INTEGER',
+        metadataKeys = {'path': 'TEXT PRIMARY KEY', 'microscope': 'TEXT', 'objective': 'TEXT', 'x_size': 'INTEGER',
                         'y_size': 'INTEGER', 'x_scale': 'REAL', 'y_scale': 'REAL', 'x_scaled': 'REAL',
                         'y_scaled': 'REAL', 'name': 'TEXT', 'mouse_id': 'INTEGER', 'viral_vectors': 'TEXT',
                         'injection_site': 'TEXT', 'tags': 'TEXT'}

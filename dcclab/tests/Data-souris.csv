@@ -1,5 +1,5 @@
 no_int,no_ext,status,DDN,parent,transfert,date_commande,date_mort,cause,description
-INT,INT,TEXT,DATE,INT,TEXT,DATE,DATE,TEXT,TEXT
+INTEGER PRIMARY KEY,INTEGER,TEXT,DATE,INTEGER,TEXT,DATE,DATE,TEXT,TEXT
 1,,,,,,2016-03-31,,,
 2,,,,,,2016-03-31,,,
 3,,,,,,2016-03-31,,,
