@@ -481,31 +481,20 @@ class ZStack(ImageCollection):
         """
         # todo: maybe add warning if viewChannelIndex=None and array has more than one channel and each channel is around or over 1 Gigapixel
         print("... Loading crop figure")
-        self.cropY = [0, array.shape[axis+1]]
-        if axis == 0:
-            self.cropX = [0, array.shape[3]]
-        else:
-            self.cropX = [0, array.shape[axis+2]]
 
-        figure, self.cropFig = plt.subplots()
         if array.shape[2] == 1:
             # Skip useless and slow numpy conversion (a = a + 0.0) of np.mean if theres nothing to average
-            image = array[:, :, 0, :]
+            projection = array[:, :, 0, :]
         elif viewChannelIndex is not None:
-            image = array[:, :, viewChannelIndex, :]
+            projection = array[:, :, viewChannelIndex, :]
         else:
             # Careful : numpy.mean gets exponentially slower with array shape and can easily lead to MemoryError
-            image = array.mean(2)
-        image = image.mean(axis)
-        self.cropFig.imshow(image, aspect="auto")
-        rs = RectangleSelector(self.cropFig, self.__drawRectangleCallback,
-                               drawtype='box', useblit=False, button=[1],
-                               minspanx=5, minspany=5, spancoords='pixels',
-                               interactive=True)
-        plt.title("Select ROI", fontsize=18)
-        plt.show()
+            projection = array.mean(2)
+        projection = projection.mean(axis)
 
-        if axis == -1 and bothAxis:
+        self.ask2DCropIndices(projection, axis)
+
+        if axis == -1:
             array = array[self.cropY[0]: self.cropY[1], self.cropX[0]: self.cropX[1]]
             if bothAxis:
                 return self.crop4DArray(array, axis=0)
@@ -514,6 +503,20 @@ class ZStack(ImageCollection):
         else:
             array = array[:, self.cropY[0]: self.cropY[1], :, self.cropX[0]: self.cropX[1]]
             return array
+
+    def ask2DCropIndices(self, channelArray, axis=-1):
+        # todo: move 2D / 3D crop logic to Channel / Image
+        self.cropX = [0, channelArray.shape[axis+1]]
+        self.cropY = [0, channelArray.shape[-axis]]
+
+        figure, self.cropFig = plt.subplots()
+        self.cropFig.imshow(channelArray, aspect="auto")
+        rs = RectangleSelector(self.cropFig, self.__drawRectangleCallback,
+                               drawtype='box', useblit=False, button=[1],
+                               minspanx=5, minspany=5, spancoords='pixels',
+                               interactive=True)
+        plt.title("Select ROI", fontsize=18)
+        plt.show()
 
     def __drawRectangleCallback(self, clickEvent, releaseEvent):
         x1, y1 = clickEvent.xdata, clickEvent.ydata
