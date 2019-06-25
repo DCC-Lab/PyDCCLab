@@ -1,5 +1,5 @@
 import env
-from dcclab import Image, cziUtil
+from dcclab import Image
 import os
 
 # For this test, the query was done by Mathieu on his computer. Selected channel is mCherry
@@ -15,6 +15,7 @@ if __name__ == '__main__':
 
     lines = readQuery.readlines()
     numberOfFiles = len(lines)
+    readQuery.close()
 
     startIndex = 0
     if startIndex == 0:
@@ -22,8 +23,9 @@ if __name__ == '__main__':
             "WARNING: The czi file reader is only capable of properly reading single image (mutli or mono channel). "
             "If it is a z-stack or any other multi image file, it will be ignored.")
     for i in range(startIndex, len(lines)):
-        path, channelNumber = lines[i].split(",")
+        path, channel = lines[i].split(";")
         pathChanged = path.replace("P", "A", 1)  # Change the P drive to A for my computer
+        channelNumber = channel.split(":")[-1]
         ok = True
         size = os.stat(pathChanged).st_size
         if size > 550 * 1024 * 1024:
@@ -55,5 +57,4 @@ if __name__ == '__main__':
                                                           stdDev=stdDev))
         print("{} / {} files read".format(i + 1, numberOfFiles))
 
-    readQuery.close()
     writeResults.close()
