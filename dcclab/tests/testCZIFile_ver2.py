@@ -38,7 +38,15 @@ class TestProperties(unittest.TestCase):
         self.assertTrue(keysChannel1 == supposedKeys and keysChannel2 == supposedKeys)
 
     def testChannelMapsValues(self):
-        #todo Test with small czi file to check if values are the right ones
+        czi = CZIFile("testTinyCzi.czi")
+        pixelsValueChannelOne = np.array([[119, 142], [134, 118], [122, 125]])
+        pixelsValueChannelTwo = np.array([[68, 72], [77, 72], [57, 69]])
+        key = (range(0, 2), range(0, 3), None, None)
+        self.assertTrue(
+            np.array_equal(czi.channelMaps[0][key], pixelsValueChannelOne) and np.array_equal(czi.channelMaps[1][key],
+                                                                                              pixelsValueChannelTwo))
+    def testChannelMapsAllSameKeys(self):
+        #todo test if keys from every channel are the same
         pass
 
 
