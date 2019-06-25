@@ -1,6 +1,6 @@
 import env
 import unittest
-from dcclab import CZIFile
+from dcclab import CZIFile_ as CZIFile
 import czifile
 import numpy as np
 import os
