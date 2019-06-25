@@ -1,24 +1,72 @@
-from .imageFile import *
+from .image import *
+from .cziUtil import *
+from .channel import *
 
 
-class CZIFile(ImageFile):
+class CZIFile(object):
     supportedFormats = ['czi']
     allAxes = "XYCZTRSIBMHV"
 
     def __init__(self, path):
-        ImageFile.__init__(self, path)
-        self.__cziObj = readCziImage(path)
+        self.__cziObj = None
+        try:
+            self.__cziObj = readCziImage(path)
+
+        except ValueError:
+            raise InvalidFileFormatException("Not a compatible format for this reader.")
         self.__tilesDirectory = self.__cziObj.filtered_subblock_directory
         self.__shape = self.__cziObj.shape
         self.__axes = self.__cziObj.axes
         self.__axesDimAndIndex = self.__findAxesDimAndIndex()
         self.__isZStack = False if self.__axesDimAndIndex["Z"][0] is None else True
         self.__isTimeSeries = False if self.__axesDimAndIndex["T"][0] is None else True
-        self.__numberOfChannel = self.__axesDimAndIndex["C"][0]
-        if len(self.__tilesDirectory) % self.__numberOfChannel != 0:
-            raise Exception("The number of tiles for each channel is not the same.")
-        self.__mosaics = self.__mosaicMaps()
-        self.__images = self.__getImages()
+        self.__isScene = False if self.__axesDimAndIndex["S"][0] is None else True
+        self.__numberOfChannels = self.__axesDimAndIndex["C"][0]
+        self.__channelMaps = self.__buildChannelMaps()
+        self.__imageMappedWithChannel = self.__mapImageToChannels()
+        self.__zStack = self.__buildZStack()
+
+    @property
+    def channelMaps(self):
+        return self.__channelMaps
+
+    @property
+    def numberOfChannels(self):
+        return self.__numberOfChannels
+
+    @property
+    def axes(self):
+        return self.__axes
+
+    @property
+    def imagesMap(self):
+        return self.__imageMappedWithChannel
+
+
+    def __mapImageToChannels(self):
+        imagesDict = {}
+        channelMaps = self.__channelMaps
+        for key in channelMaps[0].keys():
+            imagesDict[key] = Image(np.dstack([d[key] for d in channelMaps]))
+        return imagesDict
+
+    def __buildChannelMaps(self):
+        channelMaps = [{}] * self.__numberOfChannels
+        for directoryEntry in self.__tilesDirectory:
+            tile = directoryEntry.data_segment().data()
+            index = tuple(slice(i - j, i - j + k) for i, j, k in
+                          zip(directoryEntry.start, self.__cziObj.start, tile.shape))
+            tileChannel = index[self.__axesDimAndIndex["C"][1]].start
+            xSlice = index[self.__axesDimAndIndex["X"][1]]
+            ySlice = index[self.__axesDimAndIndex["Y"][1]]
+            zIndex = index[self.__axesDimAndIndex["Z"][1]].start if self.__isZStack else None
+            tIndex = index[self.__axesDimAndIndex["T"][1]].start if self.__isTimeSeries else None
+            mapKey = (range(xSlice.start, xSlice.stop), range(ySlice.start, ySlice.stop), zIndex, tIndex)
+            channelMaps[tileChannel][mapKey] = np.squeeze(tile)
+        if not all(len(x) == len(channelMaps[0]) for x in channelMaps):
+            closeCziFileObject(self.__cziObj)
+            raise TypeError("The number of tiles in each channel is not the same.")
+        return channelMaps
 
     def __findAxesDimAndIndex(self):
         def findValue(key):
@@ -34,36 +82,20 @@ class CZIFile(ImageFile):
 
         return {key: findValue(key) for key in CZIFile.allAxes}
 
-    def __mosaicMaps(self):
-        channelsDict = [{}] * self.__numberOfChannel
-        for directoryEntry in self.__tilesDirectory:
-            tile = directoryEntry.data_segment().data()
-            index = tuple(slice(i - j, i - j + k) for i, j, k in
-                          zip(directoryEntry.start, self.__cziObj.start, tile.shape))
-            tileChannel = index[self.__axesDimAndIndex["C"][1]].start
-            xSlice = index[self.__axesDimAndIndex["X"][1]]
-            ySlice = index[self.__axesDimAndIndex["Y"][1]]
-            if self.__isZStack:
-                zIndex = index[self.__axesDimAndIndex["Z"][1]].start
-            else:
-                zIndex = None
-            if self.__isTimeSeries:
-                tIndex = index[self.__axesDimAndIndex["T"][1]].start
-            else:
-                tIndex = None
-            mapKey = (range(xSlice.start, xSlice.stop), range(ySlice.start, ySlice.stop), zIndex, tIndex)
-            channelsDict[tileChannel][mapKey] = Channel(np.squeeze(tile))
-        print(channelsDict)
-        return channelsDict
+    def __buildTimeSeries(self):
+        return None
 
-    def __getImages(self) -> typing.List[typing.List[np.ndarray]]:
-        listOfChannels = [np.squeeze(channel.data_segment().data()) for channel in self.__tilesDirectory]
-        listOfImages = [listOfChannels[x:x + self.__numberOfChannel] for x in
-                        range(0, len(listOfChannels), self.__numberOfChannel)]
-        plt.imshow(listOfImages[1][0])
-        plt.show()
-        return listOfImages
+    def __buildZStack(self):
+        zStack = None
+        # if self.__isZStack:
+        #   zStack = []
+        #  channelMaps = self.__channelMaps
+        # for key in channelMaps[0].keys():
+
+        return zStack
 
     def __del__(self):
         if self.__cziObj is not None:
             closeCziFileObject(self.__cziObj)
+
+
