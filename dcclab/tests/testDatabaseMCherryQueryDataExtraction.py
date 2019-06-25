@@ -7,10 +7,10 @@ if __name__ == '__main__':
     listOfAverages = []
     listOfStdDev = []
 
-    readQuery = open(r"querry_mcher.csv", "r",
+    readQuery = open(r"query_mcher.csv", "r",
                      encoding="utf-8")
 
-    writeResults = open(r"querry_mcher_results.csv",
+    writeResults = open(r"query_mcher_results.csv",
                         "a", encoding="utf-8")
 
     lines = readQuery.readlines()
