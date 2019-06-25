@@ -1,11 +1,11 @@
-from .cziFile import *
+from .imageFile import *
 import os
 import re
 from typing import List, Union
 
 class Image:
 
-    supportedClasses = [CZIFile, TIFFFile, PILFile, MATLABFile]
+    supportedClasses = [CZIFile_, TIFFFile, PILFile, MATLABFile]
     supportedFormats = []
 
 
