@@ -30,6 +30,7 @@ class CZIFile(object):
     def channelMaps(self):
         return self.__channelMaps
 
+
     @property
     def numberOfChannels(self):
         return self.__numberOfChannels
@@ -51,7 +52,7 @@ class CZIFile(object):
         return imagesDict
 
     def __buildChannelMaps(self):
-        channelMaps = [{}] * self.__numberOfChannels
+        channelMaps = [{} for _ in range(self.__numberOfChannels)]
         for directoryEntry in self.__tilesDirectory:
             tile = directoryEntry.data_segment().data()
             index = tuple(slice(i - j, i - j + k) for i, j, k in
