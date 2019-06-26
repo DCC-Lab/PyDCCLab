@@ -22,14 +22,13 @@ class CZIFile(object):
         self.__isTimeSeries = False if self.__axesDimAndIndex["T"][0] is None else True
         self.__isScene = False if self.__axesDimAndIndex["S"][0] is None else True
         self.__numberOfChannels = self.__axesDimAndIndex["C"][0]
-        self.__channelMaps = self.__buildChannelMaps()
-        self.__imageMappedWithChannel = self.__mapImageToChannels()
+        self.__channelMaps = self.__buildChannelMaps() if self.__numberOfChannels > 0 else None
+        self.__imageMappedWithChannel = self.__mapImageToChannels() if self.__channelMaps is not None else self.__YX0Image()
         self.__zStack = self.__buildZStack()
 
     @property
     def channelMaps(self):
         return self.__channelMaps
-
 
     @property
     def numberOfChannels(self):
@@ -43,12 +42,18 @@ class CZIFile(object):
     def imagesMap(self):
         return self.__imageMappedWithChannel
 
+    def __YX0Image(self):
+        return np.squeeze(decodeImages(self.__cziObj)[0])
 
     def __mapImageToChannels(self):
         imagesDict = {}
         channelMaps = self.__channelMaps
-        for key in channelMaps[0].keys():
-            imagesDict[key] = Image(np.dstack([d[key] for d in channelMaps]))
+        if len(channelMaps) > 1:
+            for key in channelMaps[0].keys():
+                imagesDict[key] = Image(np.dstack([d[key] for d in channelMaps]))
+        else:
+            for key in channelMaps[0].keys():
+                imagesDict[key] = Image(channelMaps[0][key])
         return imagesDict
 
     def __buildChannelMaps(self):
@@ -62,7 +67,8 @@ class CZIFile(object):
             ySlice = index[self.__axesDimAndIndex["Y"][1]]
             zIndex = index[self.__axesDimAndIndex["Z"][1]].start if self.__isZStack else None
             tIndex = index[self.__axesDimAndIndex["T"][1]].start if self.__isTimeSeries else None
-            mapKey = (range(xSlice.start, xSlice.stop), range(ySlice.start, ySlice.stop), zIndex, tIndex)
+            sIndex = index[self.__axesDimAndIndex["S"][1]].start if self.__isScene else None
+            mapKey = (range(xSlice.start, xSlice.stop), range(ySlice.start, ySlice.stop), zIndex, sIndex, tIndex)
             channelMaps[tileChannel][mapKey] = np.squeeze(tile)
         if not all(len(x) == len(channelMaps[0]) for x in channelMaps):
             closeCziFileObject(self.__cziObj)
@@ -76,7 +82,11 @@ class CZIFile(object):
             try:
                 index = self.__axes.index(key)
             except ValueError:
-                pass
+                if key == "C":
+                    if self.__axes == "YX0":
+                        valueReturn = 0
+                    else:
+                        raise ValueError("This image has no channel and is not of shape \"YX0\"")
             if index is not None:
                 valueReturn = self.__shape[index]
             return valueReturn, index
@@ -98,5 +108,3 @@ class CZIFile(object):
     def __del__(self):
         if self.__cziObj is not None:
             closeCziFileObject(self.__cziObj)
-
-
