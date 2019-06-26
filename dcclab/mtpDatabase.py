@@ -27,7 +27,6 @@ if __name__ == '__main__':
     print('Connecting to database...')
     database = Database(r'P:\injection AAV\résultats bruts\mtp.db', 'rwc')
     database.connect()
-    database.dropTable('cziMetadata')
     database.asynchronous()
 
     # We create the tablse for the csv Metadata.

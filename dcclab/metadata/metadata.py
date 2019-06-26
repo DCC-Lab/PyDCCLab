@@ -1,5 +1,5 @@
-from .cziMetadata import CZIMetadata
-from .csvMetadata import CSVMetadata
+from dcclab import CZIMetadata
+from dcclab import CSVMetadata
 import os
 try:
     import deprecated
