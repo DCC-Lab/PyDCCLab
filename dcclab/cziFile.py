@@ -11,20 +11,47 @@ class CZIFile(object):
         self.__cziObj = None
         try:
             self.__cziObj = readCziImage(path)
-
         except ValueError:
             raise InvalidFileFormatException("Not a compatible format for this reader.")
         self.__tilesDirectory = self.__cziObj.filtered_subblock_directory
         self.__shape = self.__cziObj.shape
         self.__axes = self.__cziObj.axes
+        self.__originalDType = self.__cziObj.dtype
         self.__axesDimAndIndex = self.__findAxesDimAndIndex()
+        self.__totalWidth = self.__axesDimAndIndex["X"][0]
+        self.__totalHeight = self.__axesDimAndIndex["Y"][0]
         self.__isZStack = False if self.__axesDimAndIndex["Z"][0] is None else True
-        self.__isTimeSeries = False if self.__axesDimAndIndex["T"][0] is None else True
+        self.__isTimeSerie = False if self.__axesDimAndIndex["T"][0] is None else True
         self.__isScene = False if self.__axesDimAndIndex["S"][0] is None else True
         self.__numberOfChannels = self.__axesDimAndIndex["C"][0]
         self.__channelMaps = self.__buildChannelMaps() if self.__numberOfChannels > 0 else None
-        self.__imageMappedWithChannel = self.__mapImageToChannels() if self.__channelMaps is not None else self.__YX0Image()
-        self.__zStack = self.__buildZStack()
+        self.__imagesMappedWithChannels = self.__mapImageToChannels() if self.__channelMaps is not None else None
+        # self.__imageList = self.__createImages()
+        # self.__zStack = self.__buildZStack()
+
+    @property
+    def shape(self):
+        return self.__shape
+
+    @property
+    def totalWidth(self):
+        return self.__totalWidth
+    
+    @property
+    def totalHeight(self):
+        return self.__totalHeight
+
+    @property
+    def isZstack(self):
+        return self.__isZStack
+
+    @property
+    def isTimeSerie(self):
+        return self.__isTimeSerie
+
+    @property
+    def isScene(self):
+        return self.__isScene
 
     @property
     def channelMaps(self):
@@ -40,10 +67,37 @@ class CZIFile(object):
 
     @property
     def imagesMap(self):
-        return self.__imageMappedWithChannel
+        return self.__imagesMappedWithChannels
+
+    def __createImages(self):
+        imageList = None
+        if self.__channelMaps is None:
+            imageList = self.__YX0Image()
+        elif len(self.__channelMaps) > 1:
+            imageList = self.__recreateMosaics()
+        else:
+            imageList = self.__recreateSingleMosaic(self.__channelMaps[0])
+        return imageList
+
+    def __recreateMosaics(self):
+        mosaics = []
+        return mosaics
+
+    def __recreateSingleMosaic(self, channelDict: dict):
+        mosaic = np.array((self.__totalWidth, self.__totalHeight), dtype=self.__originalDType)
+        for key in channelDict.keys():
+            xStart = key[0][0]
+            yStart = key[1][0]
+            xStop = key[0][-1] + 1
+            yStop = key[1][-1] + 1
+            mosaic[xStart:xStop, yStart:yStop] = channelDict[key]
+        return mosaic
 
     def __YX0Image(self):
-        return np.squeeze(decodeImages(self.__cziObj)[0])
+        images = []
+        for tile in self.__tilesDirectory:
+            images.append(tile.data_segment().data())
+        return images
 
     def __mapImageToChannels(self):
         imagesDict = {}
@@ -66,7 +120,7 @@ class CZIFile(object):
             xSlice = index[self.__axesDimAndIndex["X"][1]]
             ySlice = index[self.__axesDimAndIndex["Y"][1]]
             zIndex = index[self.__axesDimAndIndex["Z"][1]].start if self.__isZStack else None
-            tIndex = index[self.__axesDimAndIndex["T"][1]].start if self.__isTimeSeries else None
+            tIndex = index[self.__axesDimAndIndex["T"][1]].start if self.__isTimeSerie else None
             sIndex = index[self.__axesDimAndIndex["S"][1]].start if self.__isScene else None
             mapKey = (range(xSlice.start, xSlice.stop), range(ySlice.start, ySlice.stop), zIndex, sIndex, tIndex)
             channelMaps[tileChannel][mapKey] = np.squeeze(tile)
@@ -86,6 +140,7 @@ class CZIFile(object):
                     if self.__axes == "YX0":
                         valueReturn = 0
                     else:
+                        closeCziFileObject(self.__cziObj)
                         raise ValueError("This image has no channel and is not of shape \"YX0\"")
             if index is not None:
                 valueReturn = self.__shape[index]
