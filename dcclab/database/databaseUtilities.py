@@ -21,5 +21,4 @@ def appendToZip(path, file):
 
 
 if __name__ == '__main__':
-
     pass
