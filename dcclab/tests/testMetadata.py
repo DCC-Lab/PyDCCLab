@@ -1,4 +1,5 @@
 from dcclab import Metadata
+from dcclab import CZIMetadata
 import unittest
 import os
 
@@ -21,6 +22,18 @@ class TestMetadata(unittest.TestCase):
     def testWrongFileType(self):
         wrongFile = os.path.join(self.directory, 'test.db')
         with self.assertRaises(TypeError): Metadata(wrongFile)
+
+    def testNoFile(self):
+        noFile = os.path.join(self.directory, 'nonexistant.file')
+        with self.assertRaises(ValueError): Metadata(noFile)
+
+    def testCziFile(self):
+        mtdt = Metadata(self.cziPath)
+        self.assertEqual(mtdt.metaType, 'CZI')
+
+    def testCsvFile(self):
+        mtdt = Metadata(self.csvPath)
+        self.assertEqual(mtdt.metaType, 'CSV')
 
 
 if __name__ == '__main__':
