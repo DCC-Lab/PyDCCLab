@@ -8,7 +8,6 @@ from dcclab import findFiles
 
 
 if __name__ == '__main__':
-    # TODO This whole script seems to take a while. The INSERT OR REPLACE in database.insert() seems to be the cause.
     # We need paths to our metadata
     # We get a list of paths to the czi files.
     print('Searching for czi files...')
@@ -29,7 +28,6 @@ if __name__ == '__main__':
     database = Database(r'P:\injection AAV\résultats bruts\mtp.db', 'rwc')
     database.connect()
     database.asynchronous()
-    database.beginTransaction()
 
     # We create the tablse for the csv Metadata.
     print('Processing csv metadata into the database...')
@@ -38,13 +36,17 @@ if __name__ == '__main__':
 
     # We insert the csv Metadata into the tables.
     entries = miceMetadata.metadata
+    database.beginTransaction()
     for line in entries.keys():
         database.insert('Data-souris', entries[line])
+    database.commit()
     print('Data-souris was processed for {} lines...'.format(len(entries)))
 
     entries = usesMetadata.metadata
+    database.beginTransaction()
     for line in entries.keys():
         database.insert('Data-Utilisation', entries[line])
+    database.commit()
     print('Data-Utilisation was processed for {} lines...'.format(len(entries)))
 
     # We now process the czi files into the database.
@@ -54,6 +56,7 @@ if __name__ == '__main__':
     database.createTable(cziMetadata.keys)
     print('Tables were created, processing the files...')
 
+    database.beginTransaction()
     for cziFile in cziFiles:
         print('Processing {}...'.format(cziFile))
         cziMetadata = Metadata(cziFile)

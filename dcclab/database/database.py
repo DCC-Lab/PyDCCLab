@@ -26,7 +26,7 @@ class Database:
     def connect(self):
         try:
             if not self.isConnected:
-                self.__connection = lite.connect(self.path, uri=True)
+                self.__connection = lite.connect(self.path, uri=True, isolation_level=None)
                 self.__connection.row_factory = lite.Row
                 self.cursor = self.__connection.cursor()
                 return True
@@ -113,20 +113,27 @@ class Database:
             statement = 'INSERT OR REPLACE INTO "{}" ({}) VALUES ({})'.format(table, keys, values)
             self.execute(statement)
 
-    # Warning! This speeds up the writing speed in the database.
-    # But it has the potential of having the database file go corrupt if there is an os crash or power outage.
+    # WARNING : Asynchronus mode means the database doesn't wait for something to be entirely written before it begins
+    # to write something else. It has the potential of corrupting entries if the database crashed or there is a power
+    # failure. However, asynchronus mode is much faster.
     def asynchronous(self):
         if self.isConnected:
             self.execute('PRAGMA synchronous = OFF')
 
-    # Use this function to specify when a transaction begins so you can control your transaction/seconds.
-    # It can speed up the writing process.
+    # With isolation_level = None for our connection, we disable the python auto-handling of BEGIN, etc. We reset to the
+    # default SQLite handling. By default, SQLite is in auto-commit mode. It means that for each command, SQLite starts,
+    # processes, and commits the transaction automatically. By issuing a BEGIN, we override this and manually handle
+    # transactions. This allows faster writing on the database.
     def beginTransaction(self):
         if self.isConnected:
             self.execute('BEGIN TRANSACTION')
 
+    # TODO Is this a necessary function?
+    # If not, delete.
     def update(self, table: str, value: dict):
         pass
 
+    # TODO Is this a necessary function?
+    # If not, delete.
     def upsert(self, table: str, value: dict):
         pass
