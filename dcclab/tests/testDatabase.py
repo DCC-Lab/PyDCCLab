@@ -15,11 +15,13 @@ class TestDatabase(unittest.TestCase):
         self.database.connect()
 
         # We create a fake table.
+        self.database.begin()
         testTable = {'test_table': {'column_1': 'INTEGER PRIMARY KEY', 'column_2': 'TEXT', 'column_3': 'REAL'}}
         self.database.createTable(testTable)
         self.database.commit()
 
         # We create fake data and insert it into the table.
+        self.database.begin()
         frstValue = {'column_1': 1234, 'column_2': 'abcd', 'column_3': 0.1234}
         scndValue = {'column_1': 5678, 'column_2': 'efgh', 'column_3': 0.5678}
         self.database.insert('test_table', frstValue)
@@ -29,6 +31,7 @@ class TestDatabase(unittest.TestCase):
 
     def tearDown(self):
         # At the end of the test, we delete the database.
+        self.database.disconnect()
         os.remove(self.filePath)
 
     def testConnectSuccesfull(self):
@@ -101,16 +104,18 @@ class TestDatabase(unittest.TestCase):
         self.assertEqual(row[0]['column_1'], 9101)
         database.disconnect()
 
-    def testRollback(self):  # TODO Is there anything else we could test for Rollback?
+    def testRollback(self):
         database = db(self.filePath, 'rw')
         database.connect()
 
         testValue = {'column_1': 9101, 'column_2': 'plop', 'column_3': 0.9101}
+        database.begin()
         database.insert('test_table', testValue)
         database.rollback()
-        database.commit()
 
+        database.begin()
         row = database.select('test_table', 'column_1', 'column_1=9101')
+        database.end()
         self.assertFalse(row)
         database.disconnect()
 

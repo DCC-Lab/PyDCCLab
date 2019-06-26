@@ -124,9 +124,13 @@ class Database:
     # default SQLite handling. By default, SQLite is in auto-commit mode. It means that for each command, SQLite starts,
     # processes, and commits the transaction automatically. By issuing a BEGIN, we override this and manually handle
     # transactions. This allows faster writing on the database.
-    def beginTransaction(self):
+    def begin(self):
         if self.isConnected:
             self.execute('BEGIN TRANSACTION')
+
+    def end(self):
+        if self.isConnected:
+            self.execute('END TRANSACTION')
 
     # TODO Is this a necessary function?
     # If not, delete.

@@ -36,14 +36,14 @@ if __name__ == '__main__':
 
     # We insert the csv Metadata into the tables.
     entries = miceMetadata.metadata
-    database.beginTransaction()
+    database.begin()
     for line in entries.keys():
         database.insert('Data-souris', entries[line])
     database.commit()
     print('Data-souris was processed for {} lines...'.format(len(entries)))
 
     entries = usesMetadata.metadata
-    database.beginTransaction()
+    database.begin()
     for line in entries.keys():
         database.insert('Data-Utilisation', entries[line])
     database.commit()
@@ -56,7 +56,7 @@ if __name__ == '__main__':
     database.createTable(cziMetadata.keys)
     print('Tables were created, processing the files...')
 
-    database.beginTransaction()
+    database.begin()
     for cziFile in cziFiles:
         print('Processing {}...'.format(cziFile))
         cziMetadata = Metadata(cziFile)
