@@ -40,12 +40,19 @@ class CZIMetadata:
         channelsAsDict = {}
         for channel in self.channels:
             channelsAsDict['{}'.format(channel.channel)] = channel.asDict()
-        metadataAsDict = {'path': self.path, 'channels': len(self.channels), 'microscope': self.microscope,
+        metadataAsDict = {'path': self.path, 'channels': self.numberOfChannels, 'microscope': self.microscope,
                           'objective': self.objective, 'x_size': self.xSize, 'y_size': self.ySize,
                           'x_scale': self.xScale, 'y_scale': self.yScale, 'x_scaled': self.xScaled,
                           'y_scaled': self.yScaled, 'name': self.name, 'mouse_id': self.mouseId,
                           'viral_vectors': self.viralVectors, 'injection_site': self.injectionSite, 'tags': self.tags}
         return {'metadata': metadataAsDict, 'channels': channelsAsDict}
+
+    @property
+    def numberOfChannels(self):
+        try:
+            return len(self.channels)
+        except:
+            return 0
 
     @property
     def keys(self):
