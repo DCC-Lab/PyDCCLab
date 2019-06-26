@@ -4,7 +4,7 @@ import numpy as np
 import json
 import matplotlib.pyplot as plt
 from typing import List, Union
-from .__lifReader import LifReader
+#from .__lifReader import LifReader
 from scipy import ndimage
 from collections import OrderedDict
 
