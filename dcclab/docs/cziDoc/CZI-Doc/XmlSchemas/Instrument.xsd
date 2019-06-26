@@ -1315,7 +1315,7 @@
         <xs:annotation>
           <xs:documentation>
             A description of a correction controller operating mode used for the lens.
-            Depending on the mode, either values of CorrectionCollar and CorrectionCollar2, 
+            Depending on the mode, either values of CorrectionCollar and CorrectionCollar2,
             or values of CorrectionControllerBottomThickness and CorrectionControllerImagingDepth are available.
           </xs:documentation>
         </xs:annotation>

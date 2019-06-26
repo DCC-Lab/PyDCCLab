@@ -113,6 +113,7 @@ class Database:
             statement = 'INSERT OR REPLACE INTO {} ({}) VALUES ({})'.format(table, keys, values)
             self.execute(statement)
 
+
 if __name__ == '__main__':
     # If we want to create new tables in our database we proceed as follow :
     # We start with creating a proper ImageMetadata object.
