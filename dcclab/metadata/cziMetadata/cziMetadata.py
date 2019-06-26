@@ -40,10 +40,11 @@ class CZIMetadata:
         channelsAsDict = {}
         for channel in self.channels:
             channelsAsDict['{}'.format(channel.channel)] = channel.asDict()
-        metadataAsDict = {'path': self.path, 'microscope': self.microscope, 'objective': self.objective, 'x_size': self.xSize,
-                'y_size': self.ySize, 'x_scale': self.xScale, 'y_scale': self.yScale, 'x_scaled': self.xScaled,
-                'y_scaled': self.yScaled, 'name': self.name, 'mouse_id': self.mouseId,
-                'viral_vectors': self.viralVectors, 'injection_site': self.injectionSite, 'tags': self.tags}
+        metadataAsDict = {'path': self.path, 'channels': len(self.channels), 'microscope': self.microscope,
+                          'objective': self.objective, 'x_size': self.xSize, 'y_size': self.ySize,
+                          'x_scale': self.xScale, 'y_scale': self.yScale, 'x_scaled': self.xScaled,
+                          'y_scaled': self.yScaled, 'name': self.name, 'mouse_id': self.mouseId,
+                          'viral_vectors': self.viralVectors, 'injection_site': self.injectionSite, 'tags': self.tags}
         return {'metadata': metadataAsDict, 'channels': channelsAsDict}
 
     @property
@@ -51,10 +52,10 @@ class CZIMetadata:
         channelsKeys = {}
         if self.channels:
             channelsKeys = self.channels[0].keys
-        metadataKeys = {'path': 'TEXT PRIMARY KEY', 'microscope': 'TEXT', 'objective': 'TEXT', 'x_size': 'INTEGER',
-                        'y_size': 'INTEGER', 'x_scale': 'REAL', 'y_scale': 'REAL', 'x_scaled': 'REAL',
-                        'y_scaled': 'REAL', 'name': 'TEXT', 'mouse_id': 'INTEGER', 'viral_vectors': 'TEXT',
-                        'injection_site': 'TEXT', 'tags': 'TEXT'}
+        metadataKeys = {'path': 'TEXT PRIMARY KEY', 'channels': 'INTEGER', 'microscope': 'TEXT', 'objective': 'TEXT',
+                        'x_size': 'INTEGER', 'y_size': 'INTEGER', 'x_scale': 'REAL', 'y_scale': 'REAL',
+                        'x_scaled': 'REAL', 'y_scaled': 'REAL', 'name': 'TEXT', 'mouse_id': 'INTEGER',
+                        'viral_vectors': 'TEXT', 'injection_site': 'TEXT', 'tags': 'TEXT'}
         return {'cziMetadata': metadataKeys, 'cziChannels': channelsKeys}
 
     def nameFromPath(self):
