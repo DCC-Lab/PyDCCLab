@@ -6,7 +6,7 @@ import os
 if __name__ == '__main__':
     listOfAverages = []
     listOfStdDev = []
-
+    # Possible problem : 'A:\injection AAV\résultats bruts\RABV\2019-01-23\AAV720_S141_B_B-03.czi'
     readQuery = open(r"query_DAPI.csv", "r",
                      encoding="utf-8")
 
@@ -16,6 +16,8 @@ if __name__ == '__main__':
     lines = readQuery.readlines()
     numberOfFiles = len(lines)
     readQuery.close()
+    Image(path="path")
+    exit("ok")
 
     startIndex = 0
     if startIndex == 0:
