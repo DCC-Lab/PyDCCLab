@@ -7,11 +7,11 @@ if __name__ == '__main__':
     listOfAverages = []
     listOfStdDev = []
 
-    readQuery = open(os.path.join(os.path.dirname(os.path.dirname(__file__)), r"query_mcher.csv"), "r",
+    readQuery = open(r"query_mcher.csv", "r",
                      encoding="utf-8")
 
     writeResults = open(r"query_mcher_results.csv",
-                        "a", encoding="utf-8")
+                        "w", encoding="utf-8")
 
     lines = readQuery.readlines()
     numberOfFiles = len(lines)
@@ -19,7 +19,8 @@ if __name__ == '__main__':
     startIndex = 0
     for i in range(startIndex, len(lines)):
         path, channelNumber = lines[i].split(";")
-        channelNumber = channelNumber.split(":")
+        channelNumber = channelNumber.split(":")[1]
+        # The paths in
         pathChanged = os.path.join(os.path.dirname(os.path.dirname(__file__)), path)
         ok = True
         size = os.stat(pathChanged).st_size
