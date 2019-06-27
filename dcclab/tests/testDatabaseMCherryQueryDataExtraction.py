@@ -17,17 +17,12 @@ if __name__ == '__main__':
     numberOfFiles = len(lines)
 
     startIndex = 0
-    if startIndex == 0:
-        writeResults.write(
-            "WARNING: The czi file reader is only capable of properly reading single image (mutli or mono channel). "
-            "If it is a z-stack or any other multi image file, it will be ignored.")
     for i in range(startIndex, len(lines)):
-        path, channelNumber = lines[i].split(",")
-        pathChanged = path.replace("P", "A", 1)  # Change the P drive to A for my computer
+        path, channelNumber = lines[i].split(";")
+        channelNumber = channelNumber.split(":")
+        pathChanged = os.path.join(os.path.dirname(os.path.dirname(__file__)), path)
         ok = True
         size = os.stat(pathChanged).st_size
-        if size > 550 * 1024 * 1024:
-            ok = False
         if ok:
             try:
                 image = Image(path=pathChanged)
