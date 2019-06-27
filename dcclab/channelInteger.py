@@ -1,5 +1,5 @@
 from .channel import *
-#import cv2 as cv
+import cv2 as cv
 import warnings
 
 
