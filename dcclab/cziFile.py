@@ -2,6 +2,14 @@ from .image import *
 from .cziUtil import *
 from .channel import *
 
+"""
+The main goal of this file is to read czi files and extract images data (if it is a zstack, it will be read, if it is 
+a time serie, it will be read...). It will use ImageCollection instances (derived classes, like the zstack specific
+class). It is not the plan to use inheritance because it is unsure of what the structure will be (is it a zstack? or a
+simple single image?). For now, it doesn't use any of ImageCollection derived classes, but a future implementation
+can be done easily because of the current structure.
+"""
+
 
 class CZIFile(object):
     supportedFormats = ['czi']
@@ -20,9 +28,9 @@ class CZIFile(object):
         self.__axesDimAndIndex = self.__findAxesDimAndIndex()
         self.__totalWidth = self.__axesDimAndIndex["X"][0]
         self.__totalHeight = self.__axesDimAndIndex["Y"][0]
-        self.__isZStack = False if self.__axesDimAndIndex["Z"][0] is None else True
-        self.__isTimeSerie = False if self.__axesDimAndIndex["T"][0] is None else True
-        self.__isScene = False if self.__axesDimAndIndex["S"][0] is None else True
+        self.__isZStack = self.__axesDimAndIndex["Z"][0] is not None
+        self.__isTimeSerie = self.__axesDimAndIndex["T"][0] is not None
+        self.__isScene = self.__axesDimAndIndex["S"][0] is not None
         self.__numberOfChannels = self.__axesDimAndIndex["C"][0]
         self.__channelMaps = self.__buildChannelMaps() if self.__numberOfChannels > 0 else None
         self.__imagesMappedWithChannels = self.__mapImageToChannels() if self.__channelMaps is not None else None
@@ -36,7 +44,7 @@ class CZIFile(object):
     @property
     def totalWidth(self):
         return self.__totalWidth
-    
+
     @property
     def totalHeight(self):
         return self.__totalHeight
