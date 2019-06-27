@@ -31,14 +31,26 @@ if __name__ == '__main__':
         for channelId in mtdt.channels.keys():
             database.insert('cziChannels', mtdt.channels[channelId])
     database.commit()
-
     print('{} files were processed!'.format(len(files)))
-    print('Proceeding to the query : ')
 
+    print('Proceeding to the query : "mCher"')
     select = database.select('cziChannels', 'channel_id', 'channel_name="mCher"')
-    with open('query_mCher.csv', 'w', encoding='UTF-8') as file:
+    with open(os.path.join(directory, 'tests', 'query_mCher.csv'), 'w', encoding='UTF-8') as file:
         for line in select:
             file.write('{}\n'.format(line['channel_id']))
+
+    print('Proceeding to the query : "DAPI"')
+    select = database.select('cziChannels', 'channel_id', 'channel_name="DAPI"')
+    with open(os.path.join(directory, 'tests', 'query_dapi.csv'), 'w', encoding='UTF-8') as file:
+        for line in select:
+            file.write('{}\n'.format(line['channel_id']))
+
+    print('Proceeding to the query : "EGFP"')
+    select = database.select('cziChannels', 'channel_id', 'channel_name="EGFP"')
+    with open(os.path.join(directory, 'tests', 'query_egfp.csv'), 'w', encoding='UTF-8') as file:
+        for line in select:
+            file.write('{}\n'.format(line['channel_id']))
+    print('Done!')
 
     '''
     select = database.select('cziMetadata', 'path', 'channels<1')
