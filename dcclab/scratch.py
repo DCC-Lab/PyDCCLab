@@ -16,6 +16,13 @@ if __name__ == '__main__':
     database.connect()
 
     database.begin()
+    print('Creating the tables into the database...')
+    cziMetadata = Metadata(files[0])
+    database.createTable(cziMetadata.keys)
+    print('Tables were created, processing the files...')
+    database.commit()
+
+    database.begin()
     for file in files:
         print('Processing file : {}'.format(file))
         mtdt = Metadata(file)
