@@ -1,8 +1,12 @@
 from dcclab import Database
+import os
 
 
 if __name__ == '__main__':
-    database = Database(r'P:\injection AAV\résultats bruts\mtp.db')
+    directory = os.path.dirname(os.path.dirname(__file__))
+    path = os.path.join(directory, 'mountPom', 'injection AAV', 'résultats bruts', 'mtp.db')
+    #database = Database(r'P:\injection AAV\résultats bruts\mtp.db')
+    database = Database(path)
     database.connect()
 
     '''

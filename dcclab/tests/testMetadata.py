@@ -27,13 +27,27 @@ class TestMetadata(unittest.TestCase):
         noFile = os.path.join(self.directory, 'nonexistant.file')
         with self.assertRaises(ValueError): Metadata(noFile)
 
-    def testCziFile(self):
+    def testFileTypeIsCzi(self):
         mtdt = Metadata(self.cziPath)
         self.assertEqual(mtdt.metaType, 'CZI')
 
-    def testCsvFile(self):
+    def testFileTypeIsCsv(self):
         mtdt = Metadata(self.csvPath)
         self.assertEqual(mtdt.metaType, 'CSV')
+
+    def testMetadataCZI(self):
+        mtdt = Metadata(self.cziPath)
+        self.assertTrue(mtdt.metadata)
+
+    def testMetadataCSV(self):
+        mtdt = Metadata(self.csvPath)
+        self.assertTrue(mtdt.metadata)
+
+    def testChannels(self):
+        pass
+
+    def testKeys(self):
+        pass
 
 
 if __name__ == '__main__':
