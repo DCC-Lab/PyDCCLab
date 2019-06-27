@@ -6,13 +6,13 @@ import os
 
 if __name__ == '__main__':
     directory = os.path.dirname(__file__)
-    path = os.path.join(directory, 'POM', 'injection AAV', 'résultats bruts', 'mtp.db')
+    path = os.path.join(directory, 'mtp.bd')
     print('Finding czi files in POM...')
     files = findFiles(os.path.join(directory, 'POM', 'injection AAV', 'résultats bruts', 'AAV'), '*.czi') + \
             findFiles(os.path.join(directory, 'POM', 'injection AAV', 'résultats bruts', 'RABV'), '*.czi')
     print('{} files found!'.format(len(files)))
 
-    database = Database(path, 'rw')
+    database = Database(path, 'rwc')
     database.connect()
 
     database.begin()
