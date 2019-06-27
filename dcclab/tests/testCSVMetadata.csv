@@ -1,0 +1,6 @@
+no_id,date,utilisation,construction
+INTEGER,DATE,TEXT,TEXT
+1,2016-04-13,I.C.,shRNA-SLITRk5 (TL505056c)
+2,2016-04-13,I.C.,pHAGE-CMV-zsGreen
+3,2016-04-13,I.C.,pHAGE-CMV-zsGreen
+4,2016-04-13,I.C.,shRNA-SLITRk5 (TL505056c)

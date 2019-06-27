@@ -1,5 +1,5 @@
 no_utilisation,no_int,no_Nv_protocole,date_commande,date_mort,date_utilisation,temps,utilisation,volume_injection,zone,coordonees,couleur,remarque_injection,but,identification_des_animaux,vecteur,resultat,serotype,date,construction_associee,archive_fichier
-INT,INT,,DATE,DATE,DATE,TEXT,TEXT,TEXT,TEXT,TEXT,TEXT,TEXT,TEXT,TEXT,TEXT,TEXT,TEXT,DATE,TEXT,TEXT
+INTEGER PRIMARY KEY,INTEGER,DATE,DATE,DATE,DATE,TEXT,TEXT,TEXT,TEXT,TEXT,TEXT,TEXT,TEXT,TEXT,TEXT,TEXT,TEXT,DATE,TEXT,TEXT
 1,1,,2016-03-31,,2016-04-13,,I.C.,,I.C.,,,,,,HIV 53R1,,Lentivirus,2015-10-13,shRNA-SLITRk5 (TL505056c),
 2,2,,2016-03-31,,2016-04-13,,I.C.,,I.P,,,,,,HIV 129crtc,,entivirus pHage,2015-12-05,pHAGE-CMV-zsGreen,
 3,3,,2016-03-31,,2016-04-13,,I.C.,,I.C.,,,,,,HIV 129crtc,,entivirus pHage,2015-12-03,pHAGE-CMV-zsGreen,
