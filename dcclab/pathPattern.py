@@ -1,5 +1,6 @@
 import re
 import os
+from pathlib import Path, PureWindowsPath
 
 class PathPattern:
     def __init__(self, pattern:str):
@@ -10,12 +11,12 @@ class PathPattern:
     def directory(self):
         dirName = os.path.dirname(self.pattern)
         if dirName == '':
-            dirName = './'
-        return dirName
+            dirName = '.'
+        return str(Path(dirName)) # converts to native Windows or Unix
 
     @property
     def basePattern(self):
-        return os.path.basename(self.pattern)
+        return str(Path(os.path.basename(self.pattern)))
 
     @property
     def extension(self):
@@ -93,5 +94,4 @@ class PathPattern:
             filePath = self.pattern.format(i, j, k)
 
         return filePath
-
 
