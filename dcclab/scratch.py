@@ -12,7 +12,7 @@ if __name__ == '__main__':
             findFiles(os.path.join(directory, 'POM', 'injection AAV', 'résultats bruts', 'RABV'), '*.czi')
     print('{} files found!'.format(len(files)))
 
-    database = Database(path)
+    database = Database(path, 'rw')
     database.connect()
 
     database.begin()
