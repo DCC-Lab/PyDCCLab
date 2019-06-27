@@ -1,3 +1,4 @@
+import env
 from dcclab import database as db
 import unittest
 import os
