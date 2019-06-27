@@ -18,9 +18,7 @@ if __name__ == '__main__':
             file.write('{}\n'.format(line['channel_id']))
     '''
 
-    database.begin()
     select = database.select('cziMetadata', 'path', 'channels<1')
-    database.end()
     with open('query.csv', 'w', encoding='UTF-8') as file:
         for line in select:
             file.write('{}\n'.format(line['path']))
