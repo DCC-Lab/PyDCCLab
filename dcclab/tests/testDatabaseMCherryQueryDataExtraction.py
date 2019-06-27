@@ -21,7 +21,7 @@ if __name__ == '__main__':
         path, channelNumber = lines[i].split(";")
         channelNumber = channelNumber.split(":")[1]
         # The paths in
-        pathChanged = os.path.join(os.path.dirname(os.path.dirname(__file__)), path)
+        pathChanged = os.path.join("../", path)
         print(pathChanged)
         ok = True
         size = os.stat(pathChanged).st_size
