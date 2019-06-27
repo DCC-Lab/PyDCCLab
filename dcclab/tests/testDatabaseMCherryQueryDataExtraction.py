@@ -7,7 +7,7 @@ if __name__ == '__main__':
     listOfAverages = []
     listOfStdDev = []
 
-    readQuery = open(r"query_mcher.csv", "r",
+    readQuery = open(os.path.join(os.path.dirname(os.path.dirname(__file__)), r"query_mcher.csv"), "r",
                      encoding="utf-8")
 
     writeResults = open(r"query_mcher_results.csv",
