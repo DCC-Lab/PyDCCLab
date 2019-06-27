@@ -22,6 +22,7 @@ if __name__ == '__main__':
         channelNumber = channelNumber.split(":")[1]
         # The paths in
         pathChanged = os.path.join(os.path.dirname(os.path.dirname(__file__)), path)
+        print(pathChanged)
         ok = True
         size = os.stat(pathChanged).st_size
         if ok:
