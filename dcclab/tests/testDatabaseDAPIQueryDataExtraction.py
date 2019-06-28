@@ -1,37 +1,29 @@
 import env
-from dcclab import Image
+from dcclab import Image, cziUtil
 import os
 
 # For this test, the query was done by Mathieu on his computer. Selected channel is mCherry
 if __name__ == '__main__':
     listOfAverages = []
     listOfStdDev = []
-    # Possible problem : 'A:\injection AAV\résultats bruts\RABV\2019-01-23\AAV720_S141_B_B-03.czi'
+
     readQuery = open(r"query_DAPI.csv", "r",
                      encoding="utf-8")
 
     writeResults = open(r"query_DAPI_results.csv",
-                        "a", encoding="utf-8")
+                        "w", encoding="utf-8")
 
     lines = readQuery.readlines()
     numberOfFiles = len(lines)
-    readQuery.close()
-    Image(path="path")
-    exit("ok")
 
     startIndex = 0
-    if startIndex == 0:
-        writeResults.write(
-            "WARNING: The czi file reader is only capable of properly reading single image (mutli or mono channel). "
-            "If it is a z-stack or any other multi image file, it will be ignored.")
     for i in range(startIndex, len(lines)):
-        path, channel = lines[i].split(";")
-        pathChanged = path.replace("P", "A", 1)  # Change the P drive to A for my computer
-        channelNumber = channel.split(":")[-1]
+        path, channelNumber = lines[i].split(";")
+        channelNumber = channelNumber.split(":")[1]
+        # The paths in
+        pathChanged = os.path.join("../", path)
         ok = True
         size = os.stat(pathChanged).st_size
-        if size > 550 * 1024 * 1024:
-            ok = False
         if ok:
             try:
                 image = Image(path=pathChanged)
@@ -59,4 +51,5 @@ if __name__ == '__main__':
                                                           stdDev=stdDev))
         print("{} / {} files read".format(i + 1, numberOfFiles))
 
+    readQuery.close()
     writeResults.close()
