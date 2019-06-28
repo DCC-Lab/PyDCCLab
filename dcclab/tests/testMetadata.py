@@ -1,5 +1,5 @@
+import env
 from dcclab import Metadata
-from dcclab import CZIMetadata
 import unittest
 import os
 
