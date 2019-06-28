@@ -151,6 +151,14 @@ class TestProperties(unittest.TestCase):
         czi = CZIFile("testCziZStack4.czi")
         self.assertEqual(czi.axes, "BCZYX0")
 
+    def testAxesBCYX0(self):
+        czi = CZIFile("testCziFileTwoChannels.czi")
+        self.assertEqual(czi.axes, "BCYX0")
+
+    def testAxesBSCYX0(self):
+        czi = CZIFile("testCziThreeChannelsOneScene.czi")
+        self.assertEqual(czi.axes, "BSCYX0")
+
 
 if __name__ == '__main__':
     unittest.main()
