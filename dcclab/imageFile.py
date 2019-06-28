@@ -8,15 +8,52 @@ class ImageFile(object):
     supportedFormats = []
 
     def __init__(self, path):
+        if not os.path.exists(path):
+            raise FileNotFoundError("{} does not exists.".format(path))
         self.path = path
 
-    def imageDataFromPath(self) -> np.ndarray:
-        return
+    def zStackData(self):
+        """
+        :return: images data as z-stack if possible
+        """
+        return None
 
+    def timeSeriesData(self):
+        """
+        :return: images data as a time series if possible
+        """
+        return None
+
+    def scenesData(self):
+        """
+        :return: images data as scenes if possible
+        """
+        return None
+
+    def imageData(self):
+        """
+        :return: image data (if coherent to return the data of a single image)
+        """
+        return None
+
+    def allData(self):
+        """
+        :return: all image data as a list (whether it is a time series, a zstack, a time series of zstack...)
+        """
+        return None
+
+    def mapData(self):
+        """
+        :return: images data as a map (key:x/y indexes, value: image data)
+        """
+        return None
+
+    # FIXME is it really necessary?
     def metadata(self):
         return
 
 
+# This class is only temporary
 class CZIFile_(ImageFile):
     supportedFormats = ['czi']
 
@@ -26,6 +63,8 @@ class CZIFile_(ImageFile):
     def imageDataFromPath(self) -> np.ndarray:
         cziObj = readCziImage(self.path)
         axes = cziObj.axes
+        print(axes)
+        print(cziObj.shape)
         if axes == "BSCYX0":
             if cziObj.shape[1] != 1:
                 closeCziFileObject(cziObj)
@@ -33,7 +72,7 @@ class CZIFile_(ImageFile):
         if axes not in ["BCYX0", "BSCYX0", "YX0"]:
             closeCziFileObject(cziObj)
             raise NotImplementedError(axes)
-        mosaic, self.__tilesWithChannelNumber = decodeImages(cziObj)
+        mosaic, self.__indexAndTiles = decodeImages(cziObj)
         try:
             cIndex = axes.index("C")
         except ValueError:
@@ -51,6 +90,7 @@ class CZIFile_(ImageFile):
 
 
 class TIFFFile(ImageFile):
+    #todo implement parent's methods
     supportedFormats = ['tif', 'tiff']
 
     def __init__(self, path):
@@ -68,6 +108,7 @@ class TIFFFile(ImageFile):
 
 
 class PILFile(ImageFile):
+    # todo implement parent's methods
     supportedFormats = ['(formats supported by PIL module))']
 
     def __init__(self, path):
@@ -80,6 +121,7 @@ class PILFile(ImageFile):
 
 
 class MATLABFile(ImageFile):
+    # todo implement parent's methods
     supportedFormats = ['mat']
 
     def __init__(self, path, variable=None):
