@@ -4,6 +4,7 @@ import PIL.Image
 import scipy.io as sio
 
 
+
 class ImageFile(object):
     supportedFormats = []
 
@@ -90,7 +91,7 @@ class CZIFile_(ImageFile):
 
 
 class TIFFFile(ImageFile):
-    #todo implement parent's methods
+    # todo implement parent's methods
     supportedFormats = ['tif', 'tiff']
 
     def __init__(self, path):

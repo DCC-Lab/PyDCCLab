@@ -2,6 +2,7 @@ from .image import *
 from .pathPattern import *
 import numpy as np
 import json
+from .image import Image
 import matplotlib.pyplot as plt
 from typing import List, Union
 #from .__lifReader import LifReader
