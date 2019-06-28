@@ -1,40 +1,74 @@
-'''
-This is a script used to create the mtp.db database.
-This database contains metadata linked to Molecular Tools platform's operations.
-'''
 from dcclab import Database
 from dcclab import Metadata
 from dcclab import findFiles
+import os
 
 
 if __name__ == '__main__':
-    # We need paths to our metadata
-    # We get a list of paths to the czi files.
-    print('Searching for czi files...')
-    cziFiles = findFiles(r'P:\injection AAV\résultats bruts\AAV', '*.czi') + \
-               findFiles(r'P:\injection AAV\résultats bruts\RABV', '*.czi')
-    print('{} files were found!'.format(len(cziFiles)))
+    # Current directory is :
+    print('Begining process...')
+    directory = os.path.dirname(__file__)
+    print('Directory is : {}'.format(directory))
 
-    # And paths to our csv files.
-    # The csv files can be turned into metadata objects right away.
-    miceCSV = r'C:\Users\MathieuLaptop\Documents\Ulaval\ProgPython\Projets\BigData-ImageAnalysis\dcclab\tests\Data-souris.csv'
-    usesCSV = r'C:\Users\MathieuLaptop\Documents\Ulaval\ProgPython\Projets\BigData-ImageAnalysis\dcclab\tests\Data-Utilisation.csv'
-    print('Processing csv metadata...')
-    miceMetadata = Metadata(miceCSV)
-    usesMetadata = Metadata(usesCSV)
+    # Path to the Molecular Tools Platform database is :
+    mtpPath = os.path.join(directory, 'database', 'mtp.db')
+    print('Path to database "mtp.db" is : {}'.format(mtpPath))
 
-    # We create the database in the desired directory.
+    # We create a database object in rwc mode. If it doesn't exist, we create it.
+    # Then we connect to the database.
+    # Database is in asynchronous mode for faster inserts.
     print('Connecting to database...')
-    database = Database(r'P:\injection AAV\résultats bruts\mtp.db', 'rwc')
+
+    if os.path.exists(mtpPath):
+        print('Database already exists.')
+        database = Database(mtpPath, 'rw')
+        print('Dropping all existing tables...')
+        database.dropTable('Data-souris')
+        database.dropTable('Data-Utilisation')
+        database.dropTable('cziMetadata')
+        database.dropTable('cziChannels')
+        database.commit()
+        print('Done.')
+    else:
+        print("Database doesn't exist yet. Creating it...")
+        database = Database(mtpPath, 'rwc')
+        print('Done.')
+
+    print('Connecting to database...')
     database.connect()
     database.asynchronous()
+    print('...Connected!')
 
-    # We create the tablse for the csv Metadata.
-    print('Processing csv metadata into the database...')
+    # Now, we need paths to our metadata (the .czi files and the .csv files.)
+    # For the .csv, we have :
+    micePath = os.path.join(directory, 'database', 'Data-souris.csv')
+    utilPath = os.path.join(directory, 'database', 'Data-Utilisation.csv')
+    print('Path to mice data is : {}'.format(micePath))
+    print('Path to util data is : {}'.format(utilPath))
+
+    # For the .czi, we have :
+    print('Finding czi files in POM...')
+    files = findFiles(os.path.join(directory, 'POM', 'injection AAV', 'résultats bruts', 'AAV'), '*.czi') + \
+            findFiles(os.path.join(directory, 'POM', 'injection AAV', 'résultats bruts', 'RABV'), '*.czi')
+    print('{} czi files were found!'.format(len(files)))
+
+    # Now, we extract the metadata from our files. First, we start with the .csv files.
+    # We extract the metadata.
+    print('Extracting metadata from .csv files...')
+    miceMetadata = Metadata(micePath)
+    utilMetadata = Metadata(utilPath)
+    print('...Done!')
+
+    # We create tables for the metadata.
+    print('Creating tables for the .csv metadata...')
+    database.begin()
     database.createTable(miceMetadata.keys)
-    database.createTable(usesMetadata.keys)
+    database.createTable(utilMetadata.keys)
+    database.commit()
+    print('...Done!')
 
-    # We insert the csv Metadata into the tables.
+    # We insert the .csv Metadata into the tables.
+    print('Inserting metadata into the database...')
     entries = miceMetadata.metadata
     database.begin()
     for line in entries.keys():
@@ -42,7 +76,7 @@ if __name__ == '__main__':
     database.commit()
     print('Data-souris was processed for {} lines...'.format(len(entries)))
 
-    entries = usesMetadata.metadata
+    entries = utilMetadata.metadata
     database.begin()
     for line in entries.keys():
         database.insert('Data-Utilisation', entries[line])
@@ -51,19 +85,22 @@ if __name__ == '__main__':
 
     # We now process the czi files into the database.
     # We create the tables.
-    print('Processing czi files into the database...')
-    cziMetadata = Metadata(cziFiles[0])
+    database.begin()
+    print('Creating the tables into the database...')
+    cziMetadata = Metadata(files[0])
     database.createTable(cziMetadata.keys)
     print('Tables were created, processing the files...')
+    database.commit()
 
     database.begin()
-    for cziFile in cziFiles:
-        print('Processing {}...'.format(cziFile))
-        cziMetadata = Metadata(cziFile)
+    for file in files:
+        print('Processing {}...'.format(file))
+        cziMetadata = Metadata(file)
         database.insert('cziMetadata', cziMetadata.metadata)
         for channelId in cziMetadata.channels.keys():
             database.insert('cziChannels', cziMetadata.channels[channelId])
     database.commit()
-    print('{} czi files were processed!'.format(len(cziFiles)))
+    print('{} czi files were processed!'.format(len(files)))
+    print('Disconnecting from database...')
     database.disconnect()
-    print('Done!')
+    print('Done! Database was successfully created.')
