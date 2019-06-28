@@ -19,7 +19,7 @@ For example, the database will allow requests such as:
 2. All images of microglia.
 3. All images of neurons from the subthalamic nucleus.
 
-To create a new database, a `Database` object has to be created in `rwc` (read, write, create) mode. If it does not exist yet, the database will be create at the `Database.path` location (in **URI**), otherwise `rwc` mode will be equivalent to `rw` (read, write) mode. To begin using the `Database`, making queries or inserting into it, you must always use `Database.connect()`. Since `Database` is a wrapper around `SQLite3` (for `python`), the most important functions are available, such as `.insert()`, `.execute()`, `.commit()`, `.select()`, `.fetchOne()`, etc...
+To create a new database, a `Database` object has to be created in `rwc` (read, write, create) mode (by default, `Database` is in `r` (read only) mode). If it does not exist yet, the database will be create at the `Database.path` location (in **URI**), otherwise `rwc` mode will be equivalent to `rw` (read, write) mode. To begin using the `Database`, making queries or inserting into it, you must always use `Database.connect()`. Since `Database` is a wrapper around `SQLite3` (for `python`), the most important functions are available, such as `.insert()`, `.execute()`, `.commit()`, `.select()`, `.fetchOne()`, etc...
 
 If you want to create new tables, a dictionary (*of dictionaries*) containing the tables' name and their associated keys/types has to be passed to `Database.createTable()`. It should be in the form :
 
