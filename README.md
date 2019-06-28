@@ -11,13 +11,25 @@ This module is a task-oriented module for image analysis: it provides simple too
 
 ## Database
 
-Currently under development, a `Database` class allows one to obtain files from various CERVO databases. As of now, only the **Molecular Tools Platform** is supported, but the DCCLab, PDK group and Martin Levesque group will be supported in the near future.
+Currently under development, a `Database` class allows one to obtain files from various CERVO databases as well as creating new databases and tables from dictionaries. As of now, only the **Molecular Tools Platform** is supported, but the DCCLab, PDK group and Martin Levesque group will be supported in the near future.
 
 For example, the database will allow requests such as:
 
 1. All images using the viral vector AAV-173
 2. All images of microglia.
 3. All images of neurons from the subthalamic nucleus.
+
+To create a new database, a `Database` object has to be create in `rwc` (read, write, create) mode. If it does not exist yet, the database will be create at the `Database.path` location, otherwise `rwc` mode will be equivalent to `rw` (read, write) mode. If you want to create new tables, a dictionary containing the tables' name and their associated keys/types has to be passed to `Database.createTable()`. It should be in the form :
+
+```
+{table_1: {key_1: type, key_2: type, key_3: type}, table_2: {key_1: type, key_2: type, key_3: type}}
+```
+
+`keys` property of the `Metadata` object, and its underlying objects, already handle the creation of the above dictionary (of dictionaries). Knowing that, you can quickly create a table with `Database.createTable(Metadata.keys)`.
+
+To drop a table, use the `Database.dropTable()` function, passing it only the table's name. `Database` objects are created with `isolation_level = None` by default. This is because `PEP` requires `python` to handle autocommits and transactions normally. By setting `isolation_level` to `None`, we revert from `PEP` autocommit to `SQLite` autocommits. From there, it is possible, using `Database.begin()`, `Database.end()`, `Database.commit()` and `Database.rollBack()`, to control the transactions and greatly increase insert speed into the database. Similarly, `Database.asynchronous()` also changes properties of the database to allow for faster insert. **HOWEVER**, this is a dangerous function to use because it increases the chances of corrupt data in the database should the server crash or should there be a power failure.
+
+The `mtpDatabase` script in dcclab is meant to create the mtp.db database on the cafeine2 server, under dcclab/database. It contains the metadata of the **Molecular Tools Platform** `.csv` files under dcclab/database as well as the metadata from their `.czi` files in the cafeine2 server.
 
 ## Installation
 
