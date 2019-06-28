@@ -55,6 +55,10 @@ class TestMetadata(unittest.TestCase):
         mtdt = Metadata(self.cziPath)
         self.assertTrue(mtdt.keys)
 
+    def testKeysCSV(self):
+        mtdt = Metadata(self.csvPath)
+        self.assertTrue(mtdt.keys)
+
 
 if __name__ == '__main__':
     unittest.main()
