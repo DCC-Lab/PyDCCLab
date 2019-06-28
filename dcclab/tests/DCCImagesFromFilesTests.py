@@ -15,7 +15,7 @@ class TestDCCImagesFromCZIFileConstructor(unittest.TestCase):
             DCCImagesFromCZIFile("testNotCziFile.jpg")
 
     def testCorrectPath(self):
-        imagesFromCzi = DCCImagesFromCZIFile("testCziFile2Images.czi")
+        imagesFromCzi = DCCImagesFromCZIFile("testCziFileTwoChannels.czi")
         self.assertIsInstance(imagesFromCzi, DCCImagesFromCZIFile)
 
 
@@ -23,15 +23,15 @@ class testDCCImagesFromCZIFileMethods(unittest.TestCase):
 
     def setUp(self) -> None:
         import cziUtil as cziUtil
-        self.imagesFromCzi = DCCImagesFromCZIFile("testCziFile2Images.czi")
-        self.metadata = cziUtil.extractMetadataFromCziFileObject(cziUtil.readCziImage("testCziFile2Images.czi"))
+        self.imagesFromCzi = DCCImagesFromCZIFile("testCziFileTwoChannels.czi")
+        self.metadata = cziUtil.extractMetadataFromCziFileObject(cziUtil.readCziImage("testCziFileTwoChannels.czi"))
 
     def testGetMetadata(self):
         import cziMetadata as meta
         self.assertTrue(self.imagesFromCzi.getMetadata() == meta.CZIMetadata(self.imagesFromCzi.getPath()))
 
     def testGetPath(self):
-        self.assertTrue("testCziFile2Images.czi" == self.imagesFromCzi.getPath())
+        self.assertTrue("testCziFileTwoChannels.czi" == self.imagesFromCzi.getPath())
 
 
 class TestDCCImageFromNormalFileConstructor(unittest.TestCase):
@@ -47,7 +47,7 @@ class TestDCCImageFromNormalFileConstructor(unittest.TestCase):
             DCCImageFromNormalFile(file)
 
     def testInvalidConstructorCZIFile(self):
-        file = "testCziFile2Images.czi"
+        file = "testCziFileTwoChannels.czi"
         with self.assertRaises(DCCExcep.InvalidFileFormatException):
             DCCImageFromNormalFile(file)
 

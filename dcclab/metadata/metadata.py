@@ -25,11 +25,21 @@ class Metadata:
                 except:
                     continue
             if self.__fileObject is None:
-                message = "Cannot read '{0}': not a recognized image format ({1})".format(self.path, Metadata.supportedFormats)
+                message = "Cannot read '{0}': not a recognized format ({1})".format(self.path, Metadata.supportedFormats)
                 raise TypeError(message)
         else:
             self.path = None
             self.__fileObject = None
+
+    @property
+    def metaType(self):
+        fileType = type(self.__fileObject)
+        if fileType == CZIMetadata:
+            return 'CZI'
+        elif fileType == CSVMetadata:
+            return 'CSV'
+        else:
+            return None
 
     @property
     def metadata(self) -> dict:

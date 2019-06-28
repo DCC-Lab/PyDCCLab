@@ -30,7 +30,7 @@ class TestCsvMetadata(unittest.TestCase):
 
     def testKeys(self):
         metadata = mtdt(self.filePath)
-        keys = metadata.keys
+        keys = metadata.keys['unittest']
         self.assertEqual(keys['field_1'], 'INTEGER')
 
     def testLines(self):
