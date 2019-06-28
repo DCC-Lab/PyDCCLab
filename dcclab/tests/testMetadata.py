@@ -43,16 +43,17 @@ class TestMetadata(unittest.TestCase):
         mtdt = Metadata(self.csvPath)
         self.assertTrue(mtdt.metadata)
 
-    def testChannels(self):
+    def testChannelsCZI(self):
         mtdt = Metadata(self.cziPath)
         self.assertTrue(mtdt.channels)
 
-    def testChannelsWithCSVFile(self):
+    def testChannelsCSV(self):
         mtdt = Metadata(self.csvPath)
         self.assertFalse(mtdt.channels)
 
-    def testKeys(self):
-        pass
+    def testKeysCZI(self):
+        mtdt = Metadata(self.cziPath)
+        self.assertTrue(mtdt.keys)
 
 
 if __name__ == '__main__':
