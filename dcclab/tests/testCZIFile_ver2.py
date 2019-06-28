@@ -63,15 +63,15 @@ class TestProperties(unittest.TestCase):
         self.assertFalse(czi.isZstack)
 
     def testIsZStackYes(self):
-        # todo find file with zstack, timeserie (for another false)
-        pass
+        czi = CZIFile("testCziZStack4.czi")
+        self.assertTrue(czi.isZstack)
 
     def testIsTimeSerieNo(self):
         czi = CZIFile("testCziThreeChannelsOneScene.czi")
         self.assertFalse(czi.isTimeSerie)
 
-    def testIsTimeSerieYes(self):
-        # todo find file with timeserie, zstack (for another false)
+    def testIsTimeSerieNoDim1(self):
+        # todo find file with timeserie dim 1
         pass
 
     def testIsSceneNo(self):
@@ -82,9 +82,9 @@ class TestProperties(unittest.TestCase):
         czi = CZIFile("testCziThreeChannelsOneScene.czi")
         self.assertFalse(czi.isScenes)
 
-    def testIsSceneNo2(self):
-        # todo find file with timeserie/zstack for another false
-        pass
+    def testIsScenesYes(self):
+        czi = CZIFile("testCziMultipleScenes.czi")
+        self.assertTrue(czi.isScenes)
 
     def testShape(self):
         czi1936x1460 = CZIFile("testCziFileTwoChannels.czi")
@@ -138,6 +138,18 @@ class TestProperties(unittest.TestCase):
                         (range(0, 61), range(0, 61), 0, None, None, 1), (range(0, 61), range(0, 61), 1, None, None, 1),
                         (range(0, 61), range(0, 61), 1, None, None, 0), (range(0, 61), range(0, 61), 3, None, None, 1)]
         self.assertListEqual(keys, supposedKeys)
+
+    def testTileMapYX0None(self):
+        czi = CZIFile("testCziFileYX0Axes.czi")
+        self.assertIsNone(czi.tileMap)
+
+    def testAxesYX0(self):
+        czi = CZIFile("testCziFileYX0Axes.czi")
+        self.assertEqual(czi.axes, "YX0")
+
+    def testAxesBCZYX0(self):
+        czi = CZIFile("testCziZStack4.czi")
+        self.assertEqual(czi.axes, "BCZYX0")
 
 
 if __name__ == '__main__':

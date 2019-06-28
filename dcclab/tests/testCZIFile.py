@@ -3,13 +3,10 @@ import unittest
 from dcclab import CZIFile_ as CZIFile
 import czifile
 import numpy as np
-import os
+
 
 
 class TestCZIFile(unittest.TestCase):
-    def setUp(self) -> None:
-        if "tests" not in os.getcwd():
-            os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
     def testAxesNotSupported(self):
         czi = CZIFile("testCziAxesNotYetSupported.czi")
@@ -66,5 +63,4 @@ class TestCZIFile(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    print(os.path.dirname(__file__))
     unittest.main()
