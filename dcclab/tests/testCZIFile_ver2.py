@@ -24,37 +24,15 @@ class TestConstructor(unittest.TestCase):
 
 class TestProperties(unittest.TestCase):
 
-    def testChannelMapsLength(self):
-        self.assertEqual(len(CZIFile("testCziFileTwoChannels.czi").channelMaps), 2)
-
-    def testChannelMapsKeys(self):
-        czi = CZIFile("testCziFileTwoChannels.czi")
-        keysChannel1 = list(czi.channelMaps[0].keys())
-        keysChannel2 = list(czi.channelMaps[1].keys())
-        supposedKeys = [(range(0, 1936), range(0, 1460), None, None, None)]
-        self.assertTrue(keysChannel1 == supposedKeys and keysChannel2 == supposedKeys)
-
-    def testChannelMapsValues(self):
-        czi = CZIFile("testTinyCzi.czi")
-        pixelsValueChannelOne = np.array([[119, 142], [134, 118], [122, 125]])
-        pixelsValueChannelTwo = np.array([[68, 72], [77, 72], [57, 69]])
-        key = (range(0, 2), range(0, 3), None, None, None)
-        self.assertTrue(
-            np.array_equal(czi.channelMaps[0][key], pixelsValueChannelOne) and np.array_equal(czi.channelMaps[1][key],
-                                                                                              pixelsValueChannelTwo))
-
-    def testChannelMapsAllSameKeys(self):
-        czi = CZIFile("testCziFileThreeChannelsFourTiles.czi")
-        channelMaps = czi.channelMaps
-        self.assertTrue(channelMaps[0].keys() == channelMaps[1].keys() == channelMaps[2].keys())
-
     def testNumberOfChannels(self):
         czi3Channels = CZIFile("testCziFileThreeChannelsFourTiles.czi")
         czi2Channels = CZIFile("testCziFileTwoChannels.czi")
         cziOneChannel = CZIFile("testCziOneChannel.czi")
         czi0Channel = CZIFile("testCziFileYX0Axes.czi")
-        self.assertTrue(czi3Channels.numberOfChannels == 3 and czi2Channels.numberOfChannels == 2
-                        and cziOneChannel.numberOfChannels == 1 and czi0Channel.numberOfChannels == 0)
+        self.assertEqual(czi3Channels.numberOfChannels, 3)
+        self.assertEqual(czi2Channels.numberOfChannels, 2)
+        self.assertEqual(cziOneChannel.numberOfChannels, 1)
+        self.assertEqual(czi0Channel.numberOfChannels, 0)
 
     def testTotalWidth(self):
         czi1936x1460 = CZIFile("testCziFileTwoChannels.czi")
@@ -62,8 +40,11 @@ class TestProperties(unittest.TestCase):
         czi954x670 = CZIFile("testCziFileYX0Axes.czi")
         czi2x3 = CZIFile("testTinyCzi.czi")
         czi1525x905 = CZIFile("testCziThreeChannelsOneScene.czi")
-        self.assertTrue(czi2x3.totalWidth == 2 and czi954x670.totalWidth == 954 and czi1525x905.totalWidth == 1525
-                        and czi1936x1460.totalWidth == 1936 and czi3790x2892.totalWidth == 3790)
+        self.assertEqual(czi2x3.totalWidth, 2)
+        self.assertEqual(czi954x670.totalWidth, 954)
+        self.assertEqual(czi1525x905.totalWidth, 1525)
+        self.assertEqual(czi1936x1460.totalWidth, 1936)
+        self.assertEqual(czi3790x2892.totalWidth, 3790)
 
     def testTotalHeight(self):
         czi1936x1460 = CZIFile("testCziFileTwoChannels.czi")
@@ -71,8 +52,11 @@ class TestProperties(unittest.TestCase):
         czi954x670 = CZIFile("testCziFileYX0Axes.czi")
         czi2x3 = CZIFile("testTinyCzi.czi")
         czi1525x905 = CZIFile("testCziThreeChannelsOneScene.czi")
-        self.assertTrue(czi2x3.totalHeight == 3 and czi954x670.totalHeight == 670 and czi1525x905.totalHeight == 905
-                        and czi1936x1460.totalHeight == 1460 and czi3790x2892.totalHeight == 2892)
+        self.assertEqual(czi2x3.totalHeight, 3)
+        self.assertEqual(czi954x670.totalHeight, 670)
+        self.assertEqual(czi1525x905.totalHeight, 905)
+        self.assertEqual(czi1936x1460.totalHeight, 1460)
+        self.assertEqual(czi3790x2892.totalHeight, 2892)
 
     def testIsZStackNo(self):
         czi = CZIFile("testCziThreeChannelsOneScene.czi")
@@ -92,11 +76,11 @@ class TestProperties(unittest.TestCase):
 
     def testIsSceneNo(self):
         czi = CZIFile("testCziFileYX0Axes.czi")
-        self.assertFalse(czi.isScene)
+        self.assertFalse(czi.isScenes)
 
-    def testIsSceneYes(self):
+    def testIsSceneNoDim1(self):
         czi = CZIFile("testCziThreeChannelsOneScene.czi")
-        self.assertTrue(czi.isScene)
+        self.assertFalse(czi.isScenes)
 
     def testIsSceneNo2(self):
         # todo find file with timeserie/zstack for another false
@@ -113,6 +97,47 @@ class TestProperties(unittest.TestCase):
         self.assertTupleEqual(czi1525x905.shape, (1, 1, 3, 905, 1525, 1))
         self.assertTupleEqual(czi1936x1460.shape, (1, 2, 1460, 1936, 1))
         self.assertTupleEqual(czi3790x2892.shape, (1, 1, 3, 2892, 3790, 1))
+
+    def testTileMapKeysOnlyTiles(self):
+        czi3Channels = CZIFile("testCziFileThreeChannelsFourTiles.czi")
+        keys = list(czi3Channels.tileMap.keys())
+        supposedKeys = [(range(60, 1996), range(0, 1460), None, None, None, 0),
+                        (range(60, 1996), range(0, 1460), None, None, None, 1),
+                        (range(60, 1996), range(0, 1460), None, None, None, 2),
+                        (range(1854, 3790), range(80, 1540), None, None, None, 0),
+                        (range(1854, 3790), range(80, 1540), None, None, None, 1),
+                        (range(1854, 3790), range(80, 1540), None, None, None, 2),
+                        (range(1794, 3730), range(1432, 2892), None, None, None, 0),
+                        (range(1794, 3730), range(1432, 2892), None, None, None, 1),
+                        (range(1794, 3730), range(1432, 2892), None, None, None, 2),
+                        (range(0, 1936), range(1352, 2812), None, None, None, 0),
+                        (range(0, 1936), range(1352, 2812), None, None, None, 1),
+                        (range(0, 1936), range(1352, 2812), None, None, None, 2)]
+        self.assertListEqual(keys, supposedKeys)
+
+    def testTileMapKeysOnlyOneTile(self):
+        czi = CZIFile("testCziOneChannel.czi")
+        keys = list(czi.tileMap.keys())
+        supposedKeys = [(range(0, 857), range(0, 610), None, None, None, 0)]
+        self.assertListEqual(keys, supposedKeys)
+
+    def testTileMapKeysMultipleScenes(self):
+        czi = CZIFile("testCziMultipleScenes.czi")
+        keys = list(czi.tileMap.keys())
+        supposedKeys = [(range(0, 447), range(0, 357), None, 1, None, 0),
+                        (range(0, 447), range(0, 357), None, 1, None, 1),
+                        (range(0, 447), range(0, 357), None, 0, None, 0),
+                        (range(0, 447), range(0, 357), None, 0, None, 1)]
+        self.assertListEqual(keys, supposedKeys)
+
+    def testTileMapKeysZStack(self):
+        czi = CZIFile("testCziZStack4.czi")
+        keys = list(czi.tileMap.keys())
+        supposedKeys = [(range(0, 61), range(0, 61), 0, None, None, 0), (range(0, 61), range(0, 61), 3, None, None, 0),
+                        (range(0, 61), range(0, 61), 2, None, None, 1), (range(0, 61), range(0, 61), 2, None, None, 0),
+                        (range(0, 61), range(0, 61), 0, None, None, 1), (range(0, 61), range(0, 61), 1, None, None, 1),
+                        (range(0, 61), range(0, 61), 1, None, None, 0), (range(0, 61), range(0, 61), 3, None, None, 1)]
+        self.assertListEqual(keys, supposedKeys)
 
 
 if __name__ == '__main__':
