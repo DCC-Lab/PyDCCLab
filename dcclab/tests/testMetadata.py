@@ -44,7 +44,8 @@ class TestMetadata(unittest.TestCase):
         self.assertTrue(mtdt.metadata)
 
     def testChannels(self):
-        pass
+        mtdt = Metadata(self.cziPath)
+        self.assertTrue(mtdt.channels)
 
     def testKeys(self):
         pass
