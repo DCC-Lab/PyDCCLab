@@ -1,5 +1,5 @@
+import env
 from dcclab import Metadata
-from dcclab import CZIMetadata
 import unittest
 import os
 
@@ -43,11 +43,21 @@ class TestMetadata(unittest.TestCase):
         mtdt = Metadata(self.csvPath)
         self.assertTrue(mtdt.metadata)
 
-    def testChannels(self):
-        pass
+    def testChannelsCZI(self):
+        mtdt = Metadata(self.cziPath)
+        self.assertTrue(mtdt.channels)
 
-    def testKeys(self):
-        pass
+    def testChannelsCSV(self):
+        mtdt = Metadata(self.csvPath)
+        self.assertFalse(mtdt.channels)
+
+    def testKeysCZI(self):
+        mtdt = Metadata(self.cziPath)
+        self.assertTrue(mtdt.keys)
+
+    def testKeysCSV(self):
+        mtdt = Metadata(self.csvPath)
+        self.assertTrue(mtdt.keys)
 
 
 if __name__ == '__main__':
