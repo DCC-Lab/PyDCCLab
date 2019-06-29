@@ -9,16 +9,6 @@ This module is a task-oriented module for image analysis: it provides simple too
 2. `Channel`: each image has one or several channels.  The channels, which correspond to specific fluorophores, can be manipulated with filters, threshold, segmentation and other operations. More complex methods like  watershed are also available to use.
 3. `ImageCollection`: can read a collection of image files (e.g., a directory, a z-stack, a map, etc...)
 
-## Database
-
-Currently under development, a `Database` class allows one to obtain files from various CERVO databases. As of now, only the **Molecular Tools Platform** is supported, but the DCCLab, PDK group and Martin Levesque group will be supported in the near future.
-
-For example, the database will allow requests such as:
-
-1. All images using the viral vector AAV-173
-2. All images of microglia.
-3. All images of neurons from the subthalamic nucleus.
-
 ## Installation
 
 To install development versions, use:
@@ -98,4 +88,18 @@ coll.filterNoise()
 coll.applyGaussianFilter()
 coll.align()
 ```
+
+
+
+## Database
+
+Currently under development, a `Database` class allows one to manage files that may be spread over different fileservers. A local example at CERVO — the  **Plateforme d'Outils Moléculaires** — is supported, but the DCCLab, PDK, and Martin Levesque groups will be supported in the near future. 
+
+For each specific database, a new class inheriting from the `Database` object can be queried through a general SQL API but also specific-task-oriented API.  For example, the database allow requests such as:
+
+1. all images using the viral vector AAV-173,
+2. all images of microglia,
+3. all images of neurons from the subthalamic nucleus.
+
+The database is ready to use (i.e. `connected`) upon creation.  To begin using the `Database`, making queries or inserting into it, use the exposed API (e.g., `select(table, columns, condition) -> lite.Row:`) or execute an explicit SQL command (e.g., `    execute(statement)`). To create a new database, a `Database` object has to be created with `writePermission=True`. If it does not exist yet, the database will be created at the `Database.path` location (in **URI**).
 
