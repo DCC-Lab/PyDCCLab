@@ -186,7 +186,7 @@ class Image:
         for channel in self.channels:
             channel.setMaskFromThreshold(value)
 
-    def applyConvolution(self, matrix: typing.Union[np.ndarray, list]) -> None:
+    def applyConvolution(self, matrix: Union[np.ndarray, list]) -> None:
         for channel in self.channels:
             channel.applyConvolution(matrix)
 

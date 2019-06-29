@@ -235,7 +235,7 @@ class ImageCollection:
         for image in self.images:
             image.setMaskFromThreshold(value)
 
-    def applyConvolution(self, matrix: typing.Union[np.ndarray, list]) -> None:
+    def applyConvolution(self, matrix: Union[np.ndarray, list]) -> None:
         for image in self.images:
             image.applyConvolution(matrix)
 
