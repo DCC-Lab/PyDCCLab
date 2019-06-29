@@ -190,25 +190,23 @@ class Database:
             self.execute(statement)
 
     def asynchronous(self):
-    """ 
-    Asynchronous mode means the database doesn't wait for 
-    something to be entirely written before it begins
-    to write something else. It has the potential of corrupting entries
-    if the database crashed or there is a power failure. 
-    However, asynchronus mode is much faster. 
-    """
-    if self.isConnected:
-            self.execute('PRAGMA synchronous = OFF')
+    # Asynchronous mode means the database doesn't wait for 
+    # something to be entirely written before it begins
+    # to write something else. It has the potential of corrupting entries
+    # if the database crashed or there is a power failure. 
+    # However, asynchronus mode is much faster.
+
+        if self.isConnected:
+                self.execute('PRAGMA synchronous = OFF')
 
     def beginTransaction(self):
-    """ With isolation_level = None for our connection, we disable 
-    the python auto-handling of BEGIN, etc. We reset to the
-    default SQLite handling. By default, SQLite is in auto-commit mode.
-    It means that for each command, SQLite starts, processes, and
-    commits the transaction automatically. By issuing a BEGIN, we
-    override this and manually handle transaction commits. This allows
-    faster writing to the database.
-    """
+    # With isolation_level = None for our connection, we disable 
+    # the python auto-handling of BEGIN, etc. We reset to the
+    # default SQLite handling. By default, SQLite is in auto-commit mode.
+    # It means that for each command, SQLite starts, processes, and
+    # commits the transaction automatically. By issuing a BEGIN, we
+    # override this and manually handle transaction commits. This allows
+    # faster writing to the database.
         if self.isConnected:
             self.execute('BEGIN TRANSACTION')
 
