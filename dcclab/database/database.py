@@ -4,15 +4,25 @@ import pathlib
 
 
 class Database:
-    def __init__(self, path, mode='ro'):
-        # Possible modes are 'ro', 'rw', and 'rwc'. Default should be 'ro'.
+    def __init__(self, path, writePermission=False):
+        if writePermission is True:
+            # Possible modes are read-only, read write and read write create
+            # which are 'ro', 'rw', and 'rwc' respectively 
+            mode = 'rwc'
+        elif writePermission is False:
+            mode = 'ro'
+        else:
+            raise ValueError("writePermission parameter must be true or false")
+
         self.__mode = mode
         self.__path = path
         self.__connection = None
         self.cursor = None
 
-    def __del__(self):
-        self.disconnect()
+        self.connect()
+
+    # def __del__(self):
+    #     self.disconnect()
 
     @property
     def path(self):
@@ -29,8 +39,13 @@ class Database:
                 self.__connection = lite.connect(self.path, uri=True, isolation_level=None)
                 self.__connection.row_factory = lite.Row
                 self.cursor = self.__connection.cursor()
-                return True
+            return True
         except:
+            # Cleanup
+            if self.__connection is not None:
+                self.__connection.close()
+                self.cursor = None
+
             return False
 
     def disconnect(self):
@@ -44,11 +59,23 @@ class Database:
     def isConnected(self):
         return self.__connection is not None
 
-    def changeConnectionMode(self, mode):
+    def setPermissionToWrite(self):
         if self.isConnected:
             self.disconnect()
-        self.__mode = mode
+        self.__mode = 'rwc'
         self.connect()
+
+    def setPermissionToReadOnly(self):
+        if self.isConnected:
+            self.disconnect()
+        self.__mode = 'ro'
+        self.connect()
+
+    def changeConnectionMode(self, mode):
+        if mode == 'ro':
+            self.setPermissionToReadOnly()
+        elif mode == 'rwc' or mode == 'rw':
+            self.setPermissionToWrite()
 
     def commit(self):
         if self.isConnected:
@@ -124,13 +151,19 @@ class Database:
     # default SQLite handling. By default, SQLite is in auto-commit mode. It means that for each command, SQLite starts,
     # processes, and commits the transaction automatically. By issuing a BEGIN, we override this and manually handle
     # transactions. This allows faster writing on the database.
-    def begin(self):
+    def beginTransaction(self):
         if self.isConnected:
             self.execute('BEGIN TRANSACTION')
 
-    def end(self):
+    def endTransaction(self):
         if self.isConnected:
             self.execute('END TRANSACTION')
+
+    def begin(self):
+        self.beginTransaction()
+
+    def end(self):
+        self.endTransaction()
 
     # TODO Is this a necessary function?
     # If not, delete.
