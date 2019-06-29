@@ -9,7 +9,7 @@ class TestCziUtil(unittest.TestCase):
 
     def TestReadCziFile(self):
         import czifile
-        czi = cziUtil.readCziImage("testCziFile2Images.czi")
+        czi = cziUtil.readCziImage("testCziFileTwoChannels.czi")
         self.assertIsInstance(czi, czifile.CziFile)
         cziUtil.closeCziFileObject(czi)
 
@@ -22,19 +22,19 @@ class TestCziUtil(unittest.TestCase):
             cziUtil.readCziImage("testNotCziFile.jpg")
 
     def testClose(self):
-        czi = cziUtil.readCziImage("testCziFile2Images.czi")
+        czi = cziUtil.readCziImage("testCziFileTwoChannels.czi")
         cziUtil.closeCziFileObject(czi)
         with self.assertRaises(RuntimeError):
             cziUtil.getImagesFromCziFileObject(czi)
 
     def testExtractMetadatNoSave(self):
-        czi = cziUtil.readCziImage("testCziFile2Images.czi")
+        czi = cziUtil.readCziImage("testCziFileTwoChannels.czi")
         metadata = cziUtil.extractMetadataFromCziFileObject(czi)
         self.assertIsInstance(metadata, str)
         cziUtil.closeCziFileObject(czi)
 
     def testExtractMetadataSave(self):
-        czi = cziUtil.readCziImage("testCziFile2Images.czi")
+        czi = cziUtil.readCziImage("testCziFileTwoChannels.czi")
         cziUtil.extractMetadataFromCziFileObject(czi, "test_meta")
         cziUtil.closeCziFileObject(czi)
         ok = True
@@ -48,13 +48,13 @@ class TestCziUtil(unittest.TestCase):
 
 
     def testExtractImages(self):
-        czi = cziUtil.readCziImage("testCziFile2Images.czi")
+        czi = cziUtil.readCziImage("testCziFileTwoChannels.czi")
         images = cziUtil.getImagesFromCziFileObject(czi)
         cziUtil.closeCziFileObject(czi)
         self.assertIsInstance(images, np.ndarray)
 
     def testExtractNumberImages(self):
-        czi = cziUtil.readCziImage("testCziFile2Images.czi")
+        czi = cziUtil.readCziImage("testCziFileTwoChannels.czi")
         images = cziUtil.getImagesFromCziFileObject(czi)
         nb_images = images.shape[0]
         cziUtil.closeCziFileObject(czi)
@@ -62,20 +62,20 @@ class TestCziUtil(unittest.TestCase):
 
     @patch("matplotlib.pyplot.show", new=Mock)
     def testShowImages(self):
-        czi = cziUtil.readCziImage("testCziFile2Images.czi")
+        czi = cziUtil.readCziImage("testCziFileTwoChannels.czi")
         images = cziUtil.showImagesFromCziFileObject(czi)
         cziUtil.closeCziFileObject(czi)
         self.assertIsInstance(images, np.ndarray)
 
     def testSaveImagesToTIFF(self):
-        czi = cziUtil.readCziImage("testCziFile2Images.czi")
+        czi = cziUtil.readCziImage("testCziFileTwoChannels.czi")
         images = cziUtil.getImagesFromCziFileObject(czi)
         isSaved = cziUtil.saveImagesToTIFF(images, "testSaveTIFF")
         self.assertTrue(isSaved)
 
     def testSaveImagesToTIFFFilesExist(self):
         import os
-        czi = cziUtil.readCziImage("testCziFile2Images.czi")
+        czi = cziUtil.readCziImage("testCziFileTwoChannels.czi")
         images = cziUtil.getImagesFromCziFileObject(czi)
         cziUtil.saveImagesToTIFF(images, "testSaveTIFF")
         filesExist = True

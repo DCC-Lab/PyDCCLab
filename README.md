@@ -9,30 +9,6 @@ This module is a task-oriented module for image analysis: it provides simple too
 2. `Channel`: each image has one or several channels.  The channels, which correspond to specific fluorophores, can be manipulated with filters, threshold, segmentation and other operations. More complex methods like  watershed are also available to use.
 3. `ImageCollection`: can read a collection of image files (e.g., a directory, a z-stack, a map, etc...)
 
-## Database
-
-Currently under development, a `Database` class allows one to obtain files from various CERVO databases as well as creating new databases and tables from dictionaries. As of now, only the **Molecular Tools Platform** is supported, but the DCCLab, PDK group and Martin Levesque group will be supported in the near future.
-
-For example, the database will allow requests such as:
-
-1. All images using the viral vector AAV-173
-2. All images of microglia.
-3. All images of neurons from the subthalamic nucleus.
-
-To create a new database, a `Database` object has to be created in `rwc` (read, write, create) mode (by default, `Database` is in `ro` (read only) mode). If it does not exist yet, the database will be create at the `Database.path` location (in **URI**), otherwise `rwc` mode will be equivalent to `rw` (read, write) mode. To begin using the `Database`, making queries or inserting into it, you must always use `Database.connect()`. Since `Database` is a wrapper around `SQLite3` (for `python`), the most important functions are available, such as `.insert()`, `.execute()`, `.commit()`, `.select()`, `.fetchOne()`, etc... It is also possible to directly explore and query from the database using sqlite3.
-
-If you want to create new tables, a dictionary (*of dictionaries*) containing the tables' name and their associated keys/types has to be passed to `Database.createTable()`. It should be in the form :
-
-```
-{table_1: {key_1: type, key_2: type, key_3: type}, table_2: {key_1: type, key_2: type, key_3: type}, ...}
-```
-
-The `keys` property of the `Metadata` object, and its underlying objects, already handle the creation of the above dictionary. Knowing that, you can quickly create a table with `Database.createTable(Metadata.keys)`. To drop a table, use the `Database.dropTable()` function, passing it only the table's name. To insert data into the database, use `Database.insert()`, passing it the table into which you want to insert and a dictionary of keys with their associated values.
-
-`Database` objects are created with `isolation_level = None` by default. This is because `PEP` requires `python` to handle autocommits and transactions as a default stance. By setting `isolation_level` to `None`, we revert from `PEP` autocommit to `SQLite` autocommits. From there, it is possible, using `Database.begin()`, `Database.end()`, `Database.commit()` and `Database.rollBack()`, to manually control the transactions and commits. This allows us to greatly increase insert speed into the database. Similarly, `Database.asynchronous()` also changes properties of the database to allow for faster insert. **HOWEVER**, this is a dangerous function to use because it increases the chances of corrupt data in the database should the server crash or should there be a power failure.
-
-The `mtpDatabase` script in dcclab is meant to create the mtp.db database on the cafeine2 server, under dcclab/database. It contains the metadata of the **Molecular Tools Platform** `.csv` files under dcclab/database as well as the metadata from their `.czi` files in the cafeine2 server.
-
 ## Installation
 
 To install development versions, use:
@@ -53,8 +29,6 @@ img = Image('yourFile.tiff')
 img.display()
 
 ```
-
-
 
 ## Required modules for Image
 
@@ -112,4 +86,16 @@ coll.filterNoise()
 coll.applyGaussianFilter()
 coll.align()
 ```
+
+## Database
+
+Currently under development, a `Database` class allows one to manage files that may be spread over different fileservers. A local example at CERVO — the  **Plateforme d'Outils Moléculaires** — is supported, but the DCCLab, PDK, and Martin Levesque groups will be supported in the near future. 
+
+For each specific database, a new class inheriting from the `Database` object can be queried through a general SQL API but also specific-task-oriented API.  For example, the database allow requests such as:
+
+1. all images using the viral vector AAV-173,
+2. all images of microglia,
+3. all images of neurons from the subthalamic nucleus.
+
+The database is ready to use (i.e. `connected`) upon creation.  To begin using the `Database`, making queries or inserting into it, use the exposed API (e.g., `select(table, columns, condition) -> lite.Row:`) or execute an explicit SQL command (e.g., `    execute(statement)`). To create a new database, a `Database` object has to be created with `writePermission=True`. If it does not exist yet, the database will be created at the `Database.path` location (in **URI**).
 
