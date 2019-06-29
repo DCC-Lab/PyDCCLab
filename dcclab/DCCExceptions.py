@@ -57,3 +57,7 @@ class EmptyImageCollectionException(Exception):
 class EmptyDCCImageCollectionException(EmptyImageCollectionException):
     pass
 
+class FileAlreadyLoadedException(Exception):
+    def __init__(self, path:str):
+        Exception.__init__(self, "The file, {}, is already loaded.".format(path))
+

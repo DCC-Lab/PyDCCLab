@@ -1,16 +1,16 @@
-from .channel import *
+from .imageFile import CZIFile_, TIFFFile, PILFile, MATLABFile
+from .channel import Channel
 from .DCCExceptions import *
-from .cziUtil import *
-import tifffile
-import PIL
-from .imageFile import *
+import numpy as np
+import PIL.Image
+import matplotlib.pyplot as plt
 import os
 import re
 from typing import List, Union
 
 class Image:
 
-    supportedClasses = [CZIFile, TIFFFile, PILFile, MATLABFile]
+    supportedClasses = [CZIFile_, TIFFFile, PILFile, MATLABFile]
     supportedFormats = []
 
 
@@ -32,6 +32,8 @@ class Image:
                         self.channels = self.channelsFromImageData(imageData)
                         self.__fileObject = fileObject
                     break
+                except NotImplementedError as e:
+                    raise e
                 except:
                     continue
             if self.__fileObject is None:
