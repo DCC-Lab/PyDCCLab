@@ -1,4 +1,5 @@
-from dcclab import database as db
+import env
+from dcclab import Database as db
 import unittest
 import os
 
@@ -10,15 +11,17 @@ class TestDatabase(unittest.TestCase):
         self.wrongFile = os.path.join(self.directory, 'wrongfile.db')
 
         # For testing purpose, a fake database has to be built.
-        self.database = db.Database(self.filePath, 'rwc')
+        self.database = db(self.filePath, writePermission=True)
         self.database.connect()
 
         # We create a fake table.
+        self.database.begin()
         testTable = {'test_table': {'column_1': 'INTEGER PRIMARY KEY', 'column_2': 'TEXT', 'column_3': 'REAL'}}
         self.database.createTable(testTable)
         self.database.commit()
 
         # We create fake data and insert it into the table.
+        self.database.begin()
         frstValue = {'column_1': 1234, 'column_2': 'abcd', 'column_3': 0.1234}
         scndValue = {'column_1': 5678, 'column_2': 'efgh', 'column_3': 0.5678}
         self.database.insert('test_table', frstValue)
@@ -28,68 +31,75 @@ class TestDatabase(unittest.TestCase):
 
     def tearDown(self):
         # At the end of the test, we delete the database.
+        self.database.disconnect()
         os.remove(self.filePath)
 
     def testConnectSuccesfull(self):
-        database = db.Database(self.filePath)
+        database = db(self.filePath)
         self.assertTrue(database.connect())
         database.disconnect()
 
-    def testConnectUnsuccesfull(self):
-        database = db.Database(self.wrongFile)
+    def testConnectUnsuccessful(self):
+        database = db(self.wrongFile)
         self.assertFalse(database.connect())
         database.disconnect()
 
     def testConnectWithWrongMode(self):
-        database = db.Database(self.filePath, 'wrongmode')
-        self.assertFalse(database.connect())
-        database.disconnect()
+        with self.assertRaises(Exception):
+            database = db(self.filePath, 'wrongmode')
+            self.assertFalse(database.connect())
+            database.disconnect()
 
     def testConnectCreatesCursor(self):
-        database = db.Database(self.filePath)
+        database = db(self.filePath)
         database.connect()
         self.assertIsNotNone(database.cursor)
         database.disconnect()
 
     def testDisconnectSuccesfull(self):
-        database = db.Database(self.filePath)
+        database = db(self.filePath)
         database.connect()
         database.disconnect()
         self.assertFalse(database.isConnected)
 
     def testDisconnectRemovesCursor(self):
-        database = db.Database(self.filePath)
+        database = db(self.filePath)
         database.connect()
         database.disconnect()
         self.assertIsNone(database.cursor)
 
     def testIsConnected(self):
-        database = db.Database(self.filePath)
+        database = db(self.filePath)
         database.connect()
         self.assertTrue(database.isConnected)
         database.disconnect()
 
+    def testIsConnectedOnInit(self):
+        database = db(self.filePath)
+        self.assertTrue(database.isConnected)
+        database.disconnect()
+
     def testIsNotConnected(self):
-        database = db.Database(self.filePath)
+        database = db("blablabla")
         self.assertFalse(database.isConnected)
 
     def testChangeConnectionModeToValidMode(self):
-        database = db.Database(self.filePath, 'ro')
+        database = db(self.filePath)
         database.connect()
         database.changeConnectionMode('rw')
         self.assertNotEqual(database.mode, 'ro')
         database.disconnect()
 
     def testPathReadOnlyMode(self):
-        database = db.Database('unittest.db', 'ro')
+        database = db('unittest.db', writePermission=False)
         self.assertEqual(database.path, 'file:unittest.db?mode=ro')
 
     def testWindowsPathToPosix(self):
-        database = db.Database(r'C:\sqlite3\Database\test.db', 'rwc')
+        database = db(r'C:\sqlite3\Database\test.db', writePermission=True)
         self.assertEqual(database.path, 'file:C:/sqlite3/Database/test.db?mode=rwc')
 
     def testCommit(self):  # TODO Is there anything else we could test for Commit?
-        database = db.Database(self.filePath, 'rw')
+        database = db(self.filePath, writePermission=True)
         database.connect()
 
         testValue = {'column_1': 9101, 'column_2': 'plop', 'column_3': 0.9101}
@@ -100,21 +110,23 @@ class TestDatabase(unittest.TestCase):
         self.assertEqual(row[0]['column_1'], 9101)
         database.disconnect()
 
-    def testRollback(self):  # TODO Is there anything else we could test for Rollback?
-        database = db.Database(self.filePath, 'rw')
+    def testRollback(self):
+        database = db(self.filePath, writePermission=True)
         database.connect()
 
         testValue = {'column_1': 9101, 'column_2': 'plop', 'column_3': 0.9101}
+        database.begin()
         database.insert('test_table', testValue)
         database.rollback()
-        database.commit()
 
+        database.begin()
         row = database.select('test_table', 'column_1', 'column_1=9101')
+        database.end()
         self.assertFalse(row)
         database.disconnect()
 
     def testExecute(self):
-        database = db.Database(self.filePath, 'rw')
+        database = db(self.filePath, writePermission=True)
         database.connect()
 
         statement = 'DROP TABLE IF EXISTS test_table'
@@ -125,13 +137,13 @@ class TestDatabase(unittest.TestCase):
         database.disconnect()
 
     def testTables(self):
-        database = db.Database(self.filePath)
+        database = db(self.filePath)
         database.connect()
 
         self.assertEqual(database.tables[0], 'test_table')
 
     def testSelectResultsFound(self):
-        database = db.Database(self.filePath)
+        database = db(self.filePath)
         database.connect()
 
         rows = database.select('test_table', 'column_1', 'column_3<1')
@@ -139,14 +151,14 @@ class TestDatabase(unittest.TestCase):
             self.assertTrue(row['column_1'] == 1234 or 5678)
 
     def testSelectNoResultsFound(self):
-        database = db.Database(self.filePath)
+        database = db(self.filePath)
         database.connect()
 
         rows = database.select('test_table', 'column_1', 'column_2="aaaa"')
         self.assertFalse(rows)
 
     def testCreateTable(self):
-        database = db.Database(self.filePath, 'rw')
+        database = db(self.filePath, writePermission=True)
         database.connect()
 
         newTable = {'new_table': {'column_1': 'INTEGER PRIMARY KEY', 'column_2': 'TEXT'}}
@@ -156,7 +168,7 @@ class TestDatabase(unittest.TestCase):
         self.assertTrue(database.tables.index('new_table'))
 
     def testDropTable(self):
-        database = db.Database(self.filePath, 'rw')
+        database = db(self.filePath, writePermission=True)
         database.connect()
 
         database.dropTable('test_table')
@@ -165,7 +177,7 @@ class TestDatabase(unittest.TestCase):
         self.assertFalse(database.tables)
 
     def testInsert(self):
-        database = db.Database(self.filePath, 'rw')
+        database = db(self.filePath, writePermission=True)
         database.connect()
 
         testValue = {'column_1': 1121, 'column_2': 'bleh', 'column_3': 0.1121}
@@ -177,13 +189,12 @@ class TestDatabase(unittest.TestCase):
         database.disconnect()
 
     def testMode(self):
-        database = db.Database(self.filePath, 'rw')
+        database = db(self.filePath, writePermission=True)
         database.connect()
-
-        self.assertEqual(database.mode, 'rw')
+        self.assertEqual(database.mode, 'rwc')
 
     def testFetchAll(self):
-        database = db.Database(self.filePath)
+        database = db(self.filePath)
         database.connect()
 
         database.execute('SELECT * FROM test_table')
@@ -192,7 +203,7 @@ class TestDatabase(unittest.TestCase):
             self.assertTrue(row['column_1'] == 1234 or 5678)
 
     def testFetchOne(self):
-        database = db.Database(self.filePath)
+        database = db(self.filePath)
         database.connect()
 
         database.execute('SELECT * FROM test_table')

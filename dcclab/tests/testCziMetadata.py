@@ -1,3 +1,4 @@
+import env
 from dcclab import CZIMetadata as mtdt
 from dcclab import readCziImage
 import xml.etree.ElementTree as ET
@@ -5,7 +6,7 @@ import unittest
 import os
 
 
-class TestMetadata(unittest.TestCase):
+class TestCziMetadata(unittest.TestCase):
     def setUp(self):
         self.directory = os.path.dirname(__file__)
         self.testPath = os.path.join(self.directory, 'testCziFile.czi')
@@ -195,7 +196,7 @@ class TestMetadata(unittest.TestCase):
 
     def testAsDictExpectedValue(self):
         mdata = mtdt(self.testPath)
-        expectedValue = {'path': self.testPath, 'microscope': 'Axio Observer.Z1 / 7',
+        expectedValue = {'path': self.testPath, 'channels': 2, 'microscope': 'Axio Observer.Z1 / 7',
                          'objective': 'LD A-Plan 5x/0.15 Ph1', 'x_size': '1936', 'y_size': '1460',
                          'x_scale': '9.08E-07', 'y_scale': '9.08E-07', 'x_scaled': 0.001757888, 'y_scaled': 0.00132568,
                          'name': 'testCziFile.czi', 'mouse_id': None, 'viral_vectors': '', 'injection_site': None,

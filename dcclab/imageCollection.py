@@ -3,6 +3,8 @@ from .pathPattern import *
 import numpy as np
 import json
 import inspect
+from .image import Image
+
 import matplotlib.pyplot as plt
 from matplotlib.widgets import RectangleSelector
 from typing import List, Union

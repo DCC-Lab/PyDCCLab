@@ -14,8 +14,8 @@ def findFiles(directory, extension) -> list:
 
 def appendToZip(path, file):
     try:
-        with zipfile.ZipFile(path, 'a') as zip:
-            zip.write(file)
+        with zipfile.ZipFile(path, 'a') as zeep:
+            zeep.write(file)
     except:
         pass
 

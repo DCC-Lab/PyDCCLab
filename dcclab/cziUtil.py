@@ -89,24 +89,17 @@ def getImagesFromCziFileObject(cziObject):
     return np.array(arrayReturn)
 
 
-def decodeImages(cziObj, max_workers=None):
-    """Return image data from file(s) as numpy array.
-
-    Parameters
-    ----------
-    max_workers : int
-        Maximum number of threads to read and decode subblock data.
-        By default up to half the CPU cores are used.
+def decodeImages(cziObj, showProgress=False):
+    """Return image data from file(s) as numpy array and returns the list of tiles
 
     This is based on the czifil asarray method except it is modified so the data extraction is only done once.
     """
     maxSize = len(cziObj.filtered_subblock_directory)
-    print("Reading the pixel values of {} images. This may take a few minutes.".format(maxSize))
-    imagesQueue = multiprocessing.Queue(maxsize=maxSize)
+    if showProgress:
+        print("Reading the pixels value of {} tile{}. This may take a few minutes.".format(maxSize,
+                                                                                           "s" if maxSize > 1 else ""))
     out = tifffile.create_output(None, cziObj.shape, cziObj.dtype)
-
-    if max_workers is None:
-        max_workers = multiprocessing.cpu_count() // 2
+    returnList = []
 
     def func(directory_entry, start=cziObj.start, out=out):
         """Read, decode, and copy subblock data."""
@@ -115,32 +108,21 @@ def decodeImages(cziObj, max_workers=None):
 
         index = tuple(slice(i - j, i - j + k) for i, j, k in
                       zip(directory_entry.start, start, tile.shape))
-        channel = index[-4].stop - 1
-        imagesQueue.put((np.squeeze(tile), channel))
-        print("{} / {} images read".format(imagesQueue.qsize(), maxSize))
+        returnList.append((index, np.squeeze(tile)))
+        if showProgress:
+            print("{} / {} tile{} read".format(len(returnList), maxSize, "s" if len(returnList) > 1 else ""))
         try:
             out[index] = tile
         except ValueError as e:
             warnings.warn(str(e))
 
     before = time.clock()
-    if max_workers > 1:
-        cziObj._fh.lock = True
-        with ThreadPoolExecutor(max_workers) as executor:
-            executor.map(func, cziObj.filtered_subblock_directory)
-        cziObj._fh.lock = None
-    else:
-        for directory_entry in cziObj.filtered_subblock_directory:
-            func(directory_entry)
+    for directory_entry in cziObj.filtered_subblock_directory:
+        func(directory_entry)
     after = time.clock()
-    print("Reading data took {:.2f} seconds".format(after - before))
-    if hasattr(out, 'flush'):
-        out.flush()
-
-    returnList = []
-    while imagesQueue.qsize() != 0:
-        returnList.append(np.squeeze(imagesQueue.get()))
-    return np.squeeze(out), returnList
+    if showProgress:
+        print("Reading data took {:.2f} seconds".format(after - before))
+    return out, returnList
 
 
 def showImagesFromCziFileObject(cziObject):

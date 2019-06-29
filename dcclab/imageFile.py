@@ -3,20 +3,59 @@ from .channel import *
 import PIL.Image
 import scipy.io as sio
 
+
+
 class ImageFile(object):
     supportedFormats = []
 
     def __init__(self, path):
+        if not os.path.exists(path):
+            raise FileNotFoundError("{} does not exists.".format(path))
         self.path = path
 
-    def imageDataFromPath(self) -> np.ndarray:
-        return
+    def zStackData(self):
+        """
+        :return: images data as z-stack if possible
+        """
+        return None
 
+    def timeSeriesData(self):
+        """
+        :return: images data as a time series if possible
+        """
+        return None
+
+    def scenesData(self):
+        """
+        :return: images data as scenes if possible
+        """
+        return None
+
+    def imageData(self):
+        """
+        :return: image data (if coherent to return the data of a single image)
+        """
+        return None
+
+    def allData(self):
+        """
+        :return: all image data as a list (whether it is a time series, a zstack, a time series of zstack...)
+        """
+        return None
+
+    def mapData(self):
+        """
+        :return: images data as a map (key:x/y indexes, value: image data)
+        """
+        return None
+
+    # FIXME is it really necessary?
     def metadata(self):
         return
 
 
-class CZIFile(ImageFile):
+# This class is only temporary
+class CZIFile_(ImageFile):
     supportedFormats = ['czi']
 
     def __init__(self, path: str):
@@ -24,22 +63,42 @@ class CZIFile(ImageFile):
 
     def imageDataFromPath(self) -> np.ndarray:
         cziObj = readCziImage(self.path)
-        mosaic, self.__tilesWithChannelNumber = decodeImages(cziObj)
-        mosaic = np.squeeze(mosaic)
-        self.__numberOFChannels = mosaic.shape[-3]
+        axes = cziObj.axes
+        print(axes)
+        print(cziObj.shape)
+        if axes == "BSCYX0":
+            if cziObj.shape[1] != 1:
+                closeCziFileObject(cziObj)
+                raise NotImplementedError("Multiple scenes")
+        if axes not in ["BCYX0", "BSCYX0", "YX0"]:
+            closeCziFileObject(cziObj)
+            raise NotImplementedError(axes)
+        mosaic, self.__indexAndTiles = decodeImages(cziObj)
+        try:
+            cIndex = axes.index("C")
+        except ValueError:
+            cIndex = -1
+        self.__numberOFChannels = mosaic.shape[cIndex]
+        mosaic = mosaic.squeeze()
         closeCziFileObject(cziObj)
-        wholeImage = mosaic.transpose((1, 2, 0)) if mosaic.ndim == 3 else mosaic
+        if axes == "YX0":
+            wholeImage = mosaic
+        elif mosaic.ndim == 3:
+            wholeImage = mosaic.transpose((1, 2, 0))
+        else:
+            wholeImage = mosaic
         return wholeImage
 
 
 class TIFFFile(ImageFile):
-    supportedFormats = ['tif','tiff']
+    # todo implement parent's methods
+    supportedFormats = ['tif', 'tiff']
 
     def __init__(self, path):
         ImageFile.__init__(self, path)
 
     def imageDataFromPath(self) -> np.ndarray:
-        #todo better method that return every images if multipage
+        # todo better method that return every images if multipage
         tiffFileObject = tifffile.TiffFile(self.path)
         imageAsArray = tiffFileObject.asarray().astype(dtype="float32")
         self.__metadata = tiffFileObject.ome_metadata
@@ -50,6 +109,7 @@ class TIFFFile(ImageFile):
 
 
 class PILFile(ImageFile):
+    # todo implement parent's methods
     supportedFormats = ['(formats supported by PIL module))']
 
     def __init__(self, path):
@@ -60,10 +120,12 @@ class PILFile(ImageFile):
         imageAsArray = np.array(image)
         return imageAsArray
 
+
 class MATLABFile(ImageFile):
+    # todo implement parent's methods
     supportedFormats = ['mat']
 
-    def __init__(self, path, variable = None):
+    def __init__(self, path, variable=None):
         ImageFile.__init__(self, path)
         self.variable = variable
 
@@ -74,7 +136,7 @@ class MATLABFile(ImageFile):
             if array.ndim == 3:
                 return array
             elif array.ndim == 2:
-                return np.expand_dims(array,2) # always return 3D
+                return np.expand_dims(array, 2)  # always return 3D
             else:
                 raise ValueError("Not an image variable")
         else:
@@ -89,6 +151,6 @@ class MATLABFile(ImageFile):
                 variable = dataset[name]
                 if isinstance(variable, np.ndarray):
                     if variable.ndim == 2:
-                        return np.expand_dims(variable,2) # always return 3D
+                        return np.expand_dims(variable, 2)  # always return 3D
 
         return None
