@@ -3,6 +3,8 @@ import urllib.parse as parse
 import pathlib
 
 """
+General-purpose Databse() object.
+
 The database is ready to use (i.e. `connected`) upon creation.
 To begin using the `Database`, making queries or inserting into it,
 use the exposed API (e.g., `select(table, columns, condition) -> lite.Row:`)
@@ -49,11 +51,12 @@ cafeine2 server.
 
 """
 
+
 class Database:
     def __init__(self, path, writePermission=False):
         if writePermission is True:
             # Possible modes are read-only, read write and read write create
-            # which are 'ro', 'rw', and 'rwc' respectively 
+            # which are 'ro', 'rw', and 'rwc' respectively
             mode = 'rwc'
         elif writePermission is False:
             mode = 'ro'
@@ -67,9 +70,6 @@ class Database:
 
         self.connect()
 
-    # def __del__(self):
-    #     self.disconnect()
-
     @property
     def path(self):
         path = pathlib.Path(self.__path)
@@ -82,7 +82,8 @@ class Database:
     def connect(self):
         try:
             if not self.isConnected:
-                self.__connection = lite.connect(self.path, uri=True, isolation_level=None)
+                self.__connection = lite.connect(
+                    self.path, uri=True, isolation_level=None)
                 self.__connection.row_factory = lite.Row
                 self.cursor = self.__connection.cursor()
             return True
@@ -155,7 +156,8 @@ class Database:
             self.execute("SELECT {0} FROM {1}".format(columns, table))
             rows = self.fetchAll()
         else:
-            self.execute("SELECT {0} FROM {1} WHERE {2}".format(columns, table, condition))
+            self.execute("SELECT {0} FROM {1} WHERE {2}".format(
+                columns, table, condition))
             rows = self.fetchAll()
         return rows
 
@@ -183,21 +185,30 @@ class Database:
                 lstValues.append('"{}"'.format(str(values[key])))
             keys = ','.join(lstKeys)
             values = ','.join(lstValues)
-            statement = 'INSERT OR REPLACE INTO "{}" ({}) VALUES ({})'.format(table, keys, values)
+            statement = 'INSERT OR REPLACE INTO "{}" ({}) VALUES ({})'.format(
+                table, keys, values)
             self.execute(statement)
 
-    # WARNING : Asynchronus mode means the database doesn't wait for something to be entirely written before it begins
-    # to write something else. It has the potential of corrupting entries if the database crashed or there is a power
-    # failure. However, asynchronus mode is much faster.
     def asynchronous(self):
-        if self.isConnected:
+    """ 
+    Asynchronous mode means the database doesn't wait for 
+    something to be entirely written before it begins
+    to write something else. It has the potential of corrupting entries
+    if the database crashed or there is a power failure. 
+    However, asynchronus mode is much faster. 
+    """
+    if self.isConnected:
             self.execute('PRAGMA synchronous = OFF')
 
-    # With isolation_level = None for our connection, we disable the python auto-handling of BEGIN, etc. We reset to the
-    # default SQLite handling. By default, SQLite is in auto-commit mode. It means that for each command, SQLite starts,
-    # processes, and commits the transaction automatically. By issuing a BEGIN, we override this and manually handle
-    # transactions. This allows faster writing on the database.
     def beginTransaction(self):
+    """ With isolation_level = None for our connection, we disable 
+    the python auto-handling of BEGIN, etc. We reset to the
+    default SQLite handling. By default, SQLite is in auto-commit mode.
+    It means that for each command, SQLite starts, processes, and
+    commits the transaction automatically. By issuing a BEGIN, we
+    override this and manually handle transaction commits. This allows
+    faster writing to the database.
+    """
         if self.isConnected:
             self.execute('BEGIN TRANSACTION')
 
