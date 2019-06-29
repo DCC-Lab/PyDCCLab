@@ -20,8 +20,19 @@ Sometimes however, a user has a specific file and needs to comb through all the 
 
 The coding style for the group is available [online](https://github.com/DCC-Lab/Documentation/blob/master/HOWTO-CodingStyle.md). However, we highlight important aspects here:
 
-1. The code should read as a text.
-   Variable names and function names are important. A boolean variable can be called `isDone`. A table representing an image can be called `image`. A function can have an action verb in its name.
-2. We take a "camel-case" style, that is, the first letter is lowercase, and then each word is capitalized, as in `createRayPlot()`. We never use underscores (_) which are reserved for internal, hidden, private, low-level variables.
-3. Properties must be declared with `@property`.
-4. Functions shoudl have an action word (`applyFilter`).  If we "get" something, we use the name without `get` (i.e. `imageData`).  When we set something that is not a property, we use `set` (i.e. `setPermissionToReadOnly`)
+1. Plan for usage, not for coders.
+
+2. The code should read as a text.
+   Variable names and function names are important. A boolean variable can be called `isDone`. A table representing an image can be called `image`. A function can have an action verb in its name. 
+
+3. We do not need to use "array" in the name to describe an array, because it could be an array, a list, a set. We use th eplural form instead. For instance, in `Image`, the channels are kept in `Image().channels`, which happens to be a list. In `ImageCollection`, the images are in `images`.
+
+4. We take a "camel-case" style, that is, the first letter is lowercase, and then each word is capitalized, as in `createRayPlot()`. We never use underscores (_) which are reserved for internal, hidden, private, low-level variables.
+
+5. Properties must be declared with `@property`.
+
+6. Functions shoudl have an action word (`applyFilter`).  If we "get" something, we use the name without `get` (i.e. `imageData`).  When we set something that is not a property, we use `set` (i.e. `setPermissionToReadOnly`)
+
+7. Always expose as little as possible.
+
+   
