@@ -14,7 +14,7 @@ Sometimes however, a user has a specific file and needs to comb through all the 
 
 ## Class hierarchy
 
-![image-20190629120540243](assets/image-20190629120540243.png)
+![image-20190629121821276](assets/image-20190629120540243.png)
 
 ## Coding style
 
