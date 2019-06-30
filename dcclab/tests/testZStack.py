@@ -1,3 +1,4 @@
+import env
 from dcclab.imageCollection import ZStack, ImageCollection
 from unittest.mock import Mock, patch
 import numpy as np
