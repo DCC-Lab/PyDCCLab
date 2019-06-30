@@ -151,7 +151,7 @@ class TestChannelInteger(unittest.TestCase):
             computedSobel = channel.getVerticalSobelFilter()
         self.assertTrue(np.array_equal(computedSobel.pixels, sobelResult) and isinstance(computedSobel, ChannelFloat))
 
-    def testGetBothDirectionSobelFilter(self):
+    def testGetSobelFilter(self):
         array = np.zeros((5, 5), dtype=np.uint8)
         for i in range(1, 4):
             for j in range(1, 4):
@@ -167,7 +167,7 @@ class TestChannelInteger(unittest.TestCase):
         VSobelResult = HSobelResult.T
         with warnings.catch_warnings():
             warnings.simplefilter('ignore', category=UserWarning)
-            computedSobel = channel.getBothDirectionsSobelFilter()
+            computedSobel = channel.getSobelFilter()
         sobelResult = np.sqrt(HSobelResult ** 2 + VSobelResult ** 2) / np.sqrt(2)
         self.assertTrue(np.array_equal(computedSobel.pixels, sobelResult) and isinstance(computedSobel, ChannelFloat))
 

@@ -163,7 +163,7 @@ class TestChannelFloat(unittest.TestCase):
         vSobel = self.channelNotNormalized.convolveWith((np.array([[1, 2, 1], [0, 0, 0], [-1, -2, -1]]) / 4.0).T)
         HVSobel = np.sqrt(hSobel.pixels ** 2 + vSobel.pixels ** 2) / 2 ** (1 / 2)
         channelSobel = Channel(HVSobel)
-        self.assertEqual(self.channelNotNormalized.getBothDirectionsSobelFilter(), channelSobel)
+        self.assertEqual(self.channelNotNormalized.getSobelFilter(), channelSobel)
 
     def testConvertTo8BitsUint(self):
         array = (self.channelNotNormalized.pixels * 255).astype(np.uint8)

@@ -83,7 +83,7 @@ class ChannelInt(Channel):
     def getSobelFilter(self) -> Channel:
         warnings.warn("Converting to float32.")
         floatChannel = self.convertToNormalizedFloat()
-        return floatChannel.getBothDirectionsSobelFilter()
+        return floatChannel.getSobelFilter()
 
     def getIsodataThresholding(self) -> Channel:
         """
