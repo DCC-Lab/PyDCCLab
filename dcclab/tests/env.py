@@ -1,24 +1,20 @@
-import unittest
 import sys
 import os
+import unittest
 from pathlib import Path
 import tempfile
 
-# append module root directory to sys.path
-sys.path.insert(0,
-                os.path.dirname(
+class dcclabTestCase(unittest.TestCase):
+    dataDir = Path('./testData')
+    tmpDir = Path("{0}/{1}".format(tempfile.gettempdir(), "testfiles"))
+    testDir = Path(os.path.dirname(os.path.abspath(__file__) ))
+    moduleDir = os.path.dirname(
                     os.path.dirname(
                         os.path.dirname(
                             os.path.abspath(__file__)
                         )
                     )
                 )
-            )
-
-class dcclabTestCase(unittest.TestCase):
-    dataDir = Path('./testData')
-    tmpDir = Path("{0}/{1}".format(tempfile.gettempdir(), "testfiles"))
-  
     def __init__(self,tests=()):
         super(dcclabTestCase, self).__init__(tests)
 
@@ -40,5 +36,5 @@ class dcclabTestCase(unittest.TestCase):
             Path(self.tmpDir / filename).unlink()
         self.tmpDir.rmdir()
 
-tmpDir = dcclabTestCase.tmpDir
-dataDir = dcclabTestCase.dataDir
+# Very important:  append module root directory to sys.path
+sys.path.insert(0, dcclabTestCase.moduleDir)

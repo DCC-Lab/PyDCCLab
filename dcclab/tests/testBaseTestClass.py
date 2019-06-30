@@ -1,11 +1,16 @@
 import env
 import os
+from pathlib import Path
 
 class TestPatterns(env.dcclabTestCase):
     def testInit(self):
         self.assertIsNotNone(self.tmpDir)
         self.assertIsNotNone(self.dataDir)
 
+    def testTestDir(self):
+        self.assertIsNotNone(self.testDir)
+        self.assertTrue(os.path.exists(Path(self.testDir / 'env.py')))
+        
     def testTmpDirExists(self):
         self.assertTrue(os.path.exists(self.tmpDir), "Temporary directory not created")
 
