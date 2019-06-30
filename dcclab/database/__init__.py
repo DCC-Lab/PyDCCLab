@@ -3,6 +3,3 @@ namespace because it is simpler for everyone """
 
 from .database import *
 from .databaseUtilities import *
-
-__version__ = "0.9.0"
-__author__ = "Daniel Cote <dccote@cervo.ulaval.ca>"
