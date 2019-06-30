@@ -34,4 +34,4 @@ class dcclabTestCase(unittest.TestCase):
             self.tmpDir.rmdir()
 
 # Very important:  append module root directory to sys.path
-sys.path.insert(0, dcclabTestCase.moduleDir)
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))

@@ -7,24 +7,9 @@ import os
 
 
 class TestMetadata(env.dcclabTestCase):
-    tmpDir = Path("{0}/{1}".format(tempfile.gettempdir(), "testfiles"))
-    dataDir = Path('./testData')
-    @classmethod
-    def setUpClass(cls):
-        cls.tmpDir.mkdir( parents=True, exist_ok=True )
-
-    @classmethod
-    def tearDownClass(cls):
-        # for filename in cls.directory.iterdir():
-        #     Path(cls.directory / filename).unlink()
-        # cls.directory.rmdir()
-        return
-
     def setUp(self):
-
-        # self.directory = os.path.dirname(__file__)
         self.cziPath = Path(self.dataDir / 'testCziFile.czi')
-        self.csvPath = Path(self.dataDir / './unittest.csv')
+        self.csvPath = Path(self.dataDir / 'unittest.csv')
 
         with open(self.csvPath, 'w') as file:
             file.write('field_1,field_2,field_3\n')

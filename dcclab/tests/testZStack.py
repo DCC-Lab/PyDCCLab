@@ -1,6 +1,6 @@
 import env
-from dcclab.imageCollection import ZStack, ImageCollection
-from unittest.mock import Mock, patch
+from dcclab import *
+#from unittest.mock import Mock, patch
 import numpy as np
 import unittest
 import os
@@ -180,22 +180,18 @@ class TestZStackFrom3DArray(env.dcclabTestCase):
         self.zStack.setLabel()
         self.zStack.parameterize()
 
-        filepath = "$testParams$.json"
+        filepath = Path(self.tmpDir / "testParams.json")
         self.zStack.saveParamsToFile(filepath)
-
         self.assertTrue(os.path.exists(filepath))
-        os.remove(filepath)
 
     def testSaveParamsToBadFileExt(self):
         self.zStack.setMask(maskClosing=1)
         self.zStack.setLabel()
         self.zStack.parameterize()
 
-        filepath = "$testParams$.txt"
+        filepath = Path(self.tmpDir / "testParams.txt")
         self.zStack.saveParamsToFile(filepath)
-
         self.assertTrue(os.path.exists(filepath + ".json"))
-        os.remove(filepath + ".json")
 
     @patch("matplotlib.pyplot.show", new=Mock)
     def testShow(self):
