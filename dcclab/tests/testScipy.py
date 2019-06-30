@@ -1,3 +1,4 @@
+import env
 from scipy import ndimage, misc, sparse
 import numpy as np
 import unittest
