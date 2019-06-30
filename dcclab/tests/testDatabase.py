@@ -5,10 +5,10 @@ import os
 from pathlib import Path, PureWindowsPath
 import tempfile
 
-class TestDatabase(unittest.TestCase):
+class TestDatabase(env.dcclabTestCase):
     def setUp(self):
-        self.directory = env.dataDir
-        self.filePath = os.path.join(env.tmpDir, 'unittest.db')
+        self.directory = self.dataDir
+        self.filePath = os.path.join(self.tmpDir, 'unittest.db')
         self.wrongFile = os.path.join(self.directory, 'wrongfile.db')
 
         # For testing purpose, a fake database has to be built.
@@ -35,7 +35,7 @@ class TestDatabase(unittest.TestCase):
         self.database.disconnect()
         os.remove(self.filePath)
 
-    def testConnectSuccesfull(self):
+    def testConnectSuccessful(self):
         database = db(self.filePath)
         self.assertTrue(database.connect())
         database.disconnect()

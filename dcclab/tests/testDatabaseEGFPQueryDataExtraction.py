@@ -8,10 +8,10 @@ if __name__ == '__main__':
     listOfAverages = []
     listOfStdDev = []
 
-    readQuery = open(Path(env.dataDir /r"query_egfp.csv"), "r",
+    readQuery = open(Path(self.dataDir /r"query_egfp.csv"), "r",
                      encoding="utf-8")
 
-    writeResults = open(Path(env.dataDir /r"query_egfp_results.csv"),
+    writeResults = open(Path(self.dataDir /r"query_egfp_results.csv"),
                         "w", encoding="utf-8")
 
     lines = readQuery.readlines()

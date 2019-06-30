@@ -4,7 +4,7 @@ import unittest
 import numpy as np
 
 
-class TestChannelInteger(unittest.TestCase):
+class TestChannelInteger(env.dcclabTestCase):
     def setUp(self) -> None:
         array = np.ones((5, 5), dtype=np.uint8)
         self.channelUint8 = Channel(array)

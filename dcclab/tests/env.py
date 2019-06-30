@@ -40,3 +40,5 @@ class dcclabTestCase(unittest.TestCase):
             Path(self.tmpDir / filename).unlink()
         self.tmpDir.rmdir()
 
+tmpDir = dcclabTestCase.tmpDir
+dataDir = dcclabTestCase.dataDir

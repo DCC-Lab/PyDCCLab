@@ -5,9 +5,9 @@ import xml.etree.ElementTree as ET
 import unittest
 import os
 
-class TestFilter(unittest.TestCase):
+class TestFilter(env.dcclabTestCase):
     def setUp(self):
-        self.directory = env.dataDir
+        self.directory = self.dataDir
         self.testPath = os.path.join(self.directory, 'testCziFile.czi')
         self.missingEntriesPath = os.path.join(self.directory, 'MissingEntries.xml')
         self.meta = mtdt(self.testPath)

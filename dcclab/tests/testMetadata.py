@@ -6,7 +6,7 @@ import unittest
 import os
 
 
-class TestMetadata(unittest.TestCase):
+class TestMetadata(env.dcclabTestCase):
     tmpDir = Path("{0}/{1}".format(tempfile.gettempdir(), "testfiles"))
     dataDir = Path('./testData')
     @classmethod

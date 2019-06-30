@@ -5,7 +5,7 @@ import unittest
 import numpy as np
 import re
 
-class TestImageCollection(unittest.TestCase):
+class TestImageCollection(env.dcclabTestCase):
     @classmethod
     def setUpClass(cls):
         super(TestImageCollection, cls).setUpClass()
@@ -34,7 +34,7 @@ class TestImageCollection(unittest.TestCase):
         self.assertTrue(coll.images == [])
 
     def testTestFilesArePresent(self):
-        pat = PathPattern(Path(env.dataDir / r'test-(\d+).jpg'))
+        pat = PathPattern(Path(self.dataDir / r'test-(\d+).jpg'))
         self.assertTrue(pat.matchingFiles() == ['./test-001.jpg','./test-002.jpg','./test-003.jpg'])
 
     def testInitWithPatternAndFiles(self):

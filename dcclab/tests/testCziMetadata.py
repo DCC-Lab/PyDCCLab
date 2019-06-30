@@ -6,9 +6,9 @@ import unittest
 import os
 
 
-class TestCziMetadata(unittest.TestCase):
+class TestCziMetadata(env.dcclabTestCase):
     def setUp(self):
-        self.directory = env.dataDir
+        self.directory = self.dataDir
         self.testPath = os.path.join(self.directory, 'testCziFile.czi')
         self.wrongFilePath = os.path.join(self.directory, 'wrongfilename.czi')
         self.wrongFileType = os.path.join(self.directory, 'wrongFile.txt')

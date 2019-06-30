@@ -3,7 +3,7 @@ import numpy as np
 import unittest
 
 
-class TestScipyFilters(unittest.TestCase):
+class TestScipyFilters(env.dcclabTestCase):
     """ Testing if scipy filters are dimension dependent """
 
     def setUp(self):
