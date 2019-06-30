@@ -1,8 +1,9 @@
 import env
+import unittest
 import os
 from pathlib import Path
 
-class TestPatterns(env.dcclabTestCase):
+class TestBaseClass(env.dcclabTestCase):
     def testInit(self):
         self.assertIsNotNone(self.tmpDir)
         self.assertIsNotNone(self.dataDir)
@@ -18,6 +19,15 @@ class TestPatterns(env.dcclabTestCase):
     def testTmpDirExists(self):
         self.assertTrue(os.path.exists(self.tmpDir), "Temporary directory not created")
 
+    def testTmpDirCanBeEmptied(self):
+        someFile = Path(self.tmpDir / "abcd.txt")
+        someFile.write_bytes(b'1')
+        self.assertTrue(someFile.exists())
+        self.deleteTempDirectoriesAndFiles()
+        self.assertFalse(self.tmpDir.exists())
+        #but we need to recreate because that is what the class expects
+        self.createTempDirectories()
+ 
     def testTmpDirIsEmpty(self):
         files = []
         for filename in Path(self.tmpDir).iterdir():

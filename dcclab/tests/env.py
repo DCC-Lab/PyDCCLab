@@ -27,9 +27,11 @@ class dcclabTestCase(unittest.TestCase):
 
     @classmethod
     def deleteTempDirectoriesAndFiles(self):
-        for filename in self.tmpDir.iterdir():
-            Path(self.tmpDir / filename).unlink()
-        self.tmpDir.rmdir()
+        # It's ok if it has been deleted at this point
+        if self.tmpDir.exists():
+            for filename in self.tmpDir.iterdir():
+                Path(self.tmpDir / filename).unlink()
+            self.tmpDir.rmdir()
 
 # Very important:  append module root directory to sys.path
 sys.path.insert(0, dcclabTestCase.moduleDir)
