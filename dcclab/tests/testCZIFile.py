@@ -3,13 +3,12 @@ import unittest
 from dcclab import CZIFile_ as CZIFile
 import czifile
 import numpy as np
-
-
+from pathlib import Path, PureWindowsPath
 
 class TestCZIFile(unittest.TestCase):
 
     def testAxesNotSupported(self):
-        czi = CZIFile("testCziAxesNotYetSupported.czi")
+        czi = CZIFile(Path(env.dataDir / "testCziAxesNotYetSupported.czi"))
         try:
             czi.imageDataFromPath()
             self.fail("If this is reached, no exception raised!")
@@ -17,7 +16,7 @@ class TestCZIFile(unittest.TestCase):
             self.assertEqual(str(e), "BSTCYX0")
 
     def testMultiSceneCZI(self):
-        czi = CZIFile("testCziMultipleScenes.czi")
+        czi = CZIFile(Path(env.dataDir / "testCziMultipleScenes.czi"))
         try:
             czi.imageDataFromPath()
             self.fail("If this is reached, no exception raised!")
@@ -25,39 +24,39 @@ class TestCZIFile(unittest.TestCase):
             self.assertEqual(str(e), "Multiple scenes")
 
     def testMosaicOutputOneChannel(self):
-        obj = czifile.CziFile("testCziOneChannel.czi")
+        obj = czifile.CziFile(Path(env.dataDir / "testCziOneChannel.czi"))
         array = obj.asarray(max_workers=1)
         array = array.squeeze()
         obj.close()
-        czi = CZIFile("testCziOneChannel.czi")
+        czi = CZIFile(Path(env.dataDir / "testCziOneChannel.czi"))
         image = czi.imageDataFromPath()
         self.assertTrue(np.array_equal(array, image))
 
     def testMosaicOutputTwoChannels(self):
-        obj = czifile.CziFile("testCziFileTwoChannels.czi")
+        obj = czifile.CziFile(Path(env.dataDir / "testCziFileTwoChannels.czi"))
         array = obj.asarray(max_workers=1)
         array = array.squeeze().transpose((1, 2, 0))
         obj.close()
-        czi = CZIFile("testCziFileTwoChannels.czi")
+        czi = CZIFile(Path(env.dataDir / "testCziFileTwoChannels.czi"))
         image = czi.imageDataFromPath()
         print(image.shape, array.shape)
         self.assertTrue(np.array_equal(array, image))
 
     def testMosaicOutputThreeChannels(self):
-        obj = czifile.CziFile("testCziThreeChannelsOneScene.czi")
+        obj = czifile.CziFile(Path(env.dataDir / "testCziThreeChannelsOneScene.czi"))
         array = obj.asarray(max_workers=1)
         array = array.squeeze().transpose((1, 2, 0))
         obj.close()
-        czi = CZIFile("testCziThreeChannelsOneScene.czi")
+        czi = CZIFile(Path(env.dataDir / "testCziThreeChannelsOneScene.czi"))
         image = czi.imageDataFromPath()
         self.assertTrue(np.array_equal(array, image))
 
     def testMosaicOutputYX0Axes(self):
-        obj = czifile.CziFile("testCziFileYX0Axes.czi")
+        obj = czifile.CziFile(Path(env.dataDir / "testCziFileYX0Axes.czi"))
         array = obj.asarray(max_workers=1)
         array = array.squeeze()
         obj.close()
-        czi = CZIFile("testCziFileYX0Axes.czi")
+        czi = CZIFile(Path(env.dataDir / "testCziFileYX0Axes.czi"))
         image = czi.imageDataFromPath()
         self.assertTrue(np.array_equal(array, image))
 

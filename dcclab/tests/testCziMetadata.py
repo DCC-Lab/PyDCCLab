@@ -8,7 +8,7 @@ import os
 
 class TestCziMetadata(unittest.TestCase):
     def setUp(self):
-        self.directory = os.path.dirname(__file__)
+        self.directory = env.dataDir
         self.testPath = os.path.join(self.directory, 'testCziFile.czi')
         self.wrongFilePath = os.path.join(self.directory, 'wrongfilename.czi')
         self.wrongFileType = os.path.join(self.directory, 'wrongFile.txt')

@@ -1,14 +1,30 @@
 import env
 from dcclab import Metadata
+from pathlib import Path, PureWindowsPath
+import tempfile
 import unittest
 import os
 
 
 class TestMetadata(unittest.TestCase):
+    tmpDir = Path("{0}/{1}".format(tempfile.gettempdir(), "testfiles"))
+    dataDir = Path('./testData')
+    @classmethod
+    def setUpClass(cls):
+        cls.tmpDir.mkdir( parents=True, exist_ok=True )
+
+    @classmethod
+    def tearDownClass(cls):
+        # for filename in cls.directory.iterdir():
+        #     Path(cls.directory / filename).unlink()
+        # cls.directory.rmdir()
+        return
+
     def setUp(self):
-        self.directory = os.path.dirname(__file__)
-        self.cziPath = os.path.join(self.directory, 'testCziFile.czi')
-        self.csvPath = os.path.join(self.directory, 'unittest.csv')
+
+        # self.directory = os.path.dirname(__file__)
+        self.cziPath = Path(self.dataDir / 'testCziFile.czi')
+        self.csvPath = Path(self.dataDir / './unittest.csv')
 
         with open(self.csvPath, 'w') as file:
             file.write('field_1,field_2,field_3\n')
@@ -16,15 +32,12 @@ class TestMetadata(unittest.TestCase):
             file.write('100,0.123,apple\n')
             file.write('200,0.456,orange\n')
 
-    def tearDown(self):
-        os.remove(self.csvPath)
-
     def testWrongFileType(self):
-        wrongFile = os.path.join(self.directory, 'test.db')
+        wrongFile = Path(self.dataDir / 'test.db')
         with self.assertRaises(TypeError): Metadata(wrongFile)
 
     def testNoFile(self):
-        noFile = os.path.join(self.directory, 'nonexistant.file')
+        noFile = Path(self.dataDir / 'nonexistant.file')
         with self.assertRaises(ValueError): Metadata(noFile)
 
     def testFileTypeIsCzi(self):

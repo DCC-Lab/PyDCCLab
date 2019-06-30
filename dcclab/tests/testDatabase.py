@@ -2,12 +2,13 @@ import env
 from dcclab import Database as db
 import unittest
 import os
-
+from pathlib import Path, PureWindowsPath
+import tempfile
 
 class TestDatabase(unittest.TestCase):
     def setUp(self):
-        self.directory = os.path.dirname(__file__)
-        self.filePath = os.path.join(self.directory, 'unittest.db')
+        self.directory = env.dataDir
+        self.filePath = os.path.join(env.tmpDir, 'unittest.db')
         self.wrongFile = os.path.join(self.directory, 'wrongfile.db')
 
         # For testing purpose, a fake database has to be built.

@@ -1,16 +1,17 @@
 import env
 from dcclab import Image, cziUtil
 import os
+from pathlib import Path, PureWindowsPath
 
 # For this test, the query was done by Mathieu on his computer. Selected channel is mCherry
 if __name__ == '__main__':
     listOfAverages = []
     listOfStdDev = []
 
-    readQuery = open(r"query_DAPI.csv", "r",
+    readQuery = open(Path(env.dataDir / r"query_DAPI.csv"), "r",
                      encoding="utf-8")
 
-    writeResults = open(r"query_DAPI_results.csv",
+    writeResults = open(Path(env.dataDir /r"query_DAPI_results.csv"),
                         "w", encoding="utf-8")
 
     lines = readQuery.readlines()

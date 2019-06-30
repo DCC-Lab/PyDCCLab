@@ -34,7 +34,7 @@ class TestImageCollection(unittest.TestCase):
         self.assertTrue(coll.images == [])
 
     def testTestFilesArePresent(self):
-        pat = PathPattern(r'test-(\d+).jpg')
+        pat = PathPattern(Path(env.dataDir / r'test-(\d+).jpg'))
         self.assertTrue(pat.matchingFiles() == ['./test-001.jpg','./test-002.jpg','./test-003.jpg'])
 
     def testInitWithPatternAndFiles(self):
