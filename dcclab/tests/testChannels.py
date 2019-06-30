@@ -3,7 +3,7 @@ from dcclab import *
 import unittest
 import numpy as np
 
-class TestChannels(unittest.TestCase):
+class TestChannels(env.dcclabTestCase):
 
     def testInitWith2DIntArray(self):
         array = np.ones((100, 100), dtype=np.int)
@@ -150,7 +150,7 @@ class TestChannels(unittest.TestCase):
         self.assertIsNotNone(channel)
 
 
-class TestChannelsSegmentation(unittest.TestCase):
+class TestChannelsSegmentation(env.dcclabTestCase):
     def testNoMaskOnInit(self):
         array = np.array([[0, 1, 2],[0, 1, 2],[0, 1, 2]])
         channel = Channel(array)

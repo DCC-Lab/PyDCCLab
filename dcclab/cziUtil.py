@@ -116,10 +116,10 @@ def decodeImages(cziObj, showProgress=False):
         except ValueError as e:
             warnings.warn(str(e))
 
-    before = time.clock()
+    before = time.perf_counter()
     for directory_entry in cziObj.filtered_subblock_directory:
         func(directory_entry)
-    after = time.clock()
+    after = time.perf_counter()
     if showProgress:
         print("Reading data took {:.2f} seconds".format(after - before))
     return out, returnList

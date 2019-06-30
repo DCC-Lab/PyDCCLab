@@ -6,9 +6,9 @@ import unittest
 import os
 
 
-class TestCziMetadata(unittest.TestCase):
+class TestCziMetadata(env.dcclabTestCase):
     def setUp(self):
-        self.directory = os.path.dirname(__file__)
+        self.directory = self.dataDir
         self.testPath = os.path.join(self.directory, 'testCziFile.czi')
         self.wrongFilePath = os.path.join(self.directory, 'wrongfilename.czi')
         self.wrongFileType = os.path.join(self.directory, 'wrongFile.txt')
@@ -17,7 +17,11 @@ class TestCziMetadata(unittest.TestCase):
 
     def testCziImageObjectFromPathIsCziImageObject(self):
         mdata = mtdt(self.testPath)
-        self.assertIs(type(mdata.cziImageObjectFromPath()), type(readCziImage(self.testPath)))
+        file1 = mdata.cziImageObjectFromPath()
+        file2 = readCziImage(self.testPath)
+        self.assertIs(type(file1), type(file2))
+        file1.close()
+        file2.close()
 
     def testCziImageObjectFromPathFileNotFound(self):
         mdata = mtdt(self.testPath)
@@ -33,6 +37,7 @@ class TestCziMetadata(unittest.TestCase):
         mdata = mtdt(self.testPath)
         cziImageObject = mdata.cziImageObjectFromPath()
         self.assertIs(type(mdata.xmlFromCziImageObject(cziImageObject)), str)
+        cziImageObject.close()
 
     def testXmlFromCziImageObjectWrongTypeOfObject(self):
         mdata = mtdt(self.testPath)

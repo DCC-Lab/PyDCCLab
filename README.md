@@ -30,8 +30,6 @@ img.display()
 
 ```
 
-
-
 ## Required modules for Image
 
 If installed through `python setup.py install -f`, all modules should install automatically.  If needed, you may install the following modules:
@@ -88,8 +86,6 @@ coll.filterNoise()
 coll.applyGaussianFilter()
 coll.align()
 ```
-
-
 
 ## Database
 

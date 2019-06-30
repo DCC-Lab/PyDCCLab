@@ -6,9 +6,9 @@ import unittest
 import os
 
 
-class TestCziChannel(unittest.TestCase):
+class TestCziChannel(env.dcclabTestCase):
     def setUp(self):
-        self.directory = os.path.dirname(__file__)
+        self.directory = self.dataDir
         self.testPath = os.path.join(self.directory, 'testCziFile.czi')
         self.missingEntriesPath = os.path.join(self.directory, 'MissingEntries.xml')
         self.missingKeysPath = os.path.join(self.directory, 'MissingKeys.xml')
