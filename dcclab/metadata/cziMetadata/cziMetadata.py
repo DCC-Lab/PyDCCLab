@@ -88,6 +88,7 @@ class CZIMetadata:
     def createElementTreeRoot(self):
         cziImageObject = self.cziImageObjectFromPath()
         stringXML = self.xmlFromCziImageObject(cziImageObject)
+        cziImageObject.close()
         return ET.fromstring(stringXML)
 
     def checkIfElementHasChildren(self, element):

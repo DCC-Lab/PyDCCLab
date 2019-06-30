@@ -2,7 +2,7 @@ import env
 from dcclab import *
 import unittest
 
-class TestTimeSeries(unittest.TestCase):
+class TestTimeSeries(env.dcclabTestCase):
 
     def testInit(self):
         self.assertIsNotNone(TimeSeries())

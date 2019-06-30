@@ -18,7 +18,6 @@ if __name__ == '__main__':
     # Then we connect to the database.
     # Database is in asynchronous mode for faster inserts.
     print('Connecting to database...')
-
     if os.path.exists(mtpPath):
         print('Database already exists.')
         database = Database(mtpPath, 'rw')

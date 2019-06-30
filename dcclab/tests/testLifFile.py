@@ -1,16 +1,16 @@
 import env
 from dcclab import *
 from dcclab.__lifReader import LifSerie
-#from dcclab.imageCollection import LIFFile
 import unittest
+from pathlib import Path, PureWindowsPath
 
 # TODO: create ZStack Objects instead and test
 
 
-class TestLifFile(unittest.TestCase):
+class TestLifFile(env.dcclabTestCase):
 
     def setUp(self):
-        self.lifObj = LIFFile('test_LifFile.lif')
+        self.lifObj = LIFFile(Path(self.dataDir / 'test_LifFile.lif'))
 
     def testInitWithLifFile(self):
         self.assertIsNotNone(self.lifObj)

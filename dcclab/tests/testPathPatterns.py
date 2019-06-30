@@ -1,25 +1,14 @@
 import env
-from dcclab import *
+import os
 import unittest
 import numpy as np
 import re
-from pathlib import Path, PureWindowsPath
-import tempfile
-from testUtils import *
 import time
 
+from dcclab import PathPattern
+from pathlib import Path, PureWindowsPath
 
-class TestPatterns(unittest.TestCase):
-    def setUp(self):
-        self.tmpdir = Path("{0}/{1}".format(tempfile.gettempdir(), "images"))
-        self.tmpdir.mkdir( parents=True, exist_ok=True )
-
-    def tearDown(self):
-        for filename in self.tmpdir.iterdir():
-            Path(self.tmpdir / filename).unlink()
-        self.tmpdir.rmdir()
-
-
+class TestPatterns(env.dcclabTestCase):
     def testInit(self):
         self.assertIsNotNone(PathPattern('abc'))
 
@@ -181,9 +170,6 @@ class TestPatterns(unittest.TestCase):
                 for k in range(4):
                     with self.assertRaises(ValueError):
                         pat.filePathWithIndex(i,j,k)
-
-    def testTestDirPresent(self):
-        self.assertTrue(self.tmpdir)
 
 if __name__ == '__main__':
     unittest.main()

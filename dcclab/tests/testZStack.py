@@ -1,5 +1,6 @@
-from dcclab.imageCollection import ZStack, ImageCollection
-from unittest.mock import Mock, patch
+import env
+from dcclab import *
+#from unittest.mock import Mock, patch
 import numpy as np
 import unittest
 import os
@@ -8,7 +9,7 @@ import os
 # Todo: I can prepare a small stack sample folder.
 
 
-class TestZStackFrom3DArray(unittest.TestCase):
+class TestZStackFrom3DArray(env.dcclabTestCase):
 
     def setUp(self):
         self.depth = 5
@@ -179,22 +180,18 @@ class TestZStackFrom3DArray(unittest.TestCase):
         self.zStack.setLabel()
         self.zStack.parameterize()
 
-        filepath = "$testParams$.json"
+        filepath = Path(self.tmpDir / "testParams.json")
         self.zStack.saveParamsToFile(filepath)
-
         self.assertTrue(os.path.exists(filepath))
-        os.remove(filepath)
 
     def testSaveParamsToBadFileExt(self):
         self.zStack.setMask(maskClosing=1)
         self.zStack.setLabel()
         self.zStack.parameterize()
 
-        filepath = "$testParams$.txt"
+        filepath = Path(self.tmpDir / "testParams.txt")
         self.zStack.saveParamsToFile(filepath)
-
         self.assertTrue(os.path.exists(filepath + ".json"))
-        os.remove(filepath + ".json")
 
     @patch("matplotlib.pyplot.show", new=Mock)
     def testShow(self):
@@ -205,14 +202,14 @@ class TestZStackFrom3DArray(unittest.TestCase):
         pass
 
 
-class TestZStackFrom4DArray(unittest.TestCase):
+class TestZStackFrom4DArray(env.dcclabTestCase):
 
     @unittest.skip("Collection from 4D arrays is Not Implemented")
     def testZStackFromRGBArray(self):
         RGBStack = np.zeros((40, 40, 10, 3))
 
 
-class TestZStackFromImages(unittest.TestCase):
+class TestZStackFromImages(env.dcclabTestCase):
 
     def testImagesAreSimilar(self):
         pass
