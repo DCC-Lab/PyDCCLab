@@ -7,16 +7,20 @@ class TestPatterns(env.dcclabTestCase):
         self.assertIsNotNone(self.tmpDir)
         self.assertIsNotNone(self.dataDir)
 
+    def testModuleDir(self):
+        self.assertIsNotNone(self.moduleDir)
+        self.assertTrue(os.path.exists(Path(self.moduleDir / 'dcclab')))
+
     def testTestDir(self):
-        self.assertIsNotNone(self.testDir)
-        self.assertTrue(os.path.exists(Path(self.testDir / 'env.py')))
-        
+        self.assertIsNotNone(self.testsDir)
+        self.assertTrue(os.path.exists(Path(self.testsDir / 'env.py')))
+
     def testTmpDirExists(self):
         self.assertTrue(os.path.exists(self.tmpDir), "Temporary directory not created")
 
     def testTmpDirIsEmpty(self):
         files = []
-        for filename in self.tmpDir.iterdir():
+        for filename in Path(self.tmpDir).iterdir():
             files.append(filename)
         self.assertTrue(len(files) == 0, "Temporary directory empty")
 

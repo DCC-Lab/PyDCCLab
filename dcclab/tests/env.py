@@ -1,20 +1,15 @@
 import sys
 import os
 import unittest
-from pathlib import Path
 import tempfile
+from pathlib import Path
 
 class dcclabTestCase(unittest.TestCase):
-    dataDir = Path('./testData')
-    tmpDir = Path("{0}/{1}".format(tempfile.gettempdir(), "testfiles"))
-    testDir = Path(os.path.dirname(os.path.abspath(__file__) ))
-    moduleDir = os.path.dirname(
-                    os.path.dirname(
-                        os.path.dirname(
-                            os.path.abspath(__file__)
-                        )
-                    )
-                )
+    moduleDir = Path(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))) 
+    tmpDir = Path(os.path.join(tempfile.gettempdir(), "testfiles"))
+    testsDir = Path(os.path.dirname(os.path.abspath(__file__) ))
+    dataDir = Path(os.path.join(testsDir, 'testData'))
+
     def __init__(self,tests=()):
         super(dcclabTestCase, self).__init__(tests)
 
