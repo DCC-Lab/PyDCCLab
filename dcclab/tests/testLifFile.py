@@ -7,10 +7,10 @@ from pathlib import Path, PureWindowsPath
 # TODO: create ZStack Objects instead and test
 
 
-class TestLifFile(unittest.TestCase):
+class TestLifFile(env.dcclabTestCase):
 
     def setUp(self):
-        self.lifObj = LIFFile(Path(env.dataDir / 'test_LifFile.lif'))
+        self.lifObj = LIFFile(Path(self.dataDir / 'test_LifFile.lif'))
 
     def testInitWithLifFile(self):
         self.assertIsNotNone(self.lifObj)

@@ -5,7 +5,7 @@ import unittest
 import numpy as np
 import re
 
-class TestImageCollection(unittest.TestCase):
+class TestImageCollection(env.dcclabTestCase):
     @classmethod
     def setUpClass(cls):
         super(TestImageCollection, cls).setUpClass()
@@ -28,21 +28,22 @@ class TestImageCollection(unittest.TestCase):
         self.assertIsNotNone(ImageCollection())
 
     def testInitWithPatternNoFile(self):
-        coll = ImageCollection(pathPattern=r'abc-(\d).tiff')
+        coll = ImageCollection(pathPattern=self.dataFile(r'abc-(\d).tiff'))
         self.assertIsNotNone(coll)
         self.assertTrue(coll.images == [])
 
     def testTestFilesArePresent(self):
-        pat = PathPattern(Path(env.dataDir / r'test-(\d+).jpg'))
-        self.assertTrue(pat.matchingFiles() == ['./test-001.jpg','./test-002.jpg','./test-003.jpg'])
+        pat = PathPattern(self.dataFile(r'test-(\d+).jpg'))
+        self.assertTrue(pat.matchingFiles() == [self.dataFile('test-001.jpg'),
+            self.dataFile('test-002.jpg'),self.dataFile('test-003.jpg')])
 
     def testInitWithPatternAndFiles(self):
-        coll = ImageCollection(pathPattern=r'test-(\d+).jpg')
+        coll = ImageCollection(pathPattern=self.dataFile(r'test-(\d+).jpg'))
         self.assertIsNotNone(coll)
         self.assertTrue(coll.numberOfImages != 0)
 
     def testInitWithPattern(self):
-        coll = ImageCollection(pathPattern=r'abc-(\d).tiff')
+        coll = ImageCollection(pathPattern=self.dataFile(r'abc-(\d).tiff'))
         self.assertIsNotNone(coll)
 
     def testInitWithImages(self):
@@ -55,7 +56,7 @@ class TestImageCollection(unittest.TestCase):
             self.assertIsNotNone(ImageCollection("string"))
 
     def testInitImageCollection(self):
-        imgCollection = ImageCollection(pathPattern = r"/tmp/test-(\d+).png")
+        imgCollection = ImageCollection(pathPattern = self.dataFile(r"/tmp/test-(\d+).png"))
         self.assertTrue(len(imgCollection) != 0)
         self.assertIsNotNone(imgCollection.images)
         self.assertTrue(imgCollection.numberOfImages > 0)

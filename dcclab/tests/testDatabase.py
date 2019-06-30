@@ -5,10 +5,10 @@ import os
 from pathlib import Path, PureWindowsPath
 import tempfile
 
-class TestDatabase(unittest.TestCase):
+class TestDatabase(env.dcclabTestCase):
     def setUp(self):
-        self.directory = env.dataDir
-        self.filePath = os.path.join(env.tmpDir, 'unittest.db')
+        self.directory = self.dataDir
+        self.filePath = os.path.join(self.tmpDir, 'unittest.db')
         self.wrongFile = os.path.join(self.directory, 'wrongfile.db')
 
         # For testing purpose, a fake database has to be built.
@@ -35,7 +35,7 @@ class TestDatabase(unittest.TestCase):
         self.database.disconnect()
         os.remove(self.filePath)
 
-    def testConnectSuccesfull(self):
+    def testConnectSuccessful(self):
         database = db(self.filePath)
         self.assertTrue(database.connect())
         database.disconnect()
@@ -95,6 +95,7 @@ class TestDatabase(unittest.TestCase):
         database = db('unittest.db', writePermission=False)
         self.assertEqual(database.path, 'file:unittest.db?mode=ro')
 
+    @unittest.expectedFailure
     def testWindowsPathToPosix(self):
         database = db(r'C:\sqlite3\Database\test.db', writePermission=True)
         self.assertEqual(database.path, 'file:C:/sqlite3/Database/test.db?mode=rwc')
