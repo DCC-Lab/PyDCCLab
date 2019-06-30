@@ -1,6 +1,6 @@
 import env
 from dcclab import *
-#from unittest.mock import Mock, patch
+from unittest.mock import Mock, patch
 import numpy as np
 import unittest
 import os
