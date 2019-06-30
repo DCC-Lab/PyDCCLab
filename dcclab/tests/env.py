@@ -37,5 +37,9 @@ class dcclabTestCase(unittest.TestCase):
     def dataFile(self, filename):
         return os.path.join(self.dataDir, filename)
 
+    @classmethod
+    def tmpFile(self, filename):
+        return os.path.join(self.tmpDir, filename)
+
 # Very important:  append module root directory to sys.path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
