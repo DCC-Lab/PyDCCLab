@@ -2,55 +2,56 @@ import env
 from dcclab import *
 import unittest
 import numpy as np
+from pathlib import Path, PureWindowsPath
 
 class TestMATLABFile(unittest.TestCase):
 
     def testInit(self):
-        self.assertIsNotNone(MATLABFile("./test.mat"))
+        self.assertIsNotNone(MATLABFile(Path(env.dataDir / "test.mat")))
 
     def testInitWithVariable(self):
-        self.assertIsNotNone(MATLABFile("./test.mat", variable='image'))
+        self.assertIsNotNone(MATLABFile(Path(env.dataDir / "test.mat"), variable='image'))
 
     def testImageDataWithImageVariable(self):
-        file = MATLABFile("./test.mat", variable='image')
+        file = MATLABFile(Path(env.dataDir / "test.mat"), variable='image')
         data = file.imageDataFromPath()
         self.assertIsNotNone(data)
         self.assertTrue(isinstance(data, np.ndarray))
         self.assertEqual(data.ndim, 3)
 
     def testImageDataWithChannelVariable(self):
-        file = MATLABFile("./test.mat", variable='channel')
+        file = MATLABFile(Path(env.dataDir / "test.mat"), variable='channel')
         data = file.imageDataFromPath()
         self.assertIsNotNone(data)
         self.assertTrue(isinstance(data, np.ndarray))
         self.assertEqual(data.ndim, 3)
 
     def testImageDataWithSomeVariable(self):
-        file = MATLABFile("./test.mat", variable='notAnImage')
+        file = MATLABFile(Path(env.dataDir / "test.mat"), variable='notAnImage')
         with self.assertRaises(ValueError):
             data = file.imageDataFromPath()
 
     def testImageDataWithoutVariableWithImageData(self):
-        file = MATLABFile("./test.mat")
+        file = MATLABFile(Path(env.dataDir / "test.mat"))
         data = file.imageDataFromPath()
         self.assertIsNotNone(data)
         self.assertTrue(isinstance(data, np.ndarray))
         self.assertEqual(data.ndim, 3)
 
     def testImageDataWithoutVariableWithoutImageData(self):
-        file = MATLABFile("./nothing.mat")
+        file = MATLABFile(Path(env.dataDir / "nothing.mat"))
         data = file.imageDataFromPath()
         self.assertIsNone(data)
 
     def testImageDataWithoutVariableWith2DChannelData(self):
-        file = MATLABFile("./2dArray.mat")
+        file = MATLABFile(Path(env.dataDir / "2dArray.mat"))
         data = file.imageDataFromPath()
         self.assertIsNotNone(data)
         self.assertTrue(isinstance(data, np.ndarray))
         self.assertEqual(data.ndim, 3)
 
     def testImageDataWithoutVariableWith2DChannelData(self):
-        image = Image(path="./test.mat")
+        image = Image(path=Path(env.dataDir / "test.mat"))
         self.assertIsNotNone(image)
         self.assertIsNotNone(image.channels[0])
         pixels = image.channels[0].pixels
