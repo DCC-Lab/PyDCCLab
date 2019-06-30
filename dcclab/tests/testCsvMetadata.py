@@ -6,7 +6,7 @@ import os
 
 class TestCsvMetadata(unittest.TestCase):
     def setUp(self) -> None:
-        self.directory = os.path.dirname(__file__)
+        self.directory = env.dataDir
         self.filePath = os.path.join(self.directory, 'unittest.csv')
 
         with open(self.filePath, 'w') as file:

@@ -8,7 +8,7 @@ import os
 
 class TestCziChannel(unittest.TestCase):
     def setUp(self):
-        self.directory = os.path.dirname(__file__)
+        self.directory = env.dataDir
         self.testPath = os.path.join(self.directory, 'testCziFile.czi')
         self.missingEntriesPath = os.path.join(self.directory, 'MissingEntries.xml')
         self.missingKeysPath = os.path.join(self.directory, 'MissingKeys.xml')

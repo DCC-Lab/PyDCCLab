@@ -1,5 +1,7 @@
 import sys
 import os
+from pathlib import Path, PureWindowsPath
+import tempfile
 
 # append module root directory to sys.path
 sys.path.insert(0,
@@ -11,3 +13,7 @@ sys.path.insert(0,
                     )
                 )
                 )
+
+dataDir = Path('./testData')
+tmpDir = Path("{0}/{1}".format(tempfile.gettempdir(), "testfiles"))
+tmpDir.mkdir( parents=True, exist_ok=True )
