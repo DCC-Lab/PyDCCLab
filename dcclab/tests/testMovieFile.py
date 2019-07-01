@@ -30,6 +30,7 @@ class TestMovieFile(env.dcclabTestCase):
 
     def testWriteImageDataAsMOVNoExplicitRead(self):
         movie = MovieFile(self.dataFile("testMovie.mov"))
+        self.assertIsNotNone(movie.frameRate)
         tmpFile = self.tmpFile("output2.mov")
         movie.save(tmpFile)
         self.assertTrue(os.path.exists(tmpFile))
@@ -93,14 +94,16 @@ class TestMovieFile(env.dcclabTestCase):
         movie = MovieFile(self.dataFile("testMovie.raw"))
         movie.sampleType = np.dtype('uint16').newbyteorder('<')
         movie.frameShape = (1024,512,1)
+        self.assertIsNotNone(movie.sampleType)
         movie.beginReading()
         try:
             while (1):
+                self.assertIsNotNone(movie.sampleType)
                 frame = movie.appendNextFrame()
+                self.assertIsNotNone(movie.sampleType)
                 if frame is None:
                     break
                 self.assertTrue(frame.shape == (1024,512,1),frame.shape)
-                print(movie.cachedData.shape)
         except:
             self.fail("Exception when reading")
         finally:

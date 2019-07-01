@@ -11,7 +11,7 @@ class MovieFile(ImageFile):
         self.frameShape = frameShape
         self.sampleType = sampleType
         self.rawFormat = 'scientifica' # dcclab
-        self.videoCapture = None
+        self.movieHandle = None
         self.videoWriter = None
         self.cachedData = None
         try:
@@ -21,7 +21,7 @@ class MovieFile(ImageFile):
 
     @property
     def isUsingOpenCV(self):
-        return isinstance(self.videoCapture, cv2.VideoCapture)
+        return isinstance(self.movieHandle, cv2.VideoCapture)
 
     @property
     def bytesPerSample(self):
@@ -61,31 +61,37 @@ class MovieFile(ImageFile):
     def beginReading(self):
         self.cachedData = None
         if PathPattern(self.path).extension == 'raw':
-            self.videoCapture = open(self.path, "rb")
+            self.movieHandle = open(self.path, "rb")
         else:
-            self.videoCapture = cv2.VideoCapture(self.path)
-            self.frameRate = self.videoCapture.get(cv2.CAP_PROP_FPS)
+            self.movieHandle = cv2.VideoCapture(self.path)
+            self.frameRate = self.movieHandle.get(cv2.CAP_PROP_FPS)
 
     def readNextFrame(self) -> np.ndarray:
         frameData = None
 
         if self.isUsingOpenCV:
-            success, frameData = self.videoCapture.read()
+            success, frameData = self.movieHandle.read()
+            if self.frameShape is None:
+                self.frameShape = frameData.shape
         else:
-            if self.frameShape is None or self.sampleType is None:
-                raise ValueError("No frame shape determined. You must set frameShape and sampleType")
+            if (self.frameShape is None) or (self.sampleType is None):
+                raise ValueError("Not enough information: You must set frameShape and sampleType")
+
+            if self.rawFormat is None:
+                # TODO: try to guess
+                self.rawFormat = 'scientifica'
 
             if self.rawFormat == 'scientifica':
                 frameData = self.readRawScientificaFrame()
             elif self.rawFormat == 'dcclab':
                 frameData = self.readRawDCCLabFrame()
             else:
-                raise ValueError("raw format not set: scientifica or dcclab")
+                raise ValueError("Invalid raw format {0}: scientifica or dcclab".format(self.rawFormat))
         return frameData
 
     def readRawScientificaFrame(self) -> np.ndarray:
         frameData = None
-        binaryData = self.videoCapture.read(self.frameSize)
+        binaryData = self.movieHandle.read(self.frameSize)
         if len(binaryData) == self.frameSize:
             frameData = np.frombuffer(binaryData,dtype=self.sampleType)
             # Data is stored y first, then x, interleaved channels
@@ -112,10 +118,10 @@ class MovieFile(ImageFile):
 
     def endReading(self):
         if self.isUsingOpenCV:
-            self.videoCapture.release()
-            self.videoCapture = None
+            self.movieHandle.release()
+            self.movieHandle = None
         else:
-            self.videoCapture.close()
+            self.movieHandle.close()
 
     def beginWriting(self, path, frameData):
         if self.frameRate is None:
@@ -135,10 +141,9 @@ class MovieFile(ImageFile):
             if frame.shape[2] == 1:
                 frame = np.concatenate([frame, frame, frame], 2)
 
-            # OpenCV considers height first, then width
+            # OpenCV considers y,x,c, not x,y,c
+            # Most supported formats want 8 bit values
             frame = np.swapaxes(frame, 0,1).astype(np.uint8)
-            # cv2.imshow('video',frame)
-            # cv2.waitKey(1)
             self.videoWriter.write(frame)
         else:
             raise ValueError("Wrong shape: {0} expected {1}".format(frame.shape, self.frameShape))
