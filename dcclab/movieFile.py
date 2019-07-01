@@ -36,7 +36,10 @@ class MovieFile(ImageFile):
         self.frameRate = self.videoCapture.get(cv2.CAP_PROP_FPS)
 
     def readNextFrame(self) -> np.ndarray:
-        _, frame = self.videoCapture.read()
+        success, frame = self.videoCapture.read()
+        if success is False:
+            return None
+
         if frame is not None:
             return np.expand_dims(frame, 3)
 
@@ -46,11 +49,17 @@ class MovieFile(ImageFile):
         self.videoCapture.release()
         self.videoCapture = None
 
-    def beginWriting(self, path, frameData): 
+    def beginWriting(self, path, frameData):
         height, width, channels, timeSteps = frameData.shape
         if self.frameRate is None:
             raise ValueError("No frame rate determined. You must set frameRate")
-        self.videoWriter = cv2.VideoWriter(path, 0, self.frameRate, (width, height))
+
+        fourcc = 0 # no compression
+        pathPattern = PathPattern(path)
+        if pathPattern.extension == 'mov' or pathPattern.extension == 'mp4':
+            fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+
+        self.videoWriter = cv2.VideoWriter(path, fourcc, self.frameRate, (width, height))
 
     def writeNextFrame(self, frame):
         self.videoWriter.write(frame)

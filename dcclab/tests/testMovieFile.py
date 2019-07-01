@@ -28,13 +28,13 @@ class TestMovieFile(env.dcclabTestCase):
         self.assertTrue(os.path.exists(tmpFile))
         self.assertTrue(os.path.getsize(tmpFile) > 0)
 
-    # def testWriteImageDataAsMOV(self):
-    #     movie = MovieFile(self.dataFile("testMovie.mov"))
-    #     timeData = movie.timeSeriesData()
-    #     tmpFile = self.tmpFile("output.mp4")
-    #     movie.save(tmpFile, timeData)
-    #     self.assertTrue(Path(tmpFile).exists())
-    #     self.assertTrue(os.path.getsize(tmpFile) > 0)
+    def testWriteImageDataAsMOVNoExplicitRead(self):
+        movie = MovieFile(self.dataFile("testMovie.mov"))
+        tmpFile = self.tmpFile("output2.mov")
+        movie.save(tmpFile)
+        self.assertTrue(os.path.exists(tmpFile))
+        self.assertTrue(os.path.getsize(tmpFile) > 0)
+        movieSaved = MovieFile(tmpFile)
 
 if __name__ == '__main__':
     unittest.main()
