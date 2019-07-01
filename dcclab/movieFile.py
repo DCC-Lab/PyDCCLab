@@ -6,14 +6,18 @@ class MovieFile(ImageFile):
     def __init__(self, path:str):
         super(MovieFile, self).__init__(path)
         self.path = path
+        self.frameRate = None
         self.videoCapture = None
         self.videoWriter = None
         self.cachedData = self.timeSeriesData()
 
-    def save(self, path, timeSeriesData):
-        self.beginWriting(path, timeSeriesData)
-        for i in range(timeSeriesData.shape[3]):
-            self.writeNextFrame(timeSeriesData[:,:,:,i])
+    def save(self, path, timeData = None):
+        if timeData is None:
+            timeData = self.cachedData
+
+        self.beginWriting(path, timeData)
+        for i in range(timeData.shape[3]):
+            self.writeNextFrame(timeData[:,:,:,i])
         self.endWriting()
 
     def timeSeriesData(self):
@@ -29,6 +33,7 @@ class MovieFile(ImageFile):
 
     def beginReading(self):
         self.videoCapture = cv2.VideoCapture(self.path)
+        self.frameRate = self.videoCapture.get(cv2.CAP_PROP_FPS)
 
     def readNextFrame(self) -> np.ndarray:
         _, frame = self.videoCapture.read()
@@ -43,10 +48,12 @@ class MovieFile(ImageFile):
 
     def beginWriting(self, path, frameData): 
         height, width, channels, timeSteps = frameData.shape
-        self.videoWriter = cv2.VideoWriter(path, 0, 20.0, (width, height))
+        if self.frameRate is None:
+            raise ValueError("No frame rate determined. You must set frameRate")
+        self.videoWriter = cv2.VideoWriter(path, 0, self.frameRate, (width, height))
 
     def writeNextFrame(self, frame):
-        self.videoWriter.write(frame) # Write out frame to video
+        self.videoWriter.write(frame)
 
     def endWriting(self):
         self.videoWriter.release()
