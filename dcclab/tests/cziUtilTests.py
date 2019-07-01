@@ -5,36 +5,36 @@ import numpy as np
 from unittest.mock import Mock, patch
 
 
-class TestCziUtil(unittest.TestCase):
+class TestCziUtil(env.dcclabTestCase):
 
     def TestReadCziFile(self):
         import czifile
-        czi = cziUtil.readCziImage("testCziFileTwoChannels.czi")
+        czi = cziUtil.readCziImage(self.dataFile("testCziFileTwoChannels.czi"))
         self.assertIsInstance(czi, czifile.CziFile)
         cziUtil.closeCziFileObject(czi)
 
     def testReadCziFileInvalid(self):
         with self.assertRaises(FileNotFoundError):
-            cziUtil.readCziImage("test_czi_.czi")
+            cziUtil.readCziImage(self.dataFile("test_czi_.czi"))
 
     def testReadFileNotCzi(self):
         with self.assertRaises(ValueError):
-            cziUtil.readCziImage("testNotCziFile.jpg")
+            cziUtil.readCziImage(self.dataFile("testNotCziFile.jpg"))
 
     def testClose(self):
-        czi = cziUtil.readCziImage("testCziFileTwoChannels.czi")
+        czi = cziUtil.readCziImage(self.dataFile("testCziFileTwoChannels.czi"))
         cziUtil.closeCziFileObject(czi)
         with self.assertRaises(RuntimeError):
             cziUtil.getImagesFromCziFileObject(czi)
 
     def testExtractMetadatNoSave(self):
-        czi = cziUtil.readCziImage("testCziFileTwoChannels.czi")
+        czi = cziUtil.readCziImage(self.dataFile("testCziFileTwoChannels.czi"))
         metadata = cziUtil.extractMetadataFromCziFileObject(czi)
         self.assertIsInstance(metadata, str)
         cziUtil.closeCziFileObject(czi)
 
     def testExtractMetadataSave(self):
-        czi = cziUtil.readCziImage("testCziFileTwoChannels.czi")
+        czi = cziUtil.readCziImage(self.dataFile("testCziFileTwoChannels.czi"))
         cziUtil.extractMetadataFromCziFileObject(czi, "test_meta")
         cziUtil.closeCziFileObject(czi)
         ok = True
@@ -48,13 +48,13 @@ class TestCziUtil(unittest.TestCase):
 
 
     def testExtractImages(self):
-        czi = cziUtil.readCziImage("testCziFileTwoChannels.czi")
+        czi = cziUtil.readCziImage(self.dataFile("testCziFileTwoChannels.czi"))
         images = cziUtil.getImagesFromCziFileObject(czi)
         cziUtil.closeCziFileObject(czi)
         self.assertIsInstance(images, np.ndarray)
 
     def testExtractNumberImages(self):
-        czi = cziUtil.readCziImage("testCziFileTwoChannels.czi")
+        czi = cziUtil.readCziImage(self.dataFile("testCziFileTwoChannels.czi"))
         images = cziUtil.getImagesFromCziFileObject(czi)
         nb_images = images.shape[0]
         cziUtil.closeCziFileObject(czi)
@@ -62,26 +62,29 @@ class TestCziUtil(unittest.TestCase):
 
     @patch("matplotlib.pyplot.show", new=Mock)
     def testShowImages(self):
-        czi = cziUtil.readCziImage("testCziFileTwoChannels.czi")
+        czi = cziUtil.readCziImage(self.dataFile("testCziFileTwoChannels.czi"))
         images = cziUtil.showImagesFromCziFileObject(czi)
         cziUtil.closeCziFileObject(czi)
         self.assertIsInstance(images, np.ndarray)
 
     def testSaveImagesToTIFF(self):
-        czi = cziUtil.readCziImage("testCziFileTwoChannels.czi")
+        czi = cziUtil.readCziImage(self.dataFile("testCziFileTwoChannels.czi"))
         images = cziUtil.getImagesFromCziFileObject(czi)
         isSaved = cziUtil.saveImagesToTIFF(images, "testSaveTIFF")
         self.assertTrue(isSaved)
+        cziUtil.closeCziFileObject(czi)
 
     def testSaveImagesToTIFFFilesExist(self):
         import os
-        czi = cziUtil.readCziImage("testCziFileTwoChannels.czi")
+        czi = cziUtil.readCziImage(self.dataFile("testCziFileTwoChannels.czi"))
         images = cziUtil.getImagesFromCziFileObject(czi)
-        cziUtil.saveImagesToTIFF(images, "testSaveTIFF")
+        cziUtil.closeCziFileObject(czi)
+
+        cziUtil.saveImagesToTIFF(images, self.dataFile("testSaveTIFF"))
         filesExist = True
         try:
-            os.remove("testSaveTIFF_1.tif")
-            os.remove("testSaveTIFF_2.tif")
+            os.remove(self.dataFile("testSaveTIFF_1.tif"))
+            os.remove(self.dataFile("testSaveTIFF_2.tif"))
         except FileNotFoundError:
             filesExist = False
         self.assertTrue(filesExist)
