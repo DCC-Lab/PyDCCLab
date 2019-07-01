@@ -36,5 +36,62 @@ class TestMovieFile(env.dcclabTestCase):
         self.assertTrue(os.path.getsize(tmpFile) > 0)
         movieSaved = MovieFile(tmpFile)
 
+    def testOsOpenAPI(self):
+        file = open(self.dataFile("testMovie.raw"),"rb")
+        self.assertIsNotNone(file)
+        file.close()
+
+
+    def testOsReadChunk(self):
+        file = open(self.dataFile("testMovie.raw"),"rb")
+        data = file.read(1000)
+        self.assertIsNotNone(data)
+        self.assertTrue(len(data) == 1000)
+        file.close()
+
+    def testOsReadLargeChunk(self):
+        file = open(self.dataFile("testMovie.raw"),"rb")
+        data = file.read(1024*512*3)
+        self.assertIsNotNone(data)
+        self.assertTrue(len(data) == 1024*512*3)
+        file.close()
+
+    def testOsReadLargeChunk(self):
+        try:
+            file = open(self.dataFile("testMovie.raw"),"rb")
+
+            width = 1024
+            height = 512
+            spp = 3
+            dt = np.dtype('int16').newbyteorder('>')
+            bpp = dt.itemsize
+            size = height*width*spp*bpp
+            data = file.read(size)
+
+            self.assertTrue(bpp == 2)
+            self.assertIsNotNone(data)
+            self.assertTrue(len(data) == size)
+
+            numpyArray = np.frombuffer(data,dtype=dt)
+            numpyArray.reshape(width, height, spp)
+        except:
+            self.fail("Exception")
+        finally:
+            file.close()
+
+    def testReadRaw(self):
+        movie = MovieFile(self.dataFile("testMovie.raw"))
+        movie.samplesPerPixel = 3
+        movie.sampleType = np.dtype('int16').newbyteorder('>')
+        movie.frameShape = (1024,512,movie.samplesPerPixel)
+
+        try:
+            movie.beginReading()
+            movie.readNextFrame()
+        except:
+            self.fail()
+        finally:
+            movie.endReading()
+
 if __name__ == '__main__':
     unittest.main()
