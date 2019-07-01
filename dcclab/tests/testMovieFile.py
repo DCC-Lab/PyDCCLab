@@ -94,7 +94,7 @@ class TestMovieFile(env.dcclabTestCase):
         movie = MovieFile(self.dataFile("testMovie.raw"))
         movie.sampleType = np.dtype('uint16').newbyteorder('<')
         movie.frameShape = (1024,512,1)
-        self.assertIsNotNone(movie.sampleType)
+
         movie.beginReading()
         try:
             while (1):
@@ -149,6 +149,13 @@ class TestMovieFile(env.dcclabTestCase):
         self.assertIsNotNone(movie.cachedData)
         movie.frameRate = 10.0
         movie.save("/tmp/movie.avi")
+
+    def testScientificaINI(self):
+        self.assertTrue(os.path.exists(self.dataFile("testMovie.raw")))
+        self.assertTrue(os.path.exists(self.dataFile("testMovie.ini")))
+        movie = MovieFile(self.dataFile("testMovie.raw"))
+        self.assertTrue(movie.discoverRawFormat() == 'scientifica')
+
 
 if __name__ == '__main__':
     unittest.main()

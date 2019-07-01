@@ -68,7 +68,6 @@ class MovieFile(ImageFile):
 
     def readNextFrame(self) -> np.ndarray:
         frameData = None
-
         if self.isUsingOpenCV:
             success, frameData = self.movieHandle.read()
             if self.frameShape is None:
@@ -78,8 +77,7 @@ class MovieFile(ImageFile):
                 raise ValueError("Not enough information: You must set frameShape and sampleType")
 
             if self.rawFormat is None:
-                # TODO: try to guess
-                self.rawFormat = 'scientifica'
+                self.rawFormat = self.discoverRawFormat()
 
             if self.rawFormat == 'scientifica':
                 frameData = self.readRawScientificaFrame()
@@ -88,6 +86,14 @@ class MovieFile(ImageFile):
             else:
                 raise ValueError("Invalid raw format {0}: scientifica or dcclab".format(self.rawFormat))
         return frameData
+
+    def discoverRawFormat(self) -> str:
+        (baseName, _) = os.path.splitext(self.path)
+        iniPath = "{0}.ini".format(baseName)
+        if os.path.exists(iniPath):
+            return 'scientifica'
+        else:
+            return 'dcclab'
 
     def readRawScientificaFrame(self) -> np.ndarray:
         frameData = None
