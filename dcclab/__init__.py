@@ -15,5 +15,5 @@ from .cziFile import *
 from .database import *
 from .metadata import *
 
-__version__ = "0.9.0"
+__version__ = "0.9.5"
 __author__ = "Daniel Cote <dccote@cervo.ulaval.ca>"

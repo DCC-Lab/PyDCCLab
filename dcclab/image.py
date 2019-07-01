@@ -104,6 +104,7 @@ class Image:
             mode = 'RGB'
         pilImage = PIL.Image.fromarray(imageAsArray, mode=mode)
         pilImage.save(filePath)
+        pilImage.close()
 
     def display(self, colorMap=None):
         plt.imshow(self.asArray(), cmap=colorMap)
