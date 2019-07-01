@@ -4,17 +4,19 @@ import os
 import cv2
 
 class MovieFile(ImageFile):
-    def __init__(self, path:str):
+    def __init__(self, path:str, frameShape=None, sampleType=None, frameRate=None):
         super(MovieFile, self).__init__(path)
         self.path = path
-        self.frameRate = None
-        self.frameShape = None
-        self.samplesPerPixel = None
-        self.sampleType = np.int8
-        self.readModeCV = True
+        self.frameRate = frameRate
+        self.frameShape = frameShape
+        self.sampleType = sampleType
         self.videoCapture = None
         self.videoWriter = None
-        self.cachedData = self.timeSeriesData()
+        self.cachedData = None
+        try:
+            self.cachedData = self.timeSeriesData()
+        except:
+            pass
 
     @property
     def isUsingOpenCV(self):
@@ -23,6 +25,10 @@ class MovieFile(ImageFile):
     @property
     def bytesPerSample(self):
         return self.sampleType.itemsize
+
+    @property
+    def samplesPerPixel(self):
+        return self.frameShape[2]
 
     @property
     def frameSize(self):
@@ -38,20 +44,19 @@ class MovieFile(ImageFile):
         self.endWriting()
 
     def timeSeriesData(self):
-        self.beginReading()
-        timeSeriesData = None
-        try:
-            frame = self.readNextFrame()
-            timeSeriesData = frame
-            while(frame is not None):
-               timeSeriesData = np.concatenate((timeSeriesData,frame),3)
-               frame = self.readNextFrame()
-        except:
-            self.endReading()
+        if self.cachedData is None:
+            self.beginReading()
+            try:
+                while (1):
+                    if self.appendNextFrame() is None:
+                        break
+            finally:
+                self.endReading()
 
-        return timeSeriesData
+        return self.cachedData
 
     def beginReading(self):
+        self.cachedData = None
         if PathPattern(self.path).extension == 'raw':
             self.videoCapture = open(self.path, "rb")
         else:
@@ -61,20 +66,31 @@ class MovieFile(ImageFile):
     def readNextFrame(self) -> np.ndarray:
         if self.isUsingOpenCV:
             success, frame = self.videoCapture.read()
-            if success is False:
-                return None
-
-            if frame is not None:
-                return np.expand_dims(frame, 3)
+            return frame
         else:
-            if self.frameShape is None or self.samplesPerPixel is None or self.bytesPerSample is None:
-                raise ValueError("No frame size determined. You must set frameShape, samplesPerPixel and bytesPerSample")
+            if self.frameShape is None or self.sampleType is None:
+                raise ValueError("No frame size determined. You must set frameShape and sampleType")
+            
             binaryData = self.videoCapture.read(self.frameSize)
-            frameData = np.frombuffer(binaryData,dtype=self.sampleType)
-            frameData.reshape(self.frameShape)
-            return frameData
+            if len(binaryData) != self.frameSize:
+                return None
+            else:
+                frameData = np.frombuffer(binaryData,dtype=self.sampleType)
+                frameData = np.reshape(frameData, self.frameShape)
+                return frameData
 
         return None
+
+    def appendNextFrame(self) -> np.array:
+        frameData = self.readNextFrame()
+        if frameData is not None:
+            frameData = np.expand_dims(frameData, 3)
+            if self.cachedData is None:
+                self.cachedData = frameData
+            else:
+                self.cachedData = np.concatenate((self.cachedData,frameData),3)
+        
+        return frameData
 
     def endReading(self):
         if self.isUsingOpenCV:

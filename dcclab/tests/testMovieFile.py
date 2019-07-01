@@ -80,18 +80,29 @@ class TestMovieFile(env.dcclabTestCase):
             file.close()
 
     def testReadRaw(self):
-        movie = MovieFile(self.dataFile("testMovie.raw"))
-        movie.samplesPerPixel = 3
-        movie.sampleType = np.dtype('int16').newbyteorder('>')
-        movie.frameShape = (1024,512,movie.samplesPerPixel)
+        sampleType = np.dtype('int16').newbyteorder('>')
+        frameShape = (1024,512,3)
+        movie = MovieFile(self.dataFile("testMovie.raw"),
+                          frameShape=frameShape,
+                          sampleType=sampleType)
 
+        self.assertIsNotNone(movie.cachedData)
+
+    def testReadRawLater(self):
+        movie = MovieFile(self.dataFile("testMovie.raw"))
+        movie.sampleType = np.dtype('int16').newbyteorder('>')
+        movie.frameShape = (1024,512,3)
+        movie.beginReading()
         try:
-            movie.beginReading()
-            movie.readNextFrame()
+            while (1):
+                if movie.appendNextFrame() is None:
+                    break
+            
         except:
             self.fail()
         finally:
             movie.endReading()
+        self.assertIsNotNone(movie.cachedData)
 
 if __name__ == '__main__':
     unittest.main()
