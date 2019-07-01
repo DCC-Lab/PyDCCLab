@@ -34,13 +34,13 @@ frame = cv2.imread(image_path)
 if showImages:
     cv2.imshow('video',frame)
 
-height, width, channels = frame.shape
+width, height, channels = frame.shape
 
 # Define the codec and create VideoWriter object
 # fourcc = cv2.VideoWriter_fourcc(*'DIB ') 
 # use fourcc = 0 for uncompressed.
 
-out = cv2.VideoWriter(output, 0, 20.0, (width, height))
+out = cv2.VideoWriter(output, 0, 20.0, (height, width))
 
 for image in images:
     image_path = os.path.join(sourcePath, image)

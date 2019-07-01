@@ -10,6 +10,7 @@ class MovieFile(ImageFile):
         self.frameRate = frameRate
         self.frameShape = frameShape
         self.sampleType = sampleType
+        self.rawFormat = 'scientifica' # dcclab
         self.videoCapture = None
         self.videoWriter = None
         self.cachedData = None
@@ -40,7 +41,9 @@ class MovieFile(ImageFile):
 
         self.beginWriting(path, timeData)
         for i in range(timeData.shape[3]):
-            self.writeNextFrame(timeData[:,:,:,i])
+            timestepData = timeData[:,:,:,i].astype(np.uint8)
+            timestepData.squeeze()
+            self.writeNextFrame(timestepData)
         self.endWriting()
 
     def timeSeriesData(self):
@@ -64,31 +67,46 @@ class MovieFile(ImageFile):
             self.frameRate = self.videoCapture.get(cv2.CAP_PROP_FPS)
 
     def readNextFrame(self) -> np.ndarray:
+        frameData = None
+
         if self.isUsingOpenCV:
-            success, frame = self.videoCapture.read()
-            return frame
+            success, frameData = self.videoCapture.read()
         else:
             if self.frameShape is None or self.sampleType is None:
-                raise ValueError("No frame size determined. You must set frameShape and sampleType")
-            
-            binaryData = self.videoCapture.read(self.frameSize)
-            if len(binaryData) != self.frameSize:
-                return None
-            else:
-                frameData = np.frombuffer(binaryData,dtype=self.sampleType)
-                frameData = np.reshape(frameData, self.frameShape)
-                return frameData
+                raise ValueError("No frame shape determined. You must set frameShape and sampleType")
 
-        return None
+            if self.rawFormat == 'scientifica':
+                frameData = self.readRawScientificaFrame()
+            elif self.rawFormat == 'dcclab':
+                frameData = self.readRawDCCLabFrame()
+            else:
+                raise ValueError("raw format not set: scientifica or dcclab")
+        return frameData
+
+    def readRawScientificaFrame(self) -> np.ndarray:
+        frameData = None
+        binaryData = self.videoCapture.read(self.frameSize)
+        if len(binaryData) == self.frameSize:
+            frameData = np.frombuffer(binaryData,dtype=self.sampleType)
+            # Data is stored y first, then x, interleaved channels
+            frameData = np.reshape(frameData, (self.frameShape[1],self.frameShape[0],self.frameShape[2]))
+            # Swap after reading
+            frameData = frameData.swapaxes(0,1)
+
+        return frameData
+
+    def readRawDCCLabFrame(self) -> np.ndarray:
+        raise NotImplementedError("Not yet implemented")
 
     def appendNextFrame(self) -> np.array:
         frameData = self.readNextFrame()
+
         if frameData is not None:
-            frameData = np.expand_dims(frameData, 3)
+            frameDataExpanded = np.expand_dims(frameData, 3)
             if self.cachedData is None:
-                self.cachedData = frameData
+                self.cachedData = frameDataExpanded
             else:
-                self.cachedData = np.concatenate((self.cachedData,frameData),3)
+                self.cachedData = np.concatenate((self.cachedData,frameDataExpanded),3)
         
         return frameData
 
@@ -100,9 +118,10 @@ class MovieFile(ImageFile):
             self.videoCapture.close()
 
     def beginWriting(self, path, frameData):
-        height, width, channels, timeSteps = frameData.shape
         if self.frameRate is None:
             raise ValueError("No frame rate determined. You must set frameRate")
+
+        width, height, channels, timeSteps = frameData.shape
 
         fourcc = 0 # no compression
         pathPattern = PathPattern(path)
@@ -112,7 +131,17 @@ class MovieFile(ImageFile):
         self.videoWriter = cv2.VideoWriter(path, fourcc, self.frameRate, (width, height))
 
     def writeNextFrame(self, frame):
-        self.videoWriter.write(frame)
+        if frame.shape == self.frameShape:
+            if frame.shape[2] == 1:
+                frame = np.concatenate([frame, frame, frame], 2)
+
+            # OpenCV considers height first, then width
+            frame = np.swapaxes(frame, 0,1).astype(np.uint8)
+            # cv2.imshow('video',frame)
+            # cv2.waitKey(1)
+            self.videoWriter.write(frame)
+        else:
+            raise ValueError("Wrong shape: {0} expected {1}".format(frame.shape, self.frameShape))
 
     def endWriting(self):
         self.videoWriter.release()

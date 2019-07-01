@@ -63,7 +63,7 @@ class TestMovieFile(env.dcclabTestCase):
             width = 1024
             height = 512
             spp = 3
-            dt = np.dtype('int16').newbyteorder('>')
+            dt = np.dtype('int16').newbyteorder('<')
             bpp = dt.itemsize
             size = height*width*spp*bpp
             data = file.read(size)
@@ -80,29 +80,72 @@ class TestMovieFile(env.dcclabTestCase):
             file.close()
 
     def testReadRaw(self):
-        sampleType = np.dtype('int16').newbyteorder('>')
-        frameShape = (1024,512,3)
+        sampleType = np.dtype('uint16').newbyteorder('<')
+        frameShape = (1024,512,1)
         movie = MovieFile(self.dataFile("testMovie.raw"),
                           frameShape=frameShape,
                           sampleType=sampleType)
 
         self.assertIsNotNone(movie.cachedData)
+        self.assertIsNotNone(movie.cachedData.shape == frameShape)
 
     def testReadRawLater(self):
         movie = MovieFile(self.dataFile("testMovie.raw"))
-        movie.sampleType = np.dtype('int16').newbyteorder('>')
-        movie.frameShape = (1024,512,3)
+        movie.sampleType = np.dtype('uint16').newbyteorder('<')
+        movie.frameShape = (1024,512,1)
         movie.beginReading()
         try:
             while (1):
-                if movie.appendNextFrame() is None:
+                frame = movie.appendNextFrame()
+                if frame is None:
                     break
-            
+                self.assertTrue(frame.shape == (1024,512,1),frame.shape)
+                print(movie.cachedData.shape)
         except:
-            self.fail()
+            self.fail("Exception when reading")
         finally:
             movie.endReading()
         self.assertIsNotNone(movie.cachedData)
+
+    def testReadRawWriteMov(self):
+        sampleType = np.dtype('uint16').newbyteorder('<')
+        frameShape = (1024,512,1)
+        movie = MovieFile(self.dataFile("testMovie.raw"),
+                          frameShape=frameShape,
+                          sampleType=sampleType)
+        movie.frameRate = 3.0
+        self.assertIsNotNone(movie.cachedData)
+        movie.save("/tmp/movie.mov")
+
+    def testReadRawWriteAVI(self):
+        sampleType = np.dtype('uint16').newbyteorder('<')
+        frameShape = (1024, 512,1)
+        movie = MovieFile(self.dataFile("testMovie.raw"),
+                          frameShape=frameShape,
+                          sampleType=sampleType)
+        movie.frameRate = 3.0
+        self.assertIsNotNone(movie.cachedData)
+        movie.save("/tmp/movie.avi")
+
+    def testReadRawLaterWriteAVI(self):
+        movie = MovieFile(self.dataFile("testMovie.raw"))
+        movie.sampleType = np.dtype('uint16').newbyteorder('<')
+        movie.frameShape = (1024,512,1)
+        movie.beginReading()
+        try:
+            while (1):
+                frame = movie.appendNextFrame()
+                if frame is None:
+                    break
+                self.assertTrue(frame.shape == (1024,512,1),frame.shape)
+                self.assertTrue(movie.frameSize)
+        except:
+            self.fail("Exception when reading")
+        finally:
+            movie.endReading()
+        self.assertIsNotNone(movie.cachedData)
+        movie.frameRate = 10.0
+        movie.save("/tmp/movie.avi")
 
 if __name__ == '__main__':
     unittest.main()
