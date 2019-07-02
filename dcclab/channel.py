@@ -305,7 +305,7 @@ class Channel:
         before = time.clock()
         median = np.median(self.pixels)
         after = time.clock()
-        print("Median cpu time : {}".format(before - after))
+        print("Median cpu time : {}".format(after - before))
         return median
 
     def getPixelsOfIntensity(self, intensity: float) -> typing.List[tuple]:
