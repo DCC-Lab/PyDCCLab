@@ -300,6 +300,9 @@ class Channel:
     def getExtrema(self) -> typing.Tuple[int, int]:
         return np.min(self.pixels), np.max(self.pixels)
 
+    def getMedian(self):
+        return np.median(self.pixels)
+
     def getPixelsOfIntensity(self, intensity: float) -> typing.List[tuple]:
         coordsList = []
         array = self.pixels
