@@ -4,13 +4,11 @@ from dcclab.__lifReader import LifSerie
 import unittest
 from pathlib import Path, PureWindowsPath
 
-# TODO: create ZStack Objects instead and test
-
 
 class TestLifFile(env.dcclabTestCase):
 
     def setUp(self):
-        self.lifObj = LIFFile(Path(self.dataDir / 'test_LifFile.lif'))
+        self.lifObj = LIFFile(Path(self.dataDir, 'test_LifFile.lif'))
 
     def testInitWithLifFile(self):
         self.assertIsNotNone(self.lifObj)
@@ -74,24 +72,24 @@ class TestLifFile(env.dcclabTestCase):
         self.assertTrue(metadata['channel_number'] == 1)
 
     def testGetMetadataAtIndex(self):
-        metadata = self.lifObj.getMetadata(serieIndex=0)
+        metadata = self.lifObj.metadata(serieIndex=0)
         self.assertIsInstance(metadata, dict)
         self.assertTrue(metadata['channel_number'] == 1)
 
     def testGetAllMetadata(self):
-        metadata = self.lifObj.getMetadata()
+        metadata = self.lifObj.metadata()
         self.assertIsInstance(metadata, list)
         self.assertIsInstance(metadata[0], dict)
 
     def testGetZStackOneSeriesOneChannel(self):
-        stacks = self.lifObj.getZStacks(seriesIndices=0, channels=0)
+        stacks = self.lifObj.zStacksData(seriesIndices=0, channelIndices=0)
 
         self.assertIsInstance(stacks, list)
         self.assertTrue(len(stacks) == 1)
-        self.assertTrue(stacks[0].shape == (448, 448, 448))
+        self.assertTrue(stacks[0].shape == (448, 448, 448))  # fixme: will probably fail: test for the new ZStack objects
 
     def testGetZStackOneSeries(self):
-        stacks = self.lifObj.getZStacks(seriesIndices=0)
+        stacks = self.lifObj.zStacksData(seriesIndices=0)
 
         self.assertIsInstance(stacks, list)
         self.assertTrue(len(stacks) == 1)
@@ -99,7 +97,7 @@ class TestLifFile(env.dcclabTestCase):
 
     def testGetAllZStacks(self):
         self.lifObj.keepSeries([0, 1])
-        stacks = self.lifObj.getZStacks()
+        stacks = self.lifObj.zStacksData()
 
         self.assertIsInstance(stacks, list)
         self.assertTrue(len(stacks) == 2)
@@ -107,7 +105,7 @@ class TestLifFile(env.dcclabTestCase):
 
     def testGetZStacksBadChannels(self):
         with self.assertRaises(Exception):
-            self.lifObj.getZStacks(seriesIndices=0, channels=(0, 1))
+            self.lifObj.zStacksData(seriesIndices=0, channelIndices=(0, 1))
 
     @unittest.skip("no small test data file with multiple channels")
     def testGetZStacksMultipleChannels(self):
