@@ -31,18 +31,13 @@ class DataExtractionMCherry(env.dcclabTestCase):
                 stdDev = channel.getStandardDeviation()
                 entropy = channel.getShannonEntropyOfPixels
                 median = channel.getMedian()
-                minimum = channel.getMinimum()
-                maximum = channel.getMaximum()
+                minimum, maximum = channel.getExtrema()
                 normalizedChannel = channel.convertToNormalizedFloat()
                 averageN = normalizedChannel.getAverageValueOfPixels()
                 stdDevN = normalizedChannel.getStandardDeviation()
                 entropyN = normalizedChannel.getShannonEntropyOfPixels
                 medianN = normalizedChannel.getMedian()
-                minimumN = normalizedChannel.getMinimum()
-                maximumN = normalizedChannel.getMaximum()
-
-                print(average)
-                print(stdDev)
+                minimumN, maximumN = normalizedChannel.getExtrema()
             except Exception as e:
 
                 if isinstance(e, NotImplementedError):
@@ -98,18 +93,13 @@ class DataExtractionEGFP(env.dcclabTestCase):
                 stdDev = channel.getStandardDeviation()
                 entropy = channel.getShannonEntropyOfPixels
                 median = channel.getMedian()
-                minimum = channel.getMinimum()
-                maximum = channel.getMaximum()
+                minimum, maximum = channel.getExtrema()
                 normalizedChannel = channel.convertToNormalizedFloat()
                 averageN = normalizedChannel.getAverageValueOfPixels()
                 stdDevN = normalizedChannel.getStandardDeviation()
                 entropyN = normalizedChannel.getShannonEntropyOfPixels
                 medianN = normalizedChannel.getMedian()
-                minimumN = normalizedChannel.getMinimum()
-                maximumN = normalizedChannel.getMaximum()
-
-                print(average)
-                print(stdDev)
+                minimumN, maximumN = normalizedChannel.getExtrema()
             except Exception as e:
 
                 if isinstance(e, NotImplementedError):
@@ -165,18 +155,14 @@ class DataExtractionDAPI(env.dcclabTestCase):
                 stdDev = channel.getStandardDeviation()
                 entropy = channel.getShannonEntropyOfPixels
                 median = channel.getMedian()
-                minimum = channel.getMinimum()
-                maximum = channel.getMaximum()
+                minimum, maximum = channel.getExtrema()
                 normalizedChannel = channel.convertToNormalizedFloat()
                 averageN = normalizedChannel.getAverageValueOfPixels()
                 stdDevN = normalizedChannel.getStandardDeviation()
                 entropyN = normalizedChannel.getShannonEntropyOfPixels
                 medianN = normalizedChannel.getMedian()
-                minimumN = normalizedChannel.getMinimum()
-                maximumN = normalizedChannel.getMaximum()
+                minimumN, maximumN = normalizedChannel.getExtrema()
 
-                print(average)
-                print(stdDev)
             except Exception as e:
 
                 if isinstance(e, NotImplementedError):
