@@ -155,6 +155,10 @@ class TestMovieFile(env.dcclabTestCase):
         self.assertTrue(os.path.exists(self.dataFile("testMovie.ini")))
         movie = MovieFile(self.dataFile("testMovie.raw"))
         self.assertTrue(movie.discoverRawFormat() == 'scientifica')
+        self.assertTrue(movie.frameRate == 30)
+        self.assertTrue(movie.width == 1024)
+        self.assertTrue(movie.height == 512)
+        self.assertTrue(movie.sampleType == np.uint16)
 
 
 if __name__ == '__main__':

@@ -2,6 +2,7 @@ from .imageFile import *
 from .pathPattern import *
 import os
 import cv2
+import re
 
 class MovieFile(ImageFile):
     def __init__(self, path:str, frameShape=None, sampleType=None, frameRate=None):
@@ -61,6 +62,9 @@ class MovieFile(ImageFile):
     def beginReading(self):
         self.cachedData = None
         if PathPattern(self.path).extension == 'raw':
+            if self.rawFormat is None:
+                self.rawFormat = self.discoverRawFormat()
+
             self.movieHandle = open(self.path, "rb")
         else:
             self.movieHandle = cv2.VideoCapture(self.path)
@@ -91,6 +95,19 @@ class MovieFile(ImageFile):
         (baseName, _) = os.path.splitext(self.path)
         iniPath = "{0}.ini".format(baseName)
         if os.path.exists(iniPath):
+            file = open(iniPath)
+            for line in file:
+                match = re.search(r"x\.pixels\s+=\s+(\d+)", line)
+                if match is not None:
+                    self.width = int(match.groups()[0])
+                match = re.search(r"y\.pixels\s+=\s+(\d+)", line)
+                if match is not None:
+                    self.height = int(match.groups()[0])
+            
+            self.frameRate = 30
+            self.sampleType = np.uint16
+            file.close()
+
             return 'scientifica'
         else:
             return 'dcclab'
