@@ -301,7 +301,12 @@ class Channel:
         return np.min(self.pixels), np.max(self.pixels)
 
     def getMedian(self):
-        return np.median(self.pixels)
+        import time
+        before = time.clock()
+        median = np.median(self.pixels)
+        after = time.clock()
+        print("Median cpu time : {}".format(before - after))
+        return median
 
     def getPixelsOfIntensity(self, intensity: float) -> typing.List[tuple]:
         coordsList = []
