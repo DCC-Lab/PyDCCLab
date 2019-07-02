@@ -1,8 +1,10 @@
 from .__lifReader import LifReader
-from .imageCollection import *
+from .imageCollection import ZStack
+from typing import Union, List
 from .cziUtil import *
 from .channel import *
 import scipy.io as sio
+import PIL
 
 
 class ImageFile(object):
@@ -165,7 +167,7 @@ class MATLABFile(ImageFile):
 class LIFFile(ImageFile):
     supportedFormats = ['lif']
 
-    def __init__(self, path: str):
+    def __init__(self, path):
         ImageFile.__init__(self, path)
         self.__lifObject = LifReader(self.path)
         self.series = self.__lifObject.getSeries()

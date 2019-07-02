@@ -1,21 +1,21 @@
 from .image import *
+from .image import Image
 from .pathPattern import *
 import numpy as np
 import json
 import inspect
-from .image import Image
 
 import matplotlib.pyplot as plt
 from matplotlib.widgets import RectangleSelector
 from typing import List, Union
 from scipy import ndimage
 from collections import OrderedDict
-from PIL import Image as PILImage
+import PIL.Image as PILImage
 import sys
 
 
 class ImageCollection:
-    def __init__(self, images:List[Image]=None, imagesArray:np.ndarray=None, pathPattern: str=None):
+    def __init__(self, images: List[Image]=None, imagesArray:np.ndarray=None, pathPattern: str=None):
         self.__images = []
         if images is not None:
             if not all(isinstance(image, Image) for image in images):

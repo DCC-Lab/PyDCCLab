@@ -9,7 +9,6 @@ from .DCCExceptions import *
 from .channelInteger import *
 from .channelFloat import *
 from .pathPattern import *
-from .lifFile import *
 from .cziFile import *
 
 from .database import *
