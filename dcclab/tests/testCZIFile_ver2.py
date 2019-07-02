@@ -5,6 +5,7 @@ from dcclab.DCCExceptions import *
 import numpy as np
 from pathlib import Path, PureWindowsPath
 
+
 class TestConstructor(env.dcclabTestCase):
 
     def testValidCziFile(self):
@@ -158,6 +159,27 @@ class TestProperties(env.dcclabTestCase):
     def testAxesBSCYX0(self):
         czi = CZIFile(Path(self.dataDir / "testCziThreeChannelsOneScene.czi"))
         self.assertEqual(czi.axes, "BSCYX0")
+
+    def testOriginalDType(self):
+        czi = CZIFile(Path(self.dataDir / "testCziThreeChannelsOneScene.czi"))
+        self.assertEqual(czi.originalDType, np.uint16)
+
+    def testImageDataYX0Axes(self):
+        try:
+            czi = CZIFile(Path(self.dataDir / "testCziFileYX0Axes.czi"))
+            self.assertIsNotNone(czi.imageData())
+        except:
+            self.fail("Exception raised.")
+
+    def testImageDataMultipleImagesException(self):
+        czi = CZIFile(Path(self.dataDir / "testCziMultipleScenes.czi"))
+        with self.assertRaises(ValueError):
+            czi.imageData()
+
+    def testImageDataYX0Values(self):
+        czi = CZIFile(Path(self.dataDir / "testCziYX0Tiny.czi"))
+        values = np.dstack((np.array([[7, 6], [7, 6]]), np.array([[47, 45], [48, 48]]), np.array([[36, 34], [38, 37]])))
+        self.assertTrue(np.array_equal(czi.imageData().asArray(), values))
 
 
 if __name__ == '__main__':
