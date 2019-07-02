@@ -49,9 +49,9 @@ class CZIFile(ImageFile):
     def imageData(self):
         image = None
         if not (self.__isScenes or self.__isTimeSeries or self.__isZStack):
-            image = self.__mosaic.squeeze().transpose(1, 2, 0) if self.__axes != "YX0" else self.__mosaic
+            image = self.__mosaic.squeeze().transpose(1, 2, 0) if self.__axes != "YX0" else self.__YX0Image()
         else:
-            raise ValueError("This file contains more than just one image")
+            raise ValueError("This file contains more than just one image.")
         return image
 
     def mapData(self):
@@ -167,18 +167,6 @@ class CZIFile(ImageFile):
             return valueReturn, index
 
         return {key: findValue(key) for key in CZIFile.allAxes}
-
-    def __buildTimeSeries(self):
-        return None
-
-    def __buildZStack(self):
-        zStack = None
-        # if self.__isZStack:
-        #   zStack = []
-        #  channelMaps = self.__channelMaps
-        # for key in channelMaps[0].keys():
-
-        return zStack
 
     def __del__(self):
         try:
