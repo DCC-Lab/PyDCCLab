@@ -49,7 +49,7 @@ class CZIFile(ImageFile):
     def imageData(self):
         image = None
         if not (self.__isScenes or self.__isTimeSeries or self.__isZStack):
-            image = self.__mosaic.squeeze().transpose(1, 2, 0) if self.__axes != "YX0" else self.__YX0Image()
+            image = Image(self.__mosaic.squeeze().transpose(1, 2, 0)) if self.__axes != "YX0" else self.__YX0Image()
         else:
             raise ValueError("This file contains more than just one image.")
         return image
@@ -62,7 +62,8 @@ class CZIFile(ImageFile):
         if self.__isScenes:
             scenes = []
             nbScenes = self.__axesDimAndIndex["S"][0]
-            mosaic = self.__mosaic.squeeze()
+            channelIndex = self.__axesDimAndIndex["C"][1]
+            mosaic = self.__squeezeAccordingToSlice(self.__mosaic, slice(0, channelIndex))
             for i in range(nbScenes):
                 scenes.append(Image(mosaic[i, :, :, :].transpose(1, 2, 0)))
         return ImageCollection(scenes)
@@ -174,3 +175,19 @@ class CZIFile(ImageFile):
                 closeCziFileObject(self.__cziObj)
         except AttributeError:
             print("Object already deleted")
+
+    @staticmethod
+    def __squeezeAccordingToSlice(array: np.ndarray, s: slice, removeLastDim: bool = True) -> np.ndarray:
+        """
+        Useful when you want to squeeze an array only in a specific range. For example, an array with shape
+        (1, 1, 1, 1000, 1000, 1) with axes BSCYX0, you don't want to remove the Channel dimension with np.squeeze.
+        You can use this method to remove axes [0, 1[ by specifying a slice(0, 1) and these axes will be removed.
+        :param array: input array to squeeze
+        :param s: slice object containing info on which axes to remove.
+        :param removeLastDim: boolean specifying if the last axe should be removed.
+        :return: The squeezed array
+        """
+        sliceToTuple = tuple(range(s.start, s.stop))
+        if removeLastDim:
+            sliceToTuple += (-1,)
+        return array.squeeze(axes=sliceToTuple)
