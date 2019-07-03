@@ -178,7 +178,7 @@ class TestMethodsAndProperties(env.DCCLabTestCase):
 
     def testImageDataYX0Values(self):
         czi = CZIFile(Path(self.dataDir / "testCziYX0Tiny.czi"))
-        values = np.dstack((np.array([[7, 6], [7, 6]]), np.array([[47, 45], [48, 48]]), np.array([[36, 34], [38, 37]])))
+        values = np.dstack((np.array([[7, 7], [6, 6]]), np.array([[46, 48], [51, 47]]), np.array([[32, 29], [33, 28]])))
         self.assertTrue(np.array_equal(czi.imageData().asArray(), values))
 
     def testImageDataBSCYX0Values(self):
@@ -201,8 +201,8 @@ class TestMethodsAndProperties(env.DCCLabTestCase):
 
     def testScenesDataValues(self):
         czi = CZIFile(Path(self.dataDir / "testCziFileTwoScenesTiny.czi"))
-        values1 = np.dstack((np.array([[89, 98], [106, 76]]), np.array([[263, 257], [238, 240]])))
-        values2 = np.dstack((np.array([[105, 73], [89, 101]]), np.array([[152, 153], [144, 164]])))
+        values1 = np.dstack((np.array([[103, 101], [99, 86]]), np.array([[171, 190], [216, 166]])))
+        values2 = np.dstack((np.array([[99, 89], [78, 92]]), np.array([[180, 187], [186, 205]])))
         images = czi.scenesData().images
         self.assertTrue(np.array_equal(images[0].asArray(), values1))
         self.assertTrue(np.array_equal(images[1].asArray(), values2))
