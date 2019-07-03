@@ -199,6 +199,14 @@ class TestProperties(env.dcclabTestCase):
         czi = CZIFile(Path(self.dataDir / "testCziMultipleScenes.czi"))
         self.assertEqual(len(czi.scenesData()), 2)
 
+    def testScenesDataValues(self):
+        czi = CZIFile(Path(self.dataDir / "testCziFileTwoScenesTiny.czi"))
+        values1 = np.dstack((np.array([[89, 98], [106, 76]]), np.array([[263, 257], [238, 240]])))
+        values2 = np.dstack((np.array([[105, 73], [89, 101]]), np.array([[152, 153], [144, 164]])))
+        images = czi.scenesData().images
+        self.assertTrue(np.array_equal(images[0].asArray(), values1))
+        self.assertTrue(np.array_equal(images[1].asArray(), values2))
+
 
 if __name__ == '__main__':
     unittest.main()
