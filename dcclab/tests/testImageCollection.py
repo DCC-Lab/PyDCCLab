@@ -56,7 +56,7 @@ class TestImageCollection(env.dcclabTestCase):
             self.assertIsNotNone(ImageCollection("string"))
 
     def testInitImageCollection(self):
-        imgCollection = ImageCollection(pathPattern = self.dataFile(r"/tmp/test-(\d+).png"))
+        imgCollection = ImageCollection(pathPattern = self.dataFile(r"test-(\d+).jpg"))
         self.assertTrue(len(imgCollection) != 0)
         self.assertIsNotNone(imgCollection.images)
         self.assertTrue(imgCollection.numberOfImages > 0)
@@ -131,11 +131,11 @@ class TestImageCollection(env.dcclabTestCase):
             ImageCollection(imageList)
 
 
-class TesImageCollectionMethods(unittest.TestCase):
+class TesImageCollectionMethods(env.dcclabTestCase):
 
     def setUp(self) -> None:
         self.imageList = []
-        for i in range(5):
+        for i in range(12):
             array = (i+1)*np.ones((100,100,3), dtype=np.int8)
             image = Image(array)
             self.assertIsNotNone(image)
@@ -194,7 +194,7 @@ class TesImageCollectionMethods(unittest.TestCase):
 
     def testremoveAtOutOfBound(self):
         with self.assertRaises(IndexError):
-            self.collection.removeAt(5)
+            self.collection.removeAt(500)
 
     def testRemoveImageAtIndex(self):
         imageToRemove = self.imageList[-1]
@@ -259,10 +259,27 @@ class TesImageCollectionMethods(unittest.TestCase):
         self.assertTrue(listOfImage[0] == image)
 
     def testSaveCollection(self):
-        self.collection.save('/tmp/test-{0:03d}.gif')
-        self.collection.save('/tmp/test-{0:03d}.png')
-        self.collection.save('/tmp/test-{0:03d}.jpg')
-        self.collection.save('/tmp/test-{0:03d}.tif')
+        self.collection.save(self.tmpFile('test-{0:03d}.gif'))
+        self.collection.save(self.tmpFile('test-{0:03d}.png'))
+        self.collection.save(self.tmpFile('test-{0:03d}.jpg'))
+        self.collection.save(self.tmpFile('test-{0:03d}.tif'))
+
+    def testCollectionDimension(self):
+        self.assertTrue(self.collection.dimension == 1)
+        self.assertTrue(self.collection.dimension == 1)
+
+    def testCollectionShape(self):
+        self.assertTrue(self.collection.shape == (len(self.collection),))
+
+    def testCollectionReshape(self):
+        self.assertTrue(self.collection.shape == (len(self.collection),))
+        self.collection.reshape((3,4))
+        self.assertTrue(self.collection.shape == (3,4))
+        self.assertTrue(self.collection.dimension == 2)
+
+    def testCollectionReshapeAccess(self):
+        self.collection.reshape((3,4))
+        self.assertIsNotNone(self.collection[(1,2)])
 
 if __name__ == '__main__':
     unittest.main()
