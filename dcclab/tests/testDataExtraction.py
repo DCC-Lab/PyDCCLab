@@ -38,6 +38,7 @@ class DataExtractionMCherry(env.dcclabTestCase):
                 median = channel.getMedian() if computeMedian else np.nan
                 minimum, maximum = channel.getExtrema()
                 normalizedChannel = channel.convertToNormalizedFloat()
+                del channel
                 averageN = normalizedChannel.getAverageValueOfPixels()
                 stdDevN = normalizedChannel.getStandardDeviation()
                 entropyN = normalizedChannel.getShannonEntropy()
@@ -104,6 +105,7 @@ class DataExtractionEGFP(env.dcclabTestCase):
                 median = channel.getMedian() if computeMedian else np.nan
                 minimum, maximum = channel.getExtrema()
                 normalizedChannel = channel.convertToNormalizedFloat()
+                del channel
                 averageN = normalizedChannel.getAverageValueOfPixels()
                 stdDevN = normalizedChannel.getStandardDeviation()
                 entropyN = normalizedChannel.getShannonEntropy()
@@ -170,6 +172,7 @@ class DataExtractionDAPI(env.dcclabTestCase):
                 median = channel.getMedian() if computeMedian else np.nan
                 minimum, maximum = channel.getExtrema()
                 normalizedChannel = channel.convertToNormalizedFloat()
+                del channel
                 averageN = normalizedChannel.getAverageValueOfPixels()
                 stdDevN = normalizedChannel.getStandardDeviation()
                 entropyN = normalizedChannel.getShannonEntropy()
