@@ -73,14 +73,16 @@ class CZIFile(ImageFile):
         return coll
 
     def timeSeriesData(self):
-        tSeries = None
         if self.__isTimeSeries:
             tSeries = []
             nbTime = self.__axesDimAndIndex["T"][0]
-            mosaic = self.__mosaic.squeeze()
+            mosaic = self.__squeezeAllExceptChannel()
             for i in range(nbTime):
                 tSeries.append(Image(mosaic[i, :, :, :].transpose(1, 2, 0)))
-        return TimeSeries(tSeries)
+            tSeries = TimeSeries(tSeries)
+        else:
+            tSeries = None
+        return tSeries
 
     def zStackData(self):
         zStack = None
