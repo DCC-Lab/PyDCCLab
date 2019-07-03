@@ -12,7 +12,7 @@ class DataExtractionMCherry(env.dcclabTestCase):
         self.start = 0
         if self.start == 0:
             mode = "w"
-        with open(Path(self.dataDir / r"query_mcher.csv"), mode,
+        with open(Path(self.dataDir / r"query_mcher.csv"), "r",
                   encoding="utf-8") as readQuery:
             self.lines = readQuery.readlines()
 
