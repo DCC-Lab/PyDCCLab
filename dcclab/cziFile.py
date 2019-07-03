@@ -65,7 +65,7 @@ class CZIFile(ImageFile):
             channelIndex = self.__axesDimAndIndex["C"][1]
             # in case there is only one channel (it would be squeezed by np.squeeze)
             indexStopSqueeze = channelIndex if nbScenes == 1 else scenesIndex
-            mosaic = self.__squeezeAccordingToSlice(self.__mosaic, slice(0, indexStopSqueeze))
+            mosaic = self.__squeezeAllExceptChannel()
             for i in range(nbScenes):
                 scenes.append(Image(mosaic[i, :, :, :].transpose(1, 2, 0)))
         return ImageCollection(scenes)
@@ -191,6 +191,7 @@ class CZIFile(ImageFile):
             if index not in exceptionList and shape[index] == 1:
                 squeezeList.append(index)
         squeezeTuple = tuple(squeezeList)
+        return np.squeeze(self.__mosaic, axis=squeezeTuple)
 
     def __squeezeAllExceptChannel(self):
-        return
+        return self.squeezeAllExcept("C")
