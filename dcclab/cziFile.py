@@ -58,7 +58,6 @@ class CZIFile(ImageFile):
         pass
 
     def scenesData(self):
-        scenes = None
         if self.__isScenes:
             scenes = []
             nbScenes, scenesIndex = self.__axesDimAndIndex["S"]
@@ -68,7 +67,10 @@ class CZIFile(ImageFile):
             mosaic = self.__squeezeAllExceptChannel()
             for i in range(nbScenes):
                 scenes.append(Image(mosaic[i, :, :, :].transpose(1, 2, 0)))
-        return ImageCollection(scenes)
+            coll = ImageCollection(scenes)
+        else:
+            coll = None
+        return coll
 
     def timeSeriesData(self):
         tSeries = None
