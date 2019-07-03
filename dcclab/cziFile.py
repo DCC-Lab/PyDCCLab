@@ -61,9 +61,11 @@ class CZIFile(ImageFile):
         scenes = None
         if self.__isScenes:
             scenes = []
-            nbScenes = self.__axesDimAndIndex["S"][0]
+            nbScenes, scenesIndex = self.__axesDimAndIndex["S"]
             channelIndex = self.__axesDimAndIndex["C"][1]
-            mosaic = self.__squeezeAccordingToSlice(self.__mosaic, slice(0, channelIndex))
+            # in case there is only one channel (it would be squeezed by np.squeeze)
+            indexStopSqueeze = channelIndex if nbScenes == 1 else scenesIndex
+            mosaic = self.__squeezeAccordingToSlice(self.__mosaic, slice(0, indexStopSqueeze))
             for i in range(nbScenes):
                 scenes.append(Image(mosaic[i, :, :, :].transpose(1, 2, 0)))
         return ImageCollection(scenes)
@@ -176,18 +178,19 @@ class CZIFile(ImageFile):
         except AttributeError:
             print("Object already deleted")
 
-    @staticmethod
-    def __squeezeAccordingToSlice(array: np.ndarray, s: slice, removeLastDim: bool = True) -> np.ndarray:
-        """
-        Useful when you want to squeeze an array only in a specific range. For example, an array with shape
-        (1, 1, 1, 1000, 1000, 1) with axes BSCYX0, you don't want to remove the Channel dimension with np.squeeze.
-        You can use this method to remove axes [0, 1[ by specifying a slice(0, 1) and these axes will be removed.
-        :param array: input array to squeeze
-        :param s: slice object containing info on which axes to remove.
-        :param removeLastDim: boolean specifying if the last axe should be removed.
-        :return: The squeezed array
-        """
-        sliceToTuple = tuple(range(s.start, s.stop))
-        if removeLastDim:
-            sliceToTuple += (-1,)
-        return array.squeeze(axes=sliceToTuple)
+    def squeezeAllExcept(self, exceptions: str = "C") -> np.ndarray:
+        squeezeList = []
+        exceptionList = []
+        for exception in exceptions:
+            try:
+                exceptionList.append(self.__axesDimAndIndex[exception][1])
+            except KeyError:
+                raise ValueError("\"{}\" is not a valid axis.".format(exception))
+        shape = self.__shape
+        for index in range(len(shape)):
+            if index not in exceptionList and shape[index] == 1:
+                squeezeList.append(index)
+        squeezeTuple = tuple(squeezeList)
+
+    def __squeezeAllExceptChannel(self):
+        return
