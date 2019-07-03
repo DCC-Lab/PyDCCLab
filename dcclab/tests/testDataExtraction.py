@@ -8,12 +8,16 @@ computeMedian = False
 
 class DataExtractionMCherry(env.dcclabTestCase):
     def setUp(self):
-        with open(Path(self.dataDir / r"query_mcher.csv"), "r",
+        mode = "a"
+        self.start = 0
+        if self.start == 0:
+            mode = "w"
+        with open(Path(self.dataDir / r"query_mcher.csv"), mode,
                   encoding="utf-8") as readQuery:
             self.lines = readQuery.readlines()
 
         self.writeResults = open(Path(self.dataDir / r"query_mcher_results.csv"),
-                                 "w", encoding="utf-8")
+                                 mode, encoding="utf-8")
         self.writeResults.writelines(header)
 
     def tearDown(self):
@@ -21,7 +25,7 @@ class DataExtractionMCherry(env.dcclabTestCase):
 
     def testMCherryExtraction(self):
         numberOfFiles = len(self.lines)
-        for i in range(numberOfFiles):
+        for i in range(self.start, numberOfFiles):
             path, channelNumber = self.lines[i].split(";")
             channelNumber = channelNumber.split(":")[1]
             pathChanged = os.path.join("../", path)
@@ -70,12 +74,16 @@ class DataExtractionMCherry(env.dcclabTestCase):
 
 class DataExtractionEGFP(env.dcclabTestCase):
     def setUp(self):
+        mode = "a"
+        self.start = 0
+        if self.start == 0:
+            mode = "w"
         with open(Path(self.dataDir / r"query_egfp.csv"), "r",
                   encoding="utf-8") as readQuery:
             self.lines = readQuery.readlines()
 
         self.writeResults = open(Path(self.dataDir / r"query_egfp_results.csv"),
-                                 "w", encoding="utf-8")
+                                 mode, encoding="utf-8")
         self.writeResults.writelines(header)
 
     def tearDown(self):
@@ -83,7 +91,7 @@ class DataExtractionEGFP(env.dcclabTestCase):
 
     def testEGFPExtraction(self):
         numberOfFiles = len(self.lines)
-        for i in range(numberOfFiles):
+        for i in range(self.start, numberOfFiles):
             path, channelNumber = self.lines[i].split(";")
             channelNumber = channelNumber.split(":")[1]
             pathChanged = os.path.join("../", path)
@@ -132,12 +140,16 @@ class DataExtractionEGFP(env.dcclabTestCase):
 
 class DataExtractionDAPI(env.dcclabTestCase):
     def setUp(self):
+        mode = "a"
+        self.start = 0
+        if self.start == 0:
+            mode = "w"
         with open(Path(self.dataDir / r"query_DAPI.csv"), "r",
                   encoding="utf-8") as readQuery:
             self.lines = readQuery.readlines()
 
         self.writeResults = open(Path(self.dataDir / r"query_DAPI_results.csv"),
-                                 "w", encoding="utf-8")
+                                 mode, encoding="utf-8")
         self.writeResults.writelines(header)
 
     def tearDown(self):
@@ -145,7 +157,7 @@ class DataExtractionDAPI(env.dcclabTestCase):
 
     def testDAPIExtraction(self):
         numberOfFiles = len(self.lines)
-        for i in range(numberOfFiles):
+        for i in range(self.start, numberOfFiles):
             path, channelNumber = self.lines[i].split(";")
             channelNumber = channelNumber.split(":")[1]
             pathChanged = os.path.join("../", path)
