@@ -6,7 +6,7 @@ import unittest
 import os
 
 
-class TestCziChannel(env.dcclabTestCase):
+class TestCziChannel(env.DCCLabTestCase):
     def setUp(self):
         self.directory = self.dataDir
         self.testPath = os.path.join(self.directory, 'testCziFile.czi')

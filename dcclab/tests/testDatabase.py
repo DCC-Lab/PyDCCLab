@@ -5,7 +5,7 @@ import os
 from pathlib import Path, PureWindowsPath
 import tempfile
 
-class TestDatabase(env.dcclabTestCase):
+class TestDatabase(env.DCCLabTestCase):
     def setUp(self):
         self.directory = self.dataDir
         self.filePath = os.path.join(self.tmpDir, 'unittest.db')
