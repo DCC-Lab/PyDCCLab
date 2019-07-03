@@ -181,6 +181,24 @@ class TestProperties(env.dcclabTestCase):
         values = np.dstack((np.array([[7, 6], [7, 6]]), np.array([[47, 45], [48, 48]]), np.array([[36, 34], [38, 37]])))
         self.assertTrue(np.array_equal(czi.imageData().asArray(), values))
 
+    def testImageDataBSCYX0Values(self):
+        czi = CZIFile(Path(self.dataDir / "testCziBSCZY0Tiny.czi"))
+        values = np.dstack((np.array([[596, 652], [622, 618]]), np.array([[1059, 1061], [1133, 1087]]),
+                            np.array([[510, 511], [505, 497]])))
+        self.assertTrue(np.array_equal(czi.imageData().asArray(), values))
+
+    def testScenesDataOneSceneNone(self):
+        czi = CZIFile(Path(self.dataDir / "testCziThreeChannelsOneScene.czi"))
+        self.assertIsNone(czi.scenesData())
+
+    def testScenesDataTwoScenes(self):
+        czi = CZIFile(Path(self.dataDir / "testCziMultipleScenes.czi"))
+        self.assertIsNotNone(czi.scenesData())
+
+    def testScenesDataTwoScenes(self):
+        czi = CZIFile(Path(self.dataDir / "testCziMultipleScenes.czi"))
+        self.assertEqual(len(czi.scenesData()), 2)
+
 
 if __name__ == '__main__':
     unittest.main()
