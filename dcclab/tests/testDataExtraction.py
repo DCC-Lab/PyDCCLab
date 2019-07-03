@@ -72,7 +72,7 @@ class DataExtractionMCherry(env.dcclabTestCase):
                                                                      stdDevN, entropyN, medianN, minimumN, maximumN))
             print("{} / {} files read (mCherry)".format(i + 1, numberOfFiles))
 
-
+"""
 class DataExtractionEGFP(env.dcclabTestCase):
     def setUp(self):
         mode = "a"
@@ -207,6 +207,6 @@ class DataExtractionDAPI(env.dcclabTestCase):
                                                                      stdDevN, entropyN, medianN, minimumN, maximumN))
             print("{} / {} files read (DAPI)".format(i + 1, numberOfFiles))
 
-
+"""
 if __name__ == '__main__':
     unittest.main()
