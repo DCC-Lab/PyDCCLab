@@ -4,7 +4,7 @@ import unittest
 import numpy as np
 from pathlib import Path, PureWindowsPath
 
-class TestMATLABFile(env.dcclabTestCase):
+class TestMATLABFile(env.DCCLabTestCase):
 
     def testInit(self):
         self.assertIsNotNone(MATLABFile(Path(self.dataDir / "test.mat")))

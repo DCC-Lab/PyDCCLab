@@ -6,7 +6,8 @@ import numpy as np
 from pathlib import Path, PureWindowsPath
 
 
-class TestConstructor(env.dcclabTestCase):
+class TestConstructor(env.DCCLabTestCase):
+
 
     def testValidCziFile(self):
         try:
@@ -23,7 +24,7 @@ class TestConstructor(env.dcclabTestCase):
             CZIFile(Path(self.dataDir / "FileNotFound.czi"))
 
 
-class TestProperties(env.dcclabTestCase):
+class TestProperties(env.DCCLabTestCase):
 
     def testNumberOfChannels(self):
         czi3Channels = CZIFile(Path(self.dataDir / "testCziFileThreeChannelsFourTiles.czi"))

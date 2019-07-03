@@ -3,7 +3,7 @@ import unittest
 import os
 from pathlib import Path
 
-class TestBaseClass(env.dcclabTestCase):
+class TestBaseClass(env.DCCLabTestCase):
     def testInit(self):
         self.assertIsNotNone(self.tmpDir)
         self.assertIsNotNone(self.dataDir)

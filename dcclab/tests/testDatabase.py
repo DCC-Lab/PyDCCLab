@@ -5,7 +5,7 @@ import os
 from pathlib import Path, PureWindowsPath
 import tempfile
 
-class TestDatabase(env.dcclabTestCase):
+class TestDatabase(env.DCCLabTestCase):
     def setUp(self):
         self.directory = self.dataDir
         self.filePath = os.path.join(self.tmpDir, 'unittest.db')
@@ -95,7 +95,8 @@ class TestDatabase(env.dcclabTestCase):
         database = db('unittest.db', writePermission=False)
         self.assertEqual(database.path, 'file:unittest.db?mode=ro')
 
-    @unittest.expectedFailure
+    # Linux and MacOS are 'posix', windows is 'nt'.
+    @unittest.skipIf(os.name == 'posix', reason='Path is a Windows Path.')
     def testWindowsPathToPosix(self):
         database = db(r'C:\sqlite3\Database\test.db', writePermission=True)
         self.assertEqual(database.path, 'file:C:/sqlite3/Database/test.db?mode=rwc')
