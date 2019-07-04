@@ -8,6 +8,8 @@ import os
 # Fixme: only tested Zstacks with 3D Arrays : test zStack/ImageCollection from image files
 # Todo: I can prepare a small stack sample folder.
 
+
+@unittest.skip("Deprecated")
 class TestZStackFrom3DArray(env.DCCLabTestCase):
 
     def setUp(self):
