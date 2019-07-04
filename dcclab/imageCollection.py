@@ -419,7 +419,7 @@ class ZStack(ImageCollection):
         """ Labelling always need to be processed in 3D """
         for channel in list(range(self.numberOfChannels)):
             maskStackArray = self.getChannelMaskArray(channel)
-            labelStackArray, nbObjects = label(maskStackArray)
+            labelStackArray, nbObjects = ndimage.label(maskStackArray)
             self.componentsProperties["Channel {}".format(channel)] = OrderedDict()
             self.componentsProperties["Channel {}".format(channel)]["nbOfObjects"] = nbObjects
 
