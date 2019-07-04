@@ -5,7 +5,7 @@ import czifile
 import numpy as np
 from pathlib import Path, PureWindowsPath
 
-class TestCZIFile(env.dcclabTestCase):
+class TestCZIFile(env.DCCLabTestCase):
 
     def testAxesNotSupported(self):
         czi = CZIFile(Path(self.dataDir / "testCziAxesNotYetSupported.czi"))

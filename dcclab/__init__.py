@@ -10,6 +10,7 @@ from .channelInteger import *
 from .channelFloat import *
 from .pathPattern import *
 from .cziFile import *
+from .movieFile import *
 
 from .database import *
 from .metadata import *

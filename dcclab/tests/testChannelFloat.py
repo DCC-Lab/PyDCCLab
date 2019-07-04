@@ -4,7 +4,7 @@ import unittest
 import numpy as np
 
 
-class TestChannelFloat(env.dcclabTestCase):
+class TestChannelFloat(env.DCCLabTestCase):
 
     def setUp(self) -> None:
         array = np.ones((10, 10), dtype=np.float32) * 2.35

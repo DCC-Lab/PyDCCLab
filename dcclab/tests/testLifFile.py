@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path, PureWindowsPath
 
 
-class TestLifFile(env.dcclabTestCase):
+class TestLifFile(env.DCCLabTestCase):
 
     def setUp(self):
         self.lifObj = LIFFile(Path(self.dataDir, 'test_LifFile.lif'))
