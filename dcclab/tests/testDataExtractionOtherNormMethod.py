@@ -71,7 +71,7 @@ class DataExtractionEGFP(env.DCCLabTestCase):
                   encoding="utf-8") as readQuery:
             self.lines = readQuery.readlines()
 
-        self.writeResults = open(Path(self.dataDir / r"query_egfp_results.csv"),
+        self.writeResults = open(Path(self.dataDir / r"query_egfp_resultsN.csv"),
                                  mode, encoding="utf-8")
         self.writeResults.writelines(header)
 
@@ -126,7 +126,7 @@ class DataExtractionDAPI(env.DCCLabTestCase):
                   encoding="utf-8") as readQuery:
             self.lines = readQuery.readlines()
 
-        self.writeResults = open(Path(self.dataDir / r"query_DAPI_results.csv"),
+        self.writeResults = open(Path(self.dataDir / r"query_DAPI_resultsN.csv"),
                                  mode, encoding="utf-8")
         self.writeResults.writelines(header)
 
