@@ -1,6 +1,6 @@
+from zipfile import ZipFile
 import os
 import fnmatch
-import zipfile
 
 
 def findFiles(directory, extension) -> list:
@@ -14,7 +14,7 @@ def findFiles(directory, extension) -> list:
 
 def appendToZip(path, file):
     try:
-        with zipfile.ZipFile(path, 'a') as zeep:
+        with ZipFile(path, 'a') as zeep:
             zeep.write(file)
     except:
         pass
