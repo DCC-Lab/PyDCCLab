@@ -262,6 +262,12 @@ class TestChannelInteger(env.DCCLabTestCase):
         self.channelUint16.applyYDerivative()
         self.assertIsInstance(self.channelUint16, ChannelInt)
 
+    def testNormalizationMinToZeroMaxToOne(self):
+        normalizedFrom8bits = self.channelUint8.convertToNormalizedFloatMinToZeroMaxToOne()
+        normalizedFrom16bits = self.channelUint16.convertToNormalizedFloatMinToZeroMaxToOne()
+        self.assertTupleEqual(normalizedFrom8bits.getExtrema(), (0, 1))
+        self.assertTupleEqual(normalizedFrom16bits.getExtrema(), (0, 1))
+
 
 if __name__ == '__main__':
     unittest.main()

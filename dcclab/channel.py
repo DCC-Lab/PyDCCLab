@@ -158,7 +158,7 @@ class Channel:
     def convertToNormalizedFloat(self):
         pass
 
-    def convertToNormalizedFloatFromMaxValue(self):
+    def convertToNormalizedFloatMinToZeroMaxToOne(self):
         pass
 
     def convertToNormalizedFloat(self):

@@ -32,7 +32,7 @@ class DataExtractionMCherry(env.DCCLabTestCase):
             try:
                 image = Image(path=pathChanged)
                 channel = image.channels[int(channelNumber)]
-                normalizedChannel = channel.convertToNormalizedFloatFromMaxValue()
+                normalizedChannel = channel.convertToNormalizedFloatMinToZeroMaxToOne()
                 del channel
                 averageN = normalizedChannel.getAverageValueOfPixels()
                 stdDevN = normalizedChannel.getStandardDeviation()
@@ -86,7 +86,7 @@ class DataExtractionEGFP(env.DCCLabTestCase):
                 channel = image.channels[int(channelNumber)]
                 normalizedChannel = channel.convertToNormalizedFloat()
                 del channel
-                averageN = normalizedChannel.getAverageValueOfPixels()
+                averageN = normalizedChannel.convertToNormalizedFloatMinToZeroMaxToOne()
                 stdDevN = normalizedChannel.getStandardDeviation()
                 entropyN = normalizedChannel.getShannonEntropy()
                 medianN = normalizedChannel.getMedian() if computeMedian else np.nan
@@ -136,7 +136,7 @@ class DataExtractionDAPI(env.DCCLabTestCase):
             try:
                 image = Image(path=pathChanged)
                 channel = image.channels[int(channelNumber)]
-                normalizedChannel = channel.convertToNormalizedFloat()
+                normalizedChannel = channel.convertToNormalizedFloatMinToZeroMaxToOne()
                 del channel
                 averageN = normalizedChannel.getAverageValueOfPixels()
                 stdDevN = normalizedChannel.getStandardDeviation()
