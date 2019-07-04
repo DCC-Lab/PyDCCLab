@@ -163,6 +163,9 @@ class ChannelInt(Channel):
     def convertToNormalizedFloat(self) -> Channel:
         return Channel(np.copy(self.pixels) / self._originalFactor)
 
+    def convertToNormalizedFloatFromMaxValue(self) -> Channel:
+        return Channel(np.copy(self.pixels) / self.getExtrema()[1])
+
     def _convertToUnsignedInt(self, dtype) -> Channel:
         convertedArray = np.copy(self.pixels) / self._originalFactor * np.iinfo(dtype).max
         return Channel(convertedArray.astype(dtype))
