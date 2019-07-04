@@ -95,7 +95,8 @@ class TestDatabase(env.DCCLabTestCase):
         database = db('unittest.db', writePermission=False)
         self.assertEqual(database.path, 'file:unittest.db?mode=ro')
 
-    @unittest.expectedFailure
+    # Linux and MacOS are 'posix', windows is 'nt'.
+    @unittest.skipIf(os.name == 'posix', reason='Path is a Windows Path.')
     def testWindowsPathToPosix(self):
         database = db(r'C:\sqlite3\Database\test.db', writePermission=True)
         self.assertEqual(database.path, 'file:C:/sqlite3/Database/test.db?mode=rwc')
