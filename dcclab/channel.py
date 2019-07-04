@@ -158,6 +158,12 @@ class Channel:
     def convertToNormalizedFloat(self):
         pass
 
+    def convertToNormalizedFloatFromMaxValue(self):
+        pass
+
+    def convertToNormalizedFloat(self):
+        pass
+
     def filterNoise(self):
         self.applyNoiseFilter()
 
