@@ -437,6 +437,14 @@ class Channel:
             plt.imshow(channels[i].pixels)
         plt.show()
 
+    def fourierTransform(self):
+        pixels = self._pixels
+        fourierTransform = np.fft.fft2(pixels)
+        shiftedFourierTransform = np.fft.fftshift(fourierTransform)
+        magnitudeSpectrum = 30 * np.log(np.abs(shiftedFourierTransform))
+        magnitudeSpectrum = np.asarray(magnitudeSpectrum, self._originalDType)
+        return Channel(magnitudeSpectrum)
+
 
 from .channelFloat import ChannelFloat
 from .channelInteger import ChannelInt
