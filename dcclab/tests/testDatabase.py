@@ -1,7 +1,7 @@
 import env
-from dcclab import Database as db
 import unittest
 import os
+from dcclab import Database as db
 
 
 class TestDatabase(env.DCCLabTestCase):
