@@ -3,7 +3,7 @@ import unittest
 from dcclab.cziFile import CZIFile
 from dcclab.DCCExceptions import *
 import numpy as np
-from pathlib import Path, PureWindowsPath
+from pathlib import Path
 
 
 class TestConstructor(env.DCCLabTestCase):
