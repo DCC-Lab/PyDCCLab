@@ -2,7 +2,7 @@ import env
 from dcclab import *
 import unittest
 
-header = "path,channelNumber,average,stdDev,entropy,median,min,max,averageN,stdDevN,entropyN,medianN,minN,maxN"
+header = "path,channelNumber,averageN,stdDevN,entropyN,medianN"
 computeMedian = True
 
 
@@ -38,7 +38,6 @@ class DataExtractionMCherry(env.DCCLabTestCase):
                 stdDevN = normalizedChannel.getStandardDeviation()
                 entropyN = normalizedChannel.getShannonEntropy()
                 medianN = normalizedChannel.getMedian() if computeMedian else np.nan
-                minimumN, maximumN = normalizedChannel.getExtrema()
             except Exception as e:
 
                 if isinstance(e, NotImplementedError):
@@ -52,12 +51,10 @@ class DataExtractionMCherry(env.DCCLabTestCase):
                 stdDevN = average
                 entropyN = average
                 medianN = average
-                minimumN = average
-                maximumN = average
 
             self.writeResults.writelines(
-                "\n{},{},{},{},{},{},{},{}".format(path, channelNumber.strip(), averageN, stdDevN,
-                                                   entropyN, medianN, minimumN, maximumN))
+                "\n{},{},{},{},{},{}".format(path, channelNumber.strip(), averageN, stdDevN,
+                                             entropyN, medianN))
             print("{} / {} files read (mCherry)".format(i + 1, numberOfFiles))
 
 
@@ -93,7 +90,6 @@ class DataExtractionEGFP(env.DCCLabTestCase):
                 stdDevN = normalizedChannel.getStandardDeviation()
                 entropyN = normalizedChannel.getShannonEntropy()
                 medianN = normalizedChannel.getMedian() if computeMedian else np.nan
-                minimumN, maximumN = normalizedChannel.getExtrema()
             except Exception as e:
 
                 if isinstance(e, NotImplementedError):
@@ -107,12 +103,10 @@ class DataExtractionEGFP(env.DCCLabTestCase):
                 stdDevN = average
                 entropyN = average
                 medianN = average
-                minimumN = average
-                maximumN = average
 
             self.writeResults.writelines(
-                "\n{},{},{},{},{},{},{},{}".format(path, channelNumber.strip(), averageN, stdDevN,
-                                                   entropyN, medianN, minimumN, maximumN))
+                "\n{},{},{},{},{},{}".format(path, channelNumber.strip(), averageN, stdDevN,
+                                             entropyN, medianN))
             print("{} / {} files read (EGFP)".format(i + 1, numberOfFiles))
 
 
@@ -148,7 +142,6 @@ class DataExtractionDAPI(env.DCCLabTestCase):
                 stdDevN = normalizedChannel.getStandardDeviation()
                 entropyN = normalizedChannel.getShannonEntropy()
                 medianN = normalizedChannel.getMedian() if computeMedian else np.nan
-                minimumN, maximumN = normalizedChannel.getExtrema()
 
             except Exception as e:
 
@@ -163,12 +156,10 @@ class DataExtractionDAPI(env.DCCLabTestCase):
                 stdDevN = average
                 entropyN = average
                 medianN = average
-                minimumN = average
-                maximumN = average
 
             self.writeResults.writelines(
-                "\n{},{},{},{},{},{},{},{}".format(path, channelNumber.strip(), averageN, stdDevN,
-                                                   entropyN, medianN, minimumN, maximumN))
+                "\n{},{},{},{},{},{}".format(path, channelNumber.strip(), averageN, stdDevN,
+                                             entropyN, medianN))
             print("{} / {} files read (DAPI)".format(i + 1, numberOfFiles))
 
 
