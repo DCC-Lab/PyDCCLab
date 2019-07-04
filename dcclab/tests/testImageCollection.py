@@ -5,7 +5,7 @@ import unittest
 import numpy as np
 import re
 
-class TestImageCollection(env.dcclabTestCase):
+class TestImageCollection(env.DCCLabTestCase):
     @classmethod
     def setUpClass(cls):
         super(TestImageCollection, cls).setUpClass()

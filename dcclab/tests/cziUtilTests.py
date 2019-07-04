@@ -5,7 +5,7 @@ import numpy as np
 from unittest.mock import Mock, patch
 
 
-class TestCziUtil(env.dcclabTestCase):
+class TestCziUtil(env.DCCLabTestCase):
 
     def TestReadCziFile(self):
         import czifile

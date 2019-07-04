@@ -6,7 +6,7 @@ import unittest
 import os
 
 
-class TestMetadata(env.dcclabTestCase):
+class TestMetadata(env.DCCLabTestCase):
     def setUp(self):
         self.cziPath = Path(self.dataDir / 'testCziFile.czi')
         self.csvPath = Path(self.dataDir / 'unittest.csv')

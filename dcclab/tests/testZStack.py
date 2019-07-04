@@ -9,7 +9,7 @@ import os
 # Todo: I can prepare a small stack sample folder.
 
 
-class TestZStackFrom3DArray(env.dcclabTestCase):
+class TestZStackFrom3DArray(env.DCCLabTestCase):
 
     def setUp(self):
         self.depth = 5
@@ -202,14 +202,14 @@ class TestZStackFrom3DArray(env.dcclabTestCase):
         pass
 
 
-class TestZStackFrom4DArray(env.dcclabTestCase):
+class TestZStackFrom4DArray(env.DCCLabTestCase):
 
     @unittest.skip("Collection from 4D arrays is Not Implemented")
     def testZStackFromRGBArray(self):
         RGBStack = np.zeros((40, 40, 10, 3))
 
 
-class TestZStackFromImages(env.dcclabTestCase):
+class TestZStackFromImages(env.DCCLabTestCase):
 
     def testImagesAreSimilar(self):
         pass

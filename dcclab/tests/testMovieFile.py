@@ -3,7 +3,7 @@ from dcclab import *
 import unittest
 import os
 
-class TestMovieFile(env.dcclabTestCase):
+class TestMovieFile(env.DCCLabTestCase):
     def testInit(self):
         self.assertIsNotNone(MovieFile(self.dataFile("testMovie.mov")))
 

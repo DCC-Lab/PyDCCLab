@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 import unittest
 import os
 
-class TestFilter(env.dcclabTestCase):
+class TestFilter(env.DCCLabTestCase):
     def setUp(self):
         self.directory = self.dataDir
         self.testPath = os.path.join(self.directory, 'testCziFile.czi')
