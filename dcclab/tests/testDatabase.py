@@ -2,8 +2,7 @@ import env
 from dcclab import Database as db
 import unittest
 import os
-from pathlib import Path, PureWindowsPath
-import tempfile
+
 
 class TestDatabase(env.DCCLabTestCase):
     def setUp(self):
@@ -16,13 +15,13 @@ class TestDatabase(env.DCCLabTestCase):
         self.database.connect()
 
         # We create a fake table.
-        self.database.begin()
+        self.database.beginTransaction()
         testTable = {'test_table': {'column_1': 'INTEGER PRIMARY KEY', 'column_2': 'TEXT', 'column_3': 'REAL'}}
         self.database.createTable(testTable)
         self.database.commit()
 
         # We create fake data and insert it into the table.
-        self.database.begin()
+        self.database.beginTransaction()
         frstValue = {'column_1': 1234, 'column_2': 'abcd', 'column_3': 0.1234}
         scndValue = {'column_1': 5678, 'column_2': 'efgh', 'column_3': 0.5678}
         self.database.insert('test_table', frstValue)
@@ -118,13 +117,13 @@ class TestDatabase(env.DCCLabTestCase):
         database.connect()
 
         testValue = {'column_1': 9101, 'column_2': 'plop', 'column_3': 0.9101}
-        database.begin()
+        database.beginTransaction()
         database.insert('test_table', testValue)
         database.rollback()
 
-        database.begin()
+        database.beginTransaction()
         row = database.select('test_table', 'column_1', 'column_1=9101')
-        database.end()
+        database.endTransaction()
         self.assertFalse(row)
         database.disconnect()
 
@@ -218,6 +217,12 @@ class TestDatabase(env.DCCLabTestCase):
 
         row = database.fetchOne()
         self.assertFalse(row)
+
+    def testContextManager(self):
+        with db(self.filePath) as database:
+            self.assertTrue(database.isConnected)
+
+        self.assertFalse(database.isConnected)
 
 
 if __name__ == '__main__':
