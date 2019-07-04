@@ -1,5 +1,5 @@
 from .__lifReader import LifReader
-from .imageCollection import ZStack
+from .imageCollection import ZStack  # FIXME: creates a circular import that crashes
 from typing import Union, List
 from .cziUtil import *
 from .channel import *
