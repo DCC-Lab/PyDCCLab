@@ -441,7 +441,7 @@ class Channel:
         pixels = self._pixels
         fourierTransform = np.fft.fft2(pixels)
         shiftedFourierTransform = np.fft.fftshift(fourierTransform)
-        magnitudeSpectrum = 30 * np.log(np.abs(shiftedFourierTransform))
+        magnitudeSpectrum = 20 * np.log(np.abs(shiftedFourierTransform))
         magnitudeSpectrum = np.asarray(magnitudeSpectrum, self._originalDType)
         return Channel(magnitudeSpectrum)
 
@@ -484,7 +484,7 @@ class Channel:
         innerMask = x ** 2 + y ** 2 <= circleRadius ** 2
         mask = np.zeros(imageDim, dtype=bool)
         mask[innerMask] = 1
-        return mask
+        return mask.astype(int)
 
 
 from .channelFloat import ChannelFloat

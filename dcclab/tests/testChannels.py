@@ -85,7 +85,7 @@ class TestChannels(env.DCCLabTestCase):
         pixels = channel.copy()
         self.assertFalse(pixels is array)
 
-    def testIsBinary(self):        
+    def testIsBinary(self):
         array = np.random.randint(low=0, high=2, size=(100, 200))
         self.assertTrue(Channel(pixels=array).isBinary)
         self.assertFalse(Channel(pixels=array*255).isBinary)
@@ -112,7 +112,7 @@ class TestChannels(env.DCCLabTestCase):
     #     channel = Channel(pixels=array)
     #     hist, bins = channel.getHistogramValues(True)
     #     self.assertAlmostEqual(sum(hist), 1, delta=1e-9)
-       
+
     def testConvolution(self):
         # FIXME: test result
         array = np.random.randint(low=0, high=255, size=(100, 200))
@@ -196,7 +196,7 @@ class TestChannelsSegmentation(env.DCCLabTestCase):
         properties = channel.analyzeComponents()
         self.assertTrue(channel.numberOfComponents == 2)
         self.assertIsNotNone(properties)
-        
+
     def testFilterNoise(self):
         array = np.array([[1, 0, 0, 0],[0, 2,2, 0],[0, 0,0, 3]])
         channel = Channel(array)
@@ -216,6 +216,30 @@ class TestChannelsSegmentation(env.DCCLabTestCase):
     #     channel.labelMaskComponents()
     #     channel.analyzeComponents()
     #     channel.saveComponentsStatistics("/tmp/test.json")
+
+class TestChannelSpectralFiltering(env.DCCLabTestCase):
+
+    def testCircularMaskBool(self):
+        dim = (1000, 1000)
+        circleRadius = 3
+        mask = Channel.createCircularMask(dim, circleRadius)
+        self.assertEqual(mask.dtype, int)
+
+    def testCircularMaskValues(self):
+        # Test if the center of the mask is really a circular mask
+        dim = (1100,1101)
+        circleRadius = 125
+        mask = Channel.createCircularMask(dim, circleRadius)
+        maskCenterX, maskCenterY = dim[0] // 2, dim[1] // 2
+        supposedMask = morphology.selem.disk(circleRadius)
+        self.assertTrue(np.array_equal(mask[maskCenterY-circleRadius:maskCenterY+circleRadius+1, maskCenterX-circleRadius:maskCenterX+circleRadius+1], supposedMask))
+        
+    def testFourierTransform(self):
+        pass
+ 
+
+
+
 
 if __name__ == '__main__':
     unittest.main()
