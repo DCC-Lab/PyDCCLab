@@ -464,9 +464,11 @@ class Channel:
         lowPassedChannel = self.lowPassFilter(radius)
         return lowPassedChannel.inverseFourierTransform()
 
-    def highPassFilter(self, radius:int):
+    def highPassFilter(self, radius: int):
         pass
 
+
+"""
     def __spectralFiltering(self, radius: int, isLowPass: bool):
         fourierTransformedPixels = self.fourierTransform().pixels
         innerMask = morphology.disk(radius, dtype=bool)
@@ -493,6 +495,6 @@ class Channel:
         inerMask = x ** 2 + y ** 2 <= circleRadius ** 2
         mask
 
-
+"""
 from .channelFloat import ChannelFloat
 from .channelInteger import ChannelInt
