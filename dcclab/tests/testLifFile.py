@@ -8,7 +8,7 @@ from pathlib import Path, PureWindowsPath
 class TestLifFile(env.DCCLabTestCase):
 
     def setUp(self):
-        self.lifObj = LIFFile(Path(self.dataDir, 'test_LifFile.lif'))
+        self.lifObj = LIFFile(Path(self.dataDir, 'test_LifFile.lif').__str__())
 
     def testInitWithLifFile(self):
         self.assertIsNotNone(self.lifObj)
