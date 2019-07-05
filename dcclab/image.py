@@ -1,4 +1,4 @@
-from .imageFile import CZIFile_, TIFFFile, PILFile, MATLABFile, LIFFile
+from .imageFile import *
 from .channel import Channel
 from .DCCExceptions import *
 import numpy as np
@@ -11,7 +11,7 @@ from typing import List, Union
 
 class Image:
 
-    supportedClasses = [CZIFile_, TIFFFile, PILFile, MATLABFile]  # todo: Maybe add LIFFILE if we can implement an imageData method for LIF files
+    supportedClasses = [CZIFile_, TIFFFile, PILFile, MATLABFile]
     supportedFormats = []
 
     def __init__(self, imageData: np.ndarray = None, path: str = None):

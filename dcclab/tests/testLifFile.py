@@ -1,5 +1,5 @@
 import env
-from dcclab import *
+from dcclab import LIFFile
 from dcclab.__lifReader import LifSerie
 import unittest
 from pathlib import Path, PureWindowsPath

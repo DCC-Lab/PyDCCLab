@@ -1,5 +1,5 @@
 from .image import *
-# from .image import Image  # fixme: ImportError: cannot import name 'Image'
+from .image import Image
 from .pathPattern import *
 import numpy as np
 import json
