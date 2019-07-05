@@ -1,4 +1,5 @@
 from .image import *
+# from .image import Image  # fixme: ImportError: cannot import name 'Image'
 from .pathPattern import *
 import numpy as np
 import json
@@ -14,7 +15,7 @@ import sys
 
 
 class ImageCollection:
-    def __init__(self, images: List['Image']=None, imagesArray:np.ndarray=None, pathPattern: str=None):
+    def __init__(self, images: List['Image']=None, imagesArray: np.ndarray=None, pathPattern: str=None):
         self.__images = []
         if images is not None:
             if not all(isinstance(image, Image) for image in images):
