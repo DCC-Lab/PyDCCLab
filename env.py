@@ -41,5 +41,5 @@ class DCCLabTestCase(unittest.TestCase):
     def tmpFile(self, filename):
         return os.path.join(self.tmpDir, filename)
 
-# Very important:  append module root directory to sys.path
-#sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+# No need to add the directory to sys path because this is for PyCharm only, which includes it already
+#sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__))))
