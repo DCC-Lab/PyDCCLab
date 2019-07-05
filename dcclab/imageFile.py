@@ -200,7 +200,7 @@ class LIFFile(ImageFile):
     def removeAt(self, index: int):
         self.series.pop(index)
 
-    def zStackData(self, seriesIndex: int=None, channelIndices=None, crop=False) -> ZStack:
+    def zStackData(self, seriesIndex: int=None, channelIndices=None, crop=False) -> 'ZStack':
         if seriesIndex is None:
             assert self.numberOfSeries == 1
             seriesIndex = 0
@@ -211,7 +211,7 @@ class LIFFile(ImageFile):
         zStack = ZStack(imagesArray=stackArray, cropAtInit=crop)
         return zStack
 
-    def zStacksData(self, seriesIndices=None, channelIndices=None, crop=False) -> List[ZStack]:
+    def zStacksData(self, seriesIndices=None, channelIndices=None, crop=False) -> List['ZStack']:
         if type(seriesIndices) is int:
             seriesIndices = [seriesIndices]
 

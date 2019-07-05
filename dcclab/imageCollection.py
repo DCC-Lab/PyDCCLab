@@ -1,5 +1,4 @@
 from .image import *
-from .image import Image
 from .pathPattern import *
 import numpy as np
 import json
@@ -15,7 +14,7 @@ import sys
 
 
 class ImageCollection:
-    def __init__(self, images: List[Image]=None, imagesArray:np.ndarray=None, pathPattern: str=None):
+    def __init__(self, images: List['Image']=None, imagesArray:np.ndarray=None, pathPattern: str=None):
         self.__images = []
         if images is not None:
             if not all(isinstance(image, Image) for image in images):
@@ -110,7 +109,7 @@ class ImageCollection:
     def contains(self, image) -> bool:
         return self.indexOf(image) is not None
 
-    def append(self, image: Image):
+    def append(self, image: 'Image'):
         if self.contains(image):
             raise ImageAlreadyInCollectionException
         if not isinstance(image, Image):
@@ -118,7 +117,7 @@ class ImageCollection:
 
         self.images.append(image)
 
-    def extend(self, images: List[Image]):
+    def extend(self, images: List['Image']):
         for image in images:
             if self.contains(image):
                 raise ImageAlreadyInCollectionException
@@ -165,7 +164,7 @@ class ImageCollection:
     def removeAt(self, index: int):
         self.images.pop(index)
 
-    def remove(self, image: Image):
+    def remove(self, image: 'Image'):
         if not isinstance(image, Image):
             raise NotImageException
 
@@ -216,14 +215,14 @@ class ImageCollection:
         for image in self.images:
             image.threshold(value)
 
-    def setMask(self, mask: Channel):
+    def setMask(self, mask: 'Channel'):
         if mask.isBinary:
             for image in self.images:
                 image.setMask(mask)
         else:
             raise ValueError("Mask must be binary")
 
-    def setMasks(self, masks: [Channel]):
+    def setMasks(self, masks: ['Channel']):
         if len(masks) == len(self.images):
             for mask in masks:
                 for image in self.images:
@@ -302,7 +301,7 @@ class ImageCollection:
 
 
 class ZStack(ImageCollection):
-    def __init__(self, images: List[Image]=None, imagesArray: np.ndarray=None, pathPattern: str=None, cropAtInit=False):
+    def __init__(self, images: List['Image']=None, imagesArray: np.ndarray=None, pathPattern: str=None, cropAtInit=False):
         self.cropX, self.cropY = [], []
         self.cropFig = None
         self.cropRect = None
