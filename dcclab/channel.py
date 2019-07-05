@@ -445,6 +445,54 @@ class Channel:
         magnitudeSpectrum = np.asarray(magnitudeSpectrum, self._originalDType)
         return Channel(magnitudeSpectrum)
 
+    def inverseFourierTransform(self):
+        pixels = self.pixels
+        shiftedInverseFourierTransform = np.fft.ifftshift(pixels)
+        inversedFourierTransform = np.fft.ifft2(shiftedInverseFourierTransform)
+        outputPixels = np.abs(inversedFourierTransform)
+        outputPixels = np.asarray(outputPixels, self._originalDType)
+        return Channel(outputPixels)
+
+    def lowPassFilter(self, radius: int):
+        fourierTransformedPixels = self.fourierTransform().pixels
+        mask = morphology.selem.disk(radius, dtype=self._originalDType)
+        lowPassFrequencies = fourierTransformedPixels * mask
+        lowPassFrequencies = np.asarray(lowPassFrequencies, self._originalDType)
+        return Channel(lowPassFrequencies)
+
+    def applyLowPassFilter(self, radius: int):
+        lowPassedChannel = self.lowPassFilter(radius)
+        return lowPassedChannel.inverseFourierTransform()
+
+    def highPassFilter(self, radius:int):
+        pass
+
+    def __spectralFiltering(self, radius: int, isLowPass: bool):
+        fourierTransformedPixels = self.fourierTransform().pixels
+        innerMask = morphology.disk(radius, dtype=bool)
+        centerX, centerY = np.floor_divide(fourierTransformedPixels.shape, 2)
+        centerX, centerY = int(centerX), int(centerY)
+        y, x = np.ogrid[-centerX:self.width - centerX, -centerY: self.height - centerY]
+        inerMask = x ** 2 + y ** 2 <= radius ** 2
+        mask
+
+
+        if not isLowPass:
+            innerMask = np.bitwise_not(innerMask)
+        innerMask = innerMask.astype(self._originalDType)
+        lowPassFrequencies = fourierTransformedPixels * innerMask
+        lowPassFrequencies = np.asarray(lowPassFrequencies, self._originalDType)
+        return Channel(lowPassFrequencies)
+
+    @staticmethod
+    def createCircularMask(imageDim:typing.Tuple[int,int], circleRadius:int):
+        innerMask = morphology.disk(circleRadius, dtype=bool)
+        centerX, centerY = np.floor_divide(imageDim, 2)
+        centerX, centerY = int(centerX), int(centerY)
+        y, x = np.ogrid[-centerX:self.width - centerX, -centerY: self.height - centerY]
+        inerMask = x ** 2 + y ** 2 <= circleRadius ** 2
+        mask
+
 
 from .channelFloat import ChannelFloat
 from .channelInteger import ChannelInt
