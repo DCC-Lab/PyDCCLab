@@ -84,9 +84,9 @@ class DataExtractionEGFP(env.DCCLabTestCase):
             try:
                 image = Image(path=pathChanged)
                 channel = image.channels[int(channelNumber)]
-                normalizedChannel = channel.convertToNormalizedFloat()
+                normalizedChannel = channel.convertToNormalizedFloatMinToZeroMaxToOne()
                 del channel
-                averageN = normalizedChannel.convertToNormalizedFloatMinToZeroMaxToOne()
+                averageN = normalizedChannel.getAverageValueOfPixels()
                 stdDevN = normalizedChannel.getStandardDeviation()
                 entropyN = normalizedChannel.getShannonEntropy()
                 medianN = normalizedChannel.getMedian() if computeMedian else np.nan
