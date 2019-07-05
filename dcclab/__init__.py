@@ -1,5 +1,11 @@
 """ We import almost everything by default, in the general
-namespace because it is simpler for everyone """
+namespace because it is simpler for everyone 
+
+Circular dependecies on modules, use forward references:
+Forward references: https://www.python.org/dev/peps/pep-0484/#forward-references
+
+"""
+
 
 from .image import *
 from .channel import *
