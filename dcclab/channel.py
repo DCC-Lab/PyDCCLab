@@ -455,9 +455,10 @@ class Channel:
         fftShiftPixels = np.fft.fftshift(fftPixels)
         rows, cols = pixels.shape
         halfRows, halfCols = rows // 2, cols // 2
-        mask = np.zeros((rows, cols, 2), np.uint8)
+        mask = np.zeros((rows, cols), np.uint8)
         mask[halfRows - filterSize:halfRows + filterSize, halfCols - filterSize:halfCols + filterSize] = 1
-        ifftShift = np.fft.ifftshift(fftShiftPixels)
+        fftShiftPixelsWithMask = fftShiftPixels * mask
+        ifftShift = np.fft.ifftshift(fftShiftPixelsWithMask)
         filteredPixels = np.abs(np.fft.ifft2(ifftShift))
         return Channel(filteredPixels)
 
