@@ -3,6 +3,7 @@ from dcclab import *
 import unittest
 import numpy as np
 
+
 class TestChannels(env.DCCLabTestCase):
 
     def testInitWith2DIntArray(self):
@@ -58,7 +59,7 @@ class TestChannels(env.DCCLabTestCase):
     def testNumberOfPixels(self):
         array = np.random.randint(low=0, high=255, size=(100, 200))
         channel = Channel(pixels=array)
-        self.assertTrue(channel.numberOfPixels == 100*200)
+        self.assertTrue(channel.numberOfPixels == 100 * 200)
 
     def testSizeInBytes(self):
         array = np.random.randint(low=0, high=255, size=(100, 200))
@@ -75,9 +76,9 @@ class TestChannels(env.DCCLabTestCase):
         array = np.random.randint(low=0, high=255, size=(100, 200))
         channel = Channel(pixels=array)
 
-        self.assertNotEqual(1, 'abc') # not an error, simply false
-        self.assertNotEqual(1, np) # not an error, simply false
-        self.assertNotEqual(1, channel) # not an error, simply false
+        self.assertNotEqual(1, 'abc')  # not an error, simply false
+        self.assertNotEqual(1, np)  # not an error, simply false
+        self.assertNotEqual(1, channel)  # not an error, simply false
 
     def testPixelsCopy(self):
         array = np.random.randint(low=0, high=255, size=(100, 200))
@@ -88,8 +89,8 @@ class TestChannels(env.DCCLabTestCase):
     def testIsBinary(self):
         array = np.random.randint(low=0, high=2, size=(100, 200))
         self.assertTrue(Channel(pixels=array).isBinary)
-        self.assertFalse(Channel(pixels=array*255).isBinary)
-        self.assertFalse(Channel(pixels=array*200).isBinary)
+        self.assertFalse(Channel(pixels=array * 255).isBinary)
+        self.assertFalse(Channel(pixels=array * 200).isBinary)
 
         array = np.random.randint(low=0, high=255, size=(100, 200))
         self.assertFalse(Channel(pixels=array).isBinary)
@@ -116,80 +117,80 @@ class TestChannels(env.DCCLabTestCase):
     def testConvolution(self):
         # FIXME: test result
         array = np.random.randint(low=0, high=255, size=(100, 200))
-        kernel = [[-1, 0, 1],[1,0,1],[0,1,1]]
+        kernel = [[-1, 0, 1], [1, 0, 1], [0, 1, 1]]
         channel = Channel(pixels=array).convolveWith(kernel)
         self.assertIsNotNone(channel)
         self.assertTrue(channel.pixels.shape == array.shape)
 
     def testXDerivative(self):
-        array = np.array([[0, 0, 0],[1,1,1],[2,2,2]])
-        expected = np.array([[0, 0, 0],[0, 0, 0],[0, 0, 0]])
+        array = np.array([[0, 0, 0], [1, 1, 1], [2, 2, 2]])
+        expected = np.array([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
         channel = Channel(pixels=array).getXAxisDerivative()
         self.assertIsNotNone(channel)
         self.assertTrue(channel.pixels.shape == array.shape)
         self.assertTrue(channel.pixels.all() == expected.all())
 
     def testYDerivative(self):
-        array = np.array([[0, 1, 2],[0, 1, 2],[0, 1, 2]])
-        expected = np.array([[0, 0, 0],[0, 0, 0],[0, 0, 0]])
+        array = np.array([[0, 1, 2], [0, 1, 2], [0, 1, 2]])
+        expected = np.array([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
         channel = Channel(pixels=array).getYAxisDerivative()
         self.assertIsNotNone(channel)
         self.assertTrue(channel.pixels.shape == array.shape)
         self.assertTrue(channel.pixels.all() == expected.all())
 
     def testAverage(self):
-        array = np.array([[0, 1, 2],[0, 1, 2],[0, 1, 2]])
+        array = np.array([[0, 1, 2], [0, 1, 2], [0, 1, 2]])
         expected = 1.0
         result = Channel(pixels=array).getAverageValueOfPixels()
         self.assertIsNotNone(channel)
         self.assertTrue(result == expected)
 
     def testStddev(self):
-        array = np.array([[0, 1, 2],[0, 1, 2],[0, 1, 2]])
+        array = np.array([[0, 1, 2], [0, 1, 2], [0, 1, 2]])
         channel = Channel(pixels=array).getStandardDeviation()
         self.assertIsNotNone(channel)
 
 
 class TestChannelsSegmentation(env.DCCLabTestCase):
     def testNoMaskOnInit(self):
-        array = np.array([[0, 1, 2],[0, 1, 2],[0, 1, 2]])
+        array = np.array([[0, 1, 2], [0, 1, 2], [0, 1, 2]])
         channel = Channel(array)
         self.assertFalse(channel.hasMask)
 
     def testMaskFromThreshold(self):
-        array = np.array([[0, 1, 2],[0, 1, 2],[0, 1, 2]])
+        array = np.array([[0, 1, 2], [0, 1, 2], [0, 1, 2]])
         channel = Channel(array)
         channel.setMaskFromThreshold(1)
         self.assertTrue(channel.hasMask)
-        self.assertTrue(channel.mask.pixels.all() == np.array([[0, 1, 1],[0, 1, 1],[0, 1, 1]]).all())
+        self.assertTrue(channel.mask.pixels.all() == np.array([[0, 1, 1], [0, 1, 1], [0, 1, 1]]).all())
 
     def testMaskFromThreshold(self):
-        array = np.array([[1, 0, 0, 0],[0, 2,2, 0],[0, 0,0, 3]])
-        expectedMask = np.array([[1, 0, 0, 0],[0, 1,1, 0],[0, 0, 0, 1]])
+        array = np.array([[1, 0, 0, 0], [0, 2, 2, 0], [0, 0, 0, 3]])
+        expectedMask = np.array([[1, 0, 0, 0], [0, 1, 1, 0], [0, 0, 0, 1]])
         channel = Channel(array)
         channel.setMaskFromThreshold(0.5)
         self.assertTrue(channel.hasMask)
         self.assertTrue(channel.mask.pixels.all() == expectedMask.all())
 
     def testLabelMask(self):
-        array = np.array([[1, 0, 0, 0],[0, 2,2, 0],[0, 0,0, 3]])
+        array = np.array([[1, 0, 0, 0], [0, 2, 2, 0], [0, 0, 0, 3]])
         channel = Channel(array)
         channel.setMaskFromThreshold(1)
         channel.labelMaskComponents()
 
-        expectedMask = np.array([[1, 0, 0, 0],[0, 1,1, 0],[0, 0, 0, 1]])
-        expectedComponents = np.array([[0, 0, 0, 0],[0, 1,1, 0],[0, 0, 0, 2]])
+        expectedMask = np.array([[1, 0, 0, 0], [0, 1, 1, 0], [0, 0, 0, 1]])
+        expectedComponents = np.array([[0, 0, 0, 0], [0, 1, 1, 0], [0, 0, 0, 2]])
         self.assertTrue(channel.labelledComponents.all() == expectedComponents.all())
         self.assertTrue(channel.numberOfComponents == 2)
 
     def testLabelWithoutMaskFail(self):
-        array = np.array([[1, 0, 0, 0],[0, 2,2, 0],[0, 0,0, 3]])
+        array = np.array([[1, 0, 0, 0], [0, 2, 2, 0], [0, 0, 0, 3]])
         channel = Channel(array)
         with self.assertRaises(Exception):
             channel.labelMaskComponents()
 
     def testAnalyzeComponents(self):
-        array = np.array([[1, 0, 0, 0],[0, 2,2, 0],[0, 0,0, 3]])
+        array = np.array([[1, 0, 0, 0], [0, 2, 2, 0], [0, 0, 0, 3]])
         channel = Channel(array)
         channel.setMaskFromThreshold(1)
         channel.labelMaskComponents()
@@ -198,16 +199,14 @@ class TestChannelsSegmentation(env.DCCLabTestCase):
         self.assertIsNotNone(properties)
 
     def testFilterNoise(self):
-        array = np.array([[1, 0, 0, 0],[0, 2,2, 0],[0, 0,0, 3]])
+        array = np.array([[1, 0, 0, 0], [0, 2, 2, 0], [0, 0, 0, 3]])
         channel = Channel(array)
         channel.filterNoise()
 
     def testThreshold(self):
-        array = np.array([[1, 0, 0, 0],[0, 2,2, 0],[0, 0,0, 3]])
+        array = np.array([[1, 0, 0, 0], [0, 2, 2, 0], [0, 0, 0, 3]])
         channel = Channel(array)
         channel.threshold(value=1.5)
-
-
 
     # def testSaveComponents(self):
     #     array = np.array([[1, 0, 0, 0],[0, 2,2, 0],[0, 0,0, 3]])
@@ -217,28 +216,20 @@ class TestChannelsSegmentation(env.DCCLabTestCase):
     #     channel.analyzeComponents()
     #     channel.saveComponentsStatistics("/tmp/test.json")
 
+
 class TestChannelSpectralFiltering(env.DCCLabTestCase):
 
-    def testCircularMaskBool(self):
-        dim = (1000, 1000)
-        circleRadius = 3
-        mask = Channel.createCircularMask(dim, circleRadius)
-        self.assertEqual(mask.dtype, int)
+    def testHighPassFilter(self):
+        image = Image(path=Path(self.dataDir / "testCziFileTwoChannels.czi"))
+        channel = image.channels[0]
+        fftChannel = channel.applyHighPassFilterFromMask(30)
+        self.assertFalse(np.allclose(channel.pixels, fftChannel.pixels))
 
-    def testCircularMaskValues(self):
-        # Test if the center of the mask is really a circular mask
-        dim = (1100,1101)
-        circleRadius = 125
-        mask = Channel.createCircularMask(dim, circleRadius)
-        maskCenterX, maskCenterY = dim[0] // 2, dim[1] // 2
-        supposedMask = morphology.selem.disk(circleRadius)
-        self.assertTrue(np.array_equal(mask[maskCenterY-circleRadius:maskCenterY+circleRadius+1, maskCenterX-circleRadius:maskCenterX+circleRadius+1], supposedMask))
-        
-    def testFourierTransform(self):
-        pass
- 
-
-
+    def testLowPassFilter(self):
+        image = Image(path=Path(self.dataDir / "testCziFileTwoChannels.czi"))
+        channel = image.channels[0]
+        fftChannel = channel.applyLowPassFilterFromMask(40)
+        self.assertFalse(np.allclose(channel.pixels, fftChannel.pixels))
 
 
 if __name__ == '__main__':
