@@ -437,54 +437,29 @@ class Channel:
             plt.imshow(channels[i].pixels)
         plt.show()
 
-    def fourierTransform(self):
-        pixels = self._pixels
-        fourierTransform = np.fft.fft2(pixels)
-        shiftedFourierTransform = np.fft.fftshift(fourierTransform)
-        magnitudeSpectrum = 20 * np.log(np.abs(shiftedFourierTransform))
-        magnitudeSpectrum = np.asarray(magnitudeSpectrum, self._originalDType)
-        return Channel(magnitudeSpectrum)
-
-    def inverseFourierTransform(self):
+    def applyHighPassFilterFromMask(self, filterSize: int):
         pixels = self.pixels
-        shiftedInverseFourierTransform = np.fft.ifftshift(pixels)
-        inversedFourierTransform = np.fft.ifft2(shiftedInverseFourierTransform)
-        outputPixels = np.abs(inversedFourierTransform)
-        outputPixels = np.asarray(outputPixels, self._originalDType)
-        return Channel(outputPixels)
+        fftPixels = np.fft.fft2(pixels)
+        fftShiftPixels = np.fft.fftshift(fftPixels)
+        rows, cols = pixels.shape
+        halfRows, halfCols = rows // 2, cols // 2
+        fftShiftPixels[halfRows - filterSize:halfRows + filterSize,
+        halfCols - filterSize:halfCols + filterSize] = 0
+        ifftShift = np.fft.ifftshift(fftShiftPixels)
+        filteredPixels = np.abs(np.fft.ifft2(ifftShift))
+        return Channel(filteredPixels)
 
-    def lowPassFilter(self, radius: int):
-        return self.__spectralFiltering(radius, True)
-
-    def applyLowPassFilter(self, radius: int):
-        lowPassedChannel = self.lowPassFilter(radius)
-        return lowPassedChannel.inverseFourierTransform()
-
-    def highPassFilter(self, radius: int):
-        return self.__spectralFiltering(radius, False)
-
-    def applyHighPassFilter(self, radius: int):
-        highPassedChannel = self.highPassFilter(radius)
-        return highPassedChannel.inverseFourierTransform()
-
-    def __spectralFiltering(self, radius: int, isLowPass: bool):
-        fourierTransformedPixels = self.fourierTransform().pixels
-        mask = self.createCircularMask(fourierTransformedPixels.shape, radius)
-        if not isLowPass:
-            mask = np.bitwise_not(mask)
-        passFilter = fourierTransformedPixels * mask
-        passFilter = np.asarray(passFilter, self._originalDType)
-        return Channel(passFilter)
-
-    @staticmethod
-    def createCircularMask(imageDim: typing.Tuple[int, int], circleRadius: int):
-        centerX, centerY = np.floor_divide(imageDim, 2)
-        centerX, centerY = int(centerX), int(centerY)
-        y, x = np.ogrid[-centerX:imageDim[0] - centerX, -centerY: imageDim[1] - centerY]
-        innerMask = x ** 2 + y ** 2 <= circleRadius ** 2
-        mask = np.zeros(imageDim, dtype=bool)
-        mask[innerMask] = 1
-        return mask.astype(int)
+    def applyLowPassFilterFromMask(self, filterSize: int):
+        pixels = self.pixels
+        fftPixels = np.fft.fft2(pixels)
+        fftShiftPixels = np.fft.fftshift(fftPixels)
+        rows, cols = pixels.shape
+        halfRows, halfCols = rows // 2, cols // 2
+        mask = np.zeros((rows, cols, 2), np.uint8)
+        mask[halfRows - filterSize:halfRows + filterSize, halfCols - filterSize:halfCols + filterSize] = 1
+        ifftShift = np.fft.ifftshift(fftShiftPixels)
+        filteredPixels = np.abs(np.fft.ifft2(ifftShift))
+        return Channel(filteredPixels)
 
 
 from .channelFloat import ChannelFloat
