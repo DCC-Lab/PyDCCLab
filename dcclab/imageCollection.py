@@ -149,7 +149,7 @@ class ImageCollection:
         if imagesArray.ndim == 4:
             nbOfImages = imagesArray.shape[3]
             for i in range(nbOfImages):
-                progressBar(i, nbOfImages-1)
+                self.progressBar(i, nbOfImages-1)
                 image = Image(imagesArray[:, :, :, i])
                 self.__images.append(image)
             print("\n")  # end progress bar
@@ -561,8 +561,8 @@ class ZStack(ImageCollection):
         return stacks
 
 
-def progressBar(value, endvalue, bar_length=20):
-
+    @staticmethod
+    def progressBar(value, endvalue, bar_length=20):
         percent = float(value) / endvalue
         arrow = '-' * int(round(percent * bar_length)-1) + '>'
         spaces = ' ' * (bar_length - len(arrow))
