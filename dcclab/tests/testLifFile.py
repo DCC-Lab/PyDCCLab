@@ -1,6 +1,6 @@
 import env
 from dcclab import LIFFile
-from dcclab.__lifReader import LifSerie
+from dcclab.lifReader import LifSerie
 import unittest
 from pathlib import Path, PureWindowsPath
 

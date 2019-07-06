@@ -1,4 +1,4 @@
-from .__lifReader import LifReader
+from .lifReader import LifReader
 # from .zStack import ZStack  # FIXME: creates a circular import that crashes [ temporary fix by importing inside methods where needed]
 from typing import Union, List
 from .cziUtil import *
