@@ -1,17 +1,11 @@
-from dcclab import *
-# from .image import Image
-from .pathPattern import *
+from .imageCollection import *
 import numpy as np
 import json
 import inspect
 
-import matplotlib.pyplot as plt
 from matplotlib.widgets import RectangleSelector
-from typing import List, Union
-from scipy import ndimage
 from collections import OrderedDict
 import PIL.Image as PILImage
-import sys
 
 
 class ZStack(ImageCollection):
