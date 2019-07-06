@@ -1,5 +1,5 @@
 from .lifReader import LIFReader
-# from .zStack import ZStack  # FIXME: creates a circular import that crashes [ temporary fix by importing inside methods where needed]
+from .zStack import ZStack
 from .imageFile import ImageFile
 from typing import Union, List
 import json
@@ -42,7 +42,6 @@ class LIFFile(ImageFile):
         self.series.pop(index)
 
     def zStackData(self, seriesIndex: int=None, channelIndices=None, crop=False) -> 'ZStack':
-        from .zStack import ZStack  # FIXME: temporary fix : import order problem
         if seriesIndex is None:
             assert self.numberOfSeries == 1
             seriesIndex = 0
@@ -54,7 +53,6 @@ class LIFFile(ImageFile):
         return zStack
 
     def zStacksData(self, seriesIndices=None, channelIndices=None, crop=False) -> List['ZStack']:
-        from .zStack import ZStack  # FIXME: temporary fix : import order problem
         if type(seriesIndices) is int:
             seriesIndices = [seriesIndices]
 

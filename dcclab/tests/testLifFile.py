@@ -2,7 +2,7 @@ import env
 from dcclab import LIFFile
 from dcclab.lifReader import LIFSerie
 import unittest
-from pathlib import Path, PureWindowsPath
+from pathlib import Path
 
 
 class TestLifFile(env.DCCLabTestCase):
