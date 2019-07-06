@@ -118,7 +118,7 @@ class Channel:
 
     def labelMaskComponents(self):
         if self.hasMask:
-            labels, nbObjects = label(self.mask.pixels)
+            labels, nbObjects = ndimage.label(self.mask.pixels)
             self.labelledComponents = labels
             self.numberOfComponents = nbObjects
         else:
