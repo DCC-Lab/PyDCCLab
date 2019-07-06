@@ -2,9 +2,12 @@ import env
 from pathlib import Path
 from dcclab import LIFFile, ZStack
 from dcclab.lifReader import LIFSerie
+from unittest.mock import patch, Mock
 import unittest
 
 
+@patch('warnings.warn', new=Mock())
+@patch('sys.stdout', new=Mock())
 class TestLifFile(env.DCCLabTestCase):
 
     def setUp(self):
