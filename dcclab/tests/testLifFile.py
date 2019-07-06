@@ -1,6 +1,6 @@
 import env
 from dcclab import LIFFile
-from dcclab.lifReader import LifSerie
+from dcclab.lifReader import LIFSerie
 import unittest
 from pathlib import Path, PureWindowsPath
 
@@ -31,17 +31,17 @@ class TestLifFile(env.DCCLabTestCase):
         self.assertTrue(len(self.lifObj) == 8)
 
     def testGetItemWithInteger(self):
-        self.assertIsInstance(self.lifObj[0], LifSerie)
+        self.assertIsInstance(self.lifObj[0], LIFSerie)
 
     def testGetItemWithIntegersTuple(self):
         series = self.lifObj[0, 1, 2]
         self.assertTrue(len(series) == 3)
-        self.assertIsInstance(series[0], LifSerie)
+        self.assertIsInstance(series[0], LIFSerie)
 
     def testGetItemWithIntegersList(self):
         series = self.lifObj[[0, 1, 2]]
         self.assertTrue(len(series) == 3)
-        self.assertIsInstance(series[0], LifSerie)
+        self.assertIsInstance(series[0], LIFSerie)
 
     def testGetItemWithBadIndex(self):
         with self.assertRaises(IndexError):
@@ -50,17 +50,17 @@ class TestLifFile(env.DCCLabTestCase):
     def testGetItemWithSlice(self):
         series = self.lifObj[2:5]
         self.assertTrue(len(series) == 3)
-        self.assertIsInstance(series[0], LifSerie)
+        self.assertIsInstance(series[0], LIFSerie)
 
     def testGetItemWithNone(self):
         series = self.lifObj[None]
         self.assertTrue(len(series) == 8)
-        self.assertIsInstance(series[0], LifSerie)
+        self.assertIsInstance(series[0], LIFSerie)
 
     def testKeepSeries(self):
         self.lifObj.keepSeries([0, 1, 2])
         self.assertTrue(self.lifObj.numberOfSeries == 3)
-        self.assertIsInstance(self.lifObj.series[0], LifSerie)
+        self.assertIsInstance(self.lifObj.series[0], LIFSerie)
 
     def testRemoveAt(self):
         self.lifObj.removeAt(0)

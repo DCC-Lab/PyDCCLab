@@ -4,23 +4,22 @@ except:
     exit("install read_lif module: pip install read-lif")
 import numpy as np
 import warnings
-import time
 import sys
 
 
-class LifReader(Reader):
+class LIFReader(Reader):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def getSeries(self):
         if not hasattr(self, '__series'):
             self.__series = [
-                LifSerie(s.root, self.f, self.offsets[i]) for i, s in enumerate(self.getSeriesHeaders())
+                LIFSerie(s.root, self.f, self.offsets[i]) for i, s in enumerate(self.getSeriesHeaders())
             ]
         return self.__series
 
 
-class LifSerie(Serie):
+class LIFSerie(Serie):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
