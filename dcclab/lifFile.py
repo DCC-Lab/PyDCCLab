@@ -43,7 +43,7 @@ class LIFFile(ImageFile):
 
     def zStackData(self, seriesIndex: int=None, channelIndices=None, crop=False) -> 'ZStack':
         if seriesIndex is None:
-            assert self.numberOfSeries == 1
+            assert self.numberOfSeries == 1, "Cannot infer the right series to take since the file has more than one series."
             seriesIndex = 0
 
         print("... Loading serie")
