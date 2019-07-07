@@ -24,6 +24,13 @@ class TestZStack(env.DCCLabTestCase):
         self.assertTrue(len(self.zStack) == self.depth)
         self.assertTrue(self.zStack[0].shape == (10, 10, 1))
 
+    def ZStackFromBad4DArray(self):
+        badStack = self.grayStack.copy()
+        badStack[:, :, 0, 0] = np.zeros((2, 2))
+
+        with self.assertRaises(ValueError):
+            stack = ZStack(imagesArray=badStack)
+
     @unittest.skip("Need a small sample stack test folder. ")
     def testZStackFromFolder(self):
         # TODO
@@ -61,6 +68,17 @@ class TestZStack(env.DCCLabTestCase):
         originalStack = self.zStack.asOriginalArray()
 
         self.assertTrue(np.array_equal(originalStack, self.grayStack))
+
+    def testAsOriginalChannelArrayNotModified(self):
+        originalStack = self.zStack.asOriginalChannelArray(0)
+
+        self.assertTrue(np.array_equal(originalStack, self.grayStack[:, :, 0, :]))
+
+    def testApply3DFilterProcessDimensionNotDefined(self):
+        self.zStack.processIn3D = None
+
+        with self.assertRaises(ZStackProcessDimensionIsNotDefined):
+            self.zStack.apply3DFilter(ndimage.grey_opening, size=4)
 
     def testApply3DFilter(self):
         self.zStack.apply3DFilter(ndimage.grey_opening, size=4)
@@ -115,6 +133,12 @@ class TestZStack(env.DCCLabTestCase):
 
         self.assertFalse(np.array_equal(self.zStack.asArray(), self.grayStack))
 
+    def testApplyNoiseFilterProcessDimensionNotDefined(self):
+        self.zStack.processIn3D = None
+
+        with self.assertRaises(ZStackProcessDimensionIsNotDefined):
+            self.zStack.applyNoiseFilterWithErosionDilation()
+
     def testApplyNoiseFilterWithErosionDilation(self):
         self.zStack.applyNoiseFilterWithErosionDilation()
 
@@ -123,6 +147,13 @@ class TestZStack(env.DCCLabTestCase):
     def testApplyNoiseFilterBadAlgorithm(self):
         with self.assertRaises(NotImplementedError):
             self.zStack.applyNoiseFilter(algorithm="Nada")
+
+    def testApplyNoiseFilterProcessIn2D(self):
+        self.zStack.processIn3D = False
+
+        self.zStack.applyNoiseFilter()
+
+        self.assertTrue(np.array_equal(self.zStack.asArray(), self.grayStack))
 
     def testSetMaskFromThreshold(self):
         self.zStack.setMaskFromThreshold(self.grayStack.mean())
@@ -216,6 +247,17 @@ class TestZStack(env.DCCLabTestCase):
         self.assertTrue(len(channelComponentsDict) == 7)
         self.assertTrue(channelComponentsDict["totalSize"] == 320)
 
+    def testAnalyzeComponentsWithOriginal(self):
+        self.zStack.filterNoise()
+        self.zStack.setMaskFromThreshold(self.grayStack.mean())
+        self.zStack.labelMaskComponents()
+
+        self.zStack.analyzeComponents()
+        channelComponentsDict = self.zStack.componentsProperties["Channel 0"]
+
+        self.assertTrue(len(channelComponentsDict) == 7)
+        self.assertTrue(channelComponentsDict["totalSize"] == 320)
+
     def testGetObjectsSize(self):
         maskArray = np.ones((2, 2))
         labelArray = maskArray.copy()
@@ -273,12 +315,16 @@ class TestZStack(env.DCCLabTestCase):
         # fixme: careful with crop logic: maybe move to image
         pass
 
-    @unittest.skip
+    @unittest.skip('')
     def testCrop4DArray(self):
         pass
 
-    @unittest.skip
+    @unittest.skip('')
     def testCrop(self):
+        pass
+
+    @unittest.skip('')
+    def testZStackFrom4DArrayCropAtInit(self):
         pass
 
     def testChannelStacksInMemory(self):
