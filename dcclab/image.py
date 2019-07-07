@@ -129,9 +129,9 @@ class Image:
         Image.supportedFormats = [item for sublist in fmts for item in sublist]
 
     @property
-    def isLabelled(self) -> bool:
+    def hasLabelledComponents(self) -> bool:
         for channel in self.channels:
-            if not channel.isLabelled:
+            if not channel.hasLabelledComponents:
                 return False
         return True
 

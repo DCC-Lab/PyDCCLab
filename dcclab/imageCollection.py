@@ -51,9 +51,9 @@ class ImageCollection:
         return sizeInBytes
 
     @property
-    def isLabelled(self) -> bool:
+    def hasLabelledComponents(self) -> bool:
         for image in self.images:
-            if not image.isLabelled:
+            if not image.hasLabelledComponents:
                 return False
         return True
 

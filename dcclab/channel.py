@@ -113,7 +113,7 @@ class Channel:
     """ High-level Image segmentation functions """
 
     @property
-    def isLabelled(self) -> bool:
+    def hasLabelledComponents(self) -> bool:
         return self.labelledComponents is not None
 
     def labelMaskComponents(self):
