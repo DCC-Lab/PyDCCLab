@@ -286,10 +286,12 @@ class ImageCollection:
             image.applyNoiseFilterWithErosionDilation(erosion_size, dilation_size, closing_size)
 
     def applyOpeningToMask(self, size: int=None, iterations: int = 1):
+        assert self.hasMask, "Mask is not present."
         for image in self.images:
             image.applyOpeningToMask(size, iterations)
 
     def applyClosingToMask(self, size: int=None, iterations: int = 1):
+        assert self.hasMask, "Mask is not present."
         for image in self.images:
             image.applyClosingToMask(size, iterations)
 
