@@ -54,13 +54,19 @@ class ZStack(ImageCollection):
         return imagesArray[:, :, channel, :]
 
     def asOriginalArray(self) -> np.ndarray:
-        return np.stack([image.asOriginalArray() for image in self.images], axis=3)
+        if self.hasOriginal:
+            return np.stack([image.asOriginalArray() for image in self.images if image], axis=3)
+        else:
+            return self.asArray()
 
     def asOriginalChannelArray(self, channel: int) -> np.ndarray:
-        originalArray = self.asOriginalArray()
-        return originalArray[:, :, channel, :]
+        if self.hasOriginal:
+            originalArray = self.asOriginalArray()
+            return originalArray[:, :, channel, :]
+        else:
+            return self.asArray()[:, :, channel, :]
 
-    def apply3DFilter(self, filterFunc, *filterArgs):
+    def apply3DFilter(self, filterFunc, *filterArgs, **filterKwargs):
         """ These Functions should be processed over one Channel at a time """
         if self.processIn3D is None:
             raise ZStackProcessDimensionIsNotDefined
@@ -68,7 +74,7 @@ class ZStack(ImageCollection):
             filteredArrays = []
             for channel in list(range(self.numberOfChannels)):
                 array = self.asChannelArray(channel)
-                filteredArrays.append(filterFunc(array, *filterArgs))
+                filteredArrays.append(filterFunc(array, *filterArgs, **filterKwargs))
             newStack = np.stack(filteredArrays, axis=2)
             self.replaceFromArray(newStack)
         else:
@@ -115,10 +121,12 @@ class ZStack(ImageCollection):
             super().applyNoiseFilterWithErosionDilation(erosion_size, dilation_size, closing_size)
 
     def getChannelMaskArray(self, channel: int):
+        assert self.hasMask, "Masks are not present."
         maskStackArray = np.stack([image.channels[channel].mask.pixels for image in self.images], axis=2)
         return maskStackArray
 
     def getChannelLabelArray(self, channel: int):
+        assert self.hasLabelledComponents, "Labelled Components are not present."
         labelStackArray = np.stack([image.channels[channel].labelledComponents for image in self.images], axis=2)
         return labelStackArray
 
@@ -263,7 +271,7 @@ class ZStack(ImageCollection):
         stacks[""] = self.asChannelArray(channel)
         if self.hasMask:
             stacks["Mask "] = self.getChannelMaskArray(channel)
-        if self.isLabelled:
+        if self.hasLabelledComponents:
             stacks["Label "] = self.getChannelLabelArray(channel)
         return stacks
 
