@@ -24,12 +24,14 @@ class TestZStack(env.DCCLabTestCase):
         self.assertTrue(len(self.zStack) == self.depth)
         self.assertTrue(self.zStack[0].shape == (10, 10, 1))
 
-    def ZStackFromBad4DArray(self):
-        badStack = self.grayStack.copy()
-        badStack[:, :, 0, 0] = np.zeros((2, 2))
+    def testZStackFromBad4DArray(self):
+        imageArrays = [self.grayStack[:, :, :, i] for i in range(self.grayStack.shape[3])]
+        imageArrays[0] = np.zeros((2, 2, 1))
+
+        imageList = [Image(imageData=imageArray) for imageArray in imageArrays]
 
         with self.assertRaises(ValueError):
-            stack = ZStack(imagesArray=badStack)
+            ZStack(imageList)
 
     @unittest.skip("Need a small sample stack test folder. ")
     def testZStackFromFolder(self):
