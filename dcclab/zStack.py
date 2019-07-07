@@ -154,25 +154,30 @@ class ZStack(ImageCollection):
                 originalArray = self.asChannelArray(channel)
             maskArray = self.getChannelMaskArray(channel)
             labelArray = self.getChannelLabelArray(channel)
-            nbOfObjects = properties['nbOfObjects']
 
-            properties["objectsSize"] = self.getObjectsSize(maskArray, labelArray, nbOfObjects)
+            properties["objectsSize"] = self.getObjectsSize(maskArray, labelArray)
             properties["totalSize"] = np.sum(properties["objectsSize"]).tolist()
-            properties["objectsMass"] = self.getObjectsMass(originalArray, labelArray, nbOfObjects)
+            properties["objectsMass"] = self.getObjectsMass(originalArray, labelArray)
             properties["totalMass"] = np.sum(properties["objectsMass"]).tolist()
-            properties["objectsCM"] = self.getObjectsCenterOfMass(originalArray, labelArray, nbOfObjects)
+            properties["objectsCM"] = self.getObjectsCenterOfMass(originalArray, labelArray)
             properties["totalCM"] = np.average(properties["objectsCM"], axis=0, weights=properties["objectsMass"]).tolist()
 
-    def getObjectsSize(self, mask, label, nbOfObjects):
-        maskSizes = ndimage.sum(mask, label, range(1, nbOfObjects + 1))
+    @staticmethod
+    def getObjectsSize(maskStack, labelStack):
+        nbOfObjects = int(labelStack.max())
+        maskSizes = ndimage.sum(maskStack, labelStack, range(1, nbOfObjects + 1))
         return list(maskSizes)
 
-    def getObjectsMass(self, originalStack, label, nbOfObjects):
-        sumValues = ndimage.sum(originalStack, label, range(1, nbOfObjects + 1))
+    @staticmethod
+    def getObjectsMass(originalStack, labelStack):
+        nbOfObjects = int(labelStack.max())
+        sumValues = ndimage.sum(originalStack, labelStack, range(1, nbOfObjects + 1))
         return list(sumValues)
 
-    def getObjectsCenterOfMass(self, originalStack, label, nbOfObjects):
-        centersOfMass = ndimage.center_of_mass(originalStack, label, range(1, nbOfObjects + 1))
+    @staticmethod
+    def getObjectsCenterOfMass(originalStack, labelStack):
+        nbOfObjects = int(labelStack.max())
+        centersOfMass = ndimage.center_of_mass(originalStack, labelStack, range(1, nbOfObjects + 1))
         return list(centersOfMass)
 
     def saveComponentsProperties(self, filePath: str):
