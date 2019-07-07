@@ -3,40 +3,36 @@ from dcclab import *
 from unittest.mock import Mock, patch
 import numpy as np
 import unittest
-import os
-
-# Fixme: only tested Zstacks with 3D Arrays : test zStack/ImageCollection from image files
-# Todo: I can prepare a small stack sample folder.
 
 
-@unittest.skip("Deprecated")
-class TestZStackFrom3DArray(env.DCCLabTestCase):
+class TestZStackFrom4DArray(env.DCCLabTestCase):
 
     def setUp(self):
         self.depth = 5
-        self.grayStack = np.zeros((10, 10, self.depth))
-        self.grayStack[1:9, 1:9, :] = 0.5
-        self.grayStack[3:7, 3:7, 1:self.depth-1] = 1
-        self.zStack = ZStack(self.grayStack)
+        self.grayStack = np.zeros((10, 10, 1, self.depth))
+        self.grayStack[1:9, 1:9, 0, :] = 0.5
+        self.grayStack[3:7, 3:7, 0,  1:self.depth-1] = 1
+        self.zStack = ZStack(imagesArray=self.grayStack)
 
-    def testImageCollectionFrom3DArray(self):  # fixme: sorry for touching another class
-        collection = ImageCollection(self.grayStack)
+    def testImageCollectionFrom4DArray(self):
+        collection = ImageCollection(imagesArray=self.grayStack)
 
         self.assertTrue(len(collection) == self.depth)
-        self.assertTrue(collection[0].shape == (10, 10))
+        self.assertTrue(collection[0].shape == (10, 10, 1))
 
-    def testZStackFrom3DArray(self):
+    def testZStackFrom4DArray(self):
         self.assertTrue(len(self.zStack) == self.depth)
-        self.assertTrue(self.zStack[0].shape == (10, 10))
+        self.assertTrue(self.zStack[0].shape == (10, 10, 1))
+
 
     def testShape(self):
-        self.assertTrue(self.zStack.shape == (10, 10, 5))
+        self.assertTrue(self.zStack.shape == (10, 10, 1, 5))
 
     def testLength(self):
         self.assertTrue(len(self.zStack) == 5)
 
-    def testArray(self):
-        stackArray = self.zStack.array
+    def testAsArray(self):
+        stackArray = self.zStack.asArray()
 
         self.assertIsInstance(stackArray, np.ndarray)
         self.assertTrue(stackArray.shape == (10, 10, 5))
