@@ -185,7 +185,7 @@ class ZStack(ImageCollection):
 
     def crop(self):
         # Cropping will not keep original content since cropping Z axis will change self.numberOfImages
-        # => using fromArray(), not replaceFromArray()
+        # So we are using fromArray(), not replaceFromArray()
         cropArray = self.crop4DArray(self.asArray())
         self.fromArray(cropArray)
 
@@ -246,8 +246,8 @@ class ZStack(ImageCollection):
         self.cropX = [int(x1), int(x2)]
         self.cropY = [int(y1), int(y2)]
 
-    def show(self, axis=-1):
-        stack4DArray = self.asArray()
+    def show(self, channel: int, axis=-1):
+        stack4DArray = self.asChannelArray(channel)
         plt.imshow(stack4DArray.mean(axis))
         plt.show()
 
