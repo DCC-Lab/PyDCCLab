@@ -68,6 +68,11 @@ class TestLifFile(env.DCCLabTestCase):
         self.assertTrue(self.lifObj.numberOfSeries == 3)
         self.assertIsInstance(self.lifObj.series[0], LIFSerie)
 
+    def testKeepOneSeriesStaysAList(self):
+        self.lifObj.keepSeries(0)
+        self.assertTrue(self.lifObj.numberOfSeries == 1)
+        self.assertIsInstance(self.lifObj.series, list)
+
     def testRemoveAt(self):
         self.lifObj.removeAt(0)
         self.assertTrue(self.lifObj.numberOfSeries == 7)
@@ -87,6 +92,11 @@ class TestLifFile(env.DCCLabTestCase):
         self.assertIsInstance(metadata, list)
         self.assertIsInstance(metadata[0], dict)
 
+    def testGetMetadataAtIndexAsJson(self):
+        metadata = self.lifObj.metadata(serieIndex=0, asJson=True)
+
+        self.assertIsInstance(metadata, str)
+
     def testGetSingleZStackDataOneSeriesOneChannel(self):
         stack = self.lifObj.zStackData(seriesIndex=0, channelIndices=0)
 
@@ -99,9 +109,17 @@ class TestLifFile(env.DCCLabTestCase):
         self.assertIsInstance(stack, ZStack)
         self.assertTrue(stack.shape == (448, 448, 1, 448))
 
-    def testGetSingleZStackDataOneSeriesNotSpecified(self):
+    def testGetSingleZStackDataNotSpecified(self):
         with self.assertRaises(AssertionError):
             self.lifObj.zStackData()
+
+    def testGetSingleZStackDataNotSpecifiedInfers(self):
+        self.lifObj.keepSeries(0)
+
+        stack = self.lifObj.zStackData()
+
+        self.assertIsInstance(stack, ZStack)
+        self.assertTrue(stack.shape == (448, 448, 1, 448))
 
     def testGetZStacksDataOneSeriesOneChannel(self):
         stacks = self.lifObj.zStacksData(seriesIndices=0, channelIndices=0)
