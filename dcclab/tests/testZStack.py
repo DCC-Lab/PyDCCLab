@@ -5,7 +5,7 @@ import numpy as np
 import unittest
 
 
-class TestZStackFrom4DArray(env.DCCLabTestCase):
+class TestZStack(env.DCCLabTestCase):
 
     def setUp(self):
         self.depth = 5
@@ -24,11 +24,20 @@ class TestZStackFrom4DArray(env.DCCLabTestCase):
         self.assertTrue(len(self.zStack) == self.depth)
         self.assertTrue(self.zStack[0].shape == (10, 10, 1))
 
-    def testImagesAreSimilar(self):
+    @unittest.skip("Need a small sample stack test folder. ")
+    def testZStackFromFolder(self):
+        # TODO
         pass
 
+    def testImagesAreSimilar(self):
+        self.assertTrue(self.zStack.imagesAreSimilar)
+
+    def testImagesAreNotSimilar(self):
+        self.zStack[0].replaceFromArray(np.zeros((2, 2, 1)))
+        self.assertFalse(self.zStack.imagesAreSimilar)
+
     def testNumberOfChannels(self):
-        pass
+        self.assertTrue(self.zStack.numberOfChannels, 1)
 
     def testShape(self):
         self.assertTrue(self.zStack.shape == (10, 10, 1, 5))
@@ -58,10 +67,6 @@ class TestZStackFrom4DArray(env.DCCLabTestCase):
 
         self.assertFalse(np.array_equal(self.zStack.asArray(), self.grayStack))
 
-    def testApply3DFilterProcessIn2D(self):
-        # assert it calls super method
-        pass
-
     def testAsOriginalArray(self):
         self.zStack.apply3DFilter(ndimage.grey_opening, size=4)
         originalArray = self.zStack.asOriginalArray()
@@ -83,6 +88,13 @@ class TestZStackFrom4DArray(env.DCCLabTestCase):
 
         self.assertFalse(np.array_equal(self.zStack.asArray(), self.grayStack))
 
+    def testApplyOpeningProcessIn2D(self):
+        self.zStack.processIn3D = False
+
+        self.zStack.applyOpening(size=4)
+
+        self.assertTrue(np.array_equal(self.zStack.asArray(), self.grayStack))
+
     def testApplyClosing(self):
         self.zStack.applyClosing(size=4)
 
@@ -98,142 +110,216 @@ class TestZStackFrom4DArray(env.DCCLabTestCase):
 
         self.assertFalse(np.array_equal(self.zStack.asArray(), self.grayStack))
 
-    def testApplyNoiseFilter(self):
-        pass
+    def testApplyNoisefilter(self):
+        self.zStack.applyNoiseFilter()
+
+        self.assertFalse(np.array_equal(self.zStack.asArray(), self.grayStack))
 
     def testApplyNoiseFilterWithErosionDilation(self):
-        pass
+        self.zStack.applyNoiseFilterWithErosionDilation()
+
+        self.assertFalse(np.array_equal(self.zStack.asArray(), self.grayStack))
+
+    def testApplyNoiseFilterBadAlgorithm(self):
+        with self.assertRaises(NotImplementedError):
+            self.zStack.applyNoiseFilter(algorithm="Nada")
 
     def testSetMaskFromThreshold(self):
         self.zStack.setMaskFromThreshold(self.grayStack.mean())
 
+        self.assertTrue(self.zStack.hasMask)
+        self.assertTrue(self.zStack[0][0].mask.pixels.max() == 1)
+
     def testGetChannelMaskArrayNotDefined(self):
-        pass
+        with self.assertRaises(AssertionError):
+            maskArray = self.zStack.getChannelMaskArray(channel=0)
 
     def testGetChannelMaskArray(self):
-        pass
+        self.zStack.setMaskFromThreshold(self.grayStack.mean())
+        onesRegion = np.ones((6, 6, self.depth-2))
 
-    def testApplyOpeningToMask(self):
-        pass
+        maskArray = self.zStack.getChannelMaskArray(channel=0)
+
+        self.assertEqual(maskArray.shape, (10, 10, 5))
+        self.assertTrue(maskArray.max() == 1)
+        self.assertTrue(np.array_equal(maskArray[2:8, 2:8, 1:self.depth-1], onesRegion))
+
+    def testApplyOpeningToMaskWithoutMask(self):
+        with self.assertRaises(AssertionError):
+            self.zStack.applyOpeningToMask()
+
+    def testApplyOpeningToMask(self):  # Fixme: test image collection instead
+        self.zStack.setMaskFromThreshold(self.grayStack.mean())
+        originalMask = self.zStack.getChannelMaskArray(0)
+
+        self.zStack.applyOpeningToMask()
+
+        self.assertFalse(np.array_equal(originalMask, self.zStack.getChannelMaskArray(0)))
 
     def testApplyClosingToMask(self):
-        pass
+        self.zStack.setMaskFromThreshold(self.grayStack.mean())
+        originalMask = self.zStack.getChannelMaskArray(0)
+
+        self.zStack.applyClosingToMask(size=4)
+
+        self.assertFalse(np.array_equal(originalMask, self.zStack.getChannelMaskArray(0)))
 
     def testLabelMaskComponentsWithoutMask(self):
-        pass
+        with self.assertRaises(AssertionError):
+            self.zStack.labelMaskComponents()
 
     def testLabelMaskComponents(self):
-        # self.zStack.setMask(maskClosing=1)
-        # self.zStack.setLabel()
-        # onesRegion = np.ones((6, 6, self.depth-2))
-        #
-        # self.assertEqual(self.zStack.labeledZStack.dtype, np.dtype('int'))
-        # self.assertTrue(np.array_equal(self.zStack.labeledZStack[2:8, 2:8, 1:self.depth-1], onesRegion))
-        pass
+        self.zStack.setMaskFromThreshold(self.grayStack.mean())
+        self.zStack.labelMaskComponents()
+
+        self.assertTrue(self.zStack.hasLabelledComponents)
+        self.assertTrue(self.zStack[0][0].labelledComponents.max() == 1)
 
     def testComponentsPropertiesNotDefined(self):
-        pass
+        self.assertTrue(len(self.zStack.componentsProperties) == 0)
 
     def testLabellingSetComponentsProperties(self):
-        # self.zStack.setMask(maskClosing=1)
-        # self.zStack.setLabel()
-        #
-        # self.assertTrue(self.zStack.params["nbOfObjects"] == 1)
-        pass
+        self.zStack.setMaskFromThreshold(self.grayStack.mean())
+        self.zStack.labelMaskComponents()
+
+        nbOfObjects = self.zStack.componentsProperties["Channel 0"]["nbOfObjects"]
+
+        self.assertTrue(nbOfObjects == 1)
 
     def testGetChannelLabelArrayNotDefined(self):
-        pass
+        with self.assertRaises(AssertionError):
+            self.zStack.getChannelLabelArray(channel=0)
 
     def testGetChannelLabelArray(self):
-        pass
+        self.zStack.setMaskFromThreshold(self.grayStack.mean())
+        self.zStack.labelMaskComponents()
+        onesRegion = np.ones((6, 6, self.depth-2))
+
+        labelArray = self.zStack.getChannelLabelArray(channel=0)
+
+        self.assertTrue(np.array_equal(labelArray[2:8, 2:8, 1:self.depth-1], onesRegion))
 
     def testSetChannelLabelsFromArray(self):
-        pass
+        labelArray = np.zeros((10, 10, 5))
+
+        self.zStack.channelLabelsFromArray(0, labelArray)
+
+        self.assertTrue(np.array_equal(self.zStack.getChannelLabelArray(0), labelArray))
 
     def testAnalyzeComponents(self):
-        # self.assertTrue(len(params) == 7)
-        # self.assertTrue(params["totalSize"] == 180)
-        pass
+        self.zStack.setMaskFromThreshold(self.grayStack.mean())
+        self.zStack.labelMaskComponents()
+
+        self.zStack.analyzeComponents()
+        channelComponentsDict = self.zStack.componentsProperties["Channel 0"]
+
+        self.assertTrue(len(channelComponentsDict) == 7)
+        self.assertTrue(channelComponentsDict["totalSize"] == 320)
 
     def testGetObjectsSize(self):
-        pass
+        maskArray = np.ones((2, 2))
+        labelArray = maskArray.copy()
+
+        objectsSize = self.zStack.getObjectsSize(maskArray, labelArray)
+
+        self.assertTrue(len(objectsSize) == 1)
+        self.assertTrue(objectsSize[0] == 4)
 
     def testGetObjectsMass(self):
-        pass
+        maskArray = np.ones((2, 2))
+        originalArray = maskArray.copy()
+        originalArray[0] = [0.5, 0.5]
+        labelArray = maskArray.copy()
+
+        objectsMass = self.zStack.getObjectsMass(originalArray, labelArray)
+
+        self.assertTrue(len(objectsMass) == 1)
+        self.assertTrue(objectsMass[0] == 3)
 
     def testGetObjectsCenterOfMass(self):
-        pass
+        maskArray = np.ones((2, 2))
+        originalArray = maskArray.copy()
+        labelArray = maskArray.copy()
+
+        objectsCM = self.zStack.getObjectsCenterOfMass(originalArray, labelArray)
+
+        self.assertTrue(len(objectsCM) == 1)
+        self.assertTrue(objectsCM[0] == (0.5, 0.5))
 
     def testSaveComponentsProperties(self):
-        # self.zStack.setMask(maskClosing=1)
-        # self.zStack.setLabel()
-        # self.zStack.parameterize()
-        #
-        # filepath = Path(self.tmpDir / "testParams.json")
-        # self.zStack.saveParamsToFile(filepath)
-        # self.assertTrue(os.path.exists(filepath))
-        pass
+        self.zStack.setMaskFromThreshold(self.grayStack.mean())
+        self.zStack.labelMaskComponents()
+        self.zStack.analyzeComponents()
+
+        filepath = Path(self.tmpDir / "testParams.json").__str__()
+        self.zStack.saveComponentsProperties(filepath)
+        self.assertTrue(os.path.exists(filepath))
+
+        os.remove(filepath)
 
     def testSaveComponentsPropertiesToBadFileExtension(self):
-        # self.zStack.setMask(maskClosing=1)
-        # self.zStack.setLabel()
-        # self.zStack.parameterize()
-        #
-        # filepath = Path(self.tmpDir / "testParams.txt")
-        # self.zStack.saveParamsToFile(filepath)
-        # self.assertTrue(os.path.exists(filepath + ".json"))
-        pass
+        self.zStack.setMaskFromThreshold(self.grayStack.mean())
+        self.zStack.labelMaskComponents()
+        self.zStack.analyzeComponents()
 
-    def testCrop(self):
-        pass
+        filepath = Path(self.tmpDir / "testParams.txt").__str__()
+        self.zStack.saveComponentsProperties(filepath)
+        self.assertTrue(os.path.exists(filepath + ".json"))
 
-    def testCrop4DArray(self):
+        os.remove(filepath + ".json")
+
+    @unittest.skip("Cropping not tested: method will propably change.")
+    def testAsk2DCropIndices(self):
         # fixme: careful with crop logic: maybe move to image
         pass
 
-    def testAsk2DCropIndices(self):
+    @unittest.skip
+    def testCrop4DArray(self):
         pass
 
-    @patch("matplotlib.pyplot.show", new=Mock())
-    def testShow(self):
+    @unittest.skip
+    def testCrop(self):
         pass
 
     def testChannelStacksInMemory(self):
-        # self.zStack.setMask()
-        # self.zStack.setLabel()
-        #
-        # self.assertTrue(len(self.zStack._stacksInMemory()) == 3)
-        pass
+        self.zStack.setMaskFromThreshold(self.grayStack.mean())
+        self.zStack.labelMaskComponents()
+
+        stacksInMemory = self.zStack.channelStacksInMemory(channel=0)
+
+        self.assertTrue(len(stacksInMemory) == 3)
 
     def testChannelStacksInMemoryOrdered(self):
-        # self.zStack.removeNoise()
-        # self.zStack.setMask()
-        # self.zStack.setLabel()
-        #
-        # orderedKeys = ["Original ", "", "Mask ", "Label "]
-        #
-        # for key, orderedKey in zip(self.zStack._stacksInMemory().keys(), orderedKeys):
-        #     self.assertEqual(key, orderedKey)
-        pass
+        self.zStack.applyNoiseFilter()
+        self.zStack.setMaskFromThreshold(self.grayStack.mean())
+        self.zStack.labelMaskComponents()
+        orderedKeys = ["Original ", "", "Mask ", "Label "]
+
+        stacksInMemory = self.zStack.channelStacksInMemory(channel=0)
+
+        self.assertTrue(len(stacksInMemory) == len(orderedKeys))
+        for key, orderedKey in zip(stacksInMemory.keys(), orderedKeys):
+            self.assertEqual(key, orderedKey)
+
+    @patch("matplotlib.pyplot.show", new=Mock())
+    def testShow(self):
+        self.zStack.show(channel=0)
+        # todo: test more indepth ?
 
     @patch("matplotlib.pyplot.show", new=Mock())
     def testShowAllChannelStacks(self):
-        pass
+        self.zStack.applyNoiseFilter()
+        self.zStack.setMaskFromThreshold(self.grayStack.mean())
+        self.zStack.labelMaskComponents()
+
+        self.zStack.showAllStacks(channel=0)
+        # todo: test more indepth ?
 
     @patch("matplotlib.pyplot.show", new=Mock())
     def testShowAllStacks(self):
-        # assert NotImplementedError...
-        pass
+        self.zStack.applyNoiseFilter()
+        self.zStack.setMaskFromThreshold(self.grayStack.mean())
+        self.zStack.labelMaskComponents()
 
-
-# Fixme: only tested Zstacks from Arrays : test zStack/ImageCollection from image files
-# Todo: I can prepare a small stack sample folder.
-
-@unittest.skip
-class TestZStackFromImages(env.DCCLabTestCase):
-
-    def testImagesAreSimilar(self):
-        pass
-
-    def testZStackFromImages(self):
-        pass
+        with self.assertRaises(NotImplementedError):
+            self.zStack.showAllStacks()
