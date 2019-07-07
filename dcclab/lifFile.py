@@ -10,7 +10,13 @@ class LIFFile(ImageFile):
 
     def __init__(self, path):
         ImageFile.__init__(self, path)
-        self.__lifObject = LIFReader(self.path)
+
+        self.file = open(path, 'rb')
+        try:
+            self.__lifObject = LIFReader(self.file)
+        except Exception as e:
+            self.file.close()
+            raise e
         self.series = self.__lifObject.getSeries()
 
     @property
@@ -83,3 +89,6 @@ class LIFFile(ImageFile):
         if asJson:
             return json.dumps(metadata, indent=4)
         return metadata
+
+    def close(self):
+        self.file.close()

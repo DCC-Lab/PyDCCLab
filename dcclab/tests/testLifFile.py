@@ -13,6 +13,9 @@ class TestLifFile(env.DCCLabTestCase):
     def setUp(self):
         self.lifObj = LIFFile(Path(self.dataDir, 'test_LifFile.lif').__str__())
 
+    def tearDown(self):
+        self.lifObj.close()
+
     def testInitWithLifFile(self):
         self.assertIsNotNone(self.lifObj)
 
