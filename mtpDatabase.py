@@ -7,15 +7,12 @@ import os
 
 if __name__ == '__main__':
     # Current directory is :
-    print('Begining process...')
+    print('Beginning process...')
     directory = os.path.dirname(__file__)
-    #directory = os.getcwd()
-    parent = os.path.dirname(directory)
-    print('Directory is : {}            Parent is : {}'.format(directory, parent))
+    print('Directory is : {}'.format(directory))
 
     # Path to the Molecular Tools Platform database is :
-    mtpPath = os.path.join(directory, 'database', 'mtp.db')
-    #mtpPath = os.path.join(directory, 'testData', 'mtp.db')
+    mtpPath = os.path.join(directory, 'dcclab', 'database', 'mtp.db')
     print('Path to database "mtp.db" is : {}'.format(mtpPath))
 
     # We create a database object in rwc mode. If it doesn't exist, we create it.
@@ -36,19 +33,15 @@ if __name__ == '__main__':
 
         # Now, we need paths to our metadata (the .czi files and the .csv files.)
         # For the .csv, we have :
-        micePath = os.path.join(directory, 'database', 'Data-souris.csv')
-        utilPath = os.path.join(directory, 'database', 'Data-Utilisation.csv')
-        #micePath = os.path.join(parent, 'database', 'Data-souris.csv')
-        #utilPath = os.path.join(parent, 'database', 'Data-Utilisation.csv')
+        micePath = os.path.join(directory, 'dcclab', 'database', 'Data-souris.csv')
+        utilPath = os.path.join(directory, 'dcclab', 'database', 'Data-Utilisation.csv')
         print('Path to mice data is : {}'.format(micePath))
         print('Path to util data is : {}'.format(utilPath))
 
         # For the .czi, we have :
         print('Finding czi files in POM...')
-        files = findFiles(os.path.join(directory, 'POM', 'injection AAV', 'résultats bruts', 'AAV'), '*.czi') + \
-                findFiles(os.path.join(directory, 'POM', 'injection AAV', 'résultats bruts', 'RABV'), '*.czi')
-        #files = findFiles(os.path.join(parent, 'POM', 'injection AAV', 'résultats bruts', 'AAV'), '*.czi') + \
-        #        findFiles(os.path.join(parent, 'POM', 'injection AAV', 'résultats bruts', 'RABV'), '*.czi')
+        files = findFiles(os.path.join(directory, 'dcclab', 'POM', 'injection AAV', 'résultats bruts', 'AAV'), '*.czi') + \
+                findFiles(os.path.join(directory, 'dcclab', 'POM', 'injection AAV', 'résultats bruts', 'RABV'), '*.czi')
         print('{} czi files were found!'.format(len(files)))
 
         # Now, we extract the metadata from our files. First, we start with the .csv files.
