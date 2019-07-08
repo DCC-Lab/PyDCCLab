@@ -6,10 +6,10 @@ import os
 
 if __name__ == '__main__':
     # Current directory is :
-    print(os.getcwd())
     print('Begining process...')
-    directory = os.path.dirname(__file__)
-    parent = os.path.dirname(os.path.dirname(__file__))
+    #directory = os.path.dirname(__file__)
+    directory = os.getcwd()
+    parent = os.path.dirname(directory)
     print('Directory is : {}            Parent is : {}'.format(directory, parent))
 
     # Path to the Molecular Tools Platform database is :
