@@ -138,7 +138,7 @@ class CZIChannel:
     def setExposureTime(self):
         try:
             return float(self.root.find('./Metadata/Information/Image/Dimensions/Channels/'
-                                        'Channel[@Id="{}"]/ExposureTime'.format(self.channel)).text) / 1E+12
+                                        'Channel[@Id="{}"]/ExposureTime'.format(self.channel)).text) / 1E6
         except Exception:
             return None
 
