@@ -138,7 +138,7 @@ class CZIChannel:
     def setExposureTime(self):
         try:
             return float(self.root.find('./Metadata/Information/Image/Dimensions/Channels/'
-                                        'Channel[@Id="{}"]/ExposureTime'.format(self.channel)).text) / 1E12
+                                        'Channel[@Id="{}"]/ExposureTime'.format(self.channel)).text) / 1E+12
         except Exception:
             return None
 
@@ -163,6 +163,6 @@ class CZIChannel:
     def setBinningMode(self):
         try:
             return float(self.root.find('./Metadata/Information/Image/Dimensions/Channels/Channel/'
-                                        'DetectorSettings/Binning').text)
+                                        'DetectorSettings/Binning').text.replace(',', '.'))
         except Exception:
             return None
