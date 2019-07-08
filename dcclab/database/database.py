@@ -179,7 +179,7 @@ class Database:
 
     def dropTable(self, table: str):
         if self.isConnected:
-            statement = "DROP TABLE IF EXISTS {}".format(table)
+            statement = 'DROP TABLE IF EXISTS "{}"'.format(table)
             self.execute(statement)
 
     def insert(self, table: str, values: dict):
