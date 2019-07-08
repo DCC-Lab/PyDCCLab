@@ -17,6 +17,8 @@ if __name__ == '__main__':
     print('>>>>TEST')
     db = Database('test.db', True)
     print('>>> Is connected : ', db.isConnected)
+    db.connect()
+    print('>>> Is connected : ', db.isConnected)
 
     # We create a database object in rwc mode. If it doesn't exist, we create it.
     # Then we connect to the database.
