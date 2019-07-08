@@ -4,7 +4,7 @@ import unittest
 import os
 
 
-class TestCsvMetadata(env.dcclabTestCase):
+class TestCsvMetadata(env.DCCLabTestCase):
     def setUp(self) -> None:
         self.directory = self.dataDir
         self.filePath = os.path.join(self.directory, 'unittest.csv')

@@ -4,10 +4,11 @@ import unittest
 import tempfile
 from pathlib import Path
 
+
 class DCCLabTestCase(unittest.TestCase):
-    moduleDir = Path(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))) 
-    tmpDir = Path(os.path.join(tempfile.gettempdir(), "testfiles"))
-    testsDir = Path(os.path.dirname(os.path.abspath(__file__)))
+    moduleDir = Path(os.path.abspath(os.path.join(os.path.dirname(__file__)))) 
+    tmpDir = Path(tempfile.gettempdir(), "testfiles")
+    testsDir = Path(moduleDir, "dcclab", "tests")
     dataDir = Path(testsDir, 'testData')
 
     def __init__(self,tests=()):
@@ -41,5 +42,5 @@ class DCCLabTestCase(unittest.TestCase):
     def tmpFile(self, filename):
         return os.path.join(self.tmpDir, filename)
 
-# Very important:  append module root directory to sys.path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+# No need to add the directory to sys path because this is for PyCharm only, which includes it already
+#sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__))))

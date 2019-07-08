@@ -57,7 +57,10 @@ class EmptyImageCollectionException(Exception):
 class EmptyDCCImageCollectionException(EmptyImageCollectionException):
     pass
 
+class ZStackProcessDimensionIsNotDefined(Exception):
+    def __init__(self):
+        Exception.__init__(self, "ZStack.processIn3D must be defined as True or False.")
+
 class FileAlreadyLoadedException(Exception):
     def __init__(self, path:str):
         Exception.__init__(self, "The file, {}, is already loaded.".format(path))
-

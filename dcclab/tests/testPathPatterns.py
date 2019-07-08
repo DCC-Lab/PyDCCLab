@@ -8,7 +8,7 @@ import time
 from dcclab import PathPattern
 from pathlib import Path, PureWindowsPath
 
-class TestPatterns(env.dcclabTestCase):
+class TestPatterns(env.DCCLabTestCase):
     def testInit(self):
         self.assertIsNotNone(PathPattern('abc'))
 
