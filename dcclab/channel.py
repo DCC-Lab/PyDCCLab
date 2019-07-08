@@ -40,7 +40,7 @@ class Channel:
         self.__original = None
 
         # Segmentation @properties
-        self.mask = None  # Channel(bool)?
+        self.mask = None  # type: Channel
         self.labelledComponents = None
         self.numberOfComponents = 0
         self.componentsProperties = None
@@ -57,7 +57,7 @@ class Channel:
         return self.pixels.ndim
 
     @property
-    def shape(self) -> typing.Tuple[int, int, int]:
+    def shape(self) -> typing.Tuple[int, int]:
         return self.pixels.shape
 
     @property
@@ -113,12 +113,12 @@ class Channel:
     """ High-level Image segmentation functions """
 
     @property
-    def isLabelled(self) -> bool:
+    def hasLabelledComponents(self) -> bool:
         return self.labelledComponents is not None
 
     def labelMaskComponents(self):
         if self.hasMask:
-            labels, nbObjects = label(self.mask.pixels)
+            labels, nbObjects = ndimage.label(self.mask.pixels)
             self.labelledComponents = labels
             self.numberOfComponents = nbObjects
         else:
@@ -194,6 +194,22 @@ class Channel:
         if self.__original is not None:
             self._pixels = self.__original
 
+    @property
+    def originalPixels(self) -> np.ndarray:
+        if self.__original is not None:
+            return self.__original
+
+    @property
+    def hasOriginal(self) -> bool:
+        if self.__original is not None:
+            return True
+        return False
+
+    def replaceFromArray(self, channelArray):
+        assert channelArray.ndim == 2
+        self.saveOriginal()
+        self._pixels = channelArray
+
     def applyConvolution(self, matrix: typing.Union[np.ndarray, list]) -> None:
         self.saveOriginal()
         result = self.convolveWith(matrix)
@@ -250,6 +266,25 @@ class Channel:
         else:
             result = self.getClosing(size)
         self._pixels = result.pixels
+
+    def applyNdImageBinaryOpening(self, size: int=None, iterations: int = 1):
+        # fixme: mask.applyOpening already exist: but ndimage method differs from morphology
+        self.saveOriginal()
+        if not self.isBinary:
+            raise TypeError("Channel has to be binary")
+        struct = None
+        if size is not None:
+            struct = np.ones((size, size))
+        self._pixels = ndimage.binary_opening(self.pixels, struct, iterations=iterations)
+
+    def applyNdImageBinaryClosing(self, size: int=None, iterations: int = 1):
+        self.saveOriginal()
+        if not self.isBinary:
+            raise TypeError("Channel has to be binary")
+        struct = None
+        if size is not None:
+            struct = np.ones((size, size))
+        self._pixels = ndimage.binary_closing(self.pixels, struct, iterations=iterations)
 
     def applyErosion(self, size: int = 2):
         self.saveOriginal()

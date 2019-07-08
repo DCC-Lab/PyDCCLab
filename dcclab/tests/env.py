@@ -7,8 +7,8 @@ from pathlib import Path
 class DCCLabTestCase(unittest.TestCase):
     moduleDir = Path(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))) 
     tmpDir = Path(os.path.join(tempfile.gettempdir(), "testfiles"))
-    testsDir = Path(os.path.dirname(os.path.abspath(__file__) ))
-    dataDir = Path(os.path.join(testsDir, 'testData'))
+    testsDir = Path(os.path.dirname(os.path.abspath(__file__)))
+    dataDir = Path(testsDir, 'testData')
 
     def __init__(self,tests=()):
         super(DCCLabTestCase, self).__init__(tests)

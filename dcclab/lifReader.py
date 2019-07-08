@@ -6,22 +6,20 @@ import numpy as np
 import warnings
 import sys
 
-# TODO: hide/move this library wrapper out of dcclab module
 
-
-class LifReader(Reader):
+class LIFReader(Reader):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def getSeries(self):
         if not hasattr(self, '__series'):
             self.__series = [
-                LifSerie(s.root, self.f, self.offsets[i]) for i, s in enumerate(self.getSeriesHeaders())
+                LIFSerie(s.root, self.f, self.offsets[i]) for i, s in enumerate(self.getSeriesHeaders())
             ]
         return self.__series
 
 
-class LifSerie(Serie):
+class LIFSerie(Serie):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -35,13 +33,11 @@ class LifSerie(Serie):
             channels = list(channels)
 
         channelStacks = []
-        for channel in channels:
+        for i, channel in enumerate(channels):
+            print("... Loading channel {}/{}".format(i+1, len(channels)))
             channelStacks.append(self.__getStackChannel(channel))
 
-        if len(channelStacks) == 1:
-            return channelStacks[0]
-        else:
-            return np.stack(channelStacks)
+        return np.stack(channelStacks, axis=2)
 
     def __getStackChannel(self, channel=0, T=0, dtype=np.uint8):
         """ Renamed custom version of getFrame """
@@ -55,6 +51,7 @@ class LifSerie(Serie):
             yx = yx.reshape(self.get2DShape())
             cyx.append(yx)
             zcyx.append(cyx)
+        print('\n')  # Leave progress bar inline update
         zcyx = np.array(zcyx)
         xzcy = np.moveaxis(zcyx, -1, 0)
         xyzc = np.moveaxis(xzcy, -1, 1)
