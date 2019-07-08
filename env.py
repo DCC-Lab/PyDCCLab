@@ -1,4 +1,3 @@
-'''
 import sys
 import os
 import unittest
@@ -45,4 +44,3 @@ class DCCLabTestCase(unittest.TestCase):
 
 # No need to add the directory to sys path because this is for PyCharm only, which includes it already
 #sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__))))
-'''
