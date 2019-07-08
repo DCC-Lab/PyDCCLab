@@ -9,7 +9,7 @@ class CZIChannel:
         # These variables get their testData from filter objects.
         self.exWavelengthFilter = self.setExWavelengthFilter(filters)
         self.emWavelengthFilter = self.setEmWavelengthFilter(filters)
-        self.beamsplitter = self.setBeamsplitter(filters)
+        self.beamSplitter = self.setBeamSplitter(filters)
 
         # These variables get their testData from root.
         self.reflector = self.setReflector()
@@ -35,7 +35,7 @@ class CZIChannel:
     def asDict(self):
         return {'file_id': self.fileId, 'channel_id': self.channelId, 'channel_name': self.channelName,
                 'ex_wavelength_filter': self.exWavelengthFilter, 'em_wavelength_filter': self.emWavelengthFilter,
-                'beamsplitter': self.beamsplitter, 'reflector': self.reflector, 'contrast_method': self.contrastMethod,
+                'beam_splitter': self.beamSplitter, 'reflector': self.reflector, 'contrast_method': self.contrastMethod,
                 'light_source': self.lightSource, 'light_source_intensity': self.lightSourceIntensity,
                 'dye_name': self.dyeName, 'channel_color': self.channelColor, 'ex_wavelength': self.exWavelength,
                 'em_wavelength': self.emWavelength, 'effective_na': self.effectiveNA,
@@ -45,7 +45,7 @@ class CZIChannel:
     @property
     def keys(self):
         return {'file_id': 'TEXT', 'channel_id': 'TEXT PRIMARY KEY', 'channel_name': 'TEXT', 'ex_wavelength_filter': 'TEXT',
-                'em_wavelength_filter': 'TEXT', 'beamsplitter': 'INTEGER', 'reflector': 'TEXT',
+                'em_wavelength_filter': 'TEXT', 'beam_splitter': 'INTEGER', 'reflector': 'TEXT',
                 'contrast_method': 'TEXT', 'light_source': 'TEXT', 'light_source_intensity': 'REAL', 'dye_name': 'TEXT',
                 'channel_color': 'TEXT', 'ex_wavelength': 'INTEGER', 'em_wavelength': 'INTEGER', 'effective_na': 'REAL',
                 'imaging_device': 'TEXT', 'camera_adapter': 'TEXT', 'exposure_time': 'REAL', 'binning_mode': 'REAL'}
@@ -68,7 +68,7 @@ class CZIChannel:
         except Exception:
             return None
 
-    def setBeamsplitter(self, filters):
+    def setBeamSplitter(self, filters):
         try:
             for filter in filters:
                 if self.channel == filter.getChannelId():
@@ -123,22 +123,22 @@ class CZIChannel:
 
     def setExWavelength(self):
         try:
-            return self.root.find('./Metadata/Information/Image/Dimensions/Channels/Channel[@Id="{}"]'
-                                  '/ExcitationWavelength'.format(self.channel)).text
+            return int(self.root.find('./Metadata/Information/Image/Dimensions/Channels/Channel[@Id="{}"]'
+                                      '/ExcitationWavelength'.format(self.channel)).text)
         except Exception:
             return None
 
     def setEmWavelength(self):
         try:
-            return self.root.find('./Metadata/Information/Image/Dimensions/Channels/Channel[@Id="{}"]'
-                                  '/EmissionWavelength'.format(self.channel)).text
+            return int(self.root.find('./Metadata/Information/Image/Dimensions/Channels/Channel[@Id="{}"]'
+                                      '/EmissionWavelength'.format(self.channel)).text)
         except Exception:
             return None
 
     def setExposureTime(self):
         try:
             return float(self.root.find('./Metadata/Information/Image/Dimensions/Channels/'
-                                        'Channel[@Id="{}"]/ExposureTime'.format(self.channel)).text) / 1E9
+                                        'Channel[@Id="{}"]/ExposureTime'.format(self.channel)).text) / 1E12
         except Exception:
             return None
 
@@ -162,6 +162,7 @@ class CZIChannel:
 
     def setBinningMode(self):
         try:
-            return self.root.find('./Metadata/Information/Image/Dimensions/Channels/Channel/DetectorSettings/Binning').text
+            return float(self.root.find('./Metadata/Information/Image/Dimensions/Channels/Channel/'
+                                        'DetectorSettings/Binning').text)
         except Exception:
             return None

@@ -159,39 +159,39 @@ class CZIMetadata:
 
     def setXScale(self):
         try:
-            return self.root.find('./Metadata/Scaling/Items/Distance[@Id="X"]/Value').text
+            return float(self.root.find('./Metadata/Scaling/Items/Distance[@Id="X"]/Value').text)
         except Exception:
             return None
 
     def setYScale(self):
         try:
-            return self.root.find('./Metadata/Scaling/Items/Distance[@Id="Y"]/Value').text
+            return float(self.root.find('./Metadata/Scaling/Items/Distance[@Id="Y"]/Value').text)
         except Exception:
             return None
 
     def setXSize(self):
         try:
-            return self.root.find('./Metadata/Information/Image/SizeX').text
+            return int(self.root.find('./Metadata/Information/Image/SizeX').text)
         except Exception:
             return None
 
     def setYSize(self):
         try:
-            return self.root.find('./Metadata/Information/Image/SizeY').text
+            return int(self.root.find('./Metadata/Information/Image/SizeY').text)
         except Exception:
             return None
 
     @property
     def xScaled(self):
         try:
-            return float(self.xSize) * float(self.xScale)
+            return (self.xSize * self.xScale) * 1000
         except Exception:
             return None
 
     @property
     def yScaled(self):
         try:
-            return float(self.ySize) * float(self.yScale)
+            return (self.ySize * self.yScale) * 1000
         except Exception:
             return None
 

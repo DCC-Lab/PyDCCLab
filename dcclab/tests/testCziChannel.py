@@ -44,15 +44,15 @@ class TestCziChannel(env.DCCLabTestCase):
 
     def testSetBeamsplitterExpectedValue(self):
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
-        self.assertEqual(channel.beamsplitter, '495')
+        self.assertEqual(channel.beamSplitter, '495')
 
     def testSetBeamsplitterNotFound(self):
         channel = chnnl(['', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
-        self.assertIsNone(channel.beamsplitter)
+        self.assertIsNone(channel.beamSplitter)
 
     def testSetBeamsplitterNoFilters(self):
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], [], self.meta.root)
-        self.assertIsNone(channel.beamsplitter)
+        self.assertIsNone(channel.beamSplitter)
 
     def testSetReflectorExpectedValue(self):
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
