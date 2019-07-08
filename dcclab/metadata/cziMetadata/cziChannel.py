@@ -46,9 +46,9 @@ class CZIChannel:
     def keys(self):
         return {'file_id': 'TEXT', 'channel_id': 'TEXT PRIMARY KEY', 'channel_name': 'TEXT', 'ex_wavelength_filter': 'TEXT',
                 'em_wavelength_filter': 'TEXT', 'beamsplitter': 'INTEGER', 'reflector': 'TEXT',
-                'contrast_method': 'TEXT', 'light_source': 'TEXT', 'light_source_intensity': 'TEXT', 'dye_name': 'TEXT',
+                'contrast_method': 'TEXT', 'light_source': 'TEXT', 'light_source_intensity': 'REAL', 'dye_name': 'TEXT',
                 'channel_color': 'TEXT', 'ex_wavelength': 'INTEGER', 'em_wavelength': 'INTEGER', 'effective_na': 'REAL',
-                'imaging_device': 'TEXT', 'camera_adapter': 'TEXT', 'exposure_time': 'TEXT', 'binning_mode': 'REAL'}
+                'imaging_device': 'TEXT', 'camera_adapter': 'TEXT', 'exposure_time': 'REAL', 'binning_mode': 'REAL'}
 
     def setExWavelengthFilter(self, filters):
         try:
@@ -102,8 +102,8 @@ class CZIChannel:
 
     def setLightSourceIntensity(self):
         try:
-            return self.root.find('./Metadata/Information/Image/Dimensions/Channels/Channel[@Id="{}"]'
-                                  '/LightSourcesSettings/LightSourceSettings/Intensity'.format(self.channel)).text
+            return float(self.root.find('./Metadata/Information/Image/Dimensions/Channels/Channel[@Id="{}"]'
+                                        '/LightSourcesSettings/LightSourceSettings/Intensity'.format(self.channel)).text.rstrip('%'))
         except Exception:
             return None
 
@@ -137,14 +137,14 @@ class CZIChannel:
 
     def setExposureTime(self):
         try:
-            return self.root.find('./Metadata/Information/Image/Dimensions/Channels/Channel[@Id="{}"]'
-                                  '/ExposureTime'.format(self.channel)).text
+            return float(self.root.find('./Metadata/Information/Image/Dimensions/Channels/'
+                                        'Channel[@Id="{}"]/ExposureTime'.format(self.channel)).text) / 1E9
         except Exception:
             return None
 
     def setEffectiveNA(self):
         try:
-            return self.root.find('./Metadata/Information/Instrument/Objectives/Objective/LensNA').text
+            return float(self.root.find('./Metadata/Information/Instrument/Objectives/Objective/LensNA').text)
         except Exception:
             return None
 
