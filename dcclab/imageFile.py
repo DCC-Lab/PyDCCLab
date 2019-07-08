@@ -1,8 +1,7 @@
 from .cziUtil import *
 from .channel import *
-import PIL.Image
 import scipy.io as sio
-
+import PIL
 
 class ImageFile(object):
     supportedFormats = []
@@ -13,6 +12,12 @@ class ImageFile(object):
         self.path = path
 
     def zStackData(self):
+        """
+        :return: images data as z-stack if possible
+        """
+        return None
+
+    def zStacksData(self):
         """
         :return: images data as z-stack if possible
         """
