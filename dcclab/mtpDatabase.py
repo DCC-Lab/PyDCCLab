@@ -14,22 +14,22 @@ if __name__ == '__main__':
     mtpPath = os.path.join(directory, 'database', 'mtp.db')
     print('Path to database "mtp.db" is : {}'.format(mtpPath))
 
+    print('>>>>TEST')
+    db = Database('test.db', True)
+    print('>>> Is connected : ', db.isConnected)
+
     # We create a database object in rwc mode. If it doesn't exist, we create it.
     # Then we connect to the database.
     # Database is in asynchronous mode for faster inserts.
     print('Connecting to database...')
     with Database(mtpPath, True) as database:
-        if os.path.exists(mtpPath):
-            print('Database already exists.')
-            print('Dropping all existing tables...')
-            database.dropTable('Data-souris')
-            database.dropTable('Data-Utilisation')
-            database.dropTable('cziMetadata')
-            database.dropTable('cziChannels')
-            database.commit()
-            print('Done.')
-        else:
-            print("Database did not exist and was created.")
+        print('Dropping all existing tables if any...')
+        database.dropTable('Data-souris')
+        database.dropTable('Data-Utilisation')
+        database.dropTable('cziMetadata')
+        database.dropTable('cziChannels')
+        database.commit()
+        print('Done.')
 
         print("WARNING : Database is in asynchronous mode.")
         database.asynchronous()
