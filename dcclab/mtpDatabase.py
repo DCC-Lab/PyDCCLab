@@ -2,10 +2,12 @@ from dcclab import Database
 from dcclab import Metadata
 from dcclab import findFiles
 import os
+import sys
 
 
 if __name__ == '__main__':
     # Current directory is :
+    print(os.getcwd())
     print('Begining process...')
     directory = os.path.dirname(__file__)
     print('Directory is : {}'.format(directory))
@@ -13,12 +15,6 @@ if __name__ == '__main__':
     # Path to the Molecular Tools Platform database is :
     mtpPath = os.path.join(directory, 'database', 'mtp.db')
     print('Path to database "mtp.db" is : {}'.format(mtpPath))
-
-    print('>>>>TEST')
-    db = Database('test.db', True)
-    print('>>> Is connected : ', db.isConnected)
-    db.connect()
-    print('>>> Is connected : ', db.isConnected)
 
     # We create a database object in rwc mode. If it doesn't exist, we create it.
     # Then we connect to the database.
