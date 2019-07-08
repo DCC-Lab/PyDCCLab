@@ -62,11 +62,11 @@ class Channel:
 
     @property
     def width(self) -> int:
-        return int(self.shape[0])
+        return int(self.shape[1])
 
     @property
     def height(self) -> int:
-        return int(self.shape[1])
+        return int(self.shape[0])
 
     @property
     def sizeInBytes(self) -> int:
@@ -267,7 +267,7 @@ class Channel:
             result = self.getClosing(size)
         self._pixels = result.pixels
 
-    def applyNdImageBinaryOpening(self, size: int=None, iterations: int = 1):
+    def applyNdImageBinaryOpening(self, size: int = None, iterations: int = 1):
         # fixme: mask.applyOpening already exist: but ndimage method differs from morphology
         self.saveOriginal()
         if not self.isBinary:
@@ -277,7 +277,7 @@ class Channel:
             struct = np.ones((size, size))
         self._pixels = ndimage.binary_opening(self.pixels, struct, iterations=iterations)
 
-    def applyNdImageBinaryClosing(self, size: int=None, iterations: int = 1):
+    def applyNdImageBinaryClosing(self, size: int = None, iterations: int = 1):
         self.saveOriginal()
         if not self.isBinary:
             raise TypeError("Channel has to be binary")
@@ -473,10 +473,8 @@ class Channel:
         plt.show()
 
     def applyHighPassFilterFromMask(self, filterSize: int):
-        pixels = self.pixels
-        fftPixels = np.fft.fft2(pixels)
-        fftShiftPixels = np.fft.fftshift(fftPixels)
-        rows, cols = pixels.shape
+        fftShiftPixels = self.fourierTransform()
+        rows, cols = self.pixels.shape
         halfRows, halfCols = rows // 2, cols // 2
         fftShiftPixels[halfRows - filterSize:halfRows + filterSize,
         halfCols - filterSize:halfCols + filterSize] = 0
@@ -485,10 +483,8 @@ class Channel:
         return Channel(filteredPixels)
 
     def applyLowPassFilterFromMask(self, filterSize: int):
-        pixels = self.pixels
-        fftPixels = np.fft.fft2(pixels)
-        fftShiftPixels = np.fft.fftshift(fftPixels)
-        rows, cols = pixels.shape
+        fftShiftPixels = self.fourierTransform()
+        rows, cols = self.pixels.shape
         halfRows, halfCols = rows // 2, cols // 2
         mask = np.zeros((rows, cols), np.uint8)
         mask[halfRows - filterSize:halfRows + filterSize, halfCols - filterSize:halfCols + filterSize] = 1
@@ -496,6 +492,20 @@ class Channel:
         ifftShift = np.fft.ifftshift(fftShiftPixelsWithMask)
         filteredPixels = np.abs(np.fft.ifft2(ifftShift))
         return Channel(filteredPixels)
+
+    def powerSpectrum(self, naturalLogScale: bool = True) -> np.ndarray:
+        fftShiftPixels = self.fourierTransform()
+        powerSpectrum = np.abs(fftShiftPixels) ** 2
+        if naturalLogScale:
+            powerSpectrum = np.log(powerSpectrum)
+        return powerSpectrum
+
+    def fourierTransform(self, shift: bool = True) -> np.ndarray:
+        pixels = self.pixels
+        fftPixels = np.fft.fft2(pixels)
+        if shift:
+            fftPixels = np.fft.fftshift(fftPixels)
+        return fftPixels
 
 
 from .channelFloat import ChannelFloat
