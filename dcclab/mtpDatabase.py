@@ -1,8 +1,19 @@
-from dcclab import Database
-from dcclab import Metadata
-from dcclab import findFiles
+try:
+    from dcclab import Database
+except:
+    print("Couldn't import Database.")
+
+try:
+    from dcclab import Metadata
+except:
+    print("Couldn't import Metadata.")
+
+try:
+    from dcclab import findFiles
+except:
+    print("Couldn't import findFiles.")
+
 import os
-import sys
 
 
 if __name__ == '__main__':
