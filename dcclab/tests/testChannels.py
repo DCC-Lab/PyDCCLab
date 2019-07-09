@@ -49,12 +49,12 @@ class TestChannels(env.DCCLabTestCase):
     def testWidth(self):
         array = np.random.randint(low=0, high=255, size=(100, 200))
         channel = Channel(pixels=array)
-        self.assertTrue(channel.width == 100)
+        self.assertTrue(channel.width == 200)
 
     def testHeight(self):
         array = np.random.randint(low=0, high=255, size=(100, 200))
         channel = Channel(pixels=array)
-        self.assertTrue(channel.height == 200)
+        self.assertTrue(channel.height == 100)
 
     def testNumberOfPixels(self):
         array = np.random.randint(low=0, high=255, size=(100, 200))
@@ -219,6 +219,35 @@ class TestChannelsSegmentation(env.DCCLabTestCase):
 
 class TestChannelSpectralFiltering(env.DCCLabTestCase):
 
+    def testFourierTransform(self):
+        def fourierTransform(array):
+            returnArray = np.zeros_like(array, dtype=complex)
+            m, n = array.shape
+            for k in range(m):
+                for l in range(n):
+                    sum_ = 0
+                    for i in range(m):
+                        for j in range(n):
+                            sum_ += array[i, j] * np.exp(-1j * 2 * np.pi * ((k * i) / m + (l * j) / n))
+                    returnArray[k, l] = sum_
+            return returnArray
+
+        array = np.arange(0, 28).reshape((4, 7))
+        channel = Channel(array)
+        fftChannel = channel.fourierTransform(False)
+        fftArray = fourierTransform(array)
+        self.assertTrue(np.allclose(fftChannel, fftArray))
+
+    def testFourierTransformShift(self):
+        shape = (4, 3)
+        array = np.random.randint(0, 1000, shape, dtype=np.uint16)
+        channel = Channel(array)
+        centerY, centerX = shape[0] // 2, shape[1] // 2
+        fftChannelShift = channel.fourierTransform()
+        fftChannel = channel.fourierTransform(False)
+        self.assertFalse(np.array_equal(fftChannelShift, fftChannel))
+        self.assertEqual(fftChannelShift[centerY, centerX], fftChannel[0, 0])
+
     def testHighPassFilter(self):
         image = Image(path=Path(self.dataDir / "testCziFileTwoChannels.czi"))
         channel = image.channels[0]
@@ -230,6 +259,22 @@ class TestChannelSpectralFiltering(env.DCCLabTestCase):
         channel = image.channels[0]
         fftChannel = channel.applyLowPassFilterFromMask(40)
         self.assertFalse(np.allclose(channel.pixels, fftChannel.pixels))
+
+    def testPowerSpectrumNoLogScale(self):
+        image = Image(path=Path(self.dataDir / "testCziFileTwoChannels.czi"))
+        channel = image.channels[-1]
+        fftChannel = np.fft.fft2(channel.pixels)
+        fftShiftChannel = np.fft.fftshift(fftChannel)
+        amplitude = np.abs(fftShiftChannel) ** 2
+        self.assertTrue(np.array_equal(channel.powerSpectrum(False), amplitude))
+
+    def testPowerSpectrumLogScale(self):
+        image = Image(path=Path(self.dataDir / "testCziFileTwoChannels.czi"))
+        channel = image.channels[-1]
+        fftChannel = np.fft.fft2(channel.pixels)
+        fftShiftChannel = np.fft.fftshift(fftChannel)
+        amplitude = np.log(np.abs(fftShiftChannel) ** 2)
+        self.assertTrue(np.array_equal(channel.powerSpectrum(True), amplitude))
 
 
 if __name__ == '__main__':
