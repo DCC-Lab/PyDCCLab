@@ -3,6 +3,7 @@ from dcclab import *
 import unittest
 import numpy as np
 
+
 class TestChannels(env.DCCLabTestCase):
 
     def testInitWith2DIntArray(self):
@@ -48,17 +49,17 @@ class TestChannels(env.DCCLabTestCase):
     def testWidth(self):
         array = np.random.randint(low=0, high=255, size=(100, 200))
         channel = Channel(pixels=array)
-        self.assertTrue(channel.width == 100)
+        self.assertTrue(channel.width == 200)
 
     def testHeight(self):
         array = np.random.randint(low=0, high=255, size=(100, 200))
         channel = Channel(pixels=array)
-        self.assertTrue(channel.height == 200)
+        self.assertTrue(channel.height == 100)
 
     def testNumberOfPixels(self):
         array = np.random.randint(low=0, high=255, size=(100, 200))
         channel = Channel(pixels=array)
-        self.assertTrue(channel.numberOfPixels == 100*200)
+        self.assertTrue(channel.numberOfPixels == 100 * 200)
 
     def testSizeInBytes(self):
         array = np.random.randint(low=0, high=255, size=(100, 200))
@@ -75,9 +76,9 @@ class TestChannels(env.DCCLabTestCase):
         array = np.random.randint(low=0, high=255, size=(100, 200))
         channel = Channel(pixels=array)
 
-        self.assertNotEqual(1, 'abc') # not an error, simply false
-        self.assertNotEqual(1, np) # not an error, simply false
-        self.assertNotEqual(1, channel) # not an error, simply false
+        self.assertNotEqual(1, 'abc')  # not an error, simply false
+        self.assertNotEqual(1, np)  # not an error, simply false
+        self.assertNotEqual(1, channel)  # not an error, simply false
 
     def testPixelsCopy(self):
         array = np.random.randint(low=0, high=255, size=(100, 200))
@@ -85,11 +86,11 @@ class TestChannels(env.DCCLabTestCase):
         pixels = channel.copy()
         self.assertFalse(pixels is array)
 
-    def testIsBinary(self):        
+    def testIsBinary(self):
         array = np.random.randint(low=0, high=2, size=(100, 200))
         self.assertTrue(Channel(pixels=array).isBinary)
-        self.assertFalse(Channel(pixels=array*255).isBinary)
-        self.assertFalse(Channel(pixels=array*200).isBinary)
+        self.assertFalse(Channel(pixels=array * 255).isBinary)
+        self.assertFalse(Channel(pixels=array * 200).isBinary)
 
         array = np.random.randint(low=0, high=255, size=(100, 200))
         self.assertFalse(Channel(pixels=array).isBinary)
@@ -112,98 +113,98 @@ class TestChannels(env.DCCLabTestCase):
     #     channel = Channel(pixels=array)
     #     hist, bins = channel.getHistogramValues(True)
     #     self.assertAlmostEqual(sum(hist), 1, delta=1e-9)
-       
+
     def testConvolution(self):
         # FIXME: test result
         array = np.random.randint(low=0, high=255, size=(100, 200))
-        kernel = [[-1, 0, 1],[1,0,1],[0,1,1]]
+        kernel = [[-1, 0, 1], [1, 0, 1], [0, 1, 1]]
         channel = Channel(pixels=array).convolveWith(kernel)
         self.assertIsNotNone(channel)
         self.assertTrue(channel.pixels.shape == array.shape)
 
     def testXDerivative(self):
-        array = np.array([[0, 0, 0],[1,1,1],[2,2,2]])
-        expected = np.array([[0, 0, 0],[0, 0, 0],[0, 0, 0]])
+        array = np.array([[0, 0, 0], [1, 1, 1], [2, 2, 2]])
+        expected = np.array([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
         channel = Channel(pixels=array).getXAxisDerivative()
         self.assertIsNotNone(channel)
         self.assertTrue(channel.pixels.shape == array.shape)
         self.assertTrue(channel.pixels.all() == expected.all())
 
     def testYDerivative(self):
-        array = np.array([[0, 1, 2],[0, 1, 2],[0, 1, 2]])
-        expected = np.array([[0, 0, 0],[0, 0, 0],[0, 0, 0]])
+        array = np.array([[0, 1, 2], [0, 1, 2], [0, 1, 2]])
+        expected = np.array([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
         channel = Channel(pixels=array).getYAxisDerivative()
         self.assertIsNotNone(channel)
         self.assertTrue(channel.pixels.shape == array.shape)
         self.assertTrue(channel.pixels.all() == expected.all())
 
     def testAverage(self):
-        array = np.array([[0, 1, 2],[0, 1, 2],[0, 1, 2]])
+        array = np.array([[0, 1, 2], [0, 1, 2], [0, 1, 2]])
         expected = 1.0
         result = Channel(pixels=array).getAverageValueOfPixels()
         self.assertIsNotNone(channel)
         self.assertTrue(result == expected)
 
     def testStddev(self):
-        array = np.array([[0, 1, 2],[0, 1, 2],[0, 1, 2]])
+        array = np.array([[0, 1, 2], [0, 1, 2], [0, 1, 2]])
         channel = Channel(pixels=array).getStandardDeviation()
         self.assertIsNotNone(channel)
 
 
 class TestChannelsSegmentation(env.DCCLabTestCase):
     def testNoMaskOnInit(self):
-        array = np.array([[0, 1, 2],[0, 1, 2],[0, 1, 2]])
+        array = np.array([[0, 1, 2], [0, 1, 2], [0, 1, 2]])
         channel = Channel(array)
         self.assertFalse(channel.hasMask)
 
     def testMaskFromThreshold(self):
-        array = np.array([[0, 1, 2],[0, 1, 2],[0, 1, 2]])
+        array = np.array([[0, 1, 2], [0, 1, 2], [0, 1, 2]])
         channel = Channel(array)
         channel.setMaskFromThreshold(1)
         self.assertTrue(channel.hasMask)
-        self.assertTrue(channel.mask.pixels.all() == np.array([[0, 1, 1],[0, 1, 1],[0, 1, 1]]).all())
+        self.assertTrue(channel.mask.pixels.all() == np.array([[0, 1, 1], [0, 1, 1], [0, 1, 1]]).all())
 
     def testMaskFromThreshold(self):
-        array = np.array([[1, 0, 0, 0],[0, 2,2, 0],[0, 0,0, 3]])
-        expectedMask = np.array([[1, 0, 0, 0],[0, 1,1, 0],[0, 0, 0, 1]])
+        array = np.array([[1, 0, 0, 0], [0, 2, 2, 0], [0, 0, 0, 3]])
+        expectedMask = np.array([[1, 0, 0, 0], [0, 1, 1, 0], [0, 0, 0, 1]])
         channel = Channel(array)
         channel.setMaskFromThreshold(0.5)
         self.assertTrue(channel.hasMask)
         self.assertTrue(channel.mask.pixels.all() == expectedMask.all())
 
     def testLabelMask(self):
-        array = np.array([[1, 0, 0, 0],[0, 2,2, 0],[0, 0,0, 3]])
+        array = np.array([[1, 0, 0, 0], [0, 2, 2, 0], [0, 0, 0, 3]])
         channel = Channel(array)
         channel.setMaskFromThreshold(1)
         channel.labelMaskComponents()
 
-        expectedMask = np.array([[1, 0, 0, 0],[0, 1,1, 0],[0, 0, 0, 1]])
-        expectedComponents = np.array([[0, 0, 0, 0],[0, 1,1, 0],[0, 0, 0, 2]])
+        expectedMask = np.array([[1, 0, 0, 0], [0, 1, 1, 0], [0, 0, 0, 1]])
+        expectedComponents = np.array([[0, 0, 0, 0], [0, 1, 1, 0], [0, 0, 0, 2]])
         self.assertTrue(channel.labelledComponents.all() == expectedComponents.all())
         self.assertTrue(channel.numberOfComponents == 2)
 
     def testLabelWithoutMaskFail(self):
-        array = np.array([[1, 0, 0, 0],[0, 2,2, 0],[0, 0,0, 3]])
+        array = np.array([[1, 0, 0, 0], [0, 2, 2, 0], [0, 0, 0, 3]])
         channel = Channel(array)
         with self.assertRaises(Exception):
             channel.labelMaskComponents()
 
     def testAnalyzeComponents(self):
-        array = np.array([[1, 0, 0, 0],[0, 2,2, 0],[0, 0,0, 3]])
+        array = np.array([[1, 0, 0, 0], [0, 2, 2, 0], [0, 0, 0, 3]])
         channel = Channel(array)
         channel.setMaskFromThreshold(1)
         channel.labelMaskComponents()
         properties = channel.analyzeComponents()
         self.assertTrue(channel.numberOfComponents == 2)
         self.assertIsNotNone(properties)
-        
+
     def testFilterNoise(self):
-        array = np.array([[1, 0, 0, 0],[0, 2,2, 0],[0, 0,0, 3]])
+        array = np.array([[1, 0, 0, 0], [0, 2, 2, 0], [0, 0, 0, 3]])
         channel = Channel(array)
         channel.filterNoise()
 
     def testThreshold(self):
-        array = np.array([[1, 0, 0, 0],[0, 2,2, 0],[0, 0,0, 3]])
+        array = np.array([[1, 0, 0, 0], [0, 2, 2, 0], [0, 0, 0, 3]])
         channel = Channel(array)
         channel.threshold(value=1.5)
 
@@ -214,6 +215,80 @@ class TestChannelsSegmentation(env.DCCLabTestCase):
     #     channel.labelMaskComponents()
     #     channel.analyzeComponents()
     #     channel.saveComponentsStatistics("/tmp/test.json")
+
+
+class TestChannelSpectralFiltering(env.DCCLabTestCase):
+
+    def testFourierTransform(self):
+        def fourierTransform(array):
+            returnArray = np.zeros_like(array, dtype=complex)
+            m, n = array.shape
+            for k in range(m):
+                for l in range(n):
+                    sum_ = 0
+                    for i in range(m):
+                        for j in range(n):
+                            sum_ += array[i, j] * np.exp(-1j * 2 * np.pi * ((k * i) / m + (l * j) / n))
+                    returnArray[k, l] = sum_
+            return returnArray
+
+        array = np.arange(0, 28).reshape((4, 7))
+        channel = Channel(array)
+        fftChannel = channel.fourierTransform(False)
+        fftArray = fourierTransform(array)
+        self.assertTrue(np.allclose(fftChannel, fftArray))
+
+    def testFourierTransformShift(self):
+        shape = (4, 3)
+        array = np.random.randint(0, 1000, shape, dtype=np.uint16)
+        channel = Channel(array)
+        centerY, centerX = shape[0] // 2, shape[1] // 2
+        fftChannelShift = channel.fourierTransform()
+        fftChannel = channel.fourierTransform(False)
+        self.assertFalse(np.array_equal(fftChannelShift, fftChannel))
+        self.assertEqual(fftChannelShift[centerY, centerX], fftChannel[0, 0])
+
+    def testHighPassFilter(self):
+        image = Image(path=Path(self.dataDir / "testCziFileTwoChannels.czi"))
+        channel = image.channels[0]
+        fftChannel = channel.applyHighPassFilterFromMask(30)
+        self.assertFalse(np.allclose(channel.pixels, fftChannel.pixels))
+
+    def testLowPassFilter(self):
+        image = Image(path=Path(self.dataDir / "testCziFileTwoChannels.czi"))
+        channel = image.channels[0]
+        fftChannel = channel.applyLowPassFilterFromMask(40)
+        self.assertFalse(np.allclose(channel.pixels, fftChannel.pixels))
+
+    def testPowerSpectrumNoLogScale(self):
+        image = Image(path=Path(self.dataDir / "testCziFileTwoChannels.czi"))
+        channel = image.channels[-1]
+        fftChannel = np.fft.fft2(channel.pixels)
+        fftShiftChannel = np.fft.fftshift(fftChannel)
+        amplitude = np.abs(fftShiftChannel) ** 2
+        self.assertTrue(np.array_equal(channel.powerSpectrum(False), amplitude))
+
+    def testPowerSpectrumLogScale(self):
+        image = Image(path=Path(self.dataDir / "testCziFileTwoChannels.czi"))
+        channel = image.channels[-1]
+        fftChannel = np.fft.fft2(channel.pixels)
+        fftShiftChannel = np.fft.fftshift(fftChannel)
+        amplitude = np.log(np.abs(fftShiftChannel) ** 2)
+        self.assertTrue(np.array_equal(channel.powerSpectrum(True), amplitude))
+        
+    def testGaussianNoise(self):
+        image = Image(path=Path(self.dataDir / "testCziFileTwoChannels.czi"))
+        channel = image.channels[0]
+        noiseChannel = channel.applyGaussianNoise(mean=channel.getAverageValueOfPixels(),sigma=20)
+        self.assertFalse(np.array_equal(channel.pixels, noiseChannel.pixels))
+        
+    def testPoissonNoise(self):
+        image = Image(path=Path(self.dataDir / "testCziFileTwoChannels.czi"))
+        channel = image.channels[0]
+        channel.applyHighPassFilterFromFractionOfImage()
+        noiseChannel = channel.applyPoissonNoise()
+        self.assertFalse(np.array_equal(channel.pixels, noiseChannel.pixels))
+
 
 if __name__ == '__main__':
     unittest.main()

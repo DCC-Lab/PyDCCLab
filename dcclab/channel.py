@@ -62,11 +62,11 @@ class Channel:
 
     @property
     def width(self) -> int:
-        return int(self.shape[0])
+        return int(self.shape[1])
 
     @property
     def height(self) -> int:
-        return int(self.shape[1])
+        return int(self.shape[0])
 
     @property
     def sizeInBytes(self) -> int:
@@ -126,7 +126,7 @@ class Channel:
             raise Exception("Channel has no mask")
 
     def analyzeComponents(self) -> dict:
-        if self.isLabelled:
+        if self.hasLabelledComponents:
             maskSizes = ndimage.sum(self.mask.pixels, self.labelledComponents, range(1, self.numberOfComponents + 1))
             sumValues = ndimage.sum(self.pixels, self.labelledComponents, range(1, self.numberOfComponents + 1))
             centersOfMass = ndimage.center_of_mass(self.pixels, self.labelledComponents,
@@ -154,6 +154,12 @@ class Channel:
             file.write(jsonParams)
 
     """ Manipulation-related functions """
+
+    def convertToNormalizedFloat(self):
+        pass
+
+    def convertToNormalizedFloatMinToZeroMaxToOne(self):
+        pass
 
     def convertToNormalizedFloat(self):
         pass
@@ -261,7 +267,7 @@ class Channel:
             result = self.getClosing(size)
         self._pixels = result.pixels
 
-    def applyNdImageBinaryOpening(self, size: int=None, iterations: int = 1):
+    def applyNdImageBinaryOpening(self, size: int = None, iterations: int = 1):
         # fixme: mask.applyOpening already exist: but ndimage method differs from morphology
         self.saveOriginal()
         if not self.isBinary:
@@ -271,7 +277,7 @@ class Channel:
             struct = np.ones((size, size))
         self._pixels = ndimage.binary_opening(self.pixels, struct, iterations=iterations)
 
-    def applyNdImageBinaryClosing(self, size: int=None, iterations: int = 1):
+    def applyNdImageBinaryClosing(self, size: int = None, iterations: int = 1):
         self.saveOriginal()
         if not self.isBinary:
             raise TypeError("Channel has to be binary")
@@ -334,6 +340,14 @@ class Channel:
 
     def getExtrema(self) -> typing.Tuple[int, int]:
         return np.min(self.pixels), np.max(self.pixels)
+
+    def getMedian(self):
+        import time
+        before = time.clock()
+        median = np.median(self.pixels)
+        after = time.clock()
+        print("Median cpu time : {}".format(after - before))
+        return median
 
     def getPixelsOfIntensity(self, intensity: float) -> typing.List[tuple]:
         coordsList = []
@@ -457,6 +471,69 @@ class Channel:
             plt.subplot(nrows, ncols, i + 1)
             plt.imshow(channels[i].pixels)
         plt.show()
+
+    def applyHighPassFilterFromMask(self, filterSize: int):
+        fftShiftPixels = self.fourierTransform()
+        rows, cols = self.pixels.shape
+        halfRows, halfCols = rows // 2, cols // 2
+        fftShiftPixels[halfRows - filterSize:halfRows + filterSize,
+        halfCols - filterSize:halfCols + filterSize] = 0
+        ifftShift = np.fft.ifftshift(fftShiftPixels)
+        filteredPixels = np.abs(np.fft.ifft2(ifftShift))
+        return Channel(filteredPixels)
+
+    def applyLowPassFilterFromMask(self, filterSize: int):
+        fftShiftPixels = self.fourierTransform()
+        rows, cols = self.pixels.shape
+        halfRows, halfCols = rows // 2, cols // 2
+        mask = np.zeros((rows, cols), np.uint8)
+        mask[halfRows - filterSize:halfRows + filterSize, halfCols - filterSize:halfCols + filterSize] = 1
+        fftShiftPixelsWithMask = fftShiftPixels * mask
+        ifftShift = np.fft.ifftshift(fftShiftPixelsWithMask)
+        filteredPixels = np.abs(np.fft.ifft2(ifftShift))
+        return Channel(filteredPixels)
+        
+    def applyHighPassFilterFromFractionOfImage(self, keepFraction:float = 0.1):
+        fftPixels = self.fourierTransform(False)
+        rows, cols = fftPixels.shape
+        mask = np.zeros_like(fftPixels, dtype=np.uint8)
+        mask[int(rows*keepFraction):int(rows*(1-keepFraction))] = 1
+        mask[:, int(cols*keepFraction):int(cols*(1-keepFraction))] = 1
+        fftPixels = mask*fftPixels
+        filteredPixels = np.abs(np.fft.ifft2(fftPixels))
+        return Channel(filteredPixels)
+        
+    def applyLowPassFilterFromFractionOfImage(self, keepFraction:float = 0.1):
+        fftPixels = self.fourierTransform(False)
+        rows, cols = fftPixels.shape
+        fftPixels[int(rows*keepFraction):int(rows*(1-keepFraction))] = 0
+        fftPixels[:, int(cols*keepFraction):int(cols*(1-keepFraction))] = 0
+        filteredPixels = np.abs(np.fft.ifft2(fftPixels))
+        return Channel(filteredPixels)
+
+    def powerSpectrum(self, naturalLogScale: bool = True) -> np.ndarray:
+        fftShiftPixels = self.fourierTransform()
+        powerSpectrum = np.abs(fftShiftPixels) ** 2
+        if naturalLogScale:
+            powerSpectrum = np.log(powerSpectrum)
+        return powerSpectrum
+
+    def fourierTransform(self, shift: bool = True) -> np.ndarray:
+        pixels = self.pixels
+        fftPixels = np.fft.fft2(pixels)
+        if shift:
+            fftPixels = np.fft.fftshift(fftPixels)
+        return fftPixels
+        
+    def applyGaussianNoise(self, mean:float, sigma:float):
+        rows, cols = self.shape
+        gauss = np.random.normal(mean, sigma, (rows, cols))
+        gauss = gauss.reshape(rows, cols)
+        noise = self.pixels + gauss
+        return Channel(noise)
+        
+    def applyPoissonNoise(self):
+        pass
 
 
 from .channelFloat import ChannelFloat

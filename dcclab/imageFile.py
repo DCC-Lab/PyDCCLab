@@ -3,7 +3,6 @@ from .channel import *
 import scipy.io as sio
 import PIL
 
-
 class ImageFile(object):
     supportedFormats = []
 
@@ -69,8 +68,6 @@ class CZIFile_(ImageFile):
     def imageDataFromPath(self) -> np.ndarray:
         cziObj = readCziImage(self.path)
         axes = cziObj.axes
-        print(axes)
-        print(cziObj.shape)
         if axes == "BSCYX0":
             if cziObj.shape[1] != 1:
                 closeCziFileObject(cziObj)
