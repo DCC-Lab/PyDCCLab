@@ -280,13 +280,14 @@ class TestChannelSpectralFiltering(env.DCCLabTestCase):
         image = Image(path=Path(self.dataDir / "testCziFileTwoChannels.czi"))
         channel = image.channels[0]
         noiseChannel = channel.applyGaussianNoise(mean=channel.getAverageValueOfPixels(),sigma=20)
-        Channel.multiChannelDisplay([channel, noiseChannel])
+        self.assertFalse(np.array_equal(channel.pixels, noiseChannel.pixels))
         
     def testPoissonNoise(self):
         image = Image(path=Path(self.dataDir / "testCziFileTwoChannels.czi"))
         channel = image.channels[0]
+        channel.applyHighPassFilterFromFractionOfImage()
         noiseChannel = channel.applyPoissonNoise()
-        Channel.multiChannelDisplay([channel, noiseChannel])
+        self.assertFalse(np.array_equal(channel.pixels, noiseChannel.pixels))
 
 
 if __name__ == '__main__':
