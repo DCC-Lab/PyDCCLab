@@ -41,3 +41,7 @@ class TestDatabaseUtilities(env.DCCLabTestCase):
             file.write('{} files found.'.format(len(listOfFiles)))
             file.write('>>>>END SEARCH (OS WALK)\n')
             file.write('Took {}\n'.format(time.clock() - begin))
+
+
+if __name__ == '__main__':
+    unittest.main()
