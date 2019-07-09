@@ -14,6 +14,7 @@ def findFilesOS(directory, extension) -> list:
 
 def findFiles(directory, extension) -> list:
     files = []
+    subfiles = []
     for entry in os.scandir(directory):
         if entry.is_file() and fnmatch(entry, extension):
             files.append(entry)
