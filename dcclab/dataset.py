@@ -65,8 +65,12 @@ class Dataset:
 
     def report(self):
         # - images have same shape
-        # - image classes
-        # - class balance
+        # - labels are present
+        # - number of classes
+        # - pixel values for the labels correspond to class indexes
+        # - image format is png
+        # - classes are balanced (ratio)
+        # - the dataset is big enough
         # - ...
         pass
 
@@ -81,8 +85,14 @@ Maybe replace ImageCollection with a possible ML Collection ? ...
 class MLCollection:
     supportedTypes = ["Image", "Spectra"]
 
-    def __new__(cls, *args, **kwargs):
-        pass
+    def __new__(cls, data: List[np.ndarray]):
+        datatype = None
+        # check data dimensions and try to infer data type
+
+        if datatype == "Image":
+            return super(MLCollection, cls).__new__(MLImageCollection)
+        elif datatype == "Spectra":
+            return super(MLCollection, cls).__new__(MLSpectraCollection)
 
     def augment(self):
         pass
