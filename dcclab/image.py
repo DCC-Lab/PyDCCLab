@@ -18,7 +18,7 @@ class Image:
         self._getSupportedFormats()  # FIXME
 
         if path is not None:
-            if not os.path.exists(path):
+            if not os.path.exists(str(path)):
                 raise ValueError("Cannot load '{0}': file does not exist".format(path))
 
             self.path = path
