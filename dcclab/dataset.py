@@ -36,10 +36,11 @@ data/
 
 
 In the first case it has to seperate and remember each type (or source?) by their name.
-This looks to me like each type (called class in ML classification) or source with its labels is one image collection object. 
+This looks to me like each type (called class in ML classification) or source, with its labels, is one image collection object. 
 This means that a Dataset Class has to load multiple ImageCollections (and remember their names).
 
-I would then define a Dataset class without heritage, that intentiate different ImageCollection objects (or maybe a new `MLCollection` object heriting from ImageCollection).
+I would then define a Dataset class without heritage, that intentiate different ImageCollection objects (or maybe 
+a new `MLCollection` object heriting from ImageCollection).
 """
 
 
@@ -51,7 +52,7 @@ class Dataset:
         self.loadCollections()
 
         self.report()
-        
+
     def loadCollections(self):
         # check inside input directory and search for possible subfolders and labels
         collections = {'nametag1': [['Images'], ['Labels']]}
