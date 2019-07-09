@@ -7,8 +7,8 @@ from dcclab import Database as db
 class TestDatabase(env.DCCLabTestCase):
     def setUp(self):
         self.directory = self.dataDir
-        self.filePath = os.path.join(self.tmpDir, 'unittest.db')
-        self.wrongFile = os.path.join(self.directory, 'wrongfile.db')
+        self.filePath = os.path.join(str(self.tmpDir), 'unittest.db')
+        self.wrongFile = os.path.join(str(self.directory), 'wrongfile.db')
 
         with db(self.filePath, True) as testDB:
             testDB.beginTransaction()
