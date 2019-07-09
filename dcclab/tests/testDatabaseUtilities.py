@@ -1,8 +1,8 @@
 from dcclab import appendToZip, findFolderInPath, findFiles
 import os
-import time
 import fnmatch
 import unittest
+import re
 import env
 
 
@@ -26,8 +26,13 @@ class TestDatabaseUtilities(env.DCCLabTestCase):
 
     def testFindFiles(self):
         dir = os.path.join(self.moduleDir, 'dcclab', 'database')
-        self.assertTrue(findFiles(dir, '*.py'))
-        self.assertFalse(findFiles(dir, '*.czi'))
+        self.assertTrue(findFiles(dir, 'py'))
+        self.assertFalse(findFiles(dir, 'czi'))
+
+    def testRegularExpressions(self):
+        file = 'truc.py'
+        extension = 'py'
+        print(re.search(r'\.{}$'.format(extension), file, re.IGNORECASE))
 
 
 if __name__ == '__main__':

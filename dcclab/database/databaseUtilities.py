@@ -1,6 +1,6 @@
 from zipfile import ZipFile
-from fnmatch import fnmatch
 import os
+import re
 
 
 def findFiles(directory, extension) -> list:
@@ -10,7 +10,7 @@ def findFiles(directory, extension) -> list:
     filesFound = []
     for root, directories, files in os.walk(os.path.normpath(directory)):
         for file in files:
-            if fnmatch(file, extension):
+            if re.search(r'^.*\.{}$'.format(extension), file, re.IGNORECASE):
                 filesFound.append(os.path.join(root, file))
     return filesFound
 
