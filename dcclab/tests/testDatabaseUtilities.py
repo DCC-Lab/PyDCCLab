@@ -28,19 +28,19 @@ class TestDatabaseUtilities(env.DCCLabTestCase):
         file.write('>>>>>>>>>BEGIN TEST')
         for i in range(5):
             file.write('>>>>BEGIN SEARCH (OS WALK)\n')
-            begin = time.clock()
+            begin = time.perf_counter()
             listOfFiles = findFilesOS(dir, '*.czi')
             file.write('{} files found.'.format(len(listOfFiles)))
             file.write('>>>>END SEARCH (OS WALK)\n')
-            file.write('Took {}\n'.format(time.clock() - begin))
+            file.write('Took {}\n'.format(time.perf_counter() - begin))
 
         for i in range(5):
             file.write('>>>>BEGIN SEARCH (OS WALK)\n')
-            begin = time.clock()
+            begin = time.perf_counter()
             listOfFiles = findFiles(dir, '*.czi')
             file.write('{} files found.'.format(len(listOfFiles)))
             file.write('>>>>END SEARCH (OS WALK)\n')
-            file.write('Took {}\n'.format(time.clock() - begin))
+            file.write('Took {}\n'.format(time.perf_counter() - begin))
 
 
 if __name__ == '__main__':
