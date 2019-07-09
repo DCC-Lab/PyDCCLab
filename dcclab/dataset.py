@@ -57,11 +57,11 @@ class Dataset:
         # check inside input directory and search for possible subfolders and labels
         collections = {'nametag1': [['Images'], ['Labels']]}
 
-        # ultimately fills the collections with a nametag, images and labels
+        # ultimately fills the collections with a nametag and an ImageCollection object
         for nametag, images, labels in collections:
             self.collections['nametag'] = ImageCollection(images=images)
             if labels is not None:
-                self.collections['nametag'].loadLabels(labels)
+                self.collections['nametag'].setLabelledComponents(labels=labels)
 
     def report(self):
         # - images have same shape
