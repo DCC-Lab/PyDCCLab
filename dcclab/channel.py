@@ -126,7 +126,7 @@ class Channel:
             raise Exception("Channel has no mask")
 
     def analyzeComponents(self) -> dict:
-        if self.isLabelled:
+        if self.hasLabelledComponents:
             maskSizes = ndimage.sum(self.mask.pixels, self.labelledComponents, range(1, self.numberOfComponents + 1))
             sumValues = ndimage.sum(self.pixels, self.labelledComponents, range(1, self.numberOfComponents + 1))
             centersOfMass = ndimage.center_of_mass(self.pixels, self.labelledComponents,
@@ -491,6 +491,24 @@ class Channel:
         fftShiftPixelsWithMask = fftShiftPixels * mask
         ifftShift = np.fft.ifftshift(fftShiftPixelsWithMask)
         filteredPixels = np.abs(np.fft.ifft2(ifftShift))
+        return Channel(filteredPixels)
+        
+    def applyHighPassFilterFromFractionOfImage(self, keepFraction:float = 0.1):
+        fftPixels = self.fourierTransform(False)
+        rows, cols = fftPixels.shape
+        mask = np.zeros_like(fftPixels, dtype=np.uint8)
+        mask[int(rows*keepFraction):int(rows*(1-keepFraction))] = 1
+        mask[:, int(cols*keepFraction):int(cols*(1-keepFraction))] = 1
+        fftPixels = mask*fftPixels
+        filteredPixels = np.abs(np.fft.ifft2(fftPixels))
+        return Channel(filteredPixels)
+        
+    def applyLowPassFilterFromFractionOfImage(self, keepFraction:float = 0.1):
+        fftPixels = self.fourierTransform(False)
+        rows, cols = fftPixels.shape
+        fftPixels[int(rows*keepFraction):int(rows*(1-keepFraction))] = 0
+        fftPixels[:, int(cols*keepFraction):int(cols*(1-keepFraction))] = 0
+        filteredPixels = np.abs(np.fft.ifft2(fftPixels))
         return Channel(filteredPixels)
 
     def powerSpectrum(self, naturalLogScale: bool = True) -> np.ndarray:
