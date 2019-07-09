@@ -1,21 +1,42 @@
 from zipfile import ZipFile
+from pathlib import Path
+from fnmatch import fnmatch
 import os
-import fnmatch
 
 
-def findFiles(directory, extension) -> list:
+def findFilesOS(directory, extension) -> list:
     filesFound = []
     for root, directories, files in os.walk(os.path.normpath(directory)):
         for file in files:
-            if fnmatch.fnmatch(file, extension):
+            if fnmatch(file, extension):
                 filesFound.append(os.path.join(root, file))
     return filesFound
+
+def findFiles(directory, extension) -> list:
+    files = []
+    for entry in os.scandir(directory):
+        if entry.is_dir():
+            files.append(findFiles(entry, extension))
+        elif fnmatch(entry, extension):
+            files.append(entry)
+    return files
 
 
 def appendToZip(path, file):
     try:
         with ZipFile(path, 'a') as zeep:
             zeep.write(file)
+    except:
+        pass
+
+
+def findFolderInPath(folder, path):
+    try:
+        newPath = os.path.dirname(path)
+        if os.path.basename(newPath) == folder:
+            return os.path.dirname(newPath)
+        else:
+            return findFolderInPath(folder, newPath)
     except:
         pass
 
