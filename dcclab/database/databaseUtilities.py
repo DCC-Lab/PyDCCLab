@@ -15,10 +15,10 @@ def findFilesOS(directory, extension) -> list:
 def findFiles(directory, extension) -> list:
     files = []
     for entry in os.scandir(directory):
-        if entry.is_dir():
-            files.append(findFiles(entry, extension))
-        elif fnmatch(entry, extension):
+        if fnmatch(entry, extension):
             files.append(entry)
+        elif entry.is_dir():
+            files = files + findFiles(entry, extension)
     return files
 
 

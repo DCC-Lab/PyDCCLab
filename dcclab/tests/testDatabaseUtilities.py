@@ -35,11 +35,11 @@ class TestDatabaseUtilities(env.DCCLabTestCase):
             file.write('Took {}\n'.format(time.perf_counter() - begin))
 
         for i in range(5):
-            file.write('>>>>BEGIN SEARCH (OS WALK)\n')
+            file.write('>>>>BEGIN SEARCH (RECURSIVE)\n')
             begin = time.perf_counter()
             listOfFiles = findFiles(dir, '*.czi')
             file.write('{} files found.'.format(len(listOfFiles)))
-            file.write('>>>>END SEARCH (OS WALK)\n')
+            file.write('>>>>END SEARCH (RECURSIVE)\n')
             file.write('Took {}\n'.format(time.perf_counter() - begin))
         file.write('>>>>>>>>>END TEST\n')
         file.close()
