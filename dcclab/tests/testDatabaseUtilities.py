@@ -25,7 +25,7 @@ class TestDatabaseUtilities(env.DCCLabTestCase):
     def testFindFiles(self):
         dir = os.path.join(self.moduleDir, 'dcclab', 'POM', 'injection AAV')
         file = open('testWalkAndRecursive.txt', 'w')
-        file.write('>>>>>>>>>BEGIN TEST')
+        file.write('>>>>>>>>>BEGIN TESt\n')
         for i in range(5):
             file.write('>>>>BEGIN SEARCH (OS WALK)\n')
             begin = time.perf_counter()
@@ -41,6 +41,8 @@ class TestDatabaseUtilities(env.DCCLabTestCase):
             file.write('{} files found.'.format(len(listOfFiles)))
             file.write('>>>>END SEARCH (OS WALK)\n')
             file.write('Took {}\n'.format(time.perf_counter() - begin))
+        file.write('>>>>>>>>>END TEST\n')
+        file.close()
 
 
 if __name__ == '__main__':
