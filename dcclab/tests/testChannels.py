@@ -275,6 +275,18 @@ class TestChannelSpectralFiltering(env.DCCLabTestCase):
         fftShiftChannel = np.fft.fftshift(fftChannel)
         amplitude = np.log(np.abs(fftShiftChannel) ** 2)
         self.assertTrue(np.array_equal(channel.powerSpectrum(True), amplitude))
+        
+    def testGaussianNoise(self):
+        image = Image(path=Path(self.dataDir / "testCziFileTwoChannels.czi"))
+        channel = image.channels[0]
+        noiseChannel = channel.applyGaussianNoise(mean=channel.getAverageValueOfPixels(),sigma=20)
+        Channel.multiChannelDisplay([channel, noiseChannel])
+        
+    def testPoissonNoise(self):
+        image = Image(path=Path(self.dataDir / "testCziFileTwoChannels.czi"))
+        channel = image.channels[0]
+        noiseChannel = channel.applyPoissonNoise()
+        Channel.multiChannelDisplay([channel, noiseChannel])
 
 
 if __name__ == '__main__':

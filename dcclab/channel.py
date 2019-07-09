@@ -506,6 +506,16 @@ class Channel:
         if shift:
             fftPixels = np.fft.fftshift(fftPixels)
         return fftPixels
+        
+    def applyGaussianNoise(self, mean:float, sigma:float):
+        rows, cols = self.shape
+        gauss = np.random.normal(mean, sigma, (rows, cols))
+        gauss = gauss.reshape(rows, cols)
+        noise = self.pixels + gauss
+        return Channel(noise)
+        
+    def applyPoissonNoise(self):
+        pass
 
 
 from .channelFloat import ChannelFloat
