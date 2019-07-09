@@ -15,11 +15,11 @@ def findFilesOS(directory, extension) -> list:
 def findFiles(directory, extension) -> list:
     files = []
     for entry in os.scandir(directory):
-        if fnmatch(entry, extension):
+        if entry.is_file() and fnmatch(entry, extension):
             files.append(entry)
         elif entry.is_dir():
-            files = files + findFiles(entry, extension)
-    return files
+            subfiles = findFiles(entry, extension)
+    return files + subfiles
 
 
 def appendToZip(path, file):
