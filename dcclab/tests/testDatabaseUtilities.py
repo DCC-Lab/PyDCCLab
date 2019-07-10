@@ -4,7 +4,6 @@ import os
 import unittest
 import re
 import env
-import tempfile
 
 
 class TestDatabaseUtilities(env.DCCLabTestCase):
@@ -29,12 +28,14 @@ class TestDatabaseUtilities(env.DCCLabTestCase):
     def testAppendToZip(self):
         testZip = self.tmpFile('test.zip')
         testFile1 = self.tmpFile('test1.txt')
-        testFile2 = self.tmpFile('test2.csv')
-        testFile3 = self.tmpFile('test3.jpg')
+        testFile2 = self.tmpFile('test2.txt')
+        testFile3 = self.tmpFile('test3.txt')
         files = [testFile1, testFile2, testFile3]
 
-        # function to test
         for file in files:
+            with open(file, 'w') as write:
+                write.write('This is a test line.')
+
             appendToZip(file, testZip)
 
         with ZipFile(testZip, 'r') as zeep:
