@@ -14,21 +14,10 @@ def findFiles(directory, extension) -> list:
                 filesFound.append(os.path.join(root, file))
     return filesFound
 
-def appendToZip(path, file):
+def appendToZip(file, zipfile):
     try:
-        with ZipFile(path, 'a') as zeep:
+        with ZipFile(zipfile, 'a') as zeep:
             zeep.write(file)
-    except:
-        pass
-
-
-def findFolderInPath(folder, path):
-    try:
-        newPath = os.path.dirname(path)
-        if os.path.basename(newPath) == folder:
-            return os.path.dirname(newPath)
-        else:
-            return findFolderInPath(folder, newPath)
     except:
         pass
 

@@ -1,38 +1,44 @@
-from dcclab import appendToZip, findFolderInPath, findFiles
+from dcclab import appendToZip, findFiles
+from zipfile import ZipFile
 import os
-import fnmatch
 import unittest
 import re
 import env
+import tempfile
 
 
 class TestDatabaseUtilities(env.DCCLabTestCase):
-    def setUp(self) -> None:
-        pass
+    def testFindFilesFilesFound(self):
+        directory = os.path.join(self.moduleDir, 'dcclab', 'database')
+        self.assertTrue(findFiles(directory, 'py'))
 
-    def tearDown(self) -> None:
-        pass
+    def testFindFilesNothingFound(self):
+        directory = os.path.join(self.moduleDir, 'dcclab', 'database')
+        self.assertFalse(findFiles(directory, 'czi'))
 
-    def testFnmatch(self):
-        self.assertTrue(fnmatch.fnmatch('test.tar.gz', '*.tar.gz'))
-
-    #@unittest.skipIf(os.name == 'posix', reason='Fails on posix.')
-    def testFnmatchUppercase(self):
-        self.assertTrue(fnmatch.fnmatch('test.TXT', '*.[tT][xX][tT]'))
-
-    #@unittest.skipIf(os.name == 'posix', reason='Fails on posix.')
-    def testFnmatchUpperAndLowerCase(self):
-        self.assertTrue(fnmatch.fnmatch('test.ThIsIsAtEsT', '*.thisisatest'))
-
-    def testFindFiles(self):
-        dir = os.path.join(self.moduleDir, 'dcclab', 'database')
-        self.assertTrue(findFiles(dir, 'py'))
-        self.assertFalse(findFiles(dir, 'czi'))
-
-    def testRegularExpressions(self):
-        file = 'truc.py'
+    def testRegularExpressionsExtension(self):
+        string = 'trucpatente.py'
         extension = 'py'
-        print(re.search(r'\.{}$'.format(extension), file, re.IGNORECASE))
+        self.assertTrue(re.search(r'\.{}$'.format(extension), string, re.IGNORECASE))
+
+    def testRegularExpressionsMoreComplexExtension(self):
+        string = 'someFile.tar.gz'
+        extension = 'tar.gz'
+        self.assertTrue(re.search(r'\.{}$'.format(extension), string, re.IGNORECASE))
+
+    def testAppendToZip(self):
+        testZip = self.tmpFile('test.zip')
+        testFile1 = self.tmpFile('test1.txt')
+        testFile2 = self.tmpFile('test2.csv')
+        testFile3 = self.tmpFile('test3.jpg')
+        files = [testFile1, testFile2, testFile3]
+
+        # function to test
+        for file in files:
+            appendToZip(file, testZip)
+
+        with ZipFile(testZip, 'r') as zeep:
+            self.assertTrue(zeep.namelist())
 
 
 if __name__ == '__main__':

@@ -40,8 +40,8 @@ if __name__ == '__main__':
 
         # For the .czi, we have :
         print('Finding czi files in POM...')
-        files = findFiles(os.path.join(directory, 'dcclab', 'POM', 'injection AAV', 'résultats bruts', 'AAV'), '.czi') + \
-                findFiles(os.path.join(directory, 'dcclab', 'POM', 'injection AAV', 'résultats bruts', 'RABV'), '.czi')
+        files = findFiles(os.path.join(directory, 'dcclab', 'POM', 'injection AAV', 'résultats bruts', 'AAV'), 'czi') + \
+                findFiles(os.path.join(directory, 'dcclab', 'POM', 'injection AAV', 'résultats bruts', 'RABV'), 'czi')
         print('{} czi files were found!'.format(len(files)))
 
         # Now, we extract the metadata from our files. First, we start with the .csv files.
