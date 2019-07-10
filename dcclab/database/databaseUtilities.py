@@ -14,6 +14,7 @@ def findFiles(directory, extension) -> list:
                 filesFound.append(os.path.join(root, file))
     return filesFound
 
+
 def appendToZip(file, zipfile):
     try:
         with ZipFile(zipfile, 'a') as zeep:

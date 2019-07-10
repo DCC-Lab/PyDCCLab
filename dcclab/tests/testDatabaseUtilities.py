@@ -15,6 +15,10 @@ class TestDatabaseUtilities(env.DCCLabTestCase):
         directory = os.path.join(self.moduleDir, 'dcclab', 'database')
         self.assertFalse(findFiles(directory, 'czi'))
 
+    def testFindFilesFolderDoesntExist(self):
+        directory = os.path.join(self.moduleDir, 'thisFolderDoesntExist')
+        self.assertFalse(findFiles(directory, 'py'))
+
     def testRegularExpressionsExtension(self):
         string = 'trucpatente.py'
         extension = 'py'
