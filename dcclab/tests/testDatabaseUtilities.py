@@ -7,7 +7,7 @@ import env
 
 
 class TestDatabaseUtilities(env.DCCLabTestCase):
-    def testFindFilesFilesFound(self):
+    def testFindFilesSomethingFound(self):
         directory = os.path.join(self.moduleDir, 'dcclab', 'database')
         self.assertTrue(findFiles(directory, 'py'))
 
