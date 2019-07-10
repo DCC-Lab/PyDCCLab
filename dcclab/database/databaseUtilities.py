@@ -15,13 +15,5 @@ def findFiles(directory, extension) -> list:
     return filesFound
 
 
-def appendToZip(file, zipfile):
-    try:
-        with ZipFile(zipfile, 'a') as zeep:
-            zeep.write(file)
-    except:
-        pass
-
-
 if __name__ == '__main__':
     pass

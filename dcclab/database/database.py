@@ -1,7 +1,9 @@
+from zipfile import ZipFile
+from datetime import date
 import sqlite3 as lite
 import urllib.parse as parse
 import pathlib
-
+import os
 """
 General-purpose Databse() object.
 
@@ -231,7 +233,13 @@ class Database:
         pass
 
     def createArchive(self):
-
+        if self.__rows is not None:
+            archive = '{}_query_archive.zip'.format(str(date.today()).replace('-', ''))
+            with ZipFile(archive, 'w') as zeep:
+                for row in self.__rows:
+                    filePath = row['file_path']
+                    fileName = os.path.basename(filePath)
+                    zeep.write(filePath, fileName)
 
     # TODO Is this a necessary function?
     # If not, delete.
@@ -245,15 +253,10 @@ class Database:
 
 
 if __name__ == '__main__':
-    from dcclab import Metadata
     import os
 
-    mtdtMice = Metadata('Data-souris.csv')
-    mtdtUses = Metadata('Data-Utilisation.csv')
+    dbPath = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'tests', 'testData', 'test.db')
+    print(dbPath)
 
-    with Database('test.db', True) as db:
-        db.createTable(mtdtMice.keys)
-        db.createTable(mtdtUses.keys)
-
-
-    os.remove('test.db')
+    with Database(dbPath) as db:
+        print(db.tables)
