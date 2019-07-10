@@ -25,12 +25,12 @@ class TestCziMetadata(env.DCCLabTestCase):
 
     def testCziImageObjectFromPathFileNotFound(self):
         mdata = mtdt(self.testPath)
-        mdata.path = self.wrongFilePath
+        mdata.filePath = self.wrongFilePath
         with self.assertRaises(FileNotFoundError): mdata.cziImageObjectFromPath()
 
     def testCziFileToCziImageObjectWrongFileType(self):
         mdata = mtdt(self.testPath)
-        mdata.path = self.wrongFileType
+        mdata.filePath = self.wrongFileType
         with self.assertRaises(ValueError): mdata.cziImageObjectFromPath()
 
     def testXmlFromCziImageObjectReturnsString(self):
@@ -343,12 +343,12 @@ class TestCziMetadata(env.DCCLabTestCase):
 
     def testNameFromPathNoPath(self):
         mdata = mtdt(self.testPath)
-        mdata.path = ''
+        mdata.filePath = ''
         self.assertEqual(mdata.nameFromPath(), '')
 
     def testNameFromPathWrongType(self):
         mdata = mtdt(self.testPath)
-        mdata.path = 0
+        mdata.filePath = 0
         self.assertIsNone(mdata.nameFromPath())
 
 

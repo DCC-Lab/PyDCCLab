@@ -3,7 +3,7 @@ class CZIChannel:
         self.channelId = '{};{}'.format(channelInformation[2], channelInformation[0])
         self.channel = channelInformation[0]
         self.channelName = channelInformation[1]
-        self.fileId = channelInformation[2]
+        self.filePath = channelInformation[2]
         self.root = root
 
         # These variables get their testData from filter objects.
@@ -33,7 +33,7 @@ class CZIChannel:
         return repr(self) == repr(other)
 
     def asDict(self):
-        return {'file_id': self.fileId, 'channel_id': self.channelId, 'channel_name': self.channelName,
+        return {'file_path': self.filePath, 'channel_id': self.channelId, 'channel_name': self.channelName,
                 'ex_wavelength_filter': self.exWavelengthFilter, 'em_wavelength_filter': self.emWavelengthFilter,
                 'beam_splitter': self.beamSplitter, 'reflector': self.reflector, 'contrast_method': self.contrastMethod,
                 'light_source': self.lightSource, 'light_source_intensity': self.lightSourceIntensity,
@@ -44,7 +44,7 @@ class CZIChannel:
 
     @property
     def keys(self):
-        return {'file_id': 'TEXT', 'channel_id': 'TEXT PRIMARY KEY', 'channel_name': 'TEXT', 'ex_wavelength_filter': 'TEXT',
+        return {'file_path': 'TEXT', 'channel_id': 'TEXT PRIMARY KEY', 'channel_name': 'TEXT', 'ex_wavelength_filter': 'TEXT',
                 'em_wavelength_filter': 'TEXT', 'beam_splitter': 'INTEGER', 'reflector': 'TEXT',
                 'contrast_method': 'TEXT', 'light_source': 'TEXT', 'light_source_intensity': 'REAL', 'dye_name': 'TEXT',
                 'channel_color': 'TEXT', 'ex_wavelength': 'INTEGER', 'em_wavelength': 'INTEGER', 'effective_na': 'REAL',
