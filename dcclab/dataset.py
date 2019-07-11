@@ -8,6 +8,7 @@ Machine Learning Dataset
 
 It needs to be able to load such data structures: 
 
+<SEMANTIC>
 data/
 |-- type_A
     |-- 0.png
@@ -23,11 +24,23 @@ data/
 
 OR 
 
+<SEMANTIC>
 data/
 |-- images
     |-- 0.png  # [each image might contain multiple classes]
     |-- ...
 |-- labels
+    |-- 0.png
+    |-- ...
+
+OR
+
+<NOT semantic>  # labels are foldernames  # ** this structure cannot be infered : user has to specify if its semantic or not
+data/
+|-- cats
+    |-- 0.png
+    |-- ...
+|-- dogs
     |-- 0.png
     |-- ...
 
