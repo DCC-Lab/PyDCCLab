@@ -13,7 +13,8 @@ class TestDatabase(env.DCCLabTestCase):
 
         with db(self.filePath, True) as testDB:
             testDB.beginTransaction()
-            testTable = {'test_table': {'column_1': 'INTEGER PRIMARY KEY', 'column_2': 'TEXT', 'column_3': 'REAL', 'file_path': 'TEXT'}}
+            testTable = {'test_table': {'column_1': 'INTEGER PRIMARY KEY', 'column_2': 'TEXT', 'column_3': 'REAL',
+                                        'file_path': 'TEXT'}}
             testDB.createTable(testTable)
             testDB.commit()
 

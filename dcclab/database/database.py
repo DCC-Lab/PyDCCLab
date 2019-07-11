@@ -229,10 +229,9 @@ class Database:
         if self.isConnected:
             self.execute('END TRANSACTION')
 
-    def selectToCSV(self):
-        pass
-
     def createArchive(self):
+        # Before using this function, make sure that you have enough disk space available.
+        # TODO Should we check for available disk space?
         if self.__rows is not None:
             archive = '{}_query_archive.zip'.format(str(date.today()).replace('-', ''))
             with ZipFile(archive, 'w') as zeep:
@@ -250,13 +249,3 @@ class Database:
     # If not, delete.
     def upsert(self, table: str, value: dict):
         pass
-
-
-if __name__ == '__main__':
-    import os
-
-    dbPath = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'tests', 'testData', 'test.db')
-    print(dbPath)
-
-    with Database(dbPath) as db:
-        print(db.tables)
