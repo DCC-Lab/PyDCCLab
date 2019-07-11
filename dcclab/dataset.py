@@ -88,11 +88,28 @@ class Dataset:
 
         self.loadCollectionObjects()
 
-        # ultimately fills the collections with a nametag and an ImageCollection object
-        for nametag, images, labels in collections:
-            self.collections['nametag'] = ImageCollection(images=images)
-            if labels is not None:
-                self.collections['nametag'].setLabelledComponents(labels=labels)
+    def loadCollectionFiles(self, source):
+        # TODO: support non-semantic structure.
+        """ self.collections = {'sourceName': [list(imageFiles), list(labelFiles)], ...} """
+
+        folderName = os.path.basename(source)
+        if self.labelTag not in folderName:
+            self.collections[folderName] = self.getImageAndLabelFiles(source)
+        else:
+            folderName = [key for key in self.collections.keys() if key in folderName][0]
+            self.collections[folderName][1] = self.getFiles(source, absolute=True)
+
+    def loadCollectionObjects(self):
+        """ self.collections = {'sourceName': ImageCollection(), ...} """
+
+        for key in self.collections:
+            imageFiles, labelFiles = self.collections[key]
+            images = [Image(path=file) for file in imageFiles]
+            self.collections[key] = ImageCollection(images=images)
+
+            if len(labelFiles) != 0:
+                labels = [Image(path=file).channels[0] for file in labelFiles]
+                self.collections[key].setLabelledComponents(labels=labels)
 
     def report(self):
         # - images have same shape
