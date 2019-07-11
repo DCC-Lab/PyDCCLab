@@ -1,5 +1,4 @@
 from dcclab import findFiles
-from zipfile import ZipFile
 import os
 import unittest
 import re
