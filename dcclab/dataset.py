@@ -1,4 +1,4 @@
-from dcclab import ImageCollection, Image, Channel
+from dcclab import ImageCollection, Image
 from typing import List
 import pandas as pd
 import numpy as np
@@ -115,10 +115,12 @@ class Dataset:
         print(">>> REPORT")
 
         collectionsInfo = []
-        for key in self.collections:
-            collectionsInfo.append([key, self.collections[key].numberOfImages, self.collections[key].hasLabelledComponents])
+        for source in self.collections:
+            collection = self.collections[source]  # type: ImageCollection
+            collectionsInfo.append([source, collection.numberOfImages, collection.hasLabelledComponents,
+                                    collection.imagesAreSimilar])
 
-        df = pd.DataFrame(collectionsInfo, columns=["Source", "nbOfImages", "hasLabels"])
+        df = pd.DataFrame(collectionsInfo, columns=["Source", "nbOfImages", "hasLabels", "Same shape"])
 
         print(df)
 
@@ -131,7 +133,12 @@ class Dataset:
         # - the dataset is big enough
         # - ...
 
-    # offer to label from folder names if its a non-semantic classification
+    def setLabelsFromSourceName(self):
+        for source in self.collections:
+            collection = self.collections[source]  # type: ImageCollection
+            for image in collection.images:
+                for channel in image.channels:
+                    channel.setLabelledComponents(source)
 
     @staticmethod
     def getFolders(source):
@@ -187,3 +194,9 @@ class MLSpectraCollection:  # ?  (SpectraCollection)
     def augment(self):
         # Spectra augmentation technique
         pass
+
+
+if __name__ == '__main__':
+    dataset = Dataset(directory="D:\MonteaCristo\Documents\Github\CERVO\CervoML\Bacteria\BacteriaML\data\preps\prep_v5_bkinit")
+    dataset.setLabelsFromSourceName()
+    dataset.report()
