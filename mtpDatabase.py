@@ -112,9 +112,9 @@ def queryViralVectors():
         for viralVector in viralVectors:
             paths = database.select('cziMetadata', 'path', 'viral_vectors="{}"'.format(viralVector['viral_vectors']))
             queryFile = os.path.join(directory, 'query', 'query_{}.csv'.format(viralVector['viral_vectors']))
-            with open(queryFile, 'w') as file:
+            with open(queryFile, 'w', encoding='UTF-8') as file:
                 for path in paths:
-                    file.write(path['path'])
+                    file.write(path['path'] + '\n')
 
 
 if __name__ == '__main__':
