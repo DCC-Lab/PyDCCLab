@@ -153,6 +153,10 @@ class Image:
         for channel in self.channels:
             channel.labelMaskComponents()
 
+    def setLabelledComponents(self, label: 'Channel'):
+        for channel in self.channels:
+            channel.setLabelledComponents(label.pixels)
+
     def analyzeComponents(self):
         for channel in self.channels:
             channel.analyzeComponents()

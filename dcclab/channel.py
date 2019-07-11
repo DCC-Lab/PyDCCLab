@@ -125,6 +125,12 @@ class Channel:
             # FIXME: Should use pixels if isBinary ?
             raise Exception("Channel has no mask")
 
+    def setLabelledComponents(self, labelArray: np.ndarray):
+        if labelArray.shape == self.shape:
+            self.labelledComponents = labelArray
+        else:
+            raise Exception("Label and Channel shapes are not equal")
+
     def analyzeComponents(self) -> dict:
         if self.hasLabelledComponents:
             maskSizes = ndimage.sum(self.mask.pixels, self.labelledComponents, range(1, self.numberOfComponents + 1))

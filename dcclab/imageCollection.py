@@ -197,6 +197,14 @@ class ImageCollection:
         for image in self.images:
             image.labelMaskComponents()
 
+    def setLabelledComponents(self, labels: ['Channel']):
+        if len(labels) == len(self.images):
+            for image, label in zip(self.images, labels):
+                image.setLabelledComponents(label)
+        else:
+            # todo: Must provide one mask per channel for each image
+            raise NotImplementedError
+
     def analyzeComponents(self):
         for image in self.images:
             image.analyzeComponents()
