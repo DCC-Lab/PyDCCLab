@@ -514,15 +514,20 @@ class Channel:
     def applyLowPassFilterFromFractionHighestFreq(self, fraction: float = 0.5):
         pass
 
-    def powerSpectrum(self, naturalLogScale: bool = True) -> np.ndarray:
+    def powerSpectrum(self) -> np.ndarray:
         fftShiftPixels = self.fourierTransform()
-        y, x = fftShiftPixels.shape
         powerSpectrum = (np.abs(fftShiftPixels)) ** 2
-        if naturalLogScale:
-            powerSpectrum = np.log(powerSpectrum)
         return powerSpectrum
 
-    def powerSpectrumDensityOneDimension(self, useSum=False):
+    def displayPowerSpectrum(self, logScale: bool = True) -> np.ndarray:
+        powerSpectrum = self.powerSpectrum()
+        if logScale:
+            powerSpectrum = np.log(powerSpectrum)
+        plt.imshow(powerSpectrum)
+        plt.show()
+        return powerSpectrum
+
+    def powerSpectrumDensity1Dimension(self, useSum=False) -> np.ndarray:
         powerSpectrumDensity = self.powerSpectrum()
         heigth, width = powerSpectrumDensity.shape
         halfH, halfW = heigth // 2, width // 2
@@ -530,7 +535,14 @@ class Channel:
         radii = np.hypot(X - halfW, Y - halfH).astype(int)
         function = ndimage.sum if useSum else ndimage.mean
         ps1D = function(powerSpectrumDensity, radii, index=np.arange(0, halfW))
-        print(len(ps1D))
+        return ps1D
+
+    def displayPowerSpectrumDensity1D(self, logScale: bool = True, useSum: bool = False) -> np.ndarray:
+        ps1D = self.powerSpectrumDensity1Dimension(useSum)
+        plt.plot(*ps1D)
+        if logScale:
+            plt.yscale("log")
+        plt.show()
         return ps1D
 
     def fourierTransform(self, shift: bool = True) -> np.ndarray:
@@ -549,6 +561,9 @@ class Channel:
 
     def applyPoissonNoise(self):
         pass
+
+    def phaseSpectrum(self):
+        
 
 
 from .channelFloat import ChannelFloat
