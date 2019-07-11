@@ -103,7 +103,26 @@ class Dataset:
         # - classes are balanced (ratio)
         # - the dataset is big enough
         # - ...
-        pass
+
+    # offer to label from folder names if its a non-semantic classification
+
+    @staticmethod
+    def getFolders(source):
+        return list(os.walk(source))[0][1]
+
+    @staticmethod
+    def getFiles(source, absolute=False):
+        filenames = list(os.walk(source))[0][2]
+        if absolute:
+            return [os.path.join(source, fn) for fn in filenames]
+        else:
+            return filenames
+
+    def getImageAndLabelFiles(self, source) -> list:
+        filenames = self.getFiles(source)
+        imageFiles = [os.path.join(source, fn) for fn in filenames if self.labelTag not in fn]
+        labelFiles = [os.path.join(source, fn) for fn in filenames if self.labelTag in fn]
+        return [imageFiles, labelFiles]
 
 
 """
@@ -136,7 +155,7 @@ class MLImageCollection(ImageCollection):  # ?
         pass
 
 
-class MLSpectraCollection('SpectraCollection'):  # ?
+class MLSpectraCollection:  # ?  (SpectraCollection)
 
     def augment(self):
         # Spectra augmentation technique
