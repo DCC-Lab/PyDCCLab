@@ -184,14 +184,14 @@ class CZIMetadata:
     @property
     def xScaled(self):
         try:
-            return (self.xSize * self.xScale) * 1000
+            return (int(self.xSize) * float(self.xScale)) * 1000
         except Exception:
             return None
 
     @property
     def yScaled(self):
         try:
-            return (self.ySize * self.yScale) * 1000
+            return (int(self.ySize) * float(self.yScale)) * 1000
         except Exception:
             return None
 

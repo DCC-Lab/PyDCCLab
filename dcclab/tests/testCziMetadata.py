@@ -82,7 +82,7 @@ class TestCziMetadata(env.DCCLabTestCase):
 
     def testSetXScaleExpectedValue(self):
         mdata = mtdt(self.testPath)
-        self.assertEqual(mdata.setXScale(), '9.08E-07')
+        self.assertEqual(mdata.setXScale(), 9.08E-07)
 
     def testSetXScaleMissingKey(self):
         mdata = mtdt(self.testPath)
@@ -98,7 +98,7 @@ class TestCziMetadata(env.DCCLabTestCase):
 
     def testSetYScaleExpectedValue(self):
         mdata = mtdt(self.testPath)
-        self.assertEqual(mdata.setYScale(), '9.08E-07')
+        self.assertEqual(mdata.setYScale(), 9.08E-07)
 
     def testSetYScaleMissingKey(self):
         mdata = mtdt(self.testPath)
@@ -114,7 +114,7 @@ class TestCziMetadata(env.DCCLabTestCase):
 
     def testSetXSizeExpectedValue(self):
         mdata = mtdt(self.testPath)
-        self.assertEqual(mdata.setXSize(), '1936')
+        self.assertEqual(mdata.setXSize(), 1936)
 
     def testSetXSizeMissingEntries(self):
         mdata = mtdt(self.testPath)
@@ -124,7 +124,7 @@ class TestCziMetadata(env.DCCLabTestCase):
 
     def testSetYSizeExpectedValue(self):
         mdata = mtdt(self.testPath)
-        self.assertEqual(mdata.setYSize(), '1460')
+        self.assertEqual(mdata.setYSize(), 1460)
 
     def testSetYSizeMissingEntries(self):
         mdata = mtdt(self.testPath)
@@ -134,7 +134,7 @@ class TestCziMetadata(env.DCCLabTestCase):
 
     def testXScaledExpectedValue(self):
         mdata = mtdt(self.testPath)
-        self.assertEqual(mdata.xScaled, 0.001757888)
+        self.assertAlmostEqual(mdata.xScaled, 1.757888)
 
     def testXScaledWrongValue(self):
         mdata = mtdt(self.testPath)
@@ -143,7 +143,7 @@ class TestCziMetadata(env.DCCLabTestCase):
 
     def testYScaledExpectedValue(self):
         mdata = mtdt(self.testPath)
-        self.assertEqual(mdata.yScaled, 0.00132568)
+        self.assertAlmostEqual(mdata.yScaled, 1.325680)
 
     def testYScaledWrongValue(self):
         mdata = mtdt(self.testPath)
@@ -201,11 +201,11 @@ class TestCziMetadata(env.DCCLabTestCase):
 
     def testAsDictExpectedValue(self):
         mdata = mtdt(self.testPath)
-        expectedValue = {'path': self.testPath, 'channels': 2, 'microscope': 'Axio Observer.Z1 / 7',
-                         'objective': 'LD A-Plan 5x/0.15 Ph1', 'x_size': '1936', 'y_size': '1460',
-                         'x_scale': '9.08E-07', 'y_scale': '9.08E-07', 'x_scaled': 0.001757888, 'y_scaled': 0.00132568,
-                         'name': 'testCziFile.czi', 'mouse_id': None, 'viral_vectors': '', 'injection_site': None,
-                         'tags': ''}
+        expectedValue = {'channels': 2, 'file_path': 'C:\\Users\\MathieuLaptop\\Documents\\Ulaval\\ProgPython\\Projets\\BigData-ImageAnalysis\\dcclab\\tests\\testData\\testCziFile.czi',
+                         'injection_site': None, 'microscope': 'Axio Observer.Z1 / 7', 'mouse_id': None,
+                         'name': 'testCziFile.czi', 'objective': 'LD A-Plan 5x/0.15 Ph1', 'tags': '',
+                         'viral_vectors': '', 'x_scale': 9.08e-07, 'x_scaled': 1.757888, 'x_size': 1936,
+                         'y_scale': 9.08e-07, 'y_scaled': 1.3256800000000002, 'y_size': 1460}
         self.assertEqual(mdata.asDict()['metadata'], expectedValue)
 
     def testSetMouseIdUpperCase(self):
