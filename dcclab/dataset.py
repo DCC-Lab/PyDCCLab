@@ -1,7 +1,8 @@
-from dcclab import ImageCollection
-from typing import Union, List
+from dcclab import ImageCollection, Image, Channel
+from typing import List
 import numpy as np
 
+import os
 
 """
 Machine Learning Dataset
@@ -60,15 +61,32 @@ a new `MLCollection` object heriting from ImageCollection).
 class Dataset:
     def __init__(self, directory: str):
         self.directory = directory
+        self.labelTag = 'label'
         self.collections = dict()
 
-        self.loadCollections()
+        self.loadAllCollections()
 
         self.report()
 
-    def loadCollections(self):
-        # check inside input directory and search for possible subfolders and labels
-        collections = {'nametag1': [['Images'], ['Labels']]}
+    def loadAllCollections(self):
+        folders = self.getFolders(self.directory)
+        files = self.getFiles(self.directory)
+
+        if len(folders) != 0:
+            assert len(files) == 0, "Cannot infer datafile structure if a directory has folders and files."
+
+            orderedFolders = [f for f in folders if self.labelTag not in f]
+            orderedFolders.extend([f for f in folders if self.labelTag in f])
+            for folder in orderedFolders:
+                self.loadCollectionFiles(os.path.join(self.directory, folder))
+
+        elif len(files) != 0:
+            self.loadCollectionFiles(self.directory)
+
+        else:
+            raise FileNotFoundError
+
+        self.loadCollectionObjects()
 
         # ultimately fills the collections with a nametag and an ImageCollection object
         for nametag, images, labels in collections:
