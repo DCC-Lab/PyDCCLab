@@ -5,7 +5,7 @@ from dcclab import findFiles
 import os
 
 
-if __name__ == '__main__':
+def createMTPDatabase():
     # Current directory is :
     print('Beginning process...')
     directory = os.path.dirname(__file__)
@@ -94,3 +94,31 @@ if __name__ == '__main__':
         database.commit()
         print('{} czi files were processed!'.format(len(files)))
     print('Database was successfully created.')
+
+
+def queryViralVectors():
+    # Current directory is :
+    print('Beginning process...')
+    directory = os.path.dirname(__file__)
+    print('Directory is : {}'.format(directory))
+
+    # Path to the Molecular Tools Platform database is :
+    mtpPath = os.path.join(directory, 'dcclab', 'database', 'mtp.db')
+    print('Path to database "mtp.db" is : {}'.format(mtpPath))
+
+    print('Connecting to database...')
+    with Database(mtpPath) as database:
+        viralVectors = database.select('cziMetadata', 'viral_vectors')
+        for viralVector in viralVectors:
+            paths = database.select('cziMetadata', 'path', 'viral_vectors="{}"'.format(viralVector['viral_vectors']))
+            queryFile = os.path.join(directory, 'query', 'query_{}.csv'.format(viralVector['viral_vectors']))
+            with open(queryFile, 'w') as file:
+                for path in paths:
+                    file.write(path['path'])
+
+
+
+
+
+if __name__ == '__main__':
+    #createMTPDatabase()
