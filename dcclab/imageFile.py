@@ -71,7 +71,7 @@ class CZIFile_(ImageFile):
         if axes == "BSCYX0":
             if cziObj.shape[1] != 1:
                 closeCziFileObject(cziObj)
-                raise NotImplementedError("Multiple scenes")
+                raise NotImplementedError("Multiple scenes in file '{}'".format(self.path))
         if axes not in ["BCYX0", "BSCYX0", "YX0"]:
             closeCziFileObject(cziObj)
             raise NotImplementedError(axes)
