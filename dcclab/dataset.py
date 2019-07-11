@@ -1,7 +1,7 @@
 from dcclab import ImageCollection, Image, Channel
 from typing import List
+import pandas as pd
 import numpy as np
-
 import os
 
 """
@@ -112,6 +112,16 @@ class Dataset:
                 self.collections[key].setLabelledComponents(labels=labels)
 
     def report(self):
+        print(">>> REPORT")
+
+        collectionsInfo = []
+        for key in self.collections:
+            collectionsInfo.append([key, self.collections[key].numberOfImages, self.collections[key].hasLabelledComponents])
+
+        df = pd.DataFrame(collectionsInfo, columns=["Source", "nbOfImages", "hasLabels"])
+
+        print(df)
+
         # - images have same shape
         # - labels are present
         # - number of classes
