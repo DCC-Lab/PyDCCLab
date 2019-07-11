@@ -8,8 +8,8 @@ import os
 
 class TestDatabase(env.DCCLabTestCase):
     def setUp(self):
-        self.filePath = os.path.join(self.dataDir, 'unittest.db')
-        self.wrongFile = os.path.join(self.dataDir, 'wrongfile.db')
+        self.filePath = os.path.join(str(self.dataDir), 'unittest.db')
+        self.wrongFile = os.path.join(str(self.dataDir), 'wrongfile.db')
 
         with db(self.filePath, True) as testDB:
             testDB.beginTransaction()
@@ -230,7 +230,7 @@ class TestDatabase(env.DCCLabTestCase):
         self.assertFalse(database.isConnected)
 
     def testCreateArchive(self):
-        textFile = os.path.join(self.dataDir, 'ziptest.txt')
+        textFile = os.path.join(str(self.dataDir), 'ziptest.txt')
         with open(textFile, 'w') as testFile:
             testFile.write('This is a test file to be deleted.')
 

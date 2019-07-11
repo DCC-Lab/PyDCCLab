@@ -8,7 +8,7 @@ import os
 
 class TestCziMetadata(env.DCCLabTestCase):
     def setUp(self):
-        self.directory = self.dataDir
+        self.directory = str(self.dataDir)
         self.testPath = os.path.join(self.directory, 'testCziFile.czi')
         self.wrongFilePath = os.path.join(self.directory, 'wrongfilename.czi')
         self.wrongFileType = os.path.join(self.directory, 'wrongFile.txt')

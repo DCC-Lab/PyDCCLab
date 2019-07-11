@@ -6,7 +6,7 @@ import os
 
 class TestCsvMetadata(env.DCCLabTestCase):
     def setUp(self) -> None:
-        self.filePath = os.path.join(self.dataDir, 'unittest.csv')
+        self.filePath = os.path.join(str(self.dataDir), 'unittest.csv')
 
         with open(self.filePath, 'w') as file:
             file.write('field_1,field_2,field_3\n')
