@@ -56,7 +56,7 @@ class TestFilter(env.DCCLabTestCase):
 
     def testSetDichroicExpectedValue(self):
         filter = fltr('Filter:1', self.meta.root)
-        self.assertEqual(filter.setDichroic(), '495')
+        self.assertEqual(filter.setDichroic(), 495)
 
     def testSetDichroicMissingKeys(self):
         filter = fltr('', self.meta.root)
@@ -94,7 +94,7 @@ class TestFilter(env.DCCLabTestCase):
 
     def testGetDichroicExpectedValue(self):
         filter = fltr('Filter:1', self.meta.root)
-        self.assertEqual(filter.getDichroic(), '495')
+        self.assertEqual(filter.getDichroic(), 495)
 
     def testGetDichroicNoneValue(self):
         filter = fltr('', self.meta.root)
