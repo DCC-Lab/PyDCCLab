@@ -205,6 +205,20 @@ class ImageCollection:
             # todo: Must provide one mask per channel for each image
             raise NotImplementedError
 
+    @property
+    def labelValues(self) -> dict:
+        uniqueValues = dict()  # {value: count, ... }
+        for image in self.images:
+            for channel in image.channels:
+                # check if its semantic
+                values, counts = np.unique(channel.labelledComponents, return_counts=True)
+                for value, count in zip(values, counts):
+                    if value not in uniqueValues:
+                        uniqueValues[value] = int(count)
+                    else:
+                        uniqueValues[value] += count
+        return uniqueValues
+
     def analyzeComponents(self):
         for image in self.images:
             image.analyzeComponents()
