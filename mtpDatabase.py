@@ -119,4 +119,5 @@ def queryViralVectors():
 
 if __name__ == '__main__':
     #createMTPDatabase()
-    queryViralVectors()
+    #queryViralVectors()
+    pass
