@@ -492,47 +492,46 @@ class Channel:
         ifftShift = np.fft.ifftshift(fftShiftPixelsWithMask)
         filteredPixels = np.abs(np.fft.ifft2(ifftShift))
         return Channel(filteredPixels)
-        
-    def applyHighPassFilterFromFractionOfImage(self, removeFraction:float = 0.1):
+
+    def applyHighPassFilterFromFractionOfImage(self, removeFraction: float = 0.1):
         fftPixels = self.fourierTransform(False)
         rows, cols = fftPixels.shape
         mask = np.zeros_like(fftPixels, dtype=np.uint8)
-        mask[int(rows*removeFraction):int(rows*(1-removeFraction))] = 1
-        mask[:, int(cols*removeFraction):int(cols*(1-removeFraction))] = 1
-        fftPixels = mask*fftPixels
+        mask[int(rows * removeFraction):int(rows * (1 - removeFraction))] = 1
+        mask[:, int(cols * removeFraction):int(cols * (1 - removeFraction))] = 1
+        fftPixels = mask * fftPixels
         filteredPixels = np.abs(np.fft.ifft2(fftPixels))
         return Channel(filteredPixels)
-        
-    def applyLowPassFilterFromFractionOfImage(self, keepFraction:float = 0.1):
+
+    def applyLowPassFilterFromFractionOfImage(self, keepFraction: float = 0.1):
         fftPixels = self.fourierTransform(False)
         rows, cols = fftPixels.shape
-        fftPixels[int(rows*keepFraction):int(rows*(1-keepFraction))] = 0
-        fftPixels[:, int(cols*keepFraction):int(cols*(1-keepFraction))] = 0
+        fftPixels[int(rows * keepFraction):int(rows * (1 - keepFraction))] = 0
+        fftPixels[:, int(cols * keepFraction):int(cols * (1 - keepFraction))] = 0
         filteredPixels = np.abs(np.fft.ifft2(fftPixels))
         return Channel(filteredPixels)
-        
-    def applyLowPassFilterFromFractionHighestFreq(self, fraction:float=0.5):
+
+    def applyLowPassFilterFromFractionHighestFreq(self, fraction: float = 0.5):
         pass
 
     def powerSpectrum(self, naturalLogScale: bool = True) -> np.ndarray:
         fftShiftPixels = self.fourierTransform()
         y, x = fftShiftPixels.shape
-        powerSpectrum = (np.abs(fftShiftPixels)/(x*y)) ** 2
+        powerSpectrum = (np.abs(fftShiftPixels)) ** 2
         if naturalLogScale:
             powerSpectrum = np.log(powerSpectrum)
         return powerSpectrum
-        
+
     def powerSpectrumDensityOneDimension(self, useSum=False):
-        powerSpectrumDensity = self.powerSpectrum(False)
+        powerSpectrumDensity = self.powerSpectrum()
         heigth, width = powerSpectrumDensity.shape
         halfH, halfW = heigth // 2, width // 2
         Y, X = np.ogrid[0:heigth, 0:width]
-        radii = np.hypot(X - halfW, Y-halfH).astype(int)
+        radii = np.hypot(X - halfW, Y - halfH).astype(int)
         function = ndimage.sum if useSum else ndimage.mean
-        ps1D = function(powerSpectrumDensity, radii, index = np.arange(0, halfW))
+        ps1D = function(powerSpectrumDensity, radii, index=np.arange(0, halfW))
+        print(len(ps1D))
         return ps1D
-        
-        
 
     def fourierTransform(self, shift: bool = True) -> np.ndarray:
         pixels = self.pixels
@@ -540,14 +539,14 @@ class Channel:
         if shift:
             fftPixels = np.fft.fftshift(fftPixels)
         return fftPixels
-        
-    def applyGaussianNoise(self, mean:float, sigma:float):
+
+    def applyGaussianNoise(self, mean: float, sigma: float):
         rows, cols = self.shape
         gauss = np.random.normal(mean, sigma, (rows, cols))
         gauss = gauss.reshape(rows, cols)
         noise = self.pixels + gauss
         return Channel(noise)
-        
+
     def applyPoissonNoise(self):
         pass
 
