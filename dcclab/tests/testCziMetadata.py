@@ -201,11 +201,11 @@ class TestCziMetadata(env.DCCLabTestCase):
 
     def testAsDictExpectedValue(self):
         mdata = mtdt(self.testPath)
-        expectedValue = {'channels': 2, 'file_path': 'C:\\Users\\MathieuLaptop\\Documents\\Ulaval\\ProgPython\\Projets\\BigData-ImageAnalysis\\dcclab\\tests\\testData\\testCziFile.czi',
+        expectedValue = {'channels': 2, 'file_path': self.testPath,
                          'injection_site': None, 'microscope': 'Axio Observer.Z1 / 7', 'mouse_id': None,
                          'name': 'testCziFile.czi', 'objective': 'LD A-Plan 5x/0.15 Ph1', 'tags': '',
                          'viral_vectors': '', 'x_scale': 9.08e-07, 'x_scaled': 1.757888, 'x_size': 1936,
-                         'y_scale': 9.08e-07, 'y_scaled': 1.3256800000000002, 'y_size': 1460}
+                         'y_scale': 9.08e-07, 'y_scaled': 1.325680, 'y_size': 1460}
         self.assertEqual(mdata.asDict()['metadata'], expectedValue)
 
     def testSetMouseIdUpperCase(self):
