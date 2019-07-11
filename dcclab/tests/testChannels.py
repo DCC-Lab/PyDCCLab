@@ -260,28 +260,20 @@ class TestChannelSpectralFiltering(env.DCCLabTestCase):
         fftChannel = channel.applyLowPassFilterFromMask(40)
         self.assertFalse(np.allclose(channel.pixels, fftChannel.pixels))
 
-    def testPowerSpectrumNoLogScale(self):
+    def testPowerSpectrum(self):
         image = Image(path=Path(self.dataDir / "testCziFileTwoChannels.czi"))
         channel = image.channels[-1]
         fftChannel = np.fft.fft2(channel.pixels)
         fftShiftChannel = np.fft.fftshift(fftChannel)
         amplitude = np.abs(fftShiftChannel) ** 2
-        self.assertTrue(np.array_equal(channel.powerSpectrum(False), amplitude))
+        self.assertTrue(np.array_equal(channel.powerSpectrum(), amplitude))
 
-    def testPowerSpectrumLogScale(self):
-        image = Image(path=Path(self.dataDir / "testCziFileTwoChannels.czi"))
-        channel = image.channels[-1]
-        fftChannel = np.fft.fft2(channel.pixels)
-        fftShiftChannel = np.fft.fftshift(fftChannel)
-        amplitude = np.log(np.abs(fftShiftChannel) ** 2)
-        self.assertTrue(np.array_equal(channel.powerSpectrum(True), amplitude))
-        
     def testGaussianNoise(self):
         image = Image(path=Path(self.dataDir / "testCziFileTwoChannels.czi"))
         channel = image.channels[0]
-        noiseChannel = channel.applyGaussianNoise(mean=channel.getAverageValueOfPixels(),sigma=20)
+        noiseChannel = channel.applyGaussianNoise(mean=channel.getAverageValueOfPixels(), sigma=20)
         self.assertFalse(np.array_equal(channel.pixels, noiseChannel.pixels))
-        
+
     def testPoissonNoise(self):
         image = Image(path=Path(self.dataDir / "testCziFileTwoChannels.czi"))
         channel = image.channels[0]
