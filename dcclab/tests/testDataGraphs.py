@@ -21,8 +21,9 @@ class DataGraphs(env.DCCLabTestCase):
             (self.egfp["average"] != "NotYetImplemented") & (self.egfp["average"] != "IndexError")]
 
     def testExtractDataSingleChannel(self):
+        writeFile = open("imagesToCheck.csv", "w", encoding="utf-8")
+        writeFile.writelines("path,channel,xVal,yVal,graphTitle")
         channels = [self.egfp, self.dapi, self.mCherry]
-        dataNonNormalized = ["average", "stdDev", "entropy"]
         dataNormalized = ["averageN", "stdDevN", "entropyN", "medianN"]
         for channel in channels:
             if self.egfp.equals(channel):
@@ -34,20 +35,6 @@ class DataGraphs(env.DCCLabTestCase):
             else:
                 channelName = "DAPI"
                 color = "blue"
-            for i in range(len(dataNonNormalized)):
-                for j in range(i, len(dataNonNormalized)):
-                    xLabel = dataNonNormalized[i]
-                    yLabel = dataNonNormalized[j]
-                    if j != i:
-                        x = np.array(channel[xLabel], float)
-                        y = np.array(channel[yLabel], float)
-                        jp = sns.jointplot(x, y, kind="reg", scatter=False, fit_reg=False)
-                        jp.ax_joint.plot(x, y, "o", color=color, alpha=0.2)
-                        plt.ylabel(yLabel)
-                        plt.xlabel(xLabel)
-                        plt.title("{} and {} of {} from the POM platform (non normalized images)".format(xLabel, yLabel,
-                                                                                                         channelName))
-                        plt.show()
             for i in range(len(dataNormalized)):
                 for j in range(i, len(dataNormalized)):
                     xLabel = dataNormalized[i]
@@ -55,13 +42,48 @@ class DataGraphs(env.DCCLabTestCase):
                     if j != i:
                         x = np.array(channel[xLabel], float)
                         y = np.array(channel[yLabel], float)
-                        jp = sns.jointplot(x, y, kind="reg", scatter=False, fit_reg=False)
-                        jp.ax_joint.plot(x, y, "o", color=color, alpha=0.2)
+
+                        fig, ax = plt.subplots()
+                        sc = plt.scatter(x, y, color=color, alpha=0.2)
+                        annot = ax.annotate("", xy=(0, 0), xytext=(-100, 20), textcoords="offset points",
+                                            bbox=dict(boxstyle="round", fc="w"),
+                                            arrowprops=dict(arrowstyle="->"))
+                        annot.set_visible(False)
+                        title = "{} and {} of {} from the POM platform (normalized images)".format(xLabel, yLabel,
+                                                                                                   channelName)
+
+                        def update_annot(ind):
+                            pos = sc.get_offsets()[ind["ind"][0]]
+                            annot.xy = pos
+                            path = [np.array(channel["path"])[n] for n in ind["ind"]]
+                            xVal = [np.array(channel[xLabel])[n] for n in ind["ind"]]
+                            yVal = [np.array(channel[yLabel])[n] for n in ind["ind"]]
+                            text = "{}".format(" ".join([channel["path"][n] for n in ind["ind"]]))
+                            annot.set_text(text)
+                            for i in range(len(path)):
+                                writeFile.writelines("\n{},{},{},{},{}".format(path[i], channelName, xVal[i], yVal[i], title))
+
+                        def click(event):
+                            vis = annot.get_visible()
+                            if event.inaxes == ax:
+                                cont, ind = sc.contains(event)
+                                if cont:
+                                    update_annot(ind)
+                                    annot.set_visible(True)
+                                    fig.canvas.draw_idle()
+                                else:
+                                    if vis:
+                                        annot.set_visible(False)
+                                        fig.canvas.draw_idle()
+
+                        fig.canvas.mpl_connect("button_press_event", click)
                         plt.ylabel(yLabel)
                         plt.xlabel(xLabel)
-                        plt.title("{} and {} of {} from the POM platform (normalized images)".format(xLabel, yLabel,
-                                                                                                     channelName))
+                        plt.title(title)
+
                         plt.show()
+
+        writeFile.close()
 
 
 if __name__ == '__main__':
