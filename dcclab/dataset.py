@@ -118,24 +118,56 @@ class Dataset:
                 self.supervised = True
 
     def report(self):
-        print(">>> REPORT")
+        # Temporary
 
         collectionsInfo = []
+        globalClassInfo = {}
+        classNames = {}
+
         for source in self.collections:
-            collection = self.collections[source]  # type: ImageCollection
-            collectionsInfo.append([source, collection.numberOfImages, collection.hasLabelledComponents,
-                                    collection.imagesAreSimilar])
+            collection = self.collections[source]
+            classInfo = collection.labelValues
 
-        df = pd.DataFrame(collectionsInfo, columns=["Source", "nbOfImages", "hasLabels", "Same shape"])
+            if collection.hasLabelledComponents:
+                classValues, classCounts = list(classInfo.keys()), list(classInfo.values())
 
-        print(df)
+                if 0 in classValues and len(classValues) == 2:
+                    classNames[0] = "background"
+                    classNames[sorted(classValues)[-1]] = source
+
+                for value, count in classInfo.items():
+                    if value not in globalClassInfo:
+                        globalClassInfo[value] = count
+                    else:
+                        globalClassInfo[value] += count
+
+                totalCount = np.sum(list(classInfo.values()))
+                for value in classInfo:
+                    classInfo[value] = np.round(int(classInfo[value]) / totalCount * 100, 1)
+            else:
+                classValues, classCounts = None, None
+
+            collectionsInfo.append([source, collection.numberOfImages, collection.hasLabelledComponents, classValues,
+                                    classCounts, collection.imagesAreSimilar, collection.images[0].shape])
+
+        df = pd.DataFrame(collectionsInfo, columns=["source", "nbOfImages", "hasLabels", "clsValues", "clsRatios", "sameShape", "shape"])
+
+        print("\n", df.to_string(index=False), "\n")
+
+        totalCount = np.sum(list(globalClassInfo.values()))
+        for value in globalClassInfo:
+            globalClassInfo[value] = np.round(int(globalClassInfo[value]) / totalCount * 100, 1)
+
+        print("NbOfClasses = ", len(globalClassInfo.keys()) if len(globalClassInfo) != 0 else None)
+        if len(classNames) == 0:
+            print("Class values = ", list(globalClassInfo.keys()))
+        else:
+            print("Class values = ", ["{}: {}".format(value, classNames[value]) for value in list(globalClassInfo.keys())])
+        print("Class ratios = ", list(globalClassInfo.values()))
         print("ML Type = ", self.type if self.type is not None else "unknown")
         print("Supervised = ", self.supervised if self.supervised is not None else "unknown")
         print("Model = ", self.model if self.model is not None else "unknown")
 
-        # - images have same shape
-        # - labels are present
-        # - number of classes
         # - pixel values for the labels correspond to class indexes
         # - image format is png
         # - classes are balanced (ratio)
@@ -182,6 +214,12 @@ class Dataset:
         return [imageFiles, labelFiles]
 
 
+if __name__ == '__main__':
+    dataset = Dataset(directory="./tests/testData/labelledDataset")
+    # dataset.applyLabelsFromSourceNames()
+    # dataset.report()
+
+
 """
 
 Maybe replace ImageCollection with a possible ML Collection ? ...
@@ -217,9 +255,3 @@ class MLSpectraCollection:  # ?  (SpectraCollection)
     def augment(self):
         # Spectra augmentation technique
         pass
-
-
-if __name__ == '__main__':
-    dataset = Dataset(directory="D:\MonteaCristo\Documents\Github\CERVO\CervoML\Bacteria\BacteriaML\data\preps\prep_v5_bkinit")
-    dataset.setLabelsFromSourceName()
-    dataset.report()
