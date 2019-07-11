@@ -62,7 +62,11 @@ class Dataset:
     def __init__(self, directory: str):
         self.directory = directory
         self.labelTag = 'label'
+
         self.collections = dict()
+        self.type = None  # Classification, Semantic Classification, Regression (more for table data: Not implemented)...
+        self.supervised = None
+        self.model = None
 
         self.loadAllCollections()
 
@@ -110,6 +114,8 @@ class Dataset:
             if len(labelFiles) != 0:
                 labels = [Image(path=file).channels[0] for file in labelFiles]
                 self.collections[key].setLabelledComponents(labels=labels)
+                self.type = "Semantic classification"
+                self.supervised = True
 
     def report(self):
         print(">>> REPORT")
@@ -123,6 +129,9 @@ class Dataset:
         df = pd.DataFrame(collectionsInfo, columns=["Source", "nbOfImages", "hasLabels", "Same shape"])
 
         print(df)
+        print("ML Type = ", self.type if self.type is not None else "unknown")
+        print("Supervised = ", self.supervised if self.supervised is not None else "unknown")
+        print("Model = ", self.model if self.model is not None else "unknown")
 
         # - images have same shape
         # - labels are present
@@ -133,12 +142,26 @@ class Dataset:
         # - the dataset is big enough
         # - ...
 
-    def setLabelsFromSourceName(self):
+    def applyLabelsFromSourceNames(self):
         for source in self.collections:
-            collection = self.collections[source]  # type: ImageCollection
+            collection = self.collections[source]
+            assert not collection.hasLabelledComponents, "Collection already has labels"
+
             for image in collection.images:
                 for channel in image.channels:
                     channel.setLabelledComponents(source)
+
+        self.type = "Classification"
+
+    def setModel(self, model=None):
+        if model is None:
+            # infer model...
+            if self.type is "Semantic classification":
+                # use resnet50... check size...
+                pass
+
+    def train(self):
+        pass
 
     @staticmethod
     def getFolders(source):
