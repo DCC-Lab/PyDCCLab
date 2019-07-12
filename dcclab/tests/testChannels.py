@@ -248,38 +248,130 @@ class TestChannelSpectralFiltering(env.DCCLabTestCase):
         self.assertFalse(np.array_equal(fftChannelShift, fftChannel))
         self.assertEqual(fftChannelShift[centerY, centerX], fftChannel[0, 0])
 
-    def testHighPassFilter(self):
+    def testHighPassFilterRectMask(self):
         image = Image(path=Path(self.dataDir / "testCziFileTwoChannels.czi"))
         channel = image.channels[0]
-        fftChannel = channel.applyHighPassFilterFromMask(30)
+        fftChannel = channel.applyHighPassFilterFromRetcangularMask(30)
         self.assertFalse(np.allclose(channel.pixels, fftChannel.pixels))
 
-    def testLowPassFilter(self):
+    def testLowPassFilterRectMask(self):
         image = Image(path=Path(self.dataDir / "testCziFileTwoChannels.czi"))
         channel = image.channels[0]
-        fftChannel = channel.applyLowPassFilterFromMask(40)
+        fftChannel = channel.applyLowPassFilterFromRectangularMask(40)
         self.assertFalse(np.allclose(channel.pixels, fftChannel.pixels))
+
+    def testCreatXYGridsAllOdd(self):
+        nbRows = 3
+        nbCols = 5
+        array = np.ones((nbRows, nbCols))
+        x, y = Channel.createXYGridsFromArray(array, False)
+        row = [i for i in range(nbCols)]
+        handComputedX = np.array([row] * nbRows)
+        column = [i for i in range(nbRows)]
+        handComputedY = np.array([column] * nbCols).T
+        self.assertTrue(np.array_equal(x, handComputedX))
+        self.assertTrue(np.array_equal(y, handComputedY))
+
+    def testCreateXYGridsOneOdd(self):
+        nbRows = 8
+        nbCols = 5
+        array = np.ones((nbRows, nbCols))
+        x, y = Channel.createXYGridsFromArray(array, False)
+        row = [i for i in range(nbCols)]
+        handComputedX = np.array([row] * nbRows)
+        column = [i for i in range(nbRows)]
+        handComputedY = np.array([column] * nbCols).T
+        self.assertTrue(np.array_equal(x, handComputedX))
+        self.assertTrue(np.array_equal(y, handComputedY))
+
+    def testCreateXYGridsAllEven(self):
+        nbRows = 8
+        nbCols = 10
+        array = np.ones((nbRows, nbCols))
+        x, y = Channel.createXYGridsFromArray(array, False)
+        row = [i for i in range(nbCols)]
+        handComputedX = np.array([row] * nbRows)
+        column = [i for i in range(nbRows)]
+        handComputedY = np.array([column] * nbCols).T
+        self.assertTrue(np.array_equal(x, handComputedX))
+        self.assertTrue(np.array_equal(y, handComputedY))
+
+    def testCreateXYGridsAllOddOriginAtCenter(self):
+        array = np.ones((5, 5))
+        x, y = Channel.createXYGridsFromArray(array)
+        handComputedX = np.array([[-2] * 5, [-1] * 5, [0] * 5, [1] * 5, [2] * 5]).T
+        handComputedY = np.flipud(handComputedX.T)
+        self.assertTrue(np.array_equal(x, handComputedX))
+        self.assertTrue(np.array_equal(y, handComputedY))
+
+    def testCreateXYGridsOneOddOriginAtCenter(self):
+        array = np.ones((5, 6))
+        x, y = Channel.createXYGridsFromArray(array)
+        handComputedX = np.array([[-2] * 5, [-1] * 5, [0] * 5, [1] * 5, [2] * 5, [3] * 5]).T
+        handComputedY = np.flipud(np.array([np.arange(-2, 3)] * 6).T)
+        self.assertTrue(np.array_equal(x, handComputedX))
+        self.assertTrue(np.array_equal(y, handComputedY))
+
+    def testCreateXYGridsAllEvenOriginAtCenter(self):
+        array = np.ones((6, 6))
+        x, y = Channel.createXYGridsFromArray(array)
+        handComputedX = np.array([[-2] * 6, [-1] * 6, [0] * 6, [1] * 6, [2] * 6, [3] * 6]).T
+        handComputedY = np.flipud(np.array([np.arange(-2, 4)] * 6).T)
+        self.assertTrue(np.array_equal(x, handComputedX))
+        self.assertTrue(np.array_equal(y, handComputedY))
+
+    def testCreateGaussianMask(self):
+        array = np.ones((3, 3))
+        xy = Channel.createXYGridsFromArray(array)
+        mask = Channel.createGaussianMask(xy, 1 / np.sqrt(2))
+        e = np.exp
+        handComputedMask = np.array([[e(-2), e(-1), e(-2)], [e(-1), e(0), e(-1)], [e(-2), e(-1), e(-2)]])
+        self.assertTrue(np.allclose(mask, handComputedMask))
+
+    def testCreateSigmoidMask(self):
+        array = np.ones((3, 3))
+        xy = Channel.createXYGridsFromArray(array)
+        radius = 1
+        mask = Channel.createSigmoidMask(xy, radius)
+
+        def sigmoid(expArg: float) -> float:
+            return 1 / (1 + np.exp(-expArg))
+
+        handComputedMask = np.array(
+            [[sigmoid(1 - 2 ** (1 / 2)), 1 / 2, sigmoid(1 - 2 ** (1 / 2))], [1 / 2, sigmoid(-1), 1 / 2],
+             [sigmoid(1 - 2 ** (1 / 2)), 1 / 2, sigmoid(1 - 2 ** (1 / 2))]])
+        self.assertTrue(np.allclose(mask, handComputedMask))
 
     def testPowerSpectrum(self):
         image = Image(path=Path(self.dataDir / "testCziFileTwoChannels.czi"))
         channel = image.channels[-1]
         fftChannel = np.fft.fft2(channel.pixels)
         fftShiftChannel = np.fft.fftshift(fftChannel)
+        for c in image.channels:
+            c.displayPowerSpectrum()
         amplitude = np.abs(fftShiftChannel) ** 2
         self.assertTrue(np.array_equal(channel.powerSpectrum(), amplitude))
 
-    def testGaussianNoise(self):
-        image = Image(path=Path(self.dataDir / "testCziFileTwoChannels.czi"))
-        channel = image.channels[0]
-        noiseChannel = channel.applyGaussianNoise(mean=channel.getAverageValueOfPixels(), sigma=20)
-        self.assertFalse(np.array_equal(channel.pixels, noiseChannel.pixels))
+    def testPowerSpectrumValues(self):
+        # For now, power spectrum not normalized by the number of pixels...
+        array = np.array([[i * 2 * np.pi / 8 for i in range(30)]] * 30)
+        values = (np.sin(array) + 1) * 255 / 2
+        channel = Channel(values.astype(np.uint8))
+        centerY, centerX = channel.shape[0] // 2, channel.shape[1] // 2
+        ps = channel.powerSpectrum()
+        # Check if center value is the DC component (after sqrt and normalization)
+        self.assertAlmostEqual(np.sqrt(ps[centerY, centerX]) / channel.numberOfPixels,
+                               channel.getAverageValueOfPixels())
 
-    def testPoissonNoise(self):
-        image = Image(path=Path(self.dataDir / "testCziFileTwoChannels.czi"))
-        channel = image.channels[0]
-        channel.applyHighPassFilterFromFractionOfImage()
-        noiseChannel = channel.applyPoissonNoise()
-        self.assertFalse(np.array_equal(channel.pixels, noiseChannel.pixels))
+    def testToto(self):
+        array = np.arange(0, 81).reshape((9, 9))
+        channel = Channel(array)
+        print(channel.powerSpectrumDensityAzimuthalAverage())
+
+    def test(self):
+        array = np.ones((8, 8))
+        channel = Channel(array)
+        Channel.azimuthalAverage(array)
 
 
 if __name__ == '__main__':
