@@ -131,7 +131,7 @@ class Dataset:
 
         print("Dataset Info\n", json.dumps(self.info, indent=4))
         # todo: dataset classes info dataframe
-        
+
         # - pixel values for the labels correspond to class indexes
         # - image format is png
         # - classes are balanced (ratio)
@@ -185,12 +185,14 @@ class Dataset:
 
         self.info['type'] = "Classification"
 
-    def setModel(self, model=None):
+    def setModel(self, model: str=None):
         if model is None:
             # infer model...
             if self.info['type'] is "Semantic classification":
                 # use resnet50... check size...
                 pass
+
+        self.info["model"] = model
 
     def train(self):
         pass
@@ -212,30 +214,6 @@ class Dataset:
         imageFiles = [os.path.join(source, fn) for fn in filenames if self.labelTag not in fn]
         labelFiles = [os.path.join(source, fn) for fn in filenames if self.labelTag in fn]
         return [imageFiles, labelFiles]
-
-"""
-
-Maybe replace ImageCollection with a possible ML Collection ? ...
-
-"""
-
-
-class MLCollection:
-    supportedTypes = ["Image", "Spectra"]
-
-    def __new__(cls, data: List[np.ndarray]):
-        # An ML Collection is always a list of samples
-        # check data dimensions and try to infer data type
-
-        if data[0].ndim == 1:
-            return super(MLCollection, cls).__new__(MLSpectraCollection)
-        elif 1 < data[0].ndim <= 3:
-            return super(MLCollection, cls).__new__(MLImageCollection)
-        else:
-            raise NotImplementedError
-
-    def augment(self):
-        pass
 
 
 class MLImageCollection(ImageCollection):
@@ -277,14 +255,39 @@ class MLImageCollection(ImageCollection):
         pass
 
 
+if __name__ == '__main__':
+    dataset = Dataset(directory="./tests/testData/labelledDataset")
+    # dataset.applyLabelsFromSourceNames()
+    # dataset.report()
+
+
+"""
+
+Maybe replace ImageCollection with a possible ML Collection ? ...
+
+"""
+
+
+class MLCollection:
+    supportedTypes = ["Image", "Spectra"]
+
+    def __new__(cls, data: List[np.ndarray]):
+        # An ML Collection is always a list of samples
+        # check data dimensions and try to infer data type
+
+        if data[0].ndim == 1:
+            return super(MLCollection, cls).__new__(MLSpectraCollection)
+        elif 1 < data[0].ndim <= 3:
+            return super(MLCollection, cls).__new__(MLImageCollection)
+        else:
+            raise NotImplementedError
+
+    def augment(self):
+        pass
+
+
 class MLSpectraCollection:  # ?  (SpectraCollection)
 
     def augment(self):
         # Spectra augmentation technique
         pass
-
-
-if __name__ == '__main__':
-    dataset = Dataset(directory="./tests/testData/labelledDataset")
-    # dataset.applyLabelsFromSourceNames()
-    # dataset.report()
