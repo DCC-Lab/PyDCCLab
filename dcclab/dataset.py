@@ -2,6 +2,7 @@ from dcclab import ImageCollection, Image
 from typing import List
 import pandas as pd
 import numpy as np
+import json
 import os
 
 """
@@ -70,7 +71,6 @@ class Dataset:
                      'validLabel': None}
 
         self.loadAllCollections()
-
         self.report()
 
     def loadAllCollections(self):
@@ -120,61 +120,59 @@ class Dataset:
                 self.info['supervised'] = True
 
     def report(self):
-        # Temporary
+        self.updateCollectionsInfo()
+        self.updateDatasetInfo()
 
-        collectionsInfo = []
-        globalClassInfo = {}
-        classNames = {}
+        infoKeys = ['source', 'nbOfImages', 'hasLabels', 'clsValues', 'clsRatios', 'sameShape', 'shape']
+        infoKeys = [k for k in infoKeys if k in self.collectionsInfo]
+        df = pd.DataFrame(self.collectionsInfo, columns=infoKeys)
 
-        for source in self.collections:
-            collection = self.collections[source]
-            classInfo = collection.labelValues
+        print("Collections Info\n", df.to_string(index=False), "\n")
 
-            if collection.hasLabelledComponents:
-                classValues, classCounts = list(classInfo.keys()), list(classInfo.values())
-
-                if 0 in classValues and len(classValues) == 2:
-                    classNames[0] = "background"
-                    classNames[sorted(classValues)[-1]] = source
-
-                for value, count in classInfo.items():
-                    if value not in globalClassInfo:
-                        globalClassInfo[value] = count
-                    else:
-                        globalClassInfo[value] += count
-
-                totalCount = np.sum(list(classInfo.values()))
-                for value in classInfo:
-                    classInfo[value] = np.round(int(classInfo[value]) / totalCount * 100, 1)
-            else:
-                classValues, classCounts = None, None
-
-            collectionsInfo.append([source, collection.numberOfImages, collection.hasLabelledComponents, classValues,
-                                    classCounts, collection.imagesAreSimilar, collection.images[0].shape])
-
-        df = pd.DataFrame(collectionsInfo, columns=["source", "nbOfImages", "hasLabels", "clsValues", "clsRatios", "sameShape", "shape"])
-
-        print("\n", df.to_string(index=False), "\n")
-
-        totalCount = np.sum(list(globalClassInfo.values()))
-        for value in globalClassInfo:
-            globalClassInfo[value] = np.round(int(globalClassInfo[value]) / totalCount * 100, 1)
-
-        print("NbOfClasses = ", len(globalClassInfo.keys()) if len(globalClassInfo) != 0 else None)
-        if len(classNames) == 0:
-            print("Class values = ", list(globalClassInfo.keys()))
-        else:
-            print("Class values = ", ["{}: {}".format(value, classNames[value]) for value in list(globalClassInfo.keys())])
-        print("Class ratios = ", list(globalClassInfo.values()))
-        print("ML Type = ", self.type if self.type is not None else "unknown")
-        print("Supervised = ", self.supervised if self.supervised is not None else "unknown")
-        print("Model = ", self.model if self.model is not None else "unknown")
-
+        print("Dataset Info\n", json.dumps(self.info, indent=4))
+        # todo: dataset classes info dataframe
+        
         # - pixel values for the labels correspond to class indexes
         # - image format is png
         # - classes are balanced (ratio)
         # - the dataset is big enough
         # - ...
+
+    def updateCollectionsInfo(self):
+        for collection in self.collections.values():
+            for k, v in collection.info.items():
+                self.collectionsInfo.setdefault(k, []).append(v)
+
+            if collection.info["hasLabels"]:
+                for value, count in zip(collection.info["clsValues"], collection.info["clsCounts"]):
+                    if str(value) not in self.info["labels"]:
+                        self.info["labels"][str(value)] = int(count)
+                    else:
+                        self.info["labels"][str(value)] += int(count)
+
+                for value, name in collection.info["clsNames"].items():
+                    if str(value) not in self.info["clsNames"]:
+                        self.info["clsNames"][str(value)] = name
+                    elif self.info["clsNames"][str(value)] != name:
+                        self.info["validLabel"] = False
+            else:
+                self.info['hasLabels'] = False
+
+    def updateDatasetInfo(self):
+        if self.info['validLabel'] is None:
+            self.info['validLabel'] = True
+
+        if self.info['hasLabels'] is None:
+            self.info['hasLabels'] = True
+
+        if self.info['hasLabels']:
+            classValues, classCounts = list(self.info["labels"].keys()), list(self.info["labels"].values())
+            totalCount = np.sum(classCounts)
+            classRatios = [np.round(count / totalCount * 100, 1) for count in classCounts]
+            nbOfClasses = len(classValues) if len(classValues) != 0 else None
+
+            self.info.update({"clsValues": classValues, "clsCounts": classCounts,
+                              "clsRatios": classRatios, "nbOfClasses": nbOfClasses})
 
     def applyLabelsFromSourceNames(self):
         for source in self.collections:
