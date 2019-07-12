@@ -64,11 +64,11 @@ class Dataset:
         self.directory = directory
         self.labelTag = 'label'
 
-        self.collections = dict()
-        self.collectionsInfo = dict()
+        self.collections = {}
+        self.collectionsInfo = {}
         self.info = {'type': None, 'supervised': None, 'model': None,
                      'labels': {}, 'clsNames': {}, 'hasLabels': None,
-                     'validLabel': None}
+                     'validLabel': None, 'hasStringLabels': False}
 
         self.loadAllCollections()
         self.report()
@@ -129,16 +129,8 @@ class Dataset:
 
         print("# Collections Info\n{}\n".format(df.to_string()))
 
-        if self.info["hasLabels"]:
-            classInfo = []
-            for i, (value, name) in enumerate(self.info['clsNames'].items()):
-                count = self.info['clsCounts'][i]
-                ratio = self.info['clsRatios'][i]
-                classDict = {'name': name, 'value': value, 'count': count, 'ratio': ratio}
-                classInfo.append(classDict)
-
-            df = pd.DataFrame(classInfo, columns=['name', 'value', 'count', 'ratio']).sort_values(by='value')
-            df.rename(columns={'name': 'name      '}, inplace=True)
+        if self.info["hasLabels"] and not self.info['hasStringLabels']:
+            df = self.getClassInfoDF()
             print("# Class Info\n{}\n".format(df.to_string(index=False)))
 
         df = pd.DataFrame.from_records([self.info], columns=['hasLabels', 'validLabel', 'nbOfClasses', 'type', 'supervised', 'model'])
@@ -151,11 +143,17 @@ class Dataset:
         # - ...
 
     def updateCollectionsInfo(self):
+        self.collectionsInfo = {}
+        self.info['hasLabels'] = None
+
         for collection in self.collections.values():
             for k, v in collection.info.items():
                 self.collectionsInfo.setdefault(k, []).append(v)
 
-            if collection.info["hasLabels"]:
+            if collection.hasStringLabels:
+                continue
+
+            elif collection.info["hasLabels"]:
                 for value, count in zip(collection.info["clsValues"], collection.info["clsCounts"]):
                     if str(value) not in self.info["labels"]:
                         self.info["labels"][str(value)] = int(count)
@@ -171,11 +169,11 @@ class Dataset:
                 self.info['hasLabels'] = False
 
     def updateDatasetInfo(self):
-        if self.info['validLabel'] is None:
-            self.info['validLabel'] = True
-
         if self.info['hasLabels'] is None:
             self.info['hasLabels'] = True
+
+            if self.info['validLabel'] is None:
+                self.info['validLabel'] = True
 
         if self.info['hasLabels']:
             classValues, classCounts = list(self.info["labels"].keys()), list(self.info["labels"].values())
@@ -186,6 +184,18 @@ class Dataset:
             self.info.update({"clsValues": classValues, "clsCounts": classCounts,
                               "clsRatios": classRatios, "nbOfClasses": nbOfClasses})
 
+    def getClassInfoDF(self) -> pd.DataFrame:
+        classInfo = []
+        for i, (value, name) in enumerate(self.info['clsNames'].items()):
+            count = self.info['clsCounts'][i]
+            ratio = self.info['clsRatios'][i]
+            classDict = {'name': name, 'value': value, 'count': count, 'ratio': ratio}
+            classInfo.append(classDict)
+
+        df = pd.DataFrame(classInfo, columns=['name', 'value', 'count', 'ratio']).sort_values(by='value')
+        df.rename(columns={'name': 'name      '}, inplace=True)
+        return df
+
     def applyLabelsFromSourceNames(self):
         for source in self.collections:
             collection = self.collections[source]
@@ -194,8 +204,11 @@ class Dataset:
             for image in collection.images:
                 for channel in image.channels:
                     channel.setLabelledComponents(source)
+            collection.hasStringLabels = True
 
+        self.info['hasStringLabels'] = True
         self.info['type'] = "Classification"
+        self.info['supervised'] = True
 
     def setModel(self, model: str=None):
         if model is None:
@@ -233,13 +246,13 @@ class MLImageCollection(ImageCollection):
         super().__init__(images, imagesArray, pathPattern)
 
         self.source = None
+        self.hasStringLabels = False
 
     @property
     def info(self) -> dict:
         info = {"source": self.source}
 
-        if self.hasLabelledComponents:
-            # todo: check if its a string label
+        if self.hasLabelledComponents and not self.hasStringLabels:
             classValues, classCounts = list(self.labelInfo.keys()), list(self.labelInfo.values())
 
             totalCount = np.sum(classCounts)
@@ -269,6 +282,7 @@ class MLImageCollection(ImageCollection):
 
 if __name__ == '__main__':
     dataset = Dataset(directory="./tests/testData/labelledDataset")
+    # dataset = Dataset(directory="./tests/testData/dataset")
     # dataset.applyLabelsFromSourceNames()
     # dataset.report()
 
