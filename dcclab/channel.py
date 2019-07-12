@@ -571,15 +571,17 @@ class Channel:
         halfH, halfW = heigth // 2, width // 2
         Y, X = np.ogrid[0:heigth, 0:width]
         radii = np.hypot(X - halfW, Y - halfH).astype(int)
+        print(radii)
         function = ndimage.sum if useSum else ndimage.mean
         ps1D = function(powerSpectrumDensity, radii, index=np.arange(0, halfW))
         return ps1D
 
-    def displayPowerSpectrumDensity1D(self, logScale: bool = True, useSum: bool = False) -> np.ndarray:
-        ps1D = self.powerSpectrumDensity1Dimension(useSum)
-        plt.plot(*ps1D)
-        if logScale:
-            plt.yscale("log")
+    def displayPowerSpectrumDensity1D(self, logBase: float = None, useSum: bool = False) -> np.ndarray:
+        ps1D = self.powerSpectrumDensityAzimuthalAverage(useSum)
+        x = range(len(ps1D))
+        plt.plot(x, ps1D)
+        if logBase is not None:
+            plt.yscale("log", basey=logBase)
         plt.show()
         return ps1D
 
@@ -620,7 +622,7 @@ class Channel:
 
     @staticmethod
     def createSigmoidMask(XYGrids: typing.Tuple[np.ndarray, np.ndarray], radius: float,
-                          inflectionPointSlope: float) -> np.ndarray:
+                          inflectionPointSlope: float = 1 / 4) -> np.ndarray:
         """
         Create a sigmoid mask with the same shape as the image to mask.
         :param XYGrids: Tuple with an array containing the x indices and another containing the y indices. The origin
@@ -635,12 +637,25 @@ class Channel:
         :param radius: Radius of the top of the sigmoid function
         :param inflectionPointSlope: The slope at the inflection point. The general sigmoid function is:
         S(x) = 1/(1 + exp(-lambda x)
-        where lambda is proportionnal to the inflection slope (slope = lambda / 4).
+        where lambda is proportional to the inflection slope (slope = lambda / 4).
         :return: Array of values in the range [0, 1] following a 2D centered sigmoid function
         """
         x, y = XYGrids
         sigmoid = 1 / (1 + np.exp(-4 * inflectionPointSlope * (radius - np.sqrt(x ** 2 + y ** 2))))
         return sigmoid
+
+    @staticmethod
+    def azimuthalAverage(array: np.ndarray) -> np.ndarray:
+        heigth, width = array.shape
+        halfH, halfW = heigth // 2, width // 2
+        Y, X = np.ogrid[0:heigth, 0:width]
+        radii = np.hypot(X - halfW, Y - halfH).astype(int)
+        x, y = Channel.createXYGridsFromArray(array)
+        radii2 = (x ** 2 + y ** 2) ** (1 / 2)
+        print(radii)
+        print(radii2.astype(int))
+        print(np.array_equal(radii, radii2.astype(int)))
+        return ndimage.mean(array, radii, index=np.arange(0, halfW))
 
 
 from .channelFloat import ChannelFloat
