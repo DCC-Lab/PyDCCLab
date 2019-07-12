@@ -513,7 +513,7 @@ class Channel:
 
     def applyLowPassFilterFromGaussianMask(self, FWHM: float):
         fftPixels = self.fourierTransform(True)
-        x, y = self.createXYGridFromArray(fftPixels)
+        x, y = self.createXYGridsFromArray(fftPixels)
         sigma = FWHM / (2 * np.sqrt(2 * np.log(2)))
         gauss = self.createGaussianMask((x, y), sigma)
         fftFiltered = fftPixels * gauss
@@ -523,7 +523,7 @@ class Channel:
 
     def applyHighPassFilterFromGaussianMask(self, FWHM: float):
         fftPixels = self.fourierTransform()
-        x, y = self.createXYGridFromArray(fftPixels)
+        x, y = self.createXYGridsFromArray(fftPixels)
         sigma = FWHM / (2 * np.sqrt(2 * np.log(2)))
         gauss = 1 - self.createGaussianMask((x, y), sigma)
         fftFiltered = fftPixels * gauss
@@ -533,7 +533,7 @@ class Channel:
 
     def applyLowPassFilterFromSigmoidMask(self, topRadius: float, inflectionPointSlope: float = 1 / 4):
         fftPixels = self.fourierTransform()
-        x, y = self.createXYGridFromArray(fftPixels)
+        x, y = self.createXYGridsFromArray(fftPixels)
         sigmoid = self.createSigmoidMask((x, y), topRadius, inflectionPointSlope)
         plt.imshow(sigmoid)
         plt.show()
@@ -544,7 +544,7 @@ class Channel:
 
     def applyHighPassFilterFromSigmoidMask(self, bottomRadius: float, inflectionPointSlope: float = 1 / 4):
         fftPixels = self.fourierTransform()
-        x, y = self.createXYGridFromArray(fftPixels)
+        x, y = self.createXYGridsFromArray(fftPixels)
         sigmoid = 1 - self.createSigmoidMask((x, y), bottomRadius, inflectionPointSlope)
         fftFiltered = fftPixels * sigmoid
         ifftShift = np.fft.ifftshift(fftFiltered)
@@ -604,7 +604,7 @@ class Channel:
         pass
 
     @staticmethod
-    def createXYGridFromArray(array: np.ndarray, gridOriginAtCenter: bool = True) -> typing.Tuple[
+    def createXYGridsFromArray(array: np.ndarray, gridOriginAtCenter: bool = True) -> typing.Tuple[
         np.ndarray, np.ndarray]:
         shape = array.shape
         y, x = np.indices(shape)
