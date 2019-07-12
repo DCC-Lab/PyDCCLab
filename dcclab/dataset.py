@@ -213,13 +213,6 @@ class Dataset:
         labelFiles = [os.path.join(source, fn) for fn in filenames if self.labelTag in fn]
         return [imageFiles, labelFiles]
 
-
-if __name__ == '__main__':
-    dataset = Dataset(directory="./tests/testData/labelledDataset")
-    # dataset.applyLabelsFromSourceNames()
-    # dataset.report()
-
-
 """
 
 Maybe replace ImageCollection with a possible ML Collection ? ...
@@ -243,7 +236,39 @@ class MLCollection:
         pass
 
 
-class MLImageCollection(ImageCollection):  # ?
+class MLImageCollection(ImageCollection):
+    def __init__(self, images: List['Image']=None, imagesArray: np.ndarray=None, pathPattern: str=None):
+        super().__init__(images, imagesArray, pathPattern)
+
+        self.source = None
+
+    @property
+    def info(self) -> dict:
+        info = {"source": self.source}
+
+        if self.hasLabelledComponents:
+            # todo: check if its a string label
+            classValues, classCounts = list(self.labelInfo.keys()), list(self.labelInfo.values())
+
+            totalCount = np.sum(classCounts)
+            classRatios = [np.round(count / totalCount * 100, 1) for count in classCounts]
+
+            classNames = {}
+            if 0 in classValues and len(classValues) == 2:
+                classNames[str(0)] = "background"
+                classNames[str(sorted(classValues)[-1])] = self.source
+
+            info.update({"clsValues": classValues, "clsCounts": classCounts,
+                         "clsRatios": classRatios, "clsNames": classNames})
+
+        if self.imagesAreSimilar:
+            info.update({"shape": self.images[0].shape})
+
+        info.update({"hasLabels": self.hasLabelledComponents,
+                     "nbOfImages": self.numberOfImages,
+                     "sameShape": self.imagesAreSimilar})
+
+        return info
 
     def augment(self):
         # Keras image augmentation generator
@@ -255,3 +280,9 @@ class MLSpectraCollection:  # ?  (SpectraCollection)
     def augment(self):
         # Spectra augmentation technique
         pass
+
+
+if __name__ == '__main__':
+    dataset = Dataset(directory="./tests/testData/labelledDataset")
+    # dataset.applyLabelsFromSourceNames()
+    # dataset.report()
