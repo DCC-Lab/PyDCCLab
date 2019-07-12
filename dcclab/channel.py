@@ -472,7 +472,7 @@ class Channel:
             plt.imshow(channels[i].pixels)
         plt.show()
 
-    def applyHighPassFilterFromMask(self, filterSize: int):
+    def applyHighPassFilterFromRetcangularMask(self, filterSize: int):
         fftShiftPixels = self.fourierTransform()
         rows, cols = self.pixels.shape
         halfRows, halfCols = rows // 2, cols // 2
@@ -482,7 +482,7 @@ class Channel:
         filteredPixels = np.abs(np.fft.ifft2(ifftShift))
         return Channel(filteredPixels)
 
-    def applyLowPassFilterFromMask(self, filterSize: int):
+    def applyLowPassFilterFromRectangularMask(self, filterSize: int):
         fftShiftPixels = self.fourierTransform()
         rows, cols = self.pixels.shape
         halfRows, halfCols = rows // 2, cols // 2
@@ -511,8 +511,45 @@ class Channel:
         filteredPixels = np.abs(np.fft.ifft2(fftPixels))
         return Channel(filteredPixels)
 
-    def applyLowPassFilterFromFractionHighestFreq(self, fraction: float = 0.5):
-        pass
+    def applyLowPassFilterFromGaussianMask(self, FWHM: float):
+        fftPixels = self.fourierTransform(True)
+        x, y = self.createXYGridFromArray(fftPixels)
+        sigma = FWHM / (2 * np.sqrt(2 * np.log(2)))
+        gauss = self.createGaussianMask((x, y), sigma)
+        fftFiltered = fftPixels * gauss
+        ifftShift = np.fft.ifftshift(fftFiltered)
+        filteredPixels = np.abs(np.fft.ifft2(ifftShift))
+        return Channel(filteredPixels)
+
+    def applyHighPassFilterFromGaussianMask(self, FWHM: float):
+        fftPixels = self.fourierTransform()
+        x, y = self.createXYGridFromArray(fftPixels)
+        sigma = FWHM / (2 * np.sqrt(2 * np.log(2)))
+        gauss = 1 - self.createGaussianMask((x, y), sigma)
+        fftFiltered = fftPixels * gauss
+        ifftShift = np.fft.ifftshift(fftFiltered)
+        filteredPixels = np.abs(np.fft.ifft2(ifftShift))
+        return Channel(filteredPixels)
+
+    def applyLowPassFilterFromSigmoidMask(self, topRadius: float, inflectionPointSlope: float = 1 / 4):
+        fftPixels = self.fourierTransform()
+        x, y = self.createXYGridFromArray(fftPixels)
+        sigmoid = self.createSigmoidMask((x, y), topRadius, inflectionPointSlope)
+        plt.imshow(sigmoid)
+        plt.show()
+        fftFiltered = fftPixels * sigmoid
+        ifftShift = np.fft.ifftshift(fftFiltered)
+        filteredPixels = np.abs(np.fft.ifft2(ifftShift))
+        return Channel(filteredPixels)
+
+    def applyHighPassFilterFromSigmoidMask(self, bottomRadius: float, inflectionPointSlope: float = 1 / 4):
+        fftPixels = self.fourierTransform()
+        x, y = self.createXYGridFromArray(fftPixels)
+        sigmoid = 1 - self.createSigmoidMask((x, y), bottomRadius, inflectionPointSlope)
+        fftFiltered = fftPixels * sigmoid
+        ifftShift = np.fft.ifftshift(fftFiltered)
+        filteredPixels = np.abs(np.fft.ifft2(ifftShift))
+        return Channel(filteredPixels)
 
     def powerSpectrum(self) -> np.ndarray:
         fftShiftPixels = self.fourierTransform()
@@ -521,13 +558,14 @@ class Channel:
 
     def displayPowerSpectrum(self, logScale: bool = True) -> np.ndarray:
         powerSpectrum = self.powerSpectrum()
+        rows, cols = powerSpectrum.shape
         if logScale:
             powerSpectrum = np.log(powerSpectrum)
-        plt.imshow(powerSpectrum)
+        plt.imshow(powerSpectrum, extent=(-cols // 2, cols // 2, -rows // 2, rows // 2))
         plt.show()
         return powerSpectrum
 
-    def powerSpectrumDensity1Dimension(self, useSum=False) -> np.ndarray:
+    def powerSpectrumDensityAzimuthalAverage(self, useSum=False) -> np.ndarray:
         powerSpectrumDensity = self.powerSpectrum()
         heigth, width = powerSpectrumDensity.shape
         halfH, halfW = heigth // 2, width // 2
@@ -563,7 +601,46 @@ class Channel:
         pass
 
     def phaseSpectrum(self):
-        
+        pass
+
+    @staticmethod
+    def createXYGridFromArray(array: np.ndarray, gridOriginAtCenter: bool = True) -> typing.Tuple[
+        np.ndarray, np.ndarray]:
+        shape = array.shape
+        y, x = np.indices(shape)
+        if gridOriginAtCenter:
+            y, x = np.flipud(y - np.max(y) // 2), x - np.max(x) // 2
+        return x, y
+
+    @staticmethod
+    def createGaussianMask(XYGrids: typing.Tuple[np.ndarray, np.ndarray], sigma: float) -> np.ndarray:
+        x, y = XYGrids
+        gauss = np.exp(-(x ** 2 / (2 * sigma ** 2) + y ** 2 / (2 * sigma ** 2)))
+        return gauss
+
+    @staticmethod
+    def createSigmoidMask(XYGrids: typing.Tuple[np.ndarray, np.ndarray], radius: float,
+                          inflectionPointSlope: float) -> np.ndarray:
+        """
+        Create a sigmoid mask with the same shape as the image to mask.
+        :param XYGrids: Tuple with an array containing the x indices and another containing the y indices. The origin
+        must be at the center of the arrays.
+        Example:
+        x : [[-1 0 1]
+             [-1 0 1]
+             [-1 0 1]]
+        y : [[1 1 1]
+             [0 0 0]
+             [-1 -1 -1]]
+        :param radius: Radius of the top of the sigmoid function
+        :param inflectionPointSlope: The slope at the inflection point. The general sigmoid function is:
+        S(x) = 1/(1 + exp(-lambda x)
+        where lambda is proportionnal to the inflection slope (slope = lambda / 4).
+        :return: Array of values in the range [0, 1] following a 2D centered sigmoid function
+        """
+        x, y = XYGrids
+        sigmoid = 1 / (1 + np.exp(-4 * inflectionPointSlope * (radius - np.sqrt(x ** 2 + y ** 2))))
+        return sigmoid
 
 
 from .channelFloat import ChannelFloat
