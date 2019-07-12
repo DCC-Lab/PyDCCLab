@@ -64,9 +64,10 @@ class Dataset:
         self.labelTag = 'label'
 
         self.collections = dict()
-        self.type = None  # Classification, Semantic Classification, Regression (more for table data: Not implemented)...
-        self.supervised = None
-        self.model = None
+        self.collectionsInfo = dict()
+        self.info = {'type': None, 'supervised': None, 'model': None,
+                     'labels': {}, 'clsNames': {}, 'hasLabels': None,
+                     'validLabel': None}
 
         self.loadAllCollections()
 
@@ -109,13 +110,14 @@ class Dataset:
         for key in self.collections:
             imageFiles, labelFiles = self.collections[key]
             images = [Image(path=file) for file in imageFiles]
-            self.collections[key] = ImageCollection(images=images)
+            self.collections[key] = MLImageCollection(images=images)
+            self.collections[key].source = key
 
             if len(labelFiles) != 0:
                 labels = [Image(path=file).channels[0] for file in labelFiles]
                 self.collections[key].setLabelledComponents(labels=labels)
-                self.type = "Semantic classification"
-                self.supervised = True
+                self.info['type'] = "Semantic classification"
+                self.info['supervised'] = True
 
     def report(self):
         # Temporary
@@ -183,12 +185,12 @@ class Dataset:
                 for channel in image.channels:
                     channel.setLabelledComponents(source)
 
-        self.type = "Classification"
+        self.info['type'] = "Classification"
 
     def setModel(self, model=None):
         if model is None:
             # infer model...
-            if self.type is "Semantic classification":
+            if self.info['type'] is "Semantic classification":
                 # use resnet50... check size...
                 pass
 
@@ -224,13 +226,15 @@ class MLCollection:
     supportedTypes = ["Image", "Spectra"]
 
     def __new__(cls, data: List[np.ndarray]):
-        datatype = None
+        # An ML Collection is always a list of samples
         # check data dimensions and try to infer data type
 
-        if datatype == "Image":
-            return super(MLCollection, cls).__new__(MLImageCollection)
-        elif datatype == "Spectra":
+        if data[0].ndim == 1:
             return super(MLCollection, cls).__new__(MLSpectraCollection)
+        elif 1 < data[0].ndim <= 3:
+            return super(MLCollection, cls).__new__(MLImageCollection)
+        else:
+            raise NotImplementedError
 
     def augment(self):
         pass
