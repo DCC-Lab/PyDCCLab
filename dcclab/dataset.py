@@ -127,10 +127,22 @@ class Dataset:
         infoKeys = [k for k in infoKeys if k in self.collectionsInfo]
         df = pd.DataFrame(self.collectionsInfo, columns=infoKeys)
 
-        print("Collections Info\n", df.to_string(index=False), "\n")
+        print("# Collections Info\n{}\n".format(df.to_string()))
 
-        print("Dataset Info\n", json.dumps(self.info, indent=4))
-        # todo: dataset classes info dataframe
+        if self.info["hasLabels"]:
+            classInfo = []
+            for i, (value, name) in enumerate(self.info['clsNames'].items()):
+                count = self.info['clsCounts'][i]
+                ratio = self.info['clsRatios'][i]
+                classDict = {'name': name, 'value': value, 'count': count, 'ratio': ratio}
+                classInfo.append(classDict)
+
+            df = pd.DataFrame(classInfo, columns=['name', 'value', 'count', 'ratio']).sort_values(by='value')
+            df.rename(columns={'name': 'name      '}, inplace=True)
+            print("# Class Info\n{}\n".format(df.to_string(index=False)))
+
+        df = pd.DataFrame.from_records([self.info], columns=['hasLabels', 'validLabel', 'nbOfClasses', 'type', 'supervised', 'model'])
+        print("# Dataset Info\n{}\n".format(df.T.to_string(header=False)))
 
         # - pixel values for the labels correspond to class indexes
         # - image format is png
