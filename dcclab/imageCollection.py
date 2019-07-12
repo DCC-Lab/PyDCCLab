@@ -206,11 +206,11 @@ class ImageCollection:
             raise NotImplementedError
 
     @property
-    def labelValues(self) -> dict:
-        uniqueValues = dict()  # {value: count, ... }
+    def labelInfo(self) -> dict:
+        uniqueValues = dict()
         for image in self.images:
             for channel in image.channels:
-                # check if its semantic
+                # todo: check if its semantic ?
                 values, counts = np.unique(channel.labelledComponents, return_counts=True)
                 for value, count in zip(values, counts):
                     if value not in uniqueValues:
