@@ -1,10 +1,16 @@
 import env
 from dcclab import *
 import unittest
+from unittest.mock import Mock, patch
 import numpy as np
 
 
 class TestChannels(env.DCCLabTestCase):
+
+    def testInitWithComplexValues(self):
+        array = np.ones((100, 100), dtype=complex) * (1 + 23.45j)
+        with self.assertRaises(PixelTypeException):
+            Channel(array)
 
     def testInitWith2DIntArray(self):
         array = np.ones((100, 100), dtype=np.int)
@@ -30,6 +36,11 @@ class TestChannels(env.DCCLabTestCase):
         array = np.random.randint(low=0, high=255, size=(100, 200))
         channel = Channel(pixels=array)
         self.assertEqual(array.all(), channel.pixels.all())
+
+    def testStringRepresentation(self):
+        array = np.random.randint(low=0, high=255, size=(100, 200), dtype=np.uint8)
+        channel = Channel(pixels=array)
+        self.assertEqual(str(array), str(channel))
 
     def testInitCopiesPixels(self):
         array = np.random.randint(low=0, high=255, size=(100, 200))
@@ -95,24 +106,163 @@ class TestChannels(env.DCCLabTestCase):
         array = np.random.randint(low=0, high=255, size=(100, 200))
         self.assertFalse(Channel(pixels=array).isBinary)
 
-    # def testHistogramValues(self):
-    #     array = np.random.randint(low=0, high=2, size=(100, 200))
-    #     hist, bins = Channel(pixels=array).getHistogramValues(True)
-    #     self.assertAlmostEqual(sum(hist), 1, delta=1e-9)
+    @patch("matplotlib.pyplot.show", new=Mock())
+    def testDisplayHistogramNormalized(self):
+        channel = Channel(np.random.randint(0, 255, (10, 10), dtype=np.uint8))
+        histValues, histBins = channel.getHistogramValues(True)
+        displayValues, displayBins = channel.displayHistogram(True)
+        self.assertTrue(np.array_equal(histValues, displayValues))
+        self.assertTrue(np.array_equal(histBins, displayBins))
 
-    # def testHistogramValuesNotNormalized(self):
-    #     array = np.ones((5, 5), dtype=np.float32)
-    #     channel = Channel(pixels=array)
-    #     hist = [0, 25]
-    #     bins = [0, 1, 2]
-    #     self.assertTrue(np.alltrue(channel.getHistogramValues()[0] == hist) and np.alltrue(
-    #         channel.getHistogramValues()[-1] == bins))
+    @patch("matplotlib.pyplot.show", new=Mock())
+    def testDisplayChannel(self):
+        channel = Channel(np.random.randint(0, 255, (10, 10), dtype=np.uint8))
+        obj = channel.display()
+        self.assertEqual(obj, channel)
 
-    # def testHistogramValuesNormalized(self):
-    #     array = np.ones((5, 5), dtype=np.float32)
-    #     channel = Channel(pixels=array)
-    #     hist, bins = channel.getHistogramValues(True)
-    #     self.assertAlmostEqual(sum(hist), 1, delta=1e-9)
+    def testApplySomethingChangesPixels(self):
+        channel = Channel(np.random.randint(0, 255, (10, 10), dtype=np.uint8))
+        originalPixels = channel.pixels
+        channel.applyXDerivative()
+        self.assertFalse(np.array_equal(originalPixels, channel.pixels))
+
+    def testRestoreOriginal(self):
+        channel = Channel(np.random.randint(0, 255, (10, 10), dtype=np.uint8))
+        originalPixels = channel.pixels
+        channel.applyXDerivative()
+        channel.restoreOriginal()
+        self.assertTrue(np.array_equal(originalPixels, channel.pixels))
+
+    def testRestoreOriginalNotSavedBefore(self):
+        channel = Channel(np.random.randint(0, 255, (10, 10), dtype=np.uint8))
+        self.assertIsNone(channel.restoreOriginal())
+
+    def testOriginalPixelsNone(self):
+        channel = Channel(np.random.randint(0, 255, (10, 10), dtype=np.uint8))
+        self.assertIsNone(channel.originalPixels)
+
+    def testOriginalPixels(self):
+        channel = Channel(np.random.randint(0, 255, (10, 10), dtype=np.uint8))
+        originalPixels = channel.pixels
+        channel.applyClosing(4)
+        self.assertTrue(np.array_equal(originalPixels, channel.originalPixels))
+
+    def testHasNoOriginalPixels(self):
+        channel = Channel(np.random.randint(0, 255, (10, 10), dtype=np.uint8))
+        self.assertFalse(channel.hasOriginal)
+
+    def testHasOriginalPixels(self):
+        channel = Channel(np.random.randint(0, 255, (10, 10), dtype=np.uint8))
+        channel.applyConvolution([[1, 2, 3], [-3, -2, -1]])
+        self.assertTrue(channel.hasOriginal)
+
+    def testReplaceFromArrayOriginalSaved(self):
+        channel = Channel(np.random.randint(0, 255, (10, 10), dtype=np.uint8))
+        channel.replaceFromArray(np.random.randint(0, 255, (11, 11), dtype=np.uint8))
+        self.assertTrue(channel.hasOriginal)
+
+    def testReplaceFromArrayException(self):
+        channel = Channel(np.random.randint(0, 255, (10, 10), dtype=np.uint8))
+        with self.assertRaises(AssertionError):
+            channel.replaceFromArray(np.array([1, 2, 3]))
+
+    def testReplaceFromArrayNewValues(self):
+        array = np.random.randint(0, 255, (10, 10), dtype=np.uint8)
+        channel = Channel(np.random.randint(0, 255, (100, 100), dtype=np.uint8))
+        channel.replaceFromArray(array)
+        self.assertTrue(np.array_equal(channel.pixels, array))
+
+    def testGetShannonEntropyArbitraryBase(self):
+        def entropy(array, base):
+            numberPixels = array.shape[0] * array.shape[1]
+            _, counts = np.unique(array, return_counts=True)
+            probArray = counts / np.sum(counts)
+            logArray = np.log(probArray) / np.log(base)
+            entropy = -np.sum(probArray * logArray)
+            return entropy
+
+        base = 0
+        while base <= 0:
+            baseCoeff = np.random.randint(1, 10, size=(1,))
+            base = np.random.rand() * baseCoeff
+        channel = Channel(np.random.randint(1, 255, (100, 100), dtype=np.uint8))
+        skimageEntropy = channel.getShannonEntropy(base)
+        testEntropy = entropy(channel.pixels, base)
+        self.assertAlmostEqual(testEntropy, skimageEntropy)
+
+    def testGetExtrema(self):
+        array = np.arange(0, 25, dtype=np.uint8).reshape((5, 5))
+        channel = Channel(array)
+        self.assertTupleEqual(channel.getExtrema(), (0, 24))
+
+    def testGetMedian(self):
+        array = np.arange(0, 100, dtype=np.uint8)
+        np.random.shuffle(array)
+        channel = Channel(array.reshape((10, 10)))
+        self.assertEqual(channel.getMedian(), 49.5)
+
+    def testPixelsOfIntensityOnTuple(self):
+        array = np.ones((100, 100)) * 0.236
+        i, j = np.random.randint(0, 100, (2,))
+        array[i, j] = 0.56
+        channel = Channel(array)
+        self.assertListEqual([(i, j)], channel.getPixelsOfIntensity(0.56))
+
+    def testPixlesOfIntensityRandomNumberOfTuple(self):
+        import operator
+        nbOfTuples = np.random.randint(1, 100)
+        listOfTuples = []
+        array = np.ones((132, 200)) * 0.14
+        for _ in range(nbOfTuples):
+            i, j = np.random.randint(0, 132), np.random.randint(0, 200)
+            array[i, j] = 0.001
+            listOfTuples.append((i, j))
+        channel = Channel(array)
+        listOfTuples = list(set(listOfTuples))
+        listOfTuples.sort(key=operator.itemgetter(0, 1))
+        self.assertListEqual(listOfTuples, channel.getPixelsOfIntensity(0.001))
+
+    def testGetMinimumIndicesOneValue(self):
+        array = np.ones((100, 100))
+        i, j = np.random.randint(0, 100, (2,))
+        array[i, j] = 0
+        channel = Channel(array)
+        self.assertListEqual([(i, j)], channel.getMinimum())
+
+    def testGetMinimumIndicesRandomNumberOfValues(self):
+        import operator
+        nbOfTuples = np.random.randint(1, 100)
+        listOfTuples = []
+        array = np.ones((132, 200))
+        for _ in range(nbOfTuples):
+            i, j = np.random.randint(0, 132), np.random.randint(0, 200)
+            array[i, j] = 0.99999
+            listOfTuples.append((i, j))
+        channel = Channel(array)
+        listOfTuples = list(set(listOfTuples))
+        listOfTuples.sort(key=operator.itemgetter(0, 1))
+        self.assertListEqual(listOfTuples, channel.getMinimum())
+
+    def testGetMaximumIndicesOneValue(self):
+        array = np.zeros((100, 100))
+        i, j = np.random.randint(0, 100, (2,))
+        array[i, j] = 1
+        channel = Channel(array)
+        self.assertListEqual([(i, j)], channel.getMaximum())
+
+    def testGetMaximumIndicesRandomNumberOfValues(self):
+        import operator
+        nbOfTuples = np.random.randint(1, 100)
+        listOfTuples = []
+        array = np.ones((132, 200))
+        for _ in range(nbOfTuples):
+            i, j = np.random.randint(0, 132), np.random.randint(0, 200)
+            array[i, j] = 1.0001
+            listOfTuples.append((i, j))
+        channel = Channel(array)
+        listOfTuples = list(set(listOfTuples))
+        listOfTuples.sort(key=operator.itemgetter(0, 1))
+        self.assertListEqual(listOfTuples, channel.getMaximum())
 
     def testConvolution(self):
         # FIXME: test result
@@ -149,6 +299,15 @@ class TestChannels(env.DCCLabTestCase):
         array = np.array([[0, 1, 2], [0, 1, 2], [0, 1, 2]])
         channel = Channel(pixels=array).getStandardDeviation()
         self.assertIsNotNone(channel)
+
+    @patch("matplotlib.pyplot.show", new=Mock())
+    def testMultichannelDisplay(self):
+        listOfChannel = []
+        nbChannel = np.random.randint(1, 10)
+        for i in range(nbChannel):
+            listOfChannel.append(Channel(np.random.randint(0, 255, (1000, 10000), np.uint8)))
+        returnList = Channel.multiChannelDisplay(listOfChannel)
+        self.assertListEqual(returnList, listOfChannel)
 
 
 class TestChannelsSegmentation(env.DCCLabTestCase):
@@ -197,6 +356,12 @@ class TestChannelsSegmentation(env.DCCLabTestCase):
         properties = channel.analyzeComponents()
         self.assertTrue(channel.numberOfComponents == 2)
         self.assertIsNotNone(properties)
+
+    def testAnalyzeComponentsException(self):
+        channel = Channel(np.random.randint(1, 255, (100, 100), dtype=np.uint8))
+        with self.assertRaises(ValueError):
+            channel.analyzeComponents()
+
 
     def testFilterNoise(self):
         array = np.array([[1, 0, 0, 0], [0, 2, 2, 0], [0, 0, 0, 3]])
@@ -338,7 +503,7 @@ class TestChannelSpectralFiltering(env.DCCLabTestCase):
             return 1 / (1 + np.exp(-expArg))
 
         handComputedMask = np.array(
-            [[sigmoid(1 - 2 ** (1 / 2)), 1 / 2, sigmoid(1 - 2 ** (1 / 2))], [1 / 2, sigmoid(-1), 1 / 2],
+            [[sigmoid(1 - 2 ** (1 / 2)), 1 / 2, sigmoid(1 - 2 ** (1 / 2))], [1 / 2, sigmoid(1), 1 / 2],
              [sigmoid(1 - 2 ** (1 / 2)), 1 / 2, sigmoid(1 - 2 ** (1 / 2))]])
         self.assertTrue(np.allclose(mask, handComputedMask))
 
@@ -347,8 +512,6 @@ class TestChannelSpectralFiltering(env.DCCLabTestCase):
         channel = image.channels[-1]
         fftChannel = np.fft.fft2(channel.pixels)
         fftShiftChannel = np.fft.fftshift(fftChannel)
-        for c in image.channels:
-            c.displayPowerSpectrum()
         amplitude = np.abs(fftShiftChannel) ** 2
         self.assertTrue(np.array_equal(channel.powerSpectrum(), amplitude))
 
@@ -363,15 +526,30 @@ class TestChannelSpectralFiltering(env.DCCLabTestCase):
         self.assertAlmostEqual(np.sqrt(ps[centerY, centerX]) / channel.numberOfPixels,
                                channel.getAverageValueOfPixels())
 
-    def testToto(self):
-        array = np.arange(0, 81).reshape((9, 9))
-        channel = Channel(array)
-        print(channel.powerSpectrumDensityAzimuthalAverage())
+    def testAzimuthalAverage(self):
+        array = np.array(
+            [[5, 4, 4, 4, 4, 4, 5, 5], [4, 3, 3, 3, 3, 3, 4, 5], [3, 2, 2, 2, 2, 2, 3, 4], [3, 2, 1, 1, 1, 2, 3, 4],
+             [3, 2, 1, 0, 1, 2, 3, 4], [3, 2, 1, 1, 1, 2, 3, 4], [3, 2, 2, 2, 2, 2, 3, 4], [4, 3, 3, 3, 3, 3, 4, 5]],
+            dtype=np.uint8)
+        azmAvg = Channel.azimuthalAverage(array).tolist()
+        self.assertListEqual(azmAvg, [0, 1, 2, 3, 4, 5])
 
-    def test(self):
-        array = np.ones((8, 8))
+    def testPowerSpectrumDensityAzimuthalAverage(self):
+        array = np.arange(0, 25, dtype=np.uint8).reshape((5, 5))
         channel = Channel(array)
-        Channel.azimuthalAverage(array)
+        powerSpectrum = np.array([[3.10064460e-30, 1.97215226e-31, 4.31864379e+03, 1.97215226e-31, 3.10064460e-30],
+                                  [8.92963732e-31, 0.00000000e+00, 1.13063562e+04, 0.00000000e+00, 8.92963732e-31],
+                                  [1.72745751e+02, 4.52254249e+02, 9.00000000e+04, 4.52254249e+02, 1.72745751e+02],
+                                  [8.92963732e-31, 0.00000000e+00, 1.13063562e+04, 0.00000000e+00, 8.92963732e-31],
+                                  [3.10064460e-30, 1.97215226e-31, 4.31864379e+03, 1.97215226e-31, 3.10064460e-30]])
+        meanRadius2 = (np.sum(powerSpectrum[0, :]) + np.sum(powerSpectrum[-1, :]) + np.sum(
+            powerSpectrum[1:-1, 0]) + np.sum(powerSpectrum[1:-1, -1])) / 16
+        meanRadius1 = np.mean(
+            [0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 4.52254249e+02, 4.52254249e+02,
+             1.13063562e+04, 1.13063562e+04])
+        meandRadius0 = 9e+04
+        handComputedAzimuthalAverage = [meandRadius0, meanRadius1, meanRadius2]
+        self.assertTrue(np.allclose(handComputedAzimuthalAverage, channel.powerSpectrumDensityAzimuthalAverage()))
 
 
 if __name__ == '__main__':
