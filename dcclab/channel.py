@@ -332,21 +332,17 @@ class Channel:
         return self.getShannonEntropy(base=base)
 
     def getShannonEntropy(self, base=2) -> float:
-        return measure.shannon_entropy(self.pixels, base)
+        return measure.shannon_entropy(self.pixels, base)[0]
 
     @deprecated("Renamed getExtrema()")
-    def getExtremaValuesOfPixels(self) -> typing.Tuple[int, int]:
+    def getExtremaValuesOfPixels(self) -> typing.Tuple[typing.Union[int, float], typing.Union[int, float]]:
         return self.getExtrema()
 
-    def getExtrema(self) -> typing.Tuple[int, int]:
+    def getExtrema(self) -> typing.Tuple[typing.Union[int, float], typing.Union[int, float]]:
         return np.min(self.pixels), np.max(self.pixels)
 
     def getMedian(self):
-        import time
-        before = time.clock()
         median = np.median(self.pixels)
-        after = time.clock()
-        print("Median cpu time : {}".format(after - before))
         return median
 
     def getPixelsOfIntensity(self, intensity: float) -> typing.List[tuple]:
@@ -363,7 +359,7 @@ class Channel:
         return self.getMinimum()
 
     def getMinimum(self) -> typing.List[typing.Tuple[int, int]]:
-        minimum = self.getExtremaValuesOfPixels()[0]
+        minimum = self.getExtrema()[0]
         return self.getPixelsOfIntensity(minimum)
 
     @deprecated("Renamed getMaximum()")
@@ -371,7 +367,7 @@ class Channel:
         return self.getMaximum()
 
     def getMaximum(self) -> typing.List[tuple]:
-        maximum = self.getExtremaValuesOfPixels()[1]
+        maximum = self.getExtrema()[1]
         return self.getPixelsOfIntensity(maximum)
 
     def getEntropyFilter(self, filterSize: int):
@@ -464,13 +460,14 @@ class Channel:
         pass
 
     @staticmethod
-    def multiChannelDisplay(channels: list):
+    def multiChannelDisplay(channels: list) -> list:
         nrows = int(np.ceil(len(channels) / 4))
         ncols = len(channels) if len(channels) < 4 else 4
         for i in range(len(channels)):
             plt.subplot(nrows, ncols, i + 1)
             plt.imshow(channels[i].pixels)
         plt.show()
+        return channels
 
     def applyHighPassFilterFromRetcangularMask(self, filterSize: int):
         fftShiftPixels = self.fourierTransform()
@@ -565,19 +562,13 @@ class Channel:
         plt.show()
         return powerSpectrum
 
-    def powerSpectrumDensityAzimuthalAverage(self, useSum=False) -> np.ndarray:
+    def powerSpectrumDensityAzimuthalAverage(self) -> np.ndarray:
         powerSpectrumDensity = self.powerSpectrum()
-        heigth, width = powerSpectrumDensity.shape
-        halfH, halfW = heigth // 2, width // 2
-        Y, X = np.ogrid[0:heigth, 0:width]
-        radii = np.hypot(X - halfW, Y - halfH).astype(int)
-        print(radii)
-        function = ndimage.sum if useSum else ndimage.mean
-        ps1D = function(powerSpectrumDensity, radii, index=np.arange(0, halfW))
+        ps1D = self.azimuthalAverage(powerSpectrumDensity)
         return ps1D
 
-    def displayPowerSpectrumDensity1D(self, logBase: float = None, useSum: bool = False) -> np.ndarray:
-        ps1D = self.powerSpectrumDensityAzimuthalAverage(useSum)
+    def displayPowerSpectrumDensityAzimuthalAverage(self, logBase: float = None) -> np.ndarray:
+        ps1D = self.powerSpectrumDensityAzimuthalAverage()
         x = range(len(ps1D))
         plt.plot(x, ps1D)
         if logBase is not None:
@@ -617,7 +608,7 @@ class Channel:
     @staticmethod
     def createGaussianMask(XYGrids: typing.Tuple[np.ndarray, np.ndarray], sigma: float) -> np.ndarray:
         x, y = XYGrids
-        gauss = np.exp(-(x ** 2 / (2 * sigma ** 2) + y ** 2 / (2 * sigma ** 2)))
+        gauss = np.exp(-(x ** 2 + y ** 2) / (2 * sigma ** 2))
         return gauss
 
     @staticmethod
@@ -646,16 +637,24 @@ class Channel:
 
     @staticmethod
     def azimuthalAverage(array: np.ndarray) -> np.ndarray:
-        heigth, width = array.shape
-        halfH, halfW = heigth // 2, width // 2
-        Y, X = np.ogrid[0:heigth, 0:width]
-        radii = np.hypot(X - halfW, Y - halfH).astype(int)
+        """
+        Computes the average value of the array for element with the same radius label.
+        Example:
+        array = [0,1,2]
+                [2,2,3]
+                [1,4,2]
+        radiiLabel = [1,1,1]
+                     [1,0,1]
+                     [1,1,1]
+        The average (depending on the radius value) is then computed. For this example, the average would be:
+        avg = [2, 1.875] (2 for the mean of radius 0, 1.875 for the mean of radius 1)
+        :param array: Array to use for the computation of the mean
+        :return: An array containing the mean of each radius present (the index of the array represent the radius value)
+        """
         x, y = Channel.createXYGridsFromArray(array)
-        radii2 = (x ** 2 + y ** 2) ** (1 / 2)
-        print(radii)
-        print(radii2.astype(int))
-        print(np.array_equal(radii, radii2.astype(int)))
-        return ndimage.mean(array, radii, index=np.arange(0, halfW))
+        radii = ((x ** 2 + y ** 2) ** (1 / 2)).astype(int)
+        index = np.unique(radii)
+        return ndimage.mean(array, radii, index=index)
 
 
 from .channelFloat import ChannelFloat
