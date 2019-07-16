@@ -471,42 +471,33 @@ class Channel:
 
     def applyHighPassFilterFromRetcangularMask(self, filterSize: int):
         fftShiftPixels = self.fourierTransform()
-        rows, cols = self.pixels.shape
-        halfRows, halfCols = rows // 2, cols // 2
-        fftShiftPixels[halfRows - filterSize:halfRows + filterSize,
-        halfCols - filterSize:halfCols + filterSize] = 0
-        ifftShift = np.fft.ifftshift(fftShiftPixels)
-        filteredPixels = np.abs(np.fft.ifft2(ifftShift))
-        return Channel(filteredPixels)
-
-    def applyLowPassFilterFromRectangularMask(self, filterSize: int):
-        fftShiftPixels = self.fourierTransform()
-        rows, cols = self.pixels.shape
-        halfRows, halfCols = rows // 2, cols // 2
-        mask = np.zeros((rows, cols), np.uint8)
-        mask[halfRows - filterSize:halfRows + filterSize, halfCols - filterSize:halfCols + filterSize] = 1
+        XY = self.createXYGridsFromArray(fftShiftPixels)
+        mask = 1 - self.createRectangularMask(XY, filterSize)
         fftShiftPixelsWithMask = fftShiftPixels * mask
         ifftShift = np.fft.ifftshift(fftShiftPixelsWithMask)
         filteredPixels = np.abs(np.fft.ifft2(ifftShift))
         return Channel(filteredPixels)
 
-    def applyHighPassFilterFromFractionOfImage(self, removeFraction: float = 0.1):
-        fftPixels = self.fourierTransform(False)
-        rows, cols = fftPixels.shape
-        mask = np.zeros_like(fftPixels, dtype=np.uint8)
-        mask[int(rows * removeFraction):int(rows * (1 - removeFraction))] = 1
-        mask[:, int(cols * removeFraction):int(cols * (1 - removeFraction))] = 1
-        fftPixels = mask * fftPixels
-        filteredPixels = np.abs(np.fft.ifft2(fftPixels))
+    def applyLowPassFilterFromRectangularMask(self, filterSize: int):
+        fftShiftPixels = self.fourierTransform()
+        XY = self.createXYGridsFromArray(fftShiftPixels)
+        mask = self.createRectangularMask(XY, filterSize)
+        fftShiftPixelsWithMask = fftShiftPixels * mask
+        ifftShift = np.fft.ifftshift(fftShiftPixelsWithMask)
+        filteredPixels = np.abs(np.fft.ifft2(ifftShift))
         return Channel(filteredPixels)
 
-    def applyLowPassFilterFromFractionOfImage(self, keepFraction: float = 0.1):
-        fftPixels = self.fourierTransform(False)
-        rows, cols = fftPixels.shape
-        fftPixels[int(rows * keepFraction):int(rows * (1 - keepFraction))] = 0
-        fftPixels[:, int(cols * keepFraction):int(cols * (1 - keepFraction))] = 0
-        filteredPixels = np.abs(np.fft.ifft2(fftPixels))
-        return Channel(filteredPixels)
+    def applyBandpassFilterFromRectangularMask(self, cutIn: int, cutOff: int) -> np.ndarray:
+        fftShiftPixels = self.fourierTransform()
+        XY = self.createXYGridsFromArray(fftShiftPixels)
+        lowPassMask = self.createRectangularMask(XY, cutIn)
+        highPassMask = 1 - self.createRectangularMask(XY, cutOff)
+        plt.imshow(np.concatenate((highPassMask, lowPassMask)))
+        plt.show()
+        bandpass = 1 - np.clip(lowPassMask + highPassMask, 0, 1)
+        plt.imshow(1 - (lowPassMask + highPassMask))
+        plt.show()
+        print(bandpass)
 
     def applyLowPassFilterFromGaussianMask(self, FWHM: float):
         fftPixels = self.fourierTransform(True)
@@ -634,6 +625,22 @@ class Channel:
         x, y = XYGrids
         sigmoid = 1 / (1 + np.exp(-4 * inflectionPointSlope * (radius - np.sqrt(x ** 2 + y ** 2))))
         return sigmoid
+
+    @staticmethod
+    def createRectangularMask(XYGrids: typing.Tuple[np.ndarray, np.ndarray], size: int) -> np.ndarray:
+        x, y = XYGrids
+        demiSize1 = size // 2
+        demiSize2 = demiSize1 if size % 2 == 0 else demiSize1 + 1
+        maskX = ((x < 0) & (np.abs(x) < demiSize2)) | (~(x < 0) & (np.abs(x) <= demiSize1))
+        maskY = ((y < 0) & (np.abs(y) < demiSize2)) | (~(y < 0) & (np.abs(y) <= demiSize1))
+        mask = maskX & maskY
+        return mask.astype(np.uint8)
+
+    @staticmethod
+    def createCircularMask(XYGrids: typing.Tuple[np.ndarray, np.ndarray], radius: float) -> np.ndarray:
+        x, y = XYGrids
+        mask = (x ** 2 + y ** 2 - radius ** 2) <= 0
+        return mask.astype(np.uint8)
 
     @staticmethod
     def azimuthalAverage(array: np.ndarray) -> np.ndarray:
