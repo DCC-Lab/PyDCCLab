@@ -70,6 +70,12 @@ class Database:
 
         self.connect()
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.disconnect()
+
     @property
     def path(self):
         path = pathlib.Path(self.__path)
@@ -195,7 +201,6 @@ class Database:
     # to write something else. It has the potential of corrupting entries
     # if the database crashed or there is a power failure. 
     # However, asynchronus mode is much faster.
-
         if self.isConnected:
                 self.execute('PRAGMA synchronous = OFF')
 
@@ -213,12 +218,6 @@ class Database:
     def endTransaction(self):
         if self.isConnected:
             self.execute('END TRANSACTION')
-
-    def begin(self):
-        self.beginTransaction()
-
-    def end(self):
-        self.endTransaction()
 
     # TODO Is this a necessary function?
     # If not, delete.
