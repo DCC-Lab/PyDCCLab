@@ -487,17 +487,16 @@ class Channel:
         filteredPixels = np.abs(np.fft.ifft2(ifftShift))
         return Channel(filteredPixels)
 
-    def applyBandpassFilterFromRectangularMask(self, cutIn: int, cutOff: int) -> np.ndarray:
+    def applyBandpassFilterFromRectangularMask(self, cutIn: int, cutOff: int):
         fftShiftPixels = self.fourierTransform()
         XY = self.createXYGridsFromArray(fftShiftPixels)
         lowPassMask = self.createRectangularMask(XY, cutIn)
         highPassMask = 1 - self.createRectangularMask(XY, cutOff)
-        plt.imshow(np.concatenate((highPassMask, lowPassMask)))
-        plt.show()
-        bandpass = 1 - np.clip(lowPassMask + highPassMask, 0, 1)
-        plt.imshow(1 - (lowPassMask + highPassMask))
-        plt.show()
-        print(bandpass)
+        bandpass = 1 - (lowPassMask + highPassMask)
+        fftFiltered = fftShiftPixels * bandpass
+        ifftShift = np.fft.ifftshift(fftFiltered)
+        filteredPixels = np.abs(np.fft.ifft2(ifftShift))
+        return Channel(filteredPixels)
 
     def applyLowPassFilterFromGaussianMask(self, FWHM: float):
         fftPixels = self.fourierTransform(True)
@@ -519,6 +518,9 @@ class Channel:
         filteredPixels = np.abs(np.fft.ifft2(ifftShift))
         return Channel(filteredPixels)
 
+    def applyBandpassFilterFromGaussianMask(self, parameter):
+        pass
+
     def applyLowPassFilterFromSigmoidMask(self, topRadius: float, inflectionPointSlope: float = 1 / 4):
         fftPixels = self.fourierTransform()
         x, y = self.createXYGridsFromArray(fftPixels)
@@ -535,6 +537,33 @@ class Channel:
         x, y = self.createXYGridsFromArray(fftPixels)
         sigmoid = 1 - self.createSigmoidMask((x, y), bottomRadius, inflectionPointSlope)
         fftFiltered = fftPixels * sigmoid
+        ifftShift = np.fft.ifftshift(fftFiltered)
+        filteredPixels = np.abs(np.fft.ifft2(ifftShift))
+        return Channel(filteredPixels)
+
+    def applyLowPassFilterFromCircularMask(self, radius: float):
+        fftPixels = self.fourierTransform()
+        XY = self.createXYGridsFromArray(fftPixels)
+        mask = self.createCircularMask(XY, radius)
+        fftFiltered = fftPixels * mask
+        ifftShift = np.fft.ifftshift(fftFiltered)
+        filteredPixels = np.abs(np.fft.ifft2(ifftShift))
+        return Channel(filteredPixels)
+
+    def applyHighPassFilterFromCircularMask(self, radius: float):
+        fftPixels = self.fourierTransform()
+        XY = self.createXYGridsFromArray(fftPixels)
+        mask = 1 - self.createCircularMask(XY, radius)
+        fftFiltered = fftPixels * mask
+        ifftShift = np.fft.ifftshift(fftFiltered)
+        filteredPixels = np.abs(np.fft.ifft2(ifftShift))
+        return Channel(filteredPixels)
+
+    def applyBandpassFilterFromCircularMask(self, cutIn: float, cutOff: float):
+        fftPixels = self.fourierTransform()
+        x, y = self.createXYGridsFromArray(fftPixels)
+        mask = ((x ** 2 + y ** 2) ** (1 / 2) - cutIn) ** 2 <= cutOff ** 2
+        fftFiltered = fftPixels * mask.astype(np.uint8)
         ifftShift = np.fft.ifftshift(fftFiltered)
         filteredPixels = np.abs(np.fft.ifft2(ifftShift))
         return Channel(filteredPixels)
