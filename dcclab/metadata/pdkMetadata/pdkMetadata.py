@@ -3,11 +3,11 @@ class pdkMetadata:
     # The metadata is in a .ini file within the same folder as the .raw file.
     def __init__(self, filePath):
         self.filePath = filePath
-        acquisitionFrequency = None
-        acquisitionType = None
-        imageDimension = None
-        objective = None
-        numberOfFrames = None
-        simulation = None
-        notes = None
+        self.acquisitionFrequency = None
+        self.acquisitionType = None
+        self.imageDimension = None
+        self.objective = None
+        self.numberOfFrames = None
+        self.simulation = None
+        self.notes = None
 
