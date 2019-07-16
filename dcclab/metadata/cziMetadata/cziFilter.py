@@ -37,15 +37,15 @@ class CZIFilter:
 
     def setCutIn(self):
         try:
-            return self.root.find('./Metadata/Information/Instrument/Filters/Filter[@Id="{}"]'
-                                  '/TransmittanceRange/CutIn'.format(self.filterId)).text
+            return int(self.root.find('./Metadata/Information/Instrument/Filters/Filter[@Id="{}"]'
+                                      '/TransmittanceRange/CutIn'.format(self.filterId)).text)
         except Exception:
             return None
 
     def setCutOut(self):
         try:
-            return self.root.find('./Metadata/Information/Instrument/Filters/Filter[@Id="{}"]'
-                                  '/TransmittanceRange/CutOut'.format(self.filterId)).text
+            return int(self.root.find('./Metadata/Information/Instrument/Filters/Filter[@Id="{}"]'
+                                      '/TransmittanceRange/CutOut'.format(self.filterId)).text)
         except Exception:
             return None
 
@@ -58,8 +58,8 @@ class CZIFilter:
 
     def setDichroic(self):
         try:
-            return self.root.find('./Metadata/Information/Instrument/Dichroics/'
-                                  'Dichroic[@Id="{}"]/Wavelengths/Wavelength'.format(self.dichroicId)).text
+            return int(self.root.find('./Metadata/Information/Instrument/Dichroics/'
+                                      'Dichroic[@Id="{}"]/Wavelengths/Wavelength'.format(self.dichroicId)).text)
         except Exception:
             return None
 
