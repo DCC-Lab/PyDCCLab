@@ -1,38 +1,29 @@
 import env
-from dcclab import Database as db
 import unittest
 import os
-from pathlib import Path, PureWindowsPath
-import tempfile
+from dcclab import Database as db
+
 
 class TestDatabase(env.DCCLabTestCase):
     def setUp(self):
         self.directory = self.dataDir
-        self.filePath = os.path.join(self.tmpDir, 'unittest.db')
-        self.wrongFile = os.path.join(self.directory, 'wrongfile.db')
+        self.filePath = os.path.join(str(self.tmpDir), 'unittest.db')
+        self.wrongFile = os.path.join(str(self.directory), 'wrongfile.db')
 
-        # For testing purpose, a fake database has to be built.
-        self.database = db(self.filePath, writePermission=True)
-        self.database.connect()
+        with db(self.filePath, True) as testDB:
+            testDB.beginTransaction()
+            testTable = {'test_table': {'column_1': 'INTEGER PRIMARY KEY', 'column_2': 'TEXT', 'column_3': 'REAL'}}
+            testDB.createTable(testTable)
+            testDB.commit()
 
-        # We create a fake table.
-        self.database.begin()
-        testTable = {'test_table': {'column_1': 'INTEGER PRIMARY KEY', 'column_2': 'TEXT', 'column_3': 'REAL'}}
-        self.database.createTable(testTable)
-        self.database.commit()
-
-        # We create fake data and insert it into the table.
-        self.database.begin()
-        frstValue = {'column_1': 1234, 'column_2': 'abcd', 'column_3': 0.1234}
-        scndValue = {'column_1': 5678, 'column_2': 'efgh', 'column_3': 0.5678}
-        self.database.insert('test_table', frstValue)
-        self.database.insert('test_table', scndValue)
-        self.database.commit()
-        self.database.disconnect()
+            testDB.beginTransaction()
+            frstValue = {'column_1': 1234, 'column_2': 'abcd', 'column_3': 0.1234}
+            scndValue = {'column_1': 5678, 'column_2': 'efgh', 'column_3': 0.5678}
+            testDB.insert('test_table', frstValue)
+            testDB.insert('test_table', scndValue)
+            testDB.commit()
 
     def tearDown(self):
-        # At the end of the test, we delete the database.
-        self.database.disconnect()
         os.remove(self.filePath)
 
     def testConnectSuccessful(self):
@@ -81,7 +72,7 @@ class TestDatabase(env.DCCLabTestCase):
         database.disconnect()
 
     def testIsNotConnected(self):
-        database = db("blablabla")
+        database = db("notADatabase")
         self.assertFalse(database.isConnected)
 
     def testChangeConnectionModeToValidMode(self):
@@ -118,13 +109,13 @@ class TestDatabase(env.DCCLabTestCase):
         database.connect()
 
         testValue = {'column_1': 9101, 'column_2': 'plop', 'column_3': 0.9101}
-        database.begin()
+        database.beginTransaction()
         database.insert('test_table', testValue)
         database.rollback()
 
-        database.begin()
+        database.beginTransaction()
         row = database.select('test_table', 'column_1', 'column_1=9101')
-        database.end()
+        database.endTransaction()
         self.assertFalse(row)
         database.disconnect()
 
@@ -218,6 +209,12 @@ class TestDatabase(env.DCCLabTestCase):
 
         row = database.fetchOne()
         self.assertFalse(row)
+
+    def testContextManager(self):
+        with db(self.filePath) as database:
+            self.assertTrue(database.isConnected)
+
+        self.assertFalse(database.isConnected)
 
 
 if __name__ == '__main__':

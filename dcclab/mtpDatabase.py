@@ -20,7 +20,7 @@ if __name__ == '__main__':
     print('Connecting to database...')
     if os.path.exists(mtpPath):
         print('Database already exists.')
-        database = Database(mtpPath, 'rw')
+        database = Database(mtpPath, True)
         print('Dropping all existing tables...')
         database.dropTable('Data-souris')
         database.dropTable('Data-Utilisation')
@@ -30,7 +30,7 @@ if __name__ == '__main__':
         print('Done.')
     else:
         print("Database doesn't exist yet. Creating it...")
-        database = Database(mtpPath, 'rwc')
+        database = Database(mtpPath, True)
         print('Done.')
 
     print('Connecting to database...')
@@ -60,7 +60,7 @@ if __name__ == '__main__':
 
     # We create tables for the metadata.
     print('Creating tables for the .csv metadata...')
-    database.begin()
+    database.beginTransaction()
     database.createTable(miceMetadata.keys)
     database.createTable(utilMetadata.keys)
     database.commit()
@@ -69,14 +69,14 @@ if __name__ == '__main__':
     # We insert the .csv Metadata into the tables.
     print('Inserting metadata into the database...')
     entries = miceMetadata.metadata
-    database.begin()
+    database.beginTransaction()
     for line in entries.keys():
         database.insert('Data-souris', entries[line])
     database.commit()
     print('Data-souris was processed for {} lines...'.format(len(entries)))
 
     entries = utilMetadata.metadata
-    database.begin()
+    database.beginTransaction()
     for line in entries.keys():
         database.insert('Data-Utilisation', entries[line])
     database.commit()
@@ -84,14 +84,14 @@ if __name__ == '__main__':
 
     # We now process the czi files into the database.
     # We create the tables.
-    database.begin()
+    database.beginTransaction()
     print('Creating the tables into the database...')
     cziMetadata = Metadata(files[0])
     database.createTable(cziMetadata.keys)
     print('Tables were created, processing the files...')
     database.commit()
 
-    database.begin()
+    database.beginTransaction()
     for file in files:
         print('Processing {}...'.format(file))
         cziMetadata = Metadata(file)
