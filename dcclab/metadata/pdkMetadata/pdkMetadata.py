@@ -5,7 +5,8 @@ class pdkMetadata:
         self.filePath = filePath
         self.acquisitionFrequency = None
         self.acquisitionType = None
-        self.imageDimension = None
+        self.xSize = None
+        self.ySize = None
         self.objective = None
         self.numberOfFrames = None
         self.simulation = None
