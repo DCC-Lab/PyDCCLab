@@ -519,6 +519,7 @@ class Channel:
         return Channel(filteredPixels)
 
     def applyBandpassFilterFromGaussianMask(self, parameter):
+        #todo
         pass
 
     def applyLowPassFilterFromSigmoidMask(self, topRadius: float, inflectionPointSlope: float = 1 / 4):
@@ -540,6 +541,18 @@ class Channel:
         ifftShift = np.fft.ifftshift(fftFiltered)
         filteredPixels = np.abs(np.fft.ifft2(ifftShift))
         return Channel(filteredPixels)
+
+    def applyBandpassFilterFromSigmoidMask(self, cutIn:int, cutOff:int, inflectionPointSlope: float = 1 / 4):
+        fftPixels = self.fourierTransform()
+        XY = self.createXYGridsFromArray(fftPixels)
+        lowPass = self.createSigmoidMask(XY, cutIn, inflectionPointSlope)
+        highPass = 1 - self.createSigmoidMask(XY, cutOff, inflectionPointSlope)
+        bandpass = 1 - (lowPass + highPass)
+        fftFiltered = fftPixels * bandpass
+        ifftShift = np.fft.ifftshift(fftFiltered)
+        filteredPixels = np.abs(np.fft.ifft2(ifftShift))
+        return Channel(filteredPixels)
+
 
     def applyLowPassFilterFromCircularMask(self, radius: float):
         fftPixels = self.fourierTransform()
@@ -613,8 +626,17 @@ class Channel:
     def applyPoissonNoise(self):
         pass
 
-    def phaseSpectrum(self):
-        pass
+    def phaseSpectrum(self, radians:bool=True) -> np.ndarray:
+        fftPixels = self.fourierTransform()
+        angles = np.angle(fftPixels, not radians)
+        return angles
+
+    def displayPhaseSpectrum(self, radians:bool=True) -> np.ndarray:
+        phaseSpectrum = self.phaseSpectrum(radians)
+        rows, cols = phaseSpectrum.shape
+        plt.imshow(phaseSpectrum, extent=(-cols // 2, cols // 2, -rows // 2, rows // 2))
+        plt.show()
+        return phaseSpectrum
 
     @staticmethod
     def createXYGridsFromArray(array: np.ndarray, gridOriginAtCenter: bool = True) -> typing.Tuple[
