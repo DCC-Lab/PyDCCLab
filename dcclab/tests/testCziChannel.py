@@ -8,7 +8,7 @@ import os
 
 class TestCziChannel(env.DCCLabTestCase):
     def setUp(self):
-        self.directory = self.dataDir
+        self.directory = str(self.dataDir)
         self.testPath = os.path.join(self.directory, 'testCziFile.czi')
         self.missingEntriesPath = os.path.join(self.directory, 'MissingEntries.xml')
         self.missingKeysPath = os.path.join(self.directory, 'MissingKeys.xml')
@@ -44,15 +44,15 @@ class TestCziChannel(env.DCCLabTestCase):
 
     def testSetBeamsplitterExpectedValue(self):
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
-        self.assertEqual(channel.beamsplitter, '495')
+        self.assertEqual(channel.beamSplitter, 495)
 
     def testSetBeamsplitterNotFound(self):
         channel = chnnl(['', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
-        self.assertIsNone(channel.beamsplitter)
+        self.assertIsNone(channel.beamSplitter)
 
     def testSetBeamsplitterNoFilters(self):
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], [], self.meta.root)
-        self.assertIsNone(channel.beamsplitter)
+        self.assertIsNone(channel.beamSplitter)
 
     def testSetReflectorExpectedValue(self):
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
@@ -98,7 +98,7 @@ class TestCziChannel(env.DCCLabTestCase):
 
     def testSetLightSourceIntensityExpectedValue(self):
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
-        self.assertEqual(channel.setLightSourceIntensity(), '58.32 %')
+        self.assertEqual(channel.setLightSourceIntensity(), 58.32)
 
     def testSetLightSourceIntensityMissingKeys(self):
         channel = chnnl(['', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
@@ -140,7 +140,7 @@ class TestCziChannel(env.DCCLabTestCase):
 
     def testSetExWavelengthExpectedValue(self):
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
-        self.assertEqual(channel.setExWavelength(), '488')
+        self.assertEqual(channel.setExWavelength(), 488)
 
     def testSetExWavelengthMissingKeys(self):
         channel = chnnl(['', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
@@ -154,7 +154,7 @@ class TestCziChannel(env.DCCLabTestCase):
 
     def testSetEmWavelengthExpectedValue(self):
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
-        self.assertEqual(channel.setEmWavelength(), '509')
+        self.assertEqual(channel.setEmWavelength(), 509)
 
     def testSetEmWavelengthMissingKeys(self):
         channel = chnnl(['', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
@@ -168,7 +168,7 @@ class TestCziChannel(env.DCCLabTestCase):
 
     def testSetExposureTimeExpectedValue(self):
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
-        self.assertEqual(channel.setExposureTime(), '950000000')
+        self.assertEqual(channel.setExposureTime(), 950.0)
 
     def testSetExposureTimeMissingKeys(self):
         channel = chnnl(['', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
@@ -182,7 +182,7 @@ class TestCziChannel(env.DCCLabTestCase):
 
     def testSetEffectiveNAExpectedValue(self):
         channel = chnnl(['Channel:0', 'EGFP', 'testCziFile.czi'], self.meta.filters, self.meta.root)
-        self.assertEqual(channel.setEffectiveNA(), '0.15')
+        self.assertEqual(channel.setEffectiveNA(), 0.15)
 
     def testSetEffectiveNAMissingEntries(self):
         tree = ET.parse(self.missingEntriesPath)

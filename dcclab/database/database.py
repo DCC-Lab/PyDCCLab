@@ -1,7 +1,9 @@
+from zipfile import ZipFile
+from datetime import date
 import sqlite3 as lite
 import urllib.parse as parse
 import pathlib
-
+import os
 """
 General-purpose Databse() object.
 
@@ -53,7 +55,7 @@ cafeine2 server.
 
 
 class Database:
-    def __init__(self, path, writePermission=False):
+    def __init__(self, databasePath, writePermission=False):
         if writePermission is True:
             # Possible modes are read-only, read write and read write create
             # which are 'ro', 'rw', and 'rwc' respectively
@@ -64,8 +66,9 @@ class Database:
             raise ValueError("writePermission parameter must be true or false")
 
         self.__mode = mode
-        self.__path = path
+        self.__databasePath = databasePath
         self.__connection = None
+        self.__rows = None
         self.cursor = None
 
         self.connect()
@@ -78,7 +81,7 @@ class Database:
 
     @property
     def path(self):
-        path = pathlib.Path(self.__path)
+        path = pathlib.Path(self.__databasePath)
         return 'file:{}?mode={}'.format(parse.quote(path.as_posix(), safe=':/'), self.mode)
 
     @property
@@ -142,13 +145,15 @@ class Database:
         if self.isConnected:
             self.cursor.execute(statement)
 
-    def fetchAll(self):
+    def fetchAll(self) -> lite.Row:
         if self.isConnected:
-            return self.cursor.fetchall()
+            self.__rows = self.cursor.fetchall()
+            return self.__rows
 
-    def fetchOne(self):
+    def fetchOne(self) -> lite.Row:
         if self.isConnected:
-            return self.cursor.fetchone()
+            self.__rows = self.cursor.fetchone()
+            return self.__rows
 
     @property
     def tables(self) -> list:
@@ -157,15 +162,20 @@ class Database:
         results = list(map(lambda row: row['name'], rows))
         return results
 
+    def columns(self, table) -> list:  # FixMe Find a better name?
+        self.execute('SELECT * FROM "{}"'.format(table))
+        columns = [description[0] for description in self.cursor.description]
+        return columns
+
     def select(self, table, columns='*', condition=None) -> lite.Row:
         if condition is None:
             self.execute("SELECT {0} FROM {1}".format(columns, table))
-            rows = self.fetchAll()
+            self.__rows = self.fetchAll()
         else:
             self.execute("SELECT {0} FROM {1} WHERE {2}".format(
                 columns, table, condition))
-            rows = self.fetchAll()
-        return rows
+            self.__rows = self.fetchAll()
+        return self.__rows
 
     def createTable(self, metadata: dict):
         if self.isConnected:
@@ -179,7 +189,7 @@ class Database:
 
     def dropTable(self, table: str):
         if self.isConnected:
-            statement = "DROP TABLE IF EXISTS {}".format(table)
+            statement = 'DROP TABLE IF EXISTS "{}"'.format(table)
             self.execute(statement)
 
     def insert(self, table: str, values: dict):
@@ -218,6 +228,17 @@ class Database:
     def endTransaction(self):
         if self.isConnected:
             self.execute('END TRANSACTION')
+
+    def createArchive(self):
+        # Before using this function, make sure that you have enough disk space available.
+        # TODO Should we check for available disk space?
+        if self.__rows is not None:
+            archive = '{}_query_archive.zip'.format(str(date.today()).replace('-', ''))
+            with ZipFile(archive, 'w') as zeep:
+                for row in self.__rows:
+                    filePath = row['file_path']
+                    fileName = os.path.basename(filePath)
+                    zeep.write(filePath, fileName)
 
     # TODO Is this a necessary function?
     # If not, delete.

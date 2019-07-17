@@ -7,8 +7,8 @@ import os
 
 
 class CZIMetadata:
-    def __init__(self, path, name=None):
-        self.path = path
+    def __init__(self, filePath, name=None):
+        self.filePath = filePath
         if name is not None:
             self.name = name
         else:
@@ -31,7 +31,7 @@ class CZIMetadata:
         self.tags = self.setTags()
 
     def __repr__(self):
-        return '{};{};{}'.format(self.path, self.filters, self.channels)
+        return '{};{};{}'.format(self.filePath, self.filters, self.channels)
 
     def __eq__(self, other):
         return repr(self) == repr(other)
@@ -40,7 +40,7 @@ class CZIMetadata:
         channelsAsDict = {}
         for channel in self.channels:
             channelsAsDict['{}'.format(channel.channel)] = channel.asDict()
-        metadataAsDict = {'path': self.path, 'channels': self.numberOfChannels, 'microscope': self.microscope,
+        metadataAsDict = {'file_path': self.filePath, 'channels': self.numberOfChannels, 'microscope': self.microscope,
                           'objective': self.objective, 'x_size': self.xSize, 'y_size': self.ySize,
                           'x_scale': self.xScale, 'y_scale': self.yScale, 'x_scaled': self.xScaled,
                           'y_scaled': self.yScaled, 'name': self.name, 'mouse_id': self.mouseId,
@@ -59,7 +59,7 @@ class CZIMetadata:
         channelsKeys = {}
         if self.channels:
             channelsKeys = self.channels[0].keys
-        metadataKeys = {'path': 'TEXT PRIMARY KEY', 'channels': 'INTEGER', 'microscope': 'TEXT', 'objective': 'TEXT',
+        metadataKeys = {'file_path': 'TEXT PRIMARY KEY', 'channels': 'INTEGER', 'microscope': 'TEXT', 'objective': 'TEXT',
                         'x_size': 'INTEGER', 'y_size': 'INTEGER', 'x_scale': 'REAL', 'y_scale': 'REAL',
                         'x_scaled': 'REAL', 'y_scaled': 'REAL', 'name': 'TEXT', 'mouse_id': 'INTEGER',
                         'viral_vectors': 'TEXT', 'injection_site': 'TEXT', 'tags': 'TEXT'}
@@ -67,13 +67,13 @@ class CZIMetadata:
 
     def nameFromPath(self):
         try:
-            return os.path.basename(self.path)
+            return os.path.basename(self.filePath)
         except Exception:
             return None
 
     def cziImageObjectFromPath(self):
         try:
-            return readCziImage(self.path)
+            return readCziImage(self.filePath)
         except FileNotFoundError:
             raise
         except ValueError:
@@ -159,39 +159,39 @@ class CZIMetadata:
 
     def setXScale(self):
         try:
-            return self.root.find('./Metadata/Scaling/Items/Distance[@Id="X"]/Value').text
+            return float(self.root.find('./Metadata/Scaling/Items/Distance[@Id="X"]/Value').text)
         except Exception:
             return None
 
     def setYScale(self):
         try:
-            return self.root.find('./Metadata/Scaling/Items/Distance[@Id="Y"]/Value').text
+            return float(self.root.find('./Metadata/Scaling/Items/Distance[@Id="Y"]/Value').text)
         except Exception:
             return None
 
     def setXSize(self):
         try:
-            return self.root.find('./Metadata/Information/Image/SizeX').text
+            return int(self.root.find('./Metadata/Information/Image/SizeX').text)
         except Exception:
             return None
 
     def setYSize(self):
         try:
-            return self.root.find('./Metadata/Information/Image/SizeY').text
+            return int(self.root.find('./Metadata/Information/Image/SizeY').text)
         except Exception:
             return None
 
     @property
     def xScaled(self):
         try:
-            return float(self.xSize) * float(self.xScale)
+            return (int(self.xSize) * float(self.xScale)) * 1000
         except Exception:
             return None
 
     @property
     def yScaled(self):
         try:
-            return float(self.ySize) * float(self.yScale)
+            return (int(self.ySize) * float(self.yScale)) * 1000
         except Exception:
             return None
 
@@ -213,7 +213,7 @@ class CZIMetadata:
             channels = self.root.find('./Metadata/Information/Image/Dimensions/Channels')
             if self.checkIfElementHasChildren(channels):
                 for channel in channels:
-                    channelInformation = [channel.attrib['Id'], channel.attrib['Name'], self.path]
+                    channelInformation = [channel.attrib['Id'], channel.attrib['Name'], self.filePath]
                     newChannels.append(chnnl(channelInformation, self.filters, self.root))
             return newChannels
         except Exception:
