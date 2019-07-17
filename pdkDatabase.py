@@ -3,6 +3,16 @@ import xlrd
 import re
 
 
+# Read the xlsx file.
+# -> From xlsx line, create pdkMetadata object.
+# -> Get primary metadata from the xlsx line.
+# -> Analyse file path in the xlsx line. (.raw file)
+# -> Find the .ini file related to the .raw file path.
+# -> -> Find more metadata from the .ini file if relevant.
+# -> Export as a dict.
+# -> Add dict to database.
+
+
 if __name__ == '__main__':
     # Reading the xlsx file
     xlsx = 'K:\\Calcium_imaging_file_info.xlsx'
