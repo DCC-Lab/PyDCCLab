@@ -30,4 +30,10 @@ class TestXlsxMetadata(env.DCCLabTestCase):
 
     def testGetWorkbook(self):
         metadata = mtdt(self.filePath)
-        self.assertTrue(type(metadata.workbook) == xlrd.book.Book)
+        self.assertTrue(type(metadata.getWorkbook()) == xlrd.book.Book)
+
+    def testGetWorksheets(self):
+        metadata = mtdt(self.filePath)
+        sheets = metadata.getWorksheets()
+        for sheet in sheets:
+            self.assertTrue(type(sheet), xlrd.sheet.Sheet)
