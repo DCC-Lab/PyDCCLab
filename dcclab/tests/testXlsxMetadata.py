@@ -41,8 +41,7 @@ class TestXlsxMetadata(env.DCCLabTestCase):
     def testGetKeys(self):
         metadata = mtdt(self.filePath)
         keys = metadata.keys
-        print(keys)
-
+        self.assertTrue(keys)
 
 if __name__ == '__main__':
     unittest.main()

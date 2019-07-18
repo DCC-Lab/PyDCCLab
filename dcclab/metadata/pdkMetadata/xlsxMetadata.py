@@ -36,9 +36,8 @@ class XLSXMetadata:
         try:
             for sheet in self.worksheets:
                 header = {}
-                for col in sheet.ncols:
+                for col in range(sheet.ncols):
                     header[sheet.cell_value(0, col)] = 'TEXT'
-
                 keys[sheet.name] = header
             return keys
         except:
