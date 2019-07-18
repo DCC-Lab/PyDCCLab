@@ -62,7 +62,8 @@ class Metadata:
 
     @property
     def keys(self) -> dict:
-        if isinstance(self.__fileObject, CZIMetadata) or isinstance(self.__fileObject, CSVMetadata):
+        if isinstance(self.__fileObject, CZIMetadata) or isinstance(self.__fileObject, CSVMetadata) or \
+                isinstance(self.__fileObject, XLSXMetadata):
             return self.__fileObject.keys
         else:
             return {}

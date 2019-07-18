@@ -10,6 +10,7 @@ class XLSXMetadata:
 
         self.workbook = self.getWorkbook()
         self.worksheets = self.getWorksheets()
+        self.keys = self.getKeys()
 
     def fileName(self):
         file = os.path.basename(self.path)
@@ -29,3 +30,16 @@ class XLSXMetadata:
             return worksheets
         except:
             return worksheets
+
+    def getKeys(self):
+        keys = {}
+        try:
+            for sheet in self.worksheets:
+                header = {}
+                for col in sheet.ncols:
+                    header[sheet.cell_value(0, col)] = 'TEXT'
+
+                keys[sheet.name] = header
+            return keys
+        except:
+            return keys
