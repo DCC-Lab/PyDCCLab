@@ -42,3 +42,17 @@ class XLSXMetadata:
             return keys
         except:
             return keys
+
+    @property
+    def asDict(self) -> dict:
+        dictio = {}
+        for worksheet in self.worksheets:
+            sheet = {}
+            for row in range(1, worksheet.nrows):
+                cols = {}
+                for col in range(worksheet.ncolss):
+                    cols[worksheet.cell_value(0, col)] = worksheet.cell_value(row, col)
+                sheet[row] = cols
+            dictio[worksheet.name] = sheet
+
+        return dictio
