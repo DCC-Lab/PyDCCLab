@@ -50,7 +50,7 @@ class XLSXMetadata:
             sheet = {}
             for row in range(1, worksheet.nrows):
                 cols = {}
-                for col in range(worksheet.ncolss):
+                for col in range(worksheet.ncols):
                     cols[worksheet.cell_value(0, col)] = worksheet.cell_value(row, col)
                 sheet[row] = cols
             dictio[worksheet.name] = sheet
