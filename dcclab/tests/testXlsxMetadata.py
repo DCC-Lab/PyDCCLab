@@ -10,7 +10,6 @@ class TestXlsxMetadata(env.DCCLabTestCase):
     def setUp(self) -> None:
         self.filePath = os.path.join(str(self.dataDir), 'unittest.xlsx')
         workbook = xlwt.Workbook()
-
         sheet = workbook.add_sheet('test_1')
         sheet.write(0, 0, 'test_column_1')
         sheet.write(0, 1, 'test_column_2')
@@ -18,7 +17,6 @@ class TestXlsxMetadata(env.DCCLabTestCase):
         sheet.write(1, 0, 'abcd')
         sheet.write(1, 1, '1234')
         sheet.write(1, 2, '\\test\\testing\\testerinoo')
-
         sheet = workbook.add_sheet('test_2')
         sheet.write(0, 0, 'test_id_1')
         sheet.write(0, 1, 'file_path')
@@ -26,7 +24,6 @@ class TestXlsxMetadata(env.DCCLabTestCase):
         sheet.write(1, 1, '\\test\\01')
         sheet.write(2, 0, '02')
         sheet.write(2, 1, '\\test\\02')
-
         workbook.save(self.filePath)
 
     def tearDown(self) -> None:
