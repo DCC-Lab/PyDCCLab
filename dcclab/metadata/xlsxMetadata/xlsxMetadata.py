@@ -3,8 +3,6 @@ import os
 import re
 
 class XLSXMetadata:
-    # Dev notes : The file is a RAW movie type file.
-    # The metadata is in a .ini file within the same folder as the .raw file.
     def __init__(self, xlsxPath):
         self.path = xlsxPath
         self.name = self.fileName()
