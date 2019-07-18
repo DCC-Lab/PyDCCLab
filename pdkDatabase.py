@@ -1,4 +1,6 @@
 from dcclab import findFiles
+from dcclab import Metadata
+from dcclab import Database
 import xlrd
 import re
 
@@ -19,13 +21,13 @@ if __name__ == '__main__':
     with xlrd.open_workbook(xlsx) as file:
         sheet = file.sheet_by_index(0)
 
-        for row in range(sheet.nrows):
-            line = ''
+        for row in range(1, sheet.nrows):
+            line = []
             for col in range(sheet.ncols):
-                line += '{}|'.format(sheet.cell_value(row, col))
-            line = line.replace(' ', '')
-            print(line.rstrip('|'))
+                line.append(sheet.cell_value(row, col))
 
+
+    '''
     # Reading the ini files.
     directory = 'K:\\'
     rawFiles = findFiles(directory, 'raw')
@@ -40,3 +42,4 @@ if __name__ == '__main__':
                 print(file.readlines())
         except:
             print(">>>>{} file doesn't work.".format(iniFile))
+    '''
