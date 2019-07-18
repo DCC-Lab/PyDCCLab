@@ -55,5 +55,6 @@ class TestXlsxMetadata(env.DCCLabTestCase):
         metadata = mtdt(self.filePath)
         self.assertTrue(metadata.asDict)
 
+
 if __name__ == '__main__':
     unittest.main()

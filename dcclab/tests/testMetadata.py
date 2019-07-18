@@ -10,6 +10,7 @@ class TestMetadata(env.DCCLabTestCase):
     def setUp(self):
         self.cziPath = Path(self.dataDir / 'testCziFile.czi')
         self.csvPath = Path(self.dataDir / 'unittest.csv')
+        self.xlsxPath = Path(self.dataDir / 'unittest.xlsx')
 
         with open(self.csvPath, 'w') as file:
             file.write('field_1,field_2,field_3\n')
