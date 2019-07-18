@@ -37,3 +37,12 @@ class TestXlsxMetadata(env.DCCLabTestCase):
         sheets = metadata.getWorksheets()
         for sheet in sheets:
             self.assertTrue(type(sheet), xlrd.sheet.Sheet)
+
+    def testGetKeys(self):
+        metadata = mtdt(self.filePath)
+        keys = metadata.keys
+        print(keys)
+
+
+if __name__ == '__main__':
+    unittest.main()
