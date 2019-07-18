@@ -1,5 +1,6 @@
 from .cziMetadata import CZIMetadata
 from .csvMetadata import CSVMetadata
+from .pdkMetadata import XLSXMetadata
 import os
 try:
     import deprecated
@@ -8,8 +9,8 @@ except:
 
 
 class Metadata:
-    supportedClasses = [CZIMetadata, CSVMetadata]
-    supportedFormats = ['CZI', 'CSV']
+    supportedClasses = [CZIMetadata, CSVMetadata, XLSXMetadata]
+    supportedFormats = ['CZI', 'CSV', 'XLSX']
 
     def __init__(self, path: str):
         if path is not None:

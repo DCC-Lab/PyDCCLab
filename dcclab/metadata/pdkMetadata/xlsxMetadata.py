@@ -1,4 +1,4 @@
-class PDKMetadata:
+class XLSXMetadata:
     # Dev notes : The file is a RAW movie type file.
     # The metadata is in a .ini file within the same folder as the .raw file.
     def __init__(self, xlsxLine: list):
@@ -12,7 +12,7 @@ class PDKMetadata:
         self.filePath = xlsxLine[7]
 
     def __repr__(self):
-        return {'pdkMetadata': {'acquisition_frequency': self.acquisitionFrequency,
+        return {'xlsxMetadata': {'acquisition_frequency': self.acquisitionFrequency,
                                 'acquisition_type': self.acquisitionType, 'image_dimensions': self.imageDimensions,
                                 'objective': self.objective, 'number_of_frames': self.numberOfFrames,
                                 'simulation': self.simulation, 'note': self.notes, 'file_path': self.filePath}}
