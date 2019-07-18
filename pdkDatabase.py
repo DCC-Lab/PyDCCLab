@@ -18,6 +18,13 @@ import re
 if __name__ == '__main__':
     # Reading the xlsx file
     xlsx = 'K:\\Calcium_imaging_file_info.xlsx'
+    mtdt = Metadata(xlsx)
+
+    for sheet in mtdt.metadata.values():
+        for row in sheet.values():
+            print(row)
+
+    '''
     with xlrd.open_workbook(xlsx) as file:
         sheet = file.sheet_by_index(0)
 
@@ -25,7 +32,7 @@ if __name__ == '__main__':
             line = []
             for col in range(sheet.ncols):
                 line.append(sheet.cell_value(row, col))
-
+    '''
 
     '''
     # Reading the ini files.

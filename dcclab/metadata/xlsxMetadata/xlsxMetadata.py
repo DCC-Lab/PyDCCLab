@@ -1,5 +1,6 @@
 import xlrd
 import os
+import re
 
 class XLSXMetadata:
     # Dev notes : The file is a RAW movie type file.
@@ -31,7 +32,7 @@ class XLSXMetadata:
         except:
             return worksheets
 
-    def getKeys(self):
+    def getKeys(self) -> dict:
         keys = {}
         try:
             for sheet in self.worksheets:
@@ -51,7 +52,9 @@ class XLSXMetadata:
             for row in range(1, worksheet.nrows):
                 cols = {}
                 for col in range(worksheet.ncols):
-                    cols[worksheet.cell_value(0, col)] = worksheet.cell_value(row, col)
+                    key = re.sub('^\\s{1,99}', '', str(worksheet.cell_value(0, col)))
+                    key = re.sub('\\s', '_', key)
+                    cols[key] = str(worksheet.cell_value(row, col)).replace(',', '')
                 sheet[row] = cols
             dictio[worksheet.name] = sheet
 
