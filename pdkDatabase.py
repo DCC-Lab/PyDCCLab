@@ -6,7 +6,7 @@ import re
 
 
 # Read the xlsx file.
-# -> From xlsx line, create pdkMetadata object.
+# -> From xlsx line, create xlsxMetadata object.
 # -> Get primary metadata from the xlsx line.
 # Opt. ? -> Analyse file path in the xlsx line. (.raw file)
 # Opt. ? -> Find the .ini file related to the .raw file path.

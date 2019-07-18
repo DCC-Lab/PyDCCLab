@@ -1,6 +1,6 @@
 from .cziMetadata import CZIMetadata
 from .csvMetadata import CSVMetadata
-from .pdkMetadata import XLSXMetadata
+from .xlsxMetadata import XLSXMetadata
 import os
 try:
     import deprecated

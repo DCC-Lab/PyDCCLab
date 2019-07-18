@@ -3,5 +3,5 @@ namespace because it is simpler for everyone """
 
 from .csvMetadata import *
 from .cziMetadata import *
-from .pdkMetadata import *
+from .xlsxMetadata import *
 from .metadata import *
