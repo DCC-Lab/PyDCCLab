@@ -39,7 +39,7 @@ class TestMetadata(env.DCCLabTestCase):
         os.remove(self.xlsxPath)
 
     def testWrongFileType(self):
-        wrongFile = os.path.join(str(self.dataDir), 'test.db')
+        wrongFile = os.path.join(str(self.dataDir), 'test.tif')
         with self.assertRaises(TypeError): Metadata(wrongFile)
 
     def testNoFile(self):
