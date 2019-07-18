@@ -75,7 +75,7 @@ class CZIFile_(ImageFile):
         if axes not in ["BCYX0", "BSCYX0", "YX0"]:
             closeCziFileObject(cziObj)
             raise NotImplementedError(axes)
-        mosaic, self.__indexAndTiles = decodeImages(cziObj)
+        mosaic, self.__indexAndTiles = decodeCZIFile(cziObj)
         try:
             cIndex = axes.index("C")
         except ValueError:
