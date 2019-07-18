@@ -39,6 +39,8 @@ class Metadata:
             return 'CZI'
         elif fileType == CSVMetadata:
             return 'CSV'
+        elif fileType == XLSXMetadata:
+            return 'XLSX'
         else:
             return None
 
@@ -60,9 +62,7 @@ class Metadata:
 
     @property
     def keys(self) -> dict:
-        if isinstance(self.__fileObject, CZIMetadata):
-            return self.__fileObject.keys
-        elif isinstance(self.__fileObject, CSVMetadata):
+        if isinstance(self.__fileObject, CZIMetadata) or isinstance(self.__fileObject, CSVMetadata):
             return self.__fileObject.keys
         else:
             return {}
