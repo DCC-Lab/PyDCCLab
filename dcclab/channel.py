@@ -519,15 +519,13 @@ class Channel:
         return Channel(filteredPixels)
 
     def applyBandpassFilterFromGaussianMask(self, parameter):
-        #todo
+        # todo
         pass
 
     def applyLowPassFilterFromSigmoidMask(self, topRadius: float, inflectionPointSlope: float = 1 / 4):
         fftPixels = self.fourierTransform()
         x, y = self.createXYGridsFromArray(fftPixels)
         sigmoid = self.createSigmoidMask((x, y), topRadius, inflectionPointSlope)
-        plt.imshow(sigmoid)
-        plt.show()
         fftFiltered = fftPixels * sigmoid
         ifftShift = np.fft.ifftshift(fftFiltered)
         filteredPixels = np.abs(np.fft.ifft2(ifftShift))
@@ -542,7 +540,7 @@ class Channel:
         filteredPixels = np.abs(np.fft.ifft2(ifftShift))
         return Channel(filteredPixels)
 
-    def applyBandpassFilterFromSigmoidMask(self, cutIn:int, cutOff:int, inflectionPointSlope: float = 1 / 4):
+    def applyBandpassFilterFromSigmoidMask(self, cutIn: int, cutOff: int, inflectionPointSlope: float = 1 / 4):
         fftPixels = self.fourierTransform()
         XY = self.createXYGridsFromArray(fftPixels)
         lowPass = self.createSigmoidMask(XY, cutIn, inflectionPointSlope)
@@ -552,7 +550,6 @@ class Channel:
         ifftShift = np.fft.ifftshift(fftFiltered)
         filteredPixels = np.abs(np.fft.ifft2(ifftShift))
         return Channel(filteredPixels)
-
 
     def applyLowPassFilterFromCircularMask(self, radius: float):
         fftPixels = self.fourierTransform()
@@ -592,16 +589,17 @@ class Channel:
         if logScale:
             powerSpectrum = np.log(powerSpectrum)
         plt.imshow(powerSpectrum, extent=(-cols // 2, cols // 2, -rows // 2, rows // 2))
+        plt.colorbar()
         plt.show()
         return powerSpectrum
 
-    def powerSpectrumDensityAzimuthalAverage(self) -> np.ndarray:
+    def powerSpectrumAzimuthalAverage(self) -> np.ndarray:
         powerSpectrumDensity = self.powerSpectrum()
         ps1D = self.azimuthalAverage(powerSpectrumDensity)
         return ps1D
 
-    def displayPowerSpectrumDensityAzimuthalAverage(self, logBase: float = None) -> np.ndarray:
-        ps1D = self.powerSpectrumDensityAzimuthalAverage()
+    def displayPowerSpectrumAzimuthalAverage(self, logBase: float = None) -> np.ndarray:
+        ps1D = self.powerSpectrumAzimuthalAverage()
         x = range(len(ps1D))
         plt.plot(x, ps1D)
         if logBase is not None:
@@ -616,22 +614,22 @@ class Channel:
             fftPixels = np.fft.fftshift(fftPixels)
         return fftPixels
 
-    def applyGaussianNoise(self, mean: float, sigma: float):
+    def applyGaussianNoise(self, sigma: float, mean: float = 0):
         rows, cols = self.shape
         gauss = np.random.normal(mean, sigma, (rows, cols))
-        gauss = gauss.reshape(rows, cols)
-        noise = self.pixels + gauss
+        gauss = np.clip(gauss.reshape(rows, cols), 0, np.max(gauss))
+        noise = self.pixels + gauss.astype(self._originalDType)
         return Channel(noise)
 
-    def applyPoissonNoise(self):
+    def applyPoissonNoise(self, scale: float):
         pass
 
-    def phaseSpectrum(self, radians:bool=True) -> np.ndarray:
+    def phaseSpectrum(self, radians: bool = True) -> np.ndarray:
         fftPixels = self.fourierTransform()
         angles = np.angle(fftPixels, not radians)
         return angles
 
-    def displayPhaseSpectrum(self, radians:bool=True) -> np.ndarray:
+    def displayPhaseSpectrum(self, radians: bool = True) -> np.ndarray:
         phaseSpectrum = self.phaseSpectrum(radians)
         rows, cols = phaseSpectrum.shape
         plt.imshow(phaseSpectrum, extent=(-cols // 2, cols // 2, -rows // 2, rows // 2))
