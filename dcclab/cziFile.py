@@ -1,5 +1,3 @@
-from .imageFile import *
-from .cziUtil import *
 from .imageCollection import *
 from .timeSeries import TimeSeries
 from .zStack import ZStack
@@ -17,7 +15,7 @@ class CZIFile(ImageFile):
             self.__cziObj = readCziImage(path)
         except ValueError:
             raise InvalidFileFormatException("Not a compatible format for this reader.")
-        self.__mosaic, self.__indexAndTiles = decodeImages(self.__cziObj)
+        self.__mosaic, self.__indexAndTiles = decodeCZIFile(self.__cziObj)
         self.__shape = self.__cziObj.shape
         self.__axes = self.__cziObj.axes
         self.__originalDType = self.__cziObj.dtype
@@ -41,7 +39,11 @@ class CZIFile(ImageFile):
 
     def imageData(self):
         if not (self.__isScenes or self.__isTimeSeries or self.__isZStack):
-            image = Image(self.__mosaic.squeeze().transpose(1, 2, 0)) if self.__axes != "YX0" else self.__YX0Image()
+            pixels = np.squeeze(self.__mosaic)
+            if pixels.ndim == 2:
+                shape = pixels.shape
+                pixels = pixels.reshape((1, shape[0], shape[1]))
+            image = Image(pixels.transpose((1, 2, 0))) if self.__axes != "YX0" else self.__YX0Image()
         else:
             raise ValueError("This file contains more than just one image.")
         return image
