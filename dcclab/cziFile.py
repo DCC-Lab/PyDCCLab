@@ -34,7 +34,6 @@ class CZIFile(ImageFile):
         if self.__isZStack and self.__isScenes:
             raise NotImplementedError("Z-stack and scenes combination is not implemented")
 
-
         self.__numberOfChannels = self.__axesDimAndIndex["C"][0]
         self.__tileMap = self.__buildTileMap() if self.__axes != "YX0" else None
 
@@ -44,6 +43,7 @@ class CZIFile(ImageFile):
     def imageData(self):
         if not (self.__isScenes or self.__isTimeSeries or self.__isZStack):
             pixels = np.squeeze(self.__mosaic)
+            # We check if ndim == 2 because the Channel dimension may disappear in squeezing if equal to 1
             if pixels.ndim == 2:
                 shape = pixels.shape
                 pixels = pixels.reshape((1, shape[0], shape[1]))
@@ -60,9 +60,10 @@ class CZIFile(ImageFile):
             scenes = []
             nbScenes = self.__axesDimAndIndex["S"][0]
             mosaic = np.squeeze(self.__mosaic)
-            if mosaic.ndim == 2:
+            # We check if ndim == 3 because the Channel dimension may disappear in squeezing if equal to 1
+            if mosaic.ndim == 3:
                 shape = mosaic.shape
-                mosaic = mosaic.resize((1, shape[0], shape[1]))
+                mosaic = mosaic.reshape((shape[0], 1, shape[1], shape[2]))
             for i in range(nbScenes):
                 scenes.append(Image(mosaic[i, :, :, :].transpose(1, 2, 0)))
             coll = ImageCollection(scenes)
@@ -75,9 +76,10 @@ class CZIFile(ImageFile):
             tSeries = []
             nbTime = self.__axesDimAndIndex["T"][0]
             mosaic = np.squeeze(self.__mosaic)
-            if mosaic.ndim == 2:
+            # We check if ndim == 3 because the Channel dimension may disappear in squeezing if equal to 1
+            if mosaic.ndim == 3:
                 shape = mosaic.shape
-                mosaic = mosaic.resize((1, shape[0], shape[1]))
+                mosaic = mosaic.reshape((shape[0], 1, shape[1], shape[2]))
             for i in range(nbTime):
                 tSeries.append(Image(mosaic[i, :, :, :].transpose(1, 2, 0)))
             tSeries = TimeSeries(tSeries)
@@ -86,13 +88,20 @@ class CZIFile(ImageFile):
         return tSeries
 
     def zStackData(self):
-        if self.__isTimeSeries:
+        if self.__isZStack:
+            mosaic = np.copy(self.__mosaic)
+            channelIndex = self.__axesDimAndIndex["C"][-1]
+            zSTackIndex = self.__axesDimAndIndex["Z"][-1]
+            # FIXME Find better way/ more efficient way to swap axes
+            if channelIndex < zSTackIndex:
+                mosaic = np.swapaxes(mosaic, channelIndex, zSTackIndex)
             zStack = []
             nbZ = self.__axesDimAndIndex["Z"][0]
-            mosaic = np.squeeze(self.__mosaic)
-            if mosaic.ndim == 2:
+            mosaic = np.squeeze(mosaic)
+            # We check if ndim == 3 because the Channel dimension may disappear in squeezing if equal to 1
+            if mosaic.ndim == 3:
                 shape = mosaic.shape
-                mosaic = mosaic.resize((1, shape[0], shape[1]))
+                mosaic = mosaic.reshape((shape[0], 1, shape[1], shape[2]))
             for i in range(nbZ):
                 zStack.append(Image(mosaic[i, :, :, :].transpose(1, 2, 0)))
             zStack = ZStack(zStack)
