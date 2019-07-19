@@ -24,5 +24,10 @@ class TestRawMetadata(env.DCCLabTestCase):
         metadata = mtdt(self.rawPath)
         self.assertEqual(metadata.iniPath, self.iniPath)
 
+    def testXmlPath(self):
+        metadata = mtdt(self.rawPath)
+        self.assertEqual(metadata.xmlPath, self.xmlPath)
+
+
 if __name__ == '__main__':
     unittest.main()
