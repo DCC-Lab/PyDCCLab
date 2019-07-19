@@ -20,7 +20,6 @@ class TestRawMetadata(env.DCCLabTestCase):
             file.write('</TEST>\n')
 
     def tearDown(self) -> None:
-        #os.remove(self.rawPath)
         os.remove(self.iniPath)
         os.remove(self.xmlPath)
         pass
