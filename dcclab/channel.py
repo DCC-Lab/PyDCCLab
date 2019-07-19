@@ -669,7 +669,10 @@ class Channel:
         :return: Array of values in the range [0, 1] following a 2D centered sigmoid function
         """
         x, y = XYGrids
-        sigmoid = 1 / (1 + np.exp(-4 * inflectionPointSlope * (radius ** 2 - x ** 2 + y ** 2)))
+        expArg = -4 * inflectionPointSlope * (radius - np.sqrt(x ** 2 + y ** 2))
+        # Overflow occuring when the xp arg is  >ln(1.7976931348623157e+308) which is a little bigger than 709
+        expArg[expArg > 709] = 709
+        sigmoid = 1 / (1 + np.exp(expArg))
         return sigmoid
 
     @staticmethod
