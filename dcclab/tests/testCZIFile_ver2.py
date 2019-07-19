@@ -22,6 +22,18 @@ class TestConstructor(env.DCCLabTestCase):
         with self.assertRaises(FileNotFoundError):
             CZIFile(Path(self.dataDir / "FileNotFound.czi"))
 
+    def testInvalidZstackAndTimeSeries(self):
+        with self.assertRaises(NotImplementedError):
+            CZIFile(Path(self.dataDir / "testCziTSeries_ZStack.czi"))
+
+    def testInvalidScenesAndTimeSeries(self):
+        with self.assertRaises(NotImplementedError):
+            CZIFile(Path(self.dataDir / "testCziTSeries_Scenes.czi"))
+
+    def testInvalidScenesAndZStack(self):
+        with self.assertRaises(NotImplementedError):
+            CZIFile(Path(self.dataDir / "testCziScenes_ZStack.czi"))
+
 
 class TestMethodsAndProperties(env.DCCLabTestCase):
 
@@ -185,33 +197,29 @@ class TestMethodsAndProperties(env.DCCLabTestCase):
     def testImageDataYX0Values(self):
         czi = CZIFile(Path(self.dataDir / "testCziYX0Tiny.czi"))
         values = np.dstack((np.array([[7, 7], [6, 6]]), np.array([[46, 48], [51, 47]]), np.array([[32, 29], [33, 28]])))
-        self.assertTrue(np.array_equal(czi.imageData().asArray(), values))
+        self.assertTrue(np.array_equal(czi.imageData().asArray(), values.transpose((1, 0, 2))))
 
     def testImageDataBSCYX0Values(self):
         czi = CZIFile(Path(self.dataDir / "testCziBSCZY0Tiny.czi"))
         values = np.dstack((np.array([[596, 652], [622, 618]]), np.array([[1059, 1061], [1133, 1087]]),
                             np.array([[510, 511], [505, 497]])))
-        self.assertTrue(np.array_equal(czi.imageData().asArray(), values))
+        self.assertTrue(np.array_equal(czi.imageData().asArray(), values.transpose((1, 0, 2))))
+
+    def testImageData2DArrayTo3DArray(self):
+        czi = CZIFile(Path(self.dataDir / "testCziOneChannel.czi"))
+        self.assertTupleEqual(czi.imageData().shape, (857, 610, 1))
 
     def testScenesDataOneSceneNone(self):
         czi = CZIFile(Path(self.dataDir / "testCziThreeChannelsOneScene.czi"))
         self.assertIsNone(czi.scenesData())
-
-    def testScenesDataTwoScenes(self):
-        czi = CZIFile(Path(self.dataDir / "testCziMultipleScenes.czi"))
-        self.assertIsNotNone(czi.scenesData())
-
-    def testScenesDataTwoScenes(self):
-        czi = CZIFile(Path(self.dataDir / "testCziMultipleScenes.czi"))
-        self.assertEqual(len(czi.scenesData()), 2)
 
     def testScenesDataValues(self):
         czi = CZIFile(Path(self.dataDir / "testCziFileTwoScenesTiny.czi"))
         values1 = np.dstack((np.array([[103, 101], [99, 86]]), np.array([[171, 190], [216, 166]])))
         values2 = np.dstack((np.array([[99, 89], [78, 92]]), np.array([[180, 187], [186, 205]])))
         images = czi.scenesData().images
-        self.assertTrue(np.array_equal(images[0].asArray(), values1))
-        self.assertTrue(np.array_equal(images[1].asArray(), values2))
+        self.assertTrue(np.array_equal(images[0].asArray(), values1.transpose((1, 0, 2))))
+        self.assertTrue(np.array_equal(images[1].asArray(), values2.transpose((1, 0, 2))))
 
 
 if __name__ == '__main__':
