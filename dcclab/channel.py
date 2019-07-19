@@ -43,6 +43,9 @@ class Channel:
     def __str__(self) -> str:
         return str(self.pixels)
 
+    def __repr__(self)->str:
+        return self.__str__()
+
     @property
     def pixels(self) -> np.ndarray:
         return self._pixels
