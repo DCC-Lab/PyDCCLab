@@ -28,6 +28,10 @@ class TestRawMetadata(env.DCCLabTestCase):
         metadata = mtdt(self.rawPath)
         self.assertEqual(metadata.xmlPath, self.xmlPath)
 
+    def testDate(self):
+        metadata = mtdt(self.rawPath)
+        self.assertEqual('2019-01-01 12:12:12', metadata.date)
+
 
 if __name__ == '__main__':
     unittest.main()

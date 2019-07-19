@@ -19,7 +19,10 @@ class RAWMetadata:
         return os.path.splitext(file)[0]
 
     def __date(self):
-        return datetime.datetime.strptime(self.fileName, '%Y%m%d_%H_%M_%S')
+        fileName = self.fileName.split('_')[0:4]
+        fileName = str.join('_', fileName)
+        date = datetime.datetime.strptime(fileName, '%Y%m%d_%H_%M_%S')
+        return '{} {}'.format(date.date(), date.time())
 
     def __iniPath(self):
         return re.sub('\.lineshifted\.raw|.raw', '.ini', self.rawPath, re.IGNORECASE)
