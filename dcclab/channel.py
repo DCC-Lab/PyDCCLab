@@ -2,17 +2,12 @@ import numpy as np
 import typing
 
 from skimage import measure, morphology
-from skimage.filters.rank import entropy
-from skimage.filters import *
-
-from scipy.signal import convolve2d
-from scipy.ndimage import label, sum, filters
+from scipy.ndimage import label, sum
 import scipy.ndimage as ndimage
 from .DCCExceptions import *
 
 import matplotlib.pyplot as plt
 import json
-import warnings
 
 try:
     from deprecated import deprecated
@@ -23,6 +18,8 @@ except:
 class Channel:
 
     def __new__(cls, pixels: np.ndarray):
+        # fixme is it really the job of Channel to transpose the array so we have (X, Y)  instead of (Y, X)?
+        pixels = pixels.T  # transpose the array so that axis 0 = X (not Y) and axis 1 = Y (not X)
         if cls is Channel:
             if "float" in str(pixels.dtype):
                 return super(Channel, cls).__new__(ChannelFloat)
@@ -32,7 +29,7 @@ class Channel:
                 raise PixelTypeException("Can't read images of type {}".format(pixels.dtype))
 
     def __init__(self, pixels: np.ndarray):
-        pixels.squeeze()
+        pixels.squeeze()  # in case the array is nested in useless dimensions
         if pixels.ndim != 2:
             raise DimensionException(pixels.ndim)
         self._pixels = np.copy(pixels)
@@ -62,11 +59,11 @@ class Channel:
 
     @property
     def width(self) -> int:
-        return int(self.shape[1])
+        return int(self.shape[0])
 
     @property
     def height(self) -> int:
-        return int(self.shape[0])
+        return int(self.shape[1])
 
     @property
     def sizeInBytes(self) -> int:
@@ -97,7 +94,7 @@ class Channel:
     """ Display-related functions """
 
     def display(self, colorMap=None):
-        plt.imshow(self.pixels, cmap=colorMap)
+        plt.imshow(self.pixels.T, cmap=colorMap)
         plt.show()
         return self
 
@@ -465,7 +462,7 @@ class Channel:
         ncols = len(channels) if len(channels) < 4 else 4
         for i in range(len(channels)):
             plt.subplot(nrows, ncols, i + 1)
-            plt.imshow(channels[i].pixels)
+            plt.imshow(channels[i].pixels.T)
         plt.show()
         return channels
 
@@ -672,7 +669,7 @@ class Channel:
         :return: Array of values in the range [0, 1] following a 2D centered sigmoid function
         """
         x, y = XYGrids
-        sigmoid = 1 / (1 + np.exp(-4 * inflectionPointSlope * (radius - np.sqrt(x ** 2 + y ** 2))))
+        sigmoid = 1 / (1 + np.exp(-4 * inflectionPointSlope * (radius ** 2 - x ** 2 + y ** 2)))
         return sigmoid
 
     @staticmethod
