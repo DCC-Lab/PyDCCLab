@@ -18,8 +18,6 @@ except:
 class Channel:
 
     def __new__(cls, pixels: np.ndarray):
-        # fixme is it really the job of Channel to transpose the array so we have (X, Y)  instead of (Y, X)?
-        pixels = pixels.T  # transpose the array so that axis 0 = X (not Y) and axis 1 = Y (not X)
         if cls is Channel:
             if "float" in str(pixels.dtype):
                 return super(Channel, cls).__new__(ChannelFloat)
