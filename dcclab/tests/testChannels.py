@@ -60,12 +60,12 @@ class TestChannels(env.DCCLabTestCase):
     def testWidth(self):
         array = np.random.randint(low=0, high=255, size=(100, 200))
         channel = Channel(pixels=array)
-        self.assertTrue(channel.width == 200)
+        self.assertTrue(channel.width == 100)
 
     def testHeight(self):
         array = np.random.randint(low=0, high=255, size=(100, 200))
         channel = Channel(pixels=array)
-        self.assertTrue(channel.height == 100)
+        self.assertTrue(channel.height == 200)
 
     def testNumberOfPixels(self):
         array = np.random.randint(low=0, high=255, size=(100, 200))
@@ -362,7 +362,6 @@ class TestChannelsSegmentation(env.DCCLabTestCase):
         with self.assertRaises(ValueError):
             channel.analyzeComponents()
 
-
     def testFilterNoise(self):
         array = np.array([[1, 0, 0, 0], [0, 2, 2, 0], [0, 0, 0, 3]])
         channel = Channel(array)
@@ -519,9 +518,13 @@ class TestChannelSpectralFiltering(env.DCCLabTestCase):
         # For now, power spectrum not normalized by the number of pixels...
         array = np.array([[i * 2 * np.pi / 8 for i in range(30)]] * 30)
         values = (np.sin(array) + 1) * 255 / 2
-        channel = Channel(values.astype(np.uint8))
+        channel = Channel(values.astype(np.uint8) + values.astype(np.uint8).T)
         centerY, centerX = channel.shape[0] // 2, channel.shape[1] // 2
         ps = channel.powerSpectrum()
+        channel.display(
+
+        )
+        channel.displayPowerSpectrum(True)
         # Check if center value is the DC component (after sqrt and normalization)
         self.assertAlmostEqual(np.sqrt(ps[centerY, centerX]) / channel.numberOfPixels,
                                channel.getAverageValueOfPixels())
@@ -549,7 +552,55 @@ class TestChannelSpectralFiltering(env.DCCLabTestCase):
              1.13063562e+04, 1.13063562e+04])
         meandRadius0 = 9e+04
         handComputedAzimuthalAverage = [meandRadius0, meanRadius1, meanRadius2]
-        self.assertTrue(np.allclose(handComputedAzimuthalAverage, channel.powerSpectrumDensityAzimuthalAverage()))
+        self.assertTrue(np.allclose(handComputedAzimuthalAverage, channel.powerSpectrumAzimuthalAverage()))
+
+    # def testPowerSpectrumCircle(self):
+    #     import skimage.morphology.selem as selem
+    #     mask = selem.disk(100)
+    #     array = np.zeros((500, 500), dtype=np.uint8)
+    #     array[500 // 2 - 100:500 // 2 + 100 + 1, 500 // 2 - 100:500 // 2 + 100 + 1] = mask
+    #     channel = Channel(array)
+    #     channel.display()
+    #     rectangle = channel.applyLowPassFilterFromRectangularMask(4)
+    #     rectangle.display()
+    #     sigmoid = channel.applyLowPassFilterFromSigmoidMask(4)
+    #     sigmoid.display()
+    #     channel.displayPowerSpectrum(True)
+    #
+    # def testWeirdFunction(self):
+    #     array = np.ones((1000, 1000))
+    #     x, y = Channel.createXYGridsFromArray(array)
+    #     sin = np.sin
+    #     cos = np.cos
+    #     tan = np.tan
+    #     array_ = sin(cos(tan(x / 150 * y / 150))) <= sin(cos(tan(x / 150))) + sin(cos(tan(y / 150)))
+    #     plt.show()
+    #     channel = Channel(array_.astype(np.uint8))
+    #     channel.display()
+    #     channel.displayPowerSpectrum()
+    #
+    # def testOtherWeirdFunction(self):
+    #     array = np.ones((1000, 1000))
+    #     x, y = Channel.createXYGridsFromArray(array)
+    #     sin = np.sin
+    #     cos = np.cos
+    #     array_ = sin(sin(x / 50) + cos(y / 50)) >= cos(sin(x * y / (50 ** 2)) + cos(x / 50))
+    #     channel = Channel(array_.astype(np.uint8))
+    #     channel.display()
+    #     channel.displayPowerSpectrum()
+    #     channel.displayPhaseSpectrum()
+    #
+    # def testImage(self):
+    #     path = Path(self.dataDir / "testCziFileTwoChannels.czi")
+    #     image = Image(path=path)
+    #     channel = image.channels[0]
+    #     # channel2 = image.channels[1]
+    #     # channel.displayPowerSpectrumDensityAzimuthalAverage(2)
+    #     # channel.displayPowerSpectrum()
+    #     noise = channel.applyGaussianNoise(0, 10)
+    #     filtered = noise.applyLowPassFilterFromSigmoidMask(50, 1 / 8)
+    #     filtered2 = noise.applyLowPassFilterFromSigmoidMask(50, 1 / 4)
+    #     Channel.multiChannelDisplay([noise, filtered, filtered2])
 
 
 if __name__ == '__main__':
