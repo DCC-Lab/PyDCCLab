@@ -17,11 +17,6 @@ class ImageFile(object):
         """
         return None
 
-    def zStacksData(self):
-        """
-        :return: images data as z-stack if possible
-        """
-        return None
 
     def timeSeriesData(self):
         """
@@ -43,7 +38,7 @@ class ImageFile(object):
 
     def allData(self):
         """
-        :return: all image data as a list (whether it is a time series, a zstack, a time series of zstack...)
+        :return: all image data as a list (whether it is a time series, a zstack...)
         """
         return None
 
