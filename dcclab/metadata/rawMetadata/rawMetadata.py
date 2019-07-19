@@ -33,7 +33,7 @@ class RAWMetadata:
         return re.sub('\.lineshifted\.raw|.raw', '.ini', self.rawPath, re.IGNORECASE)
 
     def __xmlPath(self):  # FixMe This might not be necessary. Delete if xml are irrelevant.
-        return re.sub('\.lineshifted\.raw|.raw', '.xml', self.rawPath, re.IGNORECASE)
+        return re.sub('XYT\.lineshifted\.raw|XYT.raw', 'OME.xml', self.rawPath, re.IGNORECASE)
 
     def readIniFile(self):  # TODO What's important in the .ini file? Is there anything important?
         return ''
