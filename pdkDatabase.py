@@ -14,6 +14,9 @@ import re
 # -> Export as a dict.
 # -> Add dict to database.
 
+# What database? Where?
+# Cafeine2 is a server and pdk has a whole different server so where should the database go?
+
 
 if __name__ == '__main__':
     # Reading the xlsx file
