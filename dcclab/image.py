@@ -44,6 +44,9 @@ class Image:
             self.__fileObject = None
             self.channels = self.channelsFromArray(imageData)
 
+    def __str__(self) -> str:
+        return str(np.array(self.channels))
+
     def __eq__(self, other) -> bool:
         if not isinstance(other, Image):
             return False
