@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as et
 import re
 import os
+import datetime
 
 class RAWMetadata:
     def __init__(self, rawPath):
@@ -16,6 +17,9 @@ class RAWMetadata:
         file = os.path.basename(self.rawPath)
         return os.path.splitext(file)[0]
 
+    def date(self):
+
+
     def __iniPath(self):
         return re.sub('\.lineshifted\.raw|.raw', '.ini', self.rawPath, re.IGNORECASE)
 
@@ -30,3 +34,6 @@ class RAWMetadata:
 
     def readXmlFile(self):
         return ''
+
+    def openXmlFile(self):
+        pass
