@@ -1,6 +1,7 @@
 from .cziMetadata import CZIMetadata
 from .csvMetadata import CSVMetadata
 from .xlsxMetadata import XLSXMetadata
+from .rawMetadata import RAWMetadata
 import os
 try:
     import deprecated
@@ -9,8 +10,8 @@ except:
 
 
 class Metadata:
-    supportedClasses = [CZIMetadata, CSVMetadata, XLSXMetadata]
-    supportedFormats = ['CZI', 'CSV', 'XLSX']
+    supportedClasses = [CZIMetadata, CSVMetadata, XLSXMetadata, RAWMetadata]
+    supportedFormats = ['CZI', 'CSV', 'XLSX', 'RAW']
 
     def __init__(self, path: str):
         if path is not None:
@@ -41,6 +42,8 @@ class Metadata:
             return 'CSV'
         elif fileType == XLSXMetadata:
             return 'XLSX'
+        elif fileType == RAWMetadata:
+            return 'RAW'
         else:
             return None
 
