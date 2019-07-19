@@ -221,6 +221,39 @@ class TestMethodsAndProperties(env.DCCLabTestCase):
         self.assertTrue(np.array_equal(images[0].asArray(), values1.transpose((1, 0, 2))))
         self.assertTrue(np.array_equal(images[1].asArray(), values2.transpose((1, 0, 2))))
 
+    def testScenesDataOneChannel(self):
+        czi = CZIFile(Path(self.dataDir / "testOneChannel2Scenes.czi"))
+        images = czi.scenesData().images
+        for image in images:
+            self.assertTupleEqual(image.shape, (2, 2, 1))
+
+    def testZStackDataNone(self):
+        czi = CZIFile(Path(self.dataDir / "testOneChannel2Scenes.czi"))
+        self.assertIsNone(czi.zStackData())
+
+    def testZStackDataValues(self):
+        czi = CZIFile(Path(self.dataDir / "testCziZStack4Tiny.czi"))
+        images = czi.zStackData().images
+        values1 = np.dstack(
+            (np.array([[290, 276], [270, 334], [312, 296]]), np.array([[700, 649], [660, 704], [681, 679]])))
+        values2 = np.dstack(
+            (np.array([[305, 330], [297, 306], [292, 283]]), np.array([[690, 672], [686, 670], [644, 667]])))
+        values3 = np.dstack(
+            (np.array([[278, 268], [278, 296], [282, 316]]), np.array([[691, 701], [654, 719], [678, 711]])))
+        values4 = np.dstack(
+            (np.array([[312, 276], [288, 296], [307, 315]]), np.array([[664, 668], [662, 647], [654, 699]])))
+        self.assertTrue(np.array_equal(images[0].asArray(), values1.transpose((1, 0, 2))))
+        self.assertTrue(np.array_equal(images[1].asArray(), values2.transpose((1, 0, 2))))
+        self.assertTrue(np.array_equal(images[2].asArray(), values3.transpose((1, 0, 2))))
+        self.assertTrue(np.array_equal(images[3].asArray(), values4.transpose((1, 0, 2))))
+
+    def testZStackDataOneChannel(self):
+        czi = CZIFile(Path(self.dataDir / "testCziZStack4TinyOneChannel.czi"))
+        images = czi.zStackData().images
+        for image in images:
+            self.assertTupleEqual(image.shape, (2, 3, 1))
+
+
 
 if __name__ == '__main__':
     unittest.main()
