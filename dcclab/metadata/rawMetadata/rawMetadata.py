@@ -3,16 +3,21 @@ import re
 import os
 import datetime
 
+
 class RAWMetadata:
     def __init__(self, rawPath):
         self.rawPath = rawPath
+        # Data from file name.
         self.fileName = self.__fileName()
         self.date = self.__date()
 
+        # Getting secondary files for metadata.
         self.iniPath = self.__iniPath()
         self.xmlPath = self.__xmlPath()  # FixMe This might not be necessary. Delete if xml are irrelevant.
+
+        # Data from secondary files.
         self.iniLines = self.readIniFile()
-        self.xmlLines = self.readXmlFile()  # FixMe This might not be necessary. Delete if xml are irrelevant.
+        self.xmlRoot = self.readXmlFile()  # FixMe This might not be necessary. Delete if xml are irrelevant.
 
     def __fileName(self):
         file = os.path.basename(self.rawPath)
@@ -37,7 +42,5 @@ class RAWMetadata:
         pass
 
     def readXmlFile(self):
-        return ''
-
-    def openXmlFile(self):
-        pass
+        tree = et.parse(self.xmlPath)
+        return tree.getroot()
