@@ -36,10 +36,9 @@ class RAWMetadata:
         return re.sub('XYT\.lineshifted\.raw|XYT.raw', 'OME.xml', self.rawPath, re.IGNORECASE)
 
     def readIniFile(self):  # TODO What's important in the .ini file? Is there anything important?
-        return ''
-
-    def openIniFile(self):
-        pass
+        with open(self.iniPath, 'r') as file:
+            lines = file.readlines()
+        return lines
 
     def readXmlFile(self):
         tree = et.parse(self.xmlPath)

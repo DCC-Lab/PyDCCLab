@@ -52,6 +52,12 @@ class TestRawMetadata(env.DCCLabTestCase):
         metadata = mtdt(self.rawPath)
         self.assertEqual('2019-01-01 12:12:12', metadata.date)
 
+    def testReadIniFile(self):
+        metadata = mtdt(self.rawPath)
+        self.assertTrue(metadata.readIniFile())
+
+
+
 
 if __name__ == '__main__':
     unittest.main()
