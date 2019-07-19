@@ -7,6 +7,7 @@ class RAWMetadata:
     def __init__(self, rawPath):
         self.rawPath = rawPath
         self.fileName = self.__fileName()
+        self.date = self.__date()
 
         self.iniPath = self.__iniPath()
         self.xmlPath = self.__xmlPath()  # FixMe This might not be necessary. Delete if xml are irrelevant.
@@ -17,8 +18,8 @@ class RAWMetadata:
         file = os.path.basename(self.rawPath)
         return os.path.splitext(file)[0]
 
-    def date(self):
-
+    def __date(self):
+        return datetime.datetime.strptime(self.fileName, '%Y%m%d_%H_%M_%S')
 
     def __iniPath(self):
         return re.sub('\.lineshifted\.raw|.raw', '.ini', self.rawPath, re.IGNORECASE)
