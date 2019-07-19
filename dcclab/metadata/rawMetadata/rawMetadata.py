@@ -7,7 +7,6 @@ class RAWMetadata:
         self.rawPath = rawPath
         self.fileName = self.__fileName()
 
-
         self.iniPath = self.__iniPath()
         self.xmlPath = self.__xmlPath()  # FixMe This might not be necessary. Delete if xml are irrelevant.
         self.iniLines = self.readIniFile()
