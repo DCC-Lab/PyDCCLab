@@ -164,6 +164,12 @@ class TestMethodsAndProperties(env.DCCLabTestCase):
         czi = CZIFile(Path(self.dataDir / "testCziThreeChannelsOneScene.czi"))
         self.assertEqual(czi.originalDType, np.uint16)
 
+    def testAllDataYX0(self):
+        czi = CZIFile(Path(self.dataDir / "testCziYX0Tiny.czi"))
+        allData = czi.allData()
+        data = np.dstack((np.array([[7, 7], [6, 6]]), np.array([[46, 48], [51, 47]]), np.array([[32, 29], [33, 28]])))
+        self.assertTrue(np.array_equal(allData, data))
+
     def testImageDataYX0Axes(self):
         try:
             czi = CZIFile(Path(self.dataDir / "testCziFileYX0Axes.czi"))
