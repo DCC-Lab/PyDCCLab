@@ -25,12 +25,16 @@ class CZIFile(ImageFile):
         self.__isZStack = self.__axesDimAndIndex["Z"][0] > 1
         self.__isTimeSeries = self.__axesDimAndIndex["T"][0] > 1
         self.__isScenes = self.__axesDimAndIndex["S"][0] > 1
+
+        # Special cases never encountered. To be implemented if needed.
         if self.__isTimeSeries and self.__isScenes:
             raise NotImplementedError("Time series and scenes combination is not implemented")
         if self.__isTimeSeries and self.__isZStack:
             raise NotImplementedError("Time series and z-stack combination is not implemented")
         if self.__isZStack and self.__isScenes:
             raise NotImplementedError("Z-stack and scenes combination is not implemented")
+
+
         self.__numberOfChannels = self.__axesDimAndIndex["C"][0]
         self.__tileMap = self.__buildTileMap() if self.__axes != "YX0" else None
 
@@ -164,7 +168,8 @@ class CZIFile(ImageFile):
             index = None
             try:
                 index = self.__axes.index(key)
-            except ValueError:
+            except ValueError as e:
+                del e
                 if key == "C":
                     if self.__axes == "YX0":
                         valueReturn = 0
