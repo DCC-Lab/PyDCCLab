@@ -1,4 +1,5 @@
 from .channel import *
+from scipy.signal import convolve2d
 
 
 class ChannelFloat(Channel):
