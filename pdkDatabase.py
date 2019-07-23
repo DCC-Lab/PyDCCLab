@@ -26,8 +26,31 @@ def createPDKDatabase():
     print('Directory is : {}'.format(directory))
 
     # Path to the Paul de Koninck's database is :
-    mtpPath = os.path.join(directory, 'dcclab', 'database', 'pdk.db')
-    print('Path to database "pdk.db" is : {}'.format(mtpPath))
+    pdkPath = os.path.join(directory, 'dcclab', 'database', 'pdk.db')
+    print('Path to database "pdk.db" is : {}'.format(pdkPath))
+    print('Connecting to database...')
+
+    # We create a database object in rwc mode. If the database doesn't exist, we create it.
+    # Then we connect to the database.
+    # Database is in asynchronous mode for faster inserts.
+    with Database(pdkPath, True) as database:
+        print('Dropping all existing tables if any...')
+        database.dropTable('xlsxMetadata')
+        database.commit()
+        print('Done.')
+
+        print("WARNING : Database is in asynchronous mode.")
+        database.asynchronous()
+
+        # Now, we need paths to our metadata (the .raw files and the .xlsx files.)
+        # For the .xlsx, we have :
+        xlsxPath = os.path.join(directory, 'dcclab', 'PDK', 'Calcium_imaging_file_info.xlsx')
+        print('Path to mice data is : {}'.format(xlsxPath))
+
+        # For the .raw, we have :
+        print('Finding raw files in PDK...')
+        files = findFiles(os.path.join(directory, 'dcclab', 'PDK'), 'raw')
+        print('{} raw files were found!'.format(len(files)))
 
 
 if __name__ == '__main__':
