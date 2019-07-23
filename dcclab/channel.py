@@ -79,8 +79,8 @@ class Channel:
             return False
         return np.array_equal(self.pixels, other.pixels)
 
-    def copy(self) -> np.ndarray:
-        return np.copy(self.pixels)
+    def copy(self):
+        return Channel(np.copy(self.pixels))
 
     @property
     def isBinary(self) -> bool:
@@ -463,7 +463,7 @@ class Channel:
         ncols = len(channels) if len(channels) < 4 else 4
         for i in range(len(channels)):
             plt.subplot(nrows, ncols, i + 1)
-            plt.imshow(channels[i].pixels.T)
+            plt.imshow(channels[i].pixels)
         plt.show()
         return channels
 
@@ -579,6 +579,7 @@ class Channel:
     def powerSpectrum(self) -> np.ndarray:
         fftShiftPixels = self.fourierTransform()
         powerSpectrum = (np.abs(fftShiftPixels)) ** 2
+        powerSpectrum /= np.sum(powerSpectrum)
         return powerSpectrum
 
     def displayPowerSpectrum(self, logScale: bool = True) -> np.ndarray:
