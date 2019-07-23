@@ -65,16 +65,33 @@ def createPDKDatabase():
         database.commit()
         print('...Done!')
 
+        # We insert the .xlsx Metadata into the tables.
+        print('Inserting metadata into the database...')
+        entries = xlsxMetadata.metadata
+        database.beginTransaction()
+        for sheet in entries.values():
+            for row in sheet.values():
+                database.insert('xlsxMetadata', row)
+        database.commit()
+        print('xlsxMetadata was processed for {} lines...'.format(len(entries)))
+
+        # Skip the raw files for now.
+
+    print('Database was successfully created.')
+
 
 if __name__ == '__main__':
     createPDKDatabase()
+
     # Reading the xlsx file
+    '''
     xlsx = 'K:\\Calcium_imaging_file_info.xlsx'
     mtdt = Metadata(xlsx)
 
     for sheet in mtdt.metadata.values():
         for row in sheet.values():
             print(row)
+    '''
 
     '''
     with xlrd.open_workbook(xlsx) as file:
