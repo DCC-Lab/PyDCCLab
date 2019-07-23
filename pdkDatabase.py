@@ -42,15 +42,28 @@ def createPDKDatabase():
         print("WARNING : Database is in asynchronous mode.")
         database.asynchronous()
 
-        # Now, we need paths to our metadata (the .raw files and the .xlsx files.)
+        # Now, we need paths to our metadata (the .raw files and the .xlsx file.)
         # For the .xlsx, we have :
         xlsxPath = os.path.join(directory, 'dcclab', 'PDK', 'Calcium_imaging_file_info.xlsx')
-        print('Path to mice data is : {}'.format(xlsxPath))
+        print('Path to file data is : {}'.format(xlsxPath))
 
         # For the .raw, we have :
         print('Finding raw files in PDK...')
         files = findFiles(os.path.join(directory, 'dcclab', 'PDK'), 'raw')
         print('{} raw files were found!'.format(len(files)))
+
+        # Now, we extract the metadata from our files. First, we start with the .csv files.
+        # We extract the metadata.
+        print('Extracting metadata from .xlsx file...')
+        xlsxMetadata = Metadata(xlsxPath)
+        print('...Done!')
+
+        # We create tables for the metadata.
+        print('Creating tables for the .xlsx metadata...')
+        database.beginTransaction()
+        database.createTable(xlsxMetadata.keys)
+        database.commit()
+        print('...Done!')
 
 
 if __name__ == '__main__':
