@@ -180,7 +180,7 @@ class Channel:
     def setMaskFromThreshold(self, value=None):
         if value is not None:
             binaryMask = self.pixels > value
-            self.mask = Channel(pixels=binaryMask)
+            self.mask = Channel(pixels=binaryMask.T)
         else:
             raise NotImplementedError("Mask requires a value for thresholding")
 
