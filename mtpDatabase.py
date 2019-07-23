@@ -15,7 +15,7 @@ def createMTPDatabase():
     mtpPath = os.path.join(directory, 'dcclab', 'database', 'mtp.db')
     print('Path to database "mtp.db" is : {}'.format(mtpPath))
 
-    # We create a database object in rwc mode. If it doesn't exist, we create it.
+    # We create a database object in rwc mode. If the database doesn't exist, we create it.
     # Then we connect to the database.
     # Database is in asynchronous mode for faster inserts.
     print('Connecting to database...')

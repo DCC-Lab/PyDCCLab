@@ -3,6 +3,7 @@ from dcclab import Metadata
 from dcclab import Database
 import xlrd
 import re
+import os
 
 
 # Read the xlsx file.
@@ -18,11 +19,15 @@ import re
 # Cafeine2 is a server and pdk has a whole different server so where should the database go?
 
 
-def createPDKDatabase()
+def createPDKDatabase():
     # Current directory is :
     print('Beginning process...')
     directory = os.path.dirname(__file__)
     print('Directory is : {}'.format(directory))
+
+    # Path to the Paul de Koninck's database is :
+    mtpPath = os.path.join(directory, 'dcclab', 'database', 'pdk.db')
+    print('Path to database "pdk.db" is : {}'.format(mtpPath))
 
 
 if __name__ == '__main__':
