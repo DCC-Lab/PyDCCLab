@@ -18,7 +18,15 @@ import re
 # Cafeine2 is a server and pdk has a whole different server so where should the database go?
 
 
+def createPDKDatabase()
+    # Current directory is :
+    print('Beginning process...')
+    directory = os.path.dirname(__file__)
+    print('Directory is : {}'.format(directory))
+
+
 if __name__ == '__main__':
+    createPDKDatabase()
     # Reading the xlsx file
     xlsx = 'K:\\Calcium_imaging_file_info.xlsx'
     mtdt = Metadata(xlsx)
