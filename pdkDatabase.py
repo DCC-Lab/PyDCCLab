@@ -35,7 +35,7 @@ def createPDKDatabase():
     # Database is in asynchronous mode for faster inserts.
     with Database(pdkPath, True) as database:
         print('Dropping all existing tables if any...')
-        database.dropTable('xlsxMetadata')
+        database.dropTable('Files info')
         database.commit()
         print('Done.')
 
@@ -60,7 +60,6 @@ def createPDKDatabase():
 
         # We create tables for the metadata.
         print('Creating tables for the .xlsx metadata...')
-        print(xlsxMetadata.keys)
         database.beginTransaction()
         database.createTable(xlsxMetadata.keys)
         database.commit()
@@ -72,7 +71,7 @@ def createPDKDatabase():
         database.beginTransaction()
         for sheet in entries.values():
             for row in sheet.values():
-                database.insert('xlsxMetadata', row)
+                database.insert('Files info', row)
         database.commit()
         print('xlsxMetadata was processed for {} lines...'.format(len(entries)))
 
