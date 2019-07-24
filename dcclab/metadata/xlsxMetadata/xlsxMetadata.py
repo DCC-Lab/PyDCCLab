@@ -2,6 +2,7 @@ import xlrd
 import os
 import re
 
+
 class XLSXMetadata:
     def __init__(self, xlsxPath):
         self.path = xlsxPath
@@ -36,11 +37,11 @@ class XLSXMetadata:
             for worksheet in self.worksheets:
                 header = {}
                 for col in range(worksheet.ncols):
-                    key = str(worksheet.cell_value(0, col)).replace('(Hz)', '')
-                    key = re.sub('^\\s{1,99}', '', key)
-                    key = re.sub('\\s{1,99}$', '', key)
-                    key = re.sub('\\s', '_', key)
-                    header[key] = 'TEXT'
+                    key = self.formatKey(str(worksheet.cell_value(0, col)))
+                    if key == 'Folder_path':
+                        header[key] = 'TEXT PRIMARY KEY'
+                    else:
+                        header[key] = 'TEXT'
                 keys[worksheet.name] = header
             return keys
         except:
@@ -54,12 +55,16 @@ class XLSXMetadata:
             for row in range(1, worksheet.nrows):
                 cols = {}
                 for col in range(worksheet.ncols):
-                    key = str(worksheet.cell_value(0, col)).replace('(Hz)', '')
-                    key = re.sub('^\\s{1,99}', '', key)
-                    key = re.sub('\\s{1,99}$', '', key)
-                    key = re.sub('\\s', '_', key)
+                    key = self.formatKey(str(worksheet.cell_value(0, col)))
                     cols[key] = str(worksheet.cell_value(row, col)).replace(',', '')
                 sheet[row] = cols
             dictio[worksheet.name] = sheet
 
         return dictio
+
+    def formatKey(self, key: str):
+        formattedKey = key.replace('(Hz)', '')
+        formattedKey = re.sub('^\\s{1,99}', '', formattedKey)
+        formattedKey = re.sub('\\s{1,99}$', '', formattedKey)
+        formattedKey = re.sub('\\s', '_', formattedKey)
+        return formattedKey
