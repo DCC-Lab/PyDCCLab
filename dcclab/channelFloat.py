@@ -1,5 +1,9 @@
 from .channel import *
 from scipy.signal import convolve2d
+from skimage.filters import *
+import scipy.ndimage.filters as filters
+import warnings
+from skimage.filters.rank import entropy
 
 
 class ChannelFloat(Channel):

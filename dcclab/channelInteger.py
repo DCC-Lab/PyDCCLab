@@ -1,6 +1,8 @@
+from skimage.filters.rank import entropy
 from .channel import *
 import cv2 as cv
 import warnings
+
 
 
 class ChannelInt(Channel):
