@@ -76,13 +76,12 @@ def createPDKDatabase():
         print('xlsxMetadata was processed for {} sheet(s)...'.format(len(entries)))
 
         # Skip the raw files for now.  # TODO
+        print('Metadata related to raw files cannot be processed for the moment.')
 
     print('Database was successfully created.')
 
 
 if __name__ == '__main__':
-    createPDKDatabase()
-
     '''
     # Reading the ini files.
     directory = 'K:\\'
@@ -99,4 +98,5 @@ if __name__ == '__main__':
         except:
             print(">>>>{} file doesn't work.".format(iniFile))
     '''
+    createPDKDatabase()
     pass
