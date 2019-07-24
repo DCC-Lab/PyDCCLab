@@ -73,7 +73,7 @@ def createPDKDatabase():
             for row in sheet.values():
                 database.insert('Files info', row)
         database.commit()
-        print('xlsxMetadata was processed for {} lines...'.format(len(entries)))
+        print('xlsxMetadata was processed for {} sheet(s)...'.format(len(entries)))
 
         # Skip the raw files for now.  # TODO
 
