@@ -75,7 +75,7 @@ def createPDKDatabase():
         database.commit()
         print('xlsxMetadata was processed for {} lines...'.format(len(entries)))
 
-        # Skip the raw files for now.
+        # Skip the raw files for now.  # TODO
 
     print('Database was successfully created.')
 
