@@ -83,26 +83,6 @@ def createPDKDatabase():
 if __name__ == '__main__':
     createPDKDatabase()
 
-    # Reading the xlsx file
-    '''
-    xlsx = 'K:\\Calcium_imaging_file_info.xlsx'
-    mtdt = Metadata(xlsx)
-
-    for sheet in mtdt.metadata.values():
-        for row in sheet.values():
-            print(row)
-    '''
-
-    '''
-    with xlrd.open_workbook(xlsx) as file:
-        sheet = file.sheet_by_index(0)
-
-        for row in range(1, sheet.nrows):
-            line = []
-            for col in range(sheet.ncols):
-                line.append(sheet.cell_value(row, col))
-    '''
-
     '''
     # Reading the ini files.
     directory = 'K:\\'
@@ -119,3 +99,4 @@ if __name__ == '__main__':
         except:
             print(">>>>{} file doesn't work.".format(iniFile))
     '''
+    pass

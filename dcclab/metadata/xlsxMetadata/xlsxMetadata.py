@@ -59,7 +59,6 @@ class XLSXMetadata:
                     cols[key] = str(worksheet.cell_value(row, col)).replace(',', '')
                 sheet[row] = cols
             dictio[worksheet.name] = sheet
-
         return dictio
 
     def formatKey(self, key: str):
