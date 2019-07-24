@@ -33,11 +33,13 @@ class XLSXMetadata:
     def getKeys(self) -> dict:
         keys = {}
         try:
-            for sheet in self.worksheets:
+            for worksheet in self.worksheets:
                 header = {}
-                for col in range(sheet.ncols):
-                    header[sheet.cell_value(0, col)] = 'TEXT'
-                keys[sheet.name] = header
+                for col in range(worksheet.ncols):
+                    key = re.sub('^\\s{1,99}', '', str(worksheet.cell_value(0, col)))
+                    key = re.sub('\\s', '_', key)
+                    header[key] = 'TEXT'
+                keys[worksheet.name] = header
             return keys
         except:
             return keys
