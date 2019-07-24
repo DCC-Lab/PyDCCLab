@@ -38,7 +38,7 @@ class XLSXMetadata:
                 for col in range(worksheet.ncols):
                     key = str(worksheet.cell_value(0, col)).replace('(Hz)', '')
                     key = re.sub('^\\s{1,99}', '', key)
-                    key = re.sub('$\\s{1,99}', '', key)
+                    key = re.sub('\\s{1,99}$', '', key)
                     key = re.sub('\\s', '_', key)
                     header[key] = 'TEXT'
                 keys[worksheet.name] = header
@@ -54,9 +54,9 @@ class XLSXMetadata:
             for row in range(1, worksheet.nrows):
                 cols = {}
                 for col in range(worksheet.ncols):
-                    key = str(worksheet.cell_value(0, col)).replace('(HZ)', '')
+                    key = str(worksheet.cell_value(0, col)).replace('(Hz)', '')
                     key = re.sub('^\\s{1,99}', '', key)
-                    key = re.sub('$\\s{1,99}', '', key)
+                    key = re.sub('\\s{1,99}$', '', key)
                     key = re.sub('\\s', '_', key)
                     cols[key] = str(worksheet.cell_value(row, col)).replace(',', '')
                 sheet[row] = cols
