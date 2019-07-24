@@ -6,7 +6,6 @@ import warnings
 class ChannelInt(Channel):
 
     def __init__(self, pixels: np.ndarray):
-        pixels = pixels.T
         # FIXME: use bool directly?
         if "bool" in str(pixels.dtype):
             pixels = pixels.astype(int)

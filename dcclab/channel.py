@@ -27,6 +27,10 @@ class Channel:
                 raise PixelTypeException("Can't read images of type {}".format(pixels.dtype))
 
     def __init__(self, pixels: np.ndarray):
+        """
+        Creates a Channel object from an array of pixels.
+        :param pixels: Numpy array of integers or floats. Must be in the shape (X, Y), width x height
+        """
         pixels.squeeze()  # in case the array is nested in useless dimensions
         if pixels.ndim != 2:
             raise DimensionException(pixels.ndim)
@@ -180,7 +184,7 @@ class Channel:
     def setMaskFromThreshold(self, value=None):
         if value is not None:
             binaryMask = self.pixels > value
-            self.mask = Channel(pixels=binaryMask.T)
+            self.mask = Channel(pixels=binaryMask)
         else:
             raise NotImplementedError("Mask requires a value for thresholding")
 
@@ -463,7 +467,7 @@ class Channel:
         ncols = len(channels) if len(channels) < 4 else 4
         for i in range(len(channels)):
             plt.subplot(nrows, ncols, i + 1)
-            plt.imshow(channels[i].pixels)
+            plt.imshow(channels[i].pixels.T)
         plt.show()
         return channels
 

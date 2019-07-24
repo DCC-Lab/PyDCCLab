@@ -5,7 +5,6 @@ from scipy.signal import convolve2d
 class ChannelFloat(Channel):
 
     def __init__(self, pixels: np.ndarray):
-        pixels = pixels.T
         if "float" not in str(pixels.dtype):
             raise TypeError("Pixel type must be float.")
         maxValue = np.nanmax(pixels)

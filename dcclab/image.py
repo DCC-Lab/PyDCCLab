@@ -10,7 +10,6 @@ from typing import List, Union
 
 
 class Image:
-
     supportedClasses = [CZIFile_, TIFFFile, PILFile, MATLABFile]
     supportedFormats = []
 
@@ -37,7 +36,8 @@ class Image:
                 except:
                     continue
             if self.__fileObject is None:
-                message = "Cannot read '{0}': not a recognized image format ({1})".format(self.path, Image.supportedFormats)
+                message = "Cannot read '{0}': not a recognized image format ({1})".format(self.path,
+                                                                                          Image.supportedFormats)
                 raise InvalidFileFormatException(message)
         else:
             self.path = None
@@ -68,7 +68,7 @@ class Image:
             totalSize += channel.sizeInBytes
         return totalSize
 
-    def removeChannels(self, channels:list):
+    def removeChannels(self, channels: list):
         for index in channels:
             del self.channels[index]
 
@@ -84,7 +84,7 @@ class Image:
 
     def asArray(self):
         channelArrays = self.asChannelsArray()
-        imageData = np.dstack(channelArrays) 
+        imageData = np.dstack(channelArrays)
         return imageData
 
     def asOriginalArray(self):
@@ -110,15 +110,18 @@ class Image:
         pilImage.close()
 
     def display(self, colorMap=None):
-        plt.imshow(self.asArray(), cmap=colorMap)
-        plt.show()
+        if self.shape[-1] not in [1, 3]:
+            Channel.multiChannelDisplay(self.channels)
+        else:
+            plt.imshow(self.asArray().squeeze().T, cmap=colorMap)
+            plt.show()
 
     def channelsFromArray(self, array):
         # This (static) method creates new Channel Objects
         if array.ndim == 2:
-            return [Channel(array)]
+            return [Channel(array.T)]
         elif array.ndim == 3:
-            channelsData = np.squeeze(np.dsplit(array, array.shape[2]))
+            channelsData = np.squeeze(np.dsplit(array.transpose(1, 0, 2), array.shape[2]))
             # (temp fix) : channelsData is only 2D if input array has only one channel (shape (x, y, 1))
             if channelsData.ndim == 2:
                 channelsData = np.expand_dims(channelsData, axis=0)
@@ -247,10 +250,10 @@ class Image:
         for channel in self.channels:
             channel.applyNoiseFilterWithErosionDilation(erosion_size, dilation_size, closing_size)
 
-    def applyOpeningToMask(self, size: int=None, iterations: int = 1):
+    def applyOpeningToMask(self, size: int = None, iterations: int = 1):
         for channel in self.channels:
             channel.mask.applyNdImageBinaryOpening(size, iterations)
 
-    def applyClosingToMask(self, size: int=None, iterations: int = 1):
+    def applyClosingToMask(self, size: int = None, iterations: int = 1):
         for channel in self.channels:
             channel.mask.applyNdImageBinaryClosing(size, iterations)
