@@ -60,6 +60,7 @@ def createPDKDatabase():
 
         # We create tables for the metadata.
         print('Creating tables for the .xlsx metadata...')
+        print(xlsxMetadata.keys)
         database.beginTransaction()
         database.createTable(xlsxMetadata.keys)
         database.commit()
