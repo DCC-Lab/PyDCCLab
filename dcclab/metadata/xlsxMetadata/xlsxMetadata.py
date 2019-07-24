@@ -36,7 +36,7 @@ class XLSXMetadata:
             for worksheet in self.worksheets:
                 header = {}
                 for col in range(worksheet.ncols):
-                    key = str(worksheet.cell_value(0, col)).replace('(HZ)', '')
+                    key = str(worksheet.cell_value(0, col)).replace('(Hz)', '')
                     key = re.sub('^\\s{1,99}', '', key)
                     key = re.sub('$\\s{1,99}', '', key)
                     key = re.sub('\\s', '_', key)
