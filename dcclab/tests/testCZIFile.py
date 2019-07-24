@@ -254,6 +254,5 @@ class TestMethodsAndProperties(env.DCCLabTestCase):
             self.assertTupleEqual(image.shape, (2, 3, 1))
 
 
-
 if __name__ == '__main__':
     unittest.main()
