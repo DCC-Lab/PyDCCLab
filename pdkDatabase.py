@@ -6,19 +6,6 @@ import re
 import os
 
 
-# Read the xlsx file.
-# -> From xlsx line, create xlsxMetadata object.
-# -> Get primary metadata from the xlsx line.
-# Opt. ? -> Analyse file path in the xlsx line. (.raw file)
-# Opt. ? -> Find the .ini file related to the .raw file path.
-# Opt. ? -> -> Find more metadata from the .ini file if relevant.
-# -> Export as a dict.
-# -> Add dict to database.
-
-# What database? Where?
-# Cafeine2 is a server and pdk has a whole different server so where should the database go?
-
-
 def createPDKDatabase():
     # Current directory is :
     print('Beginning process...')
