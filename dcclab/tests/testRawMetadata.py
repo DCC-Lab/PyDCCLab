@@ -10,8 +10,10 @@ class TestRawMetadata(env.DCCLabTestCase):
         self.iniPath = os.path.join(str(self.dataDir), '20190101_12_12_12_900nm_16x_512x1024_1000f_8dpf_XYT.ini')
         self.xmlPath = os.path.join(str(self.dataDir), '20190101_12_12_12_900nm_16x_512x1024_1000f_8dpf_OME.xml')
         with open(self.iniPath, 'w') as file:
-            file.write('[]\n')
-            file.write('Test File\n')
+            file.write('[_]\nTest_File = This is a test file\nno.of.channels = 1.000000000000\nblank_line = blank\n'
+                       'frame.count = 1000.000000000000\n\nx.pixels = 1024.000000000000\ny.pixels = 512.000000000000\n'
+                       'x.voltage = 5.000000000000\ny.voltage = 1.250000000000\n\nwrong.line = bleh\n'
+                       'pixel.resolution = 5.000000000000\nLaser.Power = 21.500000000000\n')
 
         with open(self.xmlPath, 'w') as file:
             file.write('<TEST>\n')
