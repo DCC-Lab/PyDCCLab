@@ -1,8 +1,6 @@
 from dcclab import findFiles
 from dcclab import Metadata
 from dcclab import Database
-import xlrd
-import re
 import os
 
 

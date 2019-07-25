@@ -64,8 +64,7 @@ class TestRawMetadata(env.DCCLabTestCase):
 
     def testExtractDataFromIniFile(self):
         metadata = mtdt(self.rawPath)
-        print(metadata.extractDataFromIniFile())
-        pass
+        self.assertTrue(metadata.extractDataFromIniFile())
 
 
 if __name__ == '__main__':
