@@ -62,6 +62,11 @@ class TestRawMetadata(env.DCCLabTestCase):
         metadata = mtdt(self.rawPath)
         self.assertTrue(metadata.readXmlFile())
 
+    def testExtractDataFromIniFile(self):
+        metadata = mtdt(self.rawPath)
+        print(metadata.extractDataFromIniFile())
+        pass
+
 
 if __name__ == '__main__':
     unittest.main()

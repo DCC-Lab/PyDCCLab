@@ -46,9 +46,14 @@ class RAWMetadata:
         iniDict = {}
         iniLines = self.readIniFile()
         for line in iniLines:
-            key, value = line.split(' = ')
-            if key in keys:
-                iniDict[key] = value
+            try:
+                line = line.split(' = ')
+                key = line[0]
+                value = line[1].rstrip('\n')
+                if key in keys:
+                    iniDict[key] = value
+            except:
+                pass
         return iniDict
 
 
