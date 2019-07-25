@@ -16,7 +16,7 @@ class RAWMetadata:
         self.xmlPath = self.__xmlPath()  # FixMe This might not be necessary. Delete if xml are irrelevant.
 
         # Data from secondary files.
-        self.iniLines = self.readIniFile()
+        self.iniDict = self.extractDataFromIniFile()
         self.xmlRoot = self.readXmlFile()  # FixMe This might not be necessary. Delete if xml are irrelevant.
 
     def __fileName(self):
@@ -43,9 +43,14 @@ class RAWMetadata:
     def extractDataFromIniFile(self):
         keys = ['no.of.channels', 'frame.count', 'x.pixels', 'y.pixels', 'x.voltage', 'y.voltage', 'pixel.resolution',
                 'Laser.Power']
+        iniDict = {}
         iniLines = self.readIniFile()
         for line in iniLines:
             key, value = line.split(' = ')
+            if key in keys:
+                iniDict[key] = value
+        return iniDict
+
 
     def readXmlFile(self):
         tree = et.parse(self.xmlPath)
