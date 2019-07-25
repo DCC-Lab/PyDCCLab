@@ -40,6 +40,7 @@ class RAWMetadata:
             lines = file.readlines()
         return lines
 
+    # TODO What about keys and types?
     def extractDataFromIniFile(self):
         keys = ['no.of.channels', 'frame.count', 'x.pixels', 'y.pixels', 'x.voltage', 'y.voltage', 'pixel.resolution',
                 'Laser.Power']
@@ -55,7 +56,6 @@ class RAWMetadata:
             except:
                 pass
         return iniDict
-
 
     def readXmlFile(self):
         tree = et.parse(self.xmlPath)
