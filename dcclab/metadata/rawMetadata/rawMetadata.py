@@ -40,6 +40,13 @@ class RAWMetadata:
             lines = file.readlines()
         return lines
 
+    def extractDataFromIniFile(self):
+        keys = ['no.of.channels', 'frame.count', 'x.pixels', 'y.pixels', 'x.voltage', 'y.voltage', 'pixel.resolution',
+                'Laser.Power']
+        iniLines = self.readIniFile()
+        for line in iniLines:
+            key, value = line.split(' = ')
+
     def readXmlFile(self):
         tree = et.parse(self.xmlPath)
         return tree.getroot()
