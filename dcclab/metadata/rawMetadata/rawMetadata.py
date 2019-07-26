@@ -62,7 +62,8 @@ class RAWMetadata:
         return iniDict
 
     def getIniKeys(self):
-        pass
+        return {'no.of.channels': 'INTEGER', 'frame.count': 'INTEGER', 'x.pixels': 'INTEGER', 'y.pixels': 'INTEGER',
+                'x.voltage': 'REAL', 'y.voltage': 'REAL', 'pixel.resolution': 'REAL', 'Laser.Power': 'REAL'}
 
     def readXmlFile(self):
         tree = et.parse(self.xmlPath)

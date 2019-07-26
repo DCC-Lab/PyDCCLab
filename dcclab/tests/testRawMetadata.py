@@ -66,6 +66,12 @@ class TestRawMetadata(env.DCCLabTestCase):
         metadata = mtdt(self.rawPath)
         self.assertTrue(metadata.extractDataFromIniFile())
 
+    def testGetIniKeys(self):
+        metadata = mtdt(self.rawPath)
+        self.assertEqual(metadata.getIniKeys(), {'no.of.channels': 'INTEGER', 'frame.count': 'INTEGER',
+                                                 'x.pixels': 'INTEGER', 'y.pixels': 'INTEGER', 'x.voltage': 'REAL',
+                                                 'y.voltage': 'REAL', 'pixel.resolution': 'REAL',
+                                                 'Laser.Power': 'REAL'})
 
 if __name__ == '__main__':
     unittest.main()
