@@ -73,5 +73,6 @@ class TestRawMetadata(env.DCCLabTestCase):
                                                  'y.voltage': 'REAL', 'pixel.resolution': 'REAL',
                                                  'Laser.Power': 'REAL'})
 
+
 if __name__ == '__main__':
     unittest.main()
