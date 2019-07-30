@@ -18,7 +18,7 @@ def sqliteDataTypes() -> list:
     # This is a list of data types and affinities for sqlite entries. Used to check if a type is valid.
     # Affinities with a range of values would work even if the given range is wrong. They are more like guidelines and
     # less like rules. Nonetheless, for the sake of cleanliness, these guidelines are currently enforced.
-    return ['INT', 'INTEGER', 'TINYINT', 'SMALLINT', 'MEIDUMINT', 'BIGINT', 'UNSIGNED BIG INT', 'INT2', 'INT8',
+    return ['INT', 'INTEGER', 'TINYINT', 'SMALLINT', 'MEDIUMINT', 'BIGINT', 'UNSIGNED BIG INT', 'INT2', 'INT8',
             r'CHARACTER\(([1-9]|1\d|20)\)|CHARACTER$',
             r'VARCHAR\(([1-9]|\d{2}|1\d{2}|2[0-4]\d|2[0-5][0-5])\)|VARCHAR$',
             r'VARYING CHARACTER\(([1-9]|\d{2}|1\d{2}|2[0-4]\d|2[0-5][0-5])\)|VARYING CHARACTER$',
