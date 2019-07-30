@@ -16,16 +16,15 @@ def findFiles(directory, extension) -> list:
 
 def sqliteDataTypes() -> list:
     # This is a list of data types and affinities for sqlite entries. Used to check if a type is valid.
-    # A couple of precisions.
-    # CHARACTER(20), VARCHAR(255), VARYING CHARACTER(255), NCHAR(55), NATIVE CHARACTER(70), NVARCHAR(100)
-    # DECIMAL(10,5)
+    # Affinities with a range of values would work even if the given range is wrong. They are more like guidelines and
+    # less like rules. Nonetheless, for the sake of cleanliness, these guidelines are currently enforced.
     return ['INT', 'INTEGER', 'TINYINT', 'SMALLINT', 'MEIDUMINT', 'BIGINT', 'UNSIGNED BIG INT', 'INT2', 'INT8',
             r'CHARACTER\(([1-9]|1\d|20)\)|CHARACTER$',
             r'VARCHAR\(([1-9]|\d{2}|1\d{2}|2[0-4]\d|2[0-5][0-5])\)|VARCHAR$',
             r'VARYING CHARACTER\(([1-9]|\d{2}|1\d{2}|2[0-4]\d|2[0-5][0-5])\)|VARYING CHARACTER$',
             r'NCHAR\(([1-9]|[1-4]\d|5[0-5])\)|NCHAR$', r'NATIVE CHARACTER\(([1-9]|[1-6]\d|70)\)|NATIVE CHARACTER$',
             r'NVARCHAR\(([1-9]|\d{2}|100)\)|NVARCHAR$', 'TEXT', 'CLOB', 'BLOB', 'REAL', 'DOUBLE', 'DOUBLE PRECISION',
-            'FLOAT', 'NUMERIC', 'DECIMAL(10,5)', 'BOOLEAN', 'DATE', 'DATETIME']
+            'FLOAT', 'NUMERIC', r'DECIMAL\(([1-9]|10),([0-5])\)|DECIMAL$', 'BOOLEAN', 'DATE', 'DATETIME']
 
 
 def checkIfValidDataType(dataType: str) -> bool:
@@ -36,22 +35,4 @@ def checkIfValidDataType(dataType: str) -> bool:
 
 
 if __name__ == '__main__':
-    dType = ''
-    print(checkIfValidDataType(dType))
-    dType = 'INT'
-    print(checkIfValidDataType(dType))
-    dType = 'character(20)'
-    print(checkIfValidDataType(dType))
-    dType = 'varChar(255)'
-    print(checkIfValidDataType(dType))
-    dType = 'Varying Character(255)'
-    print(checkIfValidDataType(dType))
-    dType = 'NCHAR(55)'
-    print(checkIfValidDataType(dType))
-    dType = 'NATIVE CHARACTER(70)'
-    print(checkIfValidDataType(dType))
-    dType = 'NVARchar(100)'
-    print(checkIfValidDataType(dType))
-    dType = 'Decimal(11,5)'
-    print(re.search(r'DECIMAL\((\d|10,[1-5])\)|DECIMAL', dType, re.IGNORECASE))
     pass
