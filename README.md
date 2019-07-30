@@ -101,4 +101,4 @@ The database is ready to use (i.e. `connected`) upon creation.  To begin using t
 
 ## Disclaimer
 
-To be written.
+Copyrights DCCote + Anais (2019).
