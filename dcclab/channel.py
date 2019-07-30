@@ -1,10 +1,11 @@
 import numpy as np
 import typing
 
-from skimage import measure, morphology
+from skimage import measure, morphology, feature
 from scipy.ndimage import label, sum
 import scipy.ndimage as ndimage
 from .DCCExceptions import *
+import cv2 as cv
 
 import matplotlib.pyplot as plt
 import json
@@ -47,7 +48,7 @@ class Channel:
     def __str__(self) -> str:
         return str(self.pixels)
 
-    def __repr__(self)->str:
+    def __repr__(self) -> str:
         return self.__str__()
 
     @property
@@ -452,6 +453,55 @@ class Channel:
         sizes = sum(self.pixels, labeled, range(nbObjects + 1))
         return Channel(labeled), nbObjects, sizes
 
+    def getDistanceTranform(self, returnIndices: bool = False) -> np.ndarray:
+        if not self.isBinary:
+            raise NotBinaryImageException
+        distanceTransform = ndimage.distance_transform_edt(self.pixels, return_indices=returnIndices)
+        return distanceTransform
+
+    def watershedSegmentation(self, gaussianFilterStdDev: float = 1.2, localPeaksMinDistance: int = 5,
+                              use4Connectivity: bool = True):
+        ccKernel = None
+        if not use4Connectivity:
+            ccKernel = np.ones((3, 3))
+        # First, we apply a gaussian filter in order to remove some noise in the channel and smooth it.
+        gaussianFilter = self.getGaussianFilter(gaussianFilterStdDev)
+        self.multiChannelDisplay([self, gaussianFilter])
+        # We can now threshold the filtered channel in order to have a binary channel.
+        gaussianBin = gaussianFilter.getOtsuThresholding()
+        gaussianBin.display()
+        # Compute the distances between each pixels and its nearest 0 value pixel.
+        distanceTransform = gaussianBin.getDistanceTranform()
+        plt.imshow(distanceTransform.T, cmap="jet")
+        plt.show()
+        # We then find the local max of the distance transform array
+        localMax = feature.peak_local_max(distanceTransform, indices=False, min_distance=localPeaksMinDistance,
+                                          labels=gaussianBin.pixels)
+        # Let's get the markers of the connected components
+        markers = Channel(localMax).getConnectedComponents(connectionStructure=ccKernel)[0].pixels
+        # Find labels of the different object in the image
+        labels = morphology.watershed(-distanceTransform, markers, mask=gaussianBin.pixels)
+        uniqueLabels = np.unique(labels)
+        allMask = np.zeros(self.shape, dtype=np.uint8)
+        for label in uniqueLabels:
+            if label == 0:
+                # label = 0 means background
+                continue
+
+            mask = np.zeros(self.shape, dtype=np.uint8)
+            mask[labels == label] = 255
+            allMask[labels == label] = label
+
+        masks = Channel(allMask)
+        return masks, len(uniqueLabels) - 1
+
+    def circularHoughTransform(self):
+        # First of all, we must find the edges
+        edges = self.getSobelFilter()
+        radii = np.arange(1, 100, 2)
+
+        pass
+
     def convertTo16BitsUnsignedInteger(self):
         pass
 
@@ -462,15 +512,23 @@ class Channel:
         pass
 
     @staticmethod
-    def multiChannelDisplay(channels: list) -> list:
+    def multiChannelDisplay(channels: list, colorMaps: list = None) -> list:
+        if colorMaps is not None and len(channels) != len(colorMaps) and len(colorMaps) != 1:
+            raise ValueError(
+                "'channels' and 'colorMaps' must have the same length or 'colorMaps' must have a single element.")
+
         nrows = int(np.ceil(len(channels) / 4))
         ncols = len(channels) if len(channels) < 4 else 4
         for i in range(len(channels)):
             plt.subplot(nrows, ncols, i + 1)
-            plt.imshow(channels[i].pixels.T)
+            colorMap = None
+            if colorMaps is not None:
+                colorMap = colorMaps[i % len(colorMaps)]
+            plt.imshow(channels[i].pixels.T, cmap=colorMap)
         plt.show()
         return channels
 
+    ### Spectral analysis methods ###
     def applyHighPassFilterFromRetcangularMask(self, filterSize: int):
         fftShiftPixels = self.fourierTransform()
         XY = self.createXYGridsFromArray(fftShiftPixels)
@@ -601,6 +659,15 @@ class Channel:
         ps1D = self.azimuthalAverage(powerSpectrumDensity)
         return ps1D
 
+    def powerSpectrumAngularAverage(self) -> np.ndarray:
+        powerSpectrumDensity = self.powerSpectrum()
+        x, y = self.createXYGridsFromArray(powerSpectrumDensity)
+
+        minTheta = (np.arctan2(y, x + 1) * 180 / np.pi).astype(int)
+        maxTheta = (np.arctan2(y + 1, x) * 180 / np.pi).astype(int)
+        plt.imshow(np.concatenate((minTheta, maxTheta)))
+        plt.show()
+
     def displayPowerSpectrumAzimuthalAverage(self, logBase: float = None) -> np.ndarray:
         ps1D = self.powerSpectrumAzimuthalAverage()
         x = range(len(ps1D))
@@ -646,6 +713,8 @@ class Channel:
         y, x = np.indices(shape)
         if gridOriginAtCenter:
             y, x = np.flipud(y - np.max(y) // 2), x - np.max(x) // 2
+            if x.shape[1] % 2 == 0:
+                x -= 1
         return x, y
 
     @staticmethod
