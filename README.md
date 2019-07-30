@@ -99,3 +99,6 @@ For each specific database, a new class inheriting from the `Database` object ca
 
 The database is ready to use (i.e. `connected`) upon creation.  To begin using the `Database`, making queries or inserting into it, use the exposed API (e.g., `select(table, columns, condition) -> lite.Row:`) or execute an explicit SQL command (e.g., `    execute(statement)`). To create a new database, a `Database` object has to be created with `writePermission=True`. If it does not exist yet, the database will be created at the `Database.path` location (in **URI**).
 
+## Disclaimer
+
+To be written.
