@@ -21,7 +21,7 @@ class DataGraphs(env.DCCLabTestCase):
             (self.egfp["average"] != "NotYetImplemented") & (self.egfp["average"] != "IndexError")]
 
     def testExtractDataSingleChannel(self):
-        writeFile = open("imagesToCheck.csv", "w", encoding="utf-8")
+        writeFile = open(Path(self.tmpDir / "imagesToCheck.csv"), "w", encoding="utf-8")
         writeFile.writelines("path,channel,xVal,yVal,graphTitle")
         channels = [self.egfp, self.dapi, self.mCherry]
         dataNormalized = ["averageN", "stdDevN", "entropyN", "medianN"]
