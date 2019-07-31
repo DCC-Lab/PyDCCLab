@@ -12,6 +12,7 @@ except:
 class Metadata:
     supportedClasses = [CZIMetadata, CSVMetadata, XLSXMetadata, RAWMetadata]
     supportedFormats = ['CZI', 'CSV', 'XLSX', 'RAW']
+    supportedReasearchGroup = ['POM', 'PDK']
 
     def __init__(self, path: str):
         if path is not None:
@@ -32,6 +33,15 @@ class Metadata:
         else:
             self.path = None
             self.__fileObject = None
+
+    def findResearchGroup(self, path: str):
+        basename = os.path.basename(path)
+        if basename == '':
+            return False
+        elif basename in Metadata.supportedReasearchGroup:
+            return basename
+        else:
+            return self.findResearchGroup(os.path.dirname(path))
 
     @property
     def metaType(self):
