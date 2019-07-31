@@ -12,7 +12,7 @@ except:
 class Metadata:
     supportedClasses = [CZIMetadata, CSVMetadata, XLSXMetadata, RAWMetadata]
     supportedFormats = ['CZI', 'CSV', 'XLSX', 'RAW']
-    supportedReasearchGroup = ['POM', 'PDK']
+    supportedResearchGroup = ['POM', 'PDK']
 
     def __init__(self, path: str):
         if path is not None:
@@ -38,7 +38,7 @@ class Metadata:
         basename = os.path.basename(path)
         if basename == '':
             return False
-        elif basename in Metadata.supportedReasearchGroup:
+        elif basename in Metadata.supportedResearchGroup:
             return basename
         else:
             return self.findResearchGroup(os.path.dirname(path))
