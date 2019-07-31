@@ -50,7 +50,7 @@ data/
 + some variants considering the fact that the labels might not exist yet.
 
 
-In the first case it has to seperate and remember each type (or source?) by their name.
+In the first case it has to separate and remember each type (or source?) by their name.
 This looks to me like each type (called class in ML classification) or source, with its labels, is one image collection object. 
 This means that a Dataset Class has to load multiple ImageCollections (and remember their names).
 
