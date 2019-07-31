@@ -14,10 +14,10 @@ class ChannelFloat(Channel):
         maxValue = np.nanmax(pixels)
         if maxValue <= 1.0:
             self.__originalFactor = 1.0
-            normalizedPixels = np.copy(pixels)
+            normalizedPixels = np.copy(pixels).astype(np.float32)
         else:
             self.__originalFactor = maxValue
-            normalizedPixels = np.copy(pixels) / maxValue
+            normalizedPixels = (np.copy(pixels) / maxValue).astype(np.float32)
         Channel.__init__(self, normalizedPixels)
 
     def getHistogramValues(self, normed: bool = False) -> typing.Tuple[np.ndarray, np.ndarray]:
