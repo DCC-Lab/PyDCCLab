@@ -180,8 +180,9 @@ class TestMethodsAndProperties(env.DCCLabTestCase):
         czi = CZIFile(Path(self.dataDir / "testCziYX0Tiny.czi"))
         allData = czi.allData()
         data = np.dstack((np.array([[7, 7], [6, 6]]), np.array([[46, 48], [51, 47]]), np.array([[32, 29], [33, 28]])))
-        self.assertTrue(np.array_equal(allData, data))
-
+        # FIXME: should try to get version of package.
+        self.assertTrue(np.array_equal(allData, data),"It is possible cziFile is an old version.  pip install czifile --upgrade")
+        
     def testImageDataYX0Axes(self):
         try:
             czi = CZIFile(Path(self.dataDir / "testCziFileYX0Axes.czi"))
@@ -197,7 +198,8 @@ class TestMethodsAndProperties(env.DCCLabTestCase):
     def testImageDataYX0Values(self):
         czi = CZIFile(Path(self.dataDir / "testCziYX0Tiny.czi"))
         values = np.dstack((np.array([[7, 7], [6, 6]]), np.array([[46, 48], [51, 47]]), np.array([[32, 29], [33, 28]])))
-        self.assertTrue(np.array_equal(czi.imageData().asArray(), values.transpose((1, 0, 2))))
+        # FIXME: should try to get version of package.
+        self.assertTrue(np.array_equal(czi.imageData().asArray(), values.transpose((1, 0, 2))),"It is possible cziFile is an old version.  pip install czifile --upgrade")
 
     def testImageDataBSCYX0Values(self):
         czi = CZIFile(Path(self.dataDir / "testCziBSCZY0Tiny.czi"))
