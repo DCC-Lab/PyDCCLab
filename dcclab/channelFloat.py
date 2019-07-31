@@ -33,8 +33,8 @@ class ChannelFloat(Channel):
         return Channel(entropyFiltered.astype(np.float32))
 
     def convolveWith(self, matrix: typing.Union[np.ndarray, list]):
-        convolvedArray = convolve2d(self.pixels, matrix, mode="same", boundary="symm")
-        return Channel(convolvedArray)
+        convolvedArray = convolve2d(self.pixels.T, matrix, mode="same", boundary="symm")
+        return Channel(convolvedArray.T)
 
     def getGaussianFilter(self, sigma: float = 1):
         gaussianFiltered = gaussian(self.pixels, sigma, mode="nearest", multichannel=False,
@@ -68,16 +68,16 @@ class ChannelFloat(Channel):
         return integerChannel.getAdaptiveThresholdGaussian(oddRegionSize)
 
     def getHorizontalSobelFilter(self):
-        sobelH = sobel_h(self.pixels)
-        return Channel(sobelH)
+        sobelH = sobel_h(self.pixels.T)
+        return Channel(sobelH.T)
 
     def getVerticalSobelFilter(self):
-        sobelV = sobel_v(self.pixels)
-        return Channel(sobelV)
+        sobelV = sobel_v(self.pixels.T)
+        return Channel(sobelV.T)
 
     def getSobelFilter(self) -> Channel:
-        sobelHV = sobel(self.pixels)
-        return Channel(sobelHV)
+        sobelHV = sobel(self.pixels.T)
+        return Channel(sobelHV.T)
 
     def convertTo8BitsUnsignedInteger(self):
         return self._convertToUnsignedInt(np.uint8)

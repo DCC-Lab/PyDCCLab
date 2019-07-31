@@ -646,10 +646,10 @@ class Channel:
 
     def displayPowerSpectrum(self, logScale: bool = True) -> np.ndarray:
         powerSpectrum = self.powerSpectrum()
-        rows, cols = powerSpectrum.shape
+        cols, rows = powerSpectrum.T.shape
         if logScale:
             powerSpectrum = np.log(powerSpectrum)
-        plt.imshow(powerSpectrum, extent=(-cols // 2, cols // 2, -rows // 2, rows // 2))
+        plt.imshow(powerSpectrum.T, extent=(-cols // 2, cols // 2, -rows // 2, rows // 2))
         plt.colorbar()
         plt.show()
         return powerSpectrum
@@ -658,15 +658,6 @@ class Channel:
         powerSpectrumDensity = self.powerSpectrum()
         ps1D = self.azimuthalAverage(powerSpectrumDensity)
         return ps1D
-
-    def powerSpectrumAngularAverage(self) -> np.ndarray:
-        powerSpectrumDensity = self.powerSpectrum()
-        x, y = self.createXYGridsFromArray(powerSpectrumDensity)
-
-        minTheta = (np.arctan2(y, x + 1) * 180 / np.pi).astype(int)
-        maxTheta = (np.arctan2(y + 1, x) * 180 / np.pi).astype(int)
-        plt.imshow(np.concatenate((minTheta, maxTheta)))
-        plt.show()
 
     def displayPowerSpectrumAzimuthalAverage(self, logBase: float = None) -> np.ndarray:
         ps1D = self.powerSpectrumAzimuthalAverage()
@@ -677,6 +668,25 @@ class Channel:
         plt.show()
         return ps1D
 
+    def powerSpectrumAngularAverage(self) -> np.ndarray:
+        powerSpectrumDensity = self.powerSpectrum()
+        psAngAvg = self.angularAverage(powerSpectrumDensity)
+        return psAngAvg
+
+    def displayPowerSpectrumAngularAverage(self, logBase: float = None, useRadians: bool = False) -> np.ndarray:
+        psAngAvg = self.powerSpectrumAngularAverage()
+        x = range(len(psAngAvg))
+        label = "degrees"
+        if useRadians:
+            x = np.array(x) / 180 * np.pi
+            label = "radians"
+        plt.plot(x, psAngAvg)
+        if logBase is not None:
+            plt.yscale("log", basey=logBase)
+        plt.xlabel("Angle [{}]".format(label))
+        plt.show()
+        return psAngAvg
+
     def fourierTransform(self, shift: bool = True) -> np.ndarray:
         pixels = self.pixels
         fftPixels = np.fft.fft2(pixels)
@@ -685,7 +695,7 @@ class Channel:
         return fftPixels
 
     def applyGaussianNoise(self, sigma: float, mean: float = 0):
-        rows, cols = self.shape
+        cols, rows = self.shape
         gauss = np.random.normal(mean, sigma, (rows, cols))
         gauss = np.clip(gauss.reshape(rows, cols), 0, np.max(gauss))
         noise = self.pixels + gauss.astype(self._originalDType)
@@ -710,7 +720,7 @@ class Channel:
     def createXYGridsFromArray(array: np.ndarray, gridOriginAtCenter: bool = True) -> typing.Tuple[
         np.ndarray, np.ndarray]:
         shape = array.shape
-        y, x = np.indices(shape)
+        x, y = np.indices(shape)
         if gridOriginAtCenter:
             y, x = np.flipud(y - np.max(y) // 2), x - np.max(x) // 2
             if x.shape[1] % 2 == 0:
@@ -785,7 +795,23 @@ class Channel:
         x, y = Channel.createXYGridsFromArray(array)
         radii = ((x ** 2 + y ** 2) ** (1 / 2)).astype(int)
         index = np.unique(radii)
-        return ndimage.mean(array, radii, index=index)
+        return np.array(ndimage.mean(array, radii, index=index))
+
+    @staticmethod
+    def angularAverage(array: np.ndarray) -> np.ndarray:
+        x, y = Channel.createXYGridsFromArray(array)
+        centerY = y.shape[0] // 2
+        # We only take the 1st and 2nd quadrant because the 3rd and 4th are just a reflection.
+        x, y = x[:centerY + 1, :], y[:centerY + 1, :]
+        # The angle of a line starting from origin and passing through a pixel is given by arctan(y/x) where (x, y) are
+        # the coordinates of each pixel.
+        angleMask = np.round(np.arctan2(y, x) * 180 / np.pi).astype(int)
+        upperPartArray = array[:centerY + 1, :]
+        plt.imshow(np.log(upperPartArray))
+        plt.show()
+        index = np.unique(angleMask)
+        average = ndimage.mean(upperPartArray, angleMask, index=index)
+        return np.array(average)
 
 
 from .channelFloat import ChannelFloat
