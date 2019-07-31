@@ -29,12 +29,6 @@ class TestChannelFloat(env.DCCLabTestCase):
     def testGetHistogramValuesNormed(self):
         self.assertTrue(sum(self.channelNormalized.getHistogramValues(True)[0]) == 1)
 
-    def testEntropyFilterWarning(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("error", category=UserWarning)
-            with self.assertRaises(UserWarning):
-                self.channelNormalized.getEntropyFilter(3)
-
     def testEntropyFiltering(self):
         filterSize = 3
         array = np.zeros((5, 5), dtype=np.float32)
@@ -44,9 +38,7 @@ class TestChannelFloat(env.DCCLabTestCase):
             for j in range(1, 4):
                 resultEntropyArray[i][j] = 503.2583348E-3
         resultEntropyImage = Channel(resultEntropyArray)
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            computedByClass = Channel(array).getEntropyFilter(filterSize)
+        computedByClass = Channel(array).getEntropyFilter(filterSize)
         self.assertTrue(resultEntropyImage == computedByClass)
 
     def testConvolveWith(self):
@@ -69,9 +61,7 @@ class TestChannelFloat(env.DCCLabTestCase):
                 gaussianBlurredArray[i][j] = np.exp(-((i - 2) ** 2 + (j - 2) ** 2) / (2 * sigma ** 2)) / (
                         2 * np.pi * sigma ** 2)
         normalizedGaussianBlurredArray = gaussianBlurredArray / np.sum(gaussianBlurredArray) * 1
-        with warnings.catch_warnings():
-            warnings.simplefilter('ignore', category=UserWarning)
-            channelGaussian = channel.getGaussianFilter(sigma)
+        channelGaussian = channel.getGaussianFilter(sigma)
         channelGaussianPixels = channelGaussian.pixels
         self.assertTrue(np.allclose(channelGaussianPixels,
                                     normalizedGaussianBlurredArray) and isinstance(channelGaussian, ChannelFloat))
@@ -94,60 +84,28 @@ class TestChannelFloat(env.DCCLabTestCase):
                 # Compute the standard deviation of the smaller arrays
         resultArray = np.array([channel.getStandardDeviation() for channel in listOfChannels],
                                dtype=np.float32).reshape((5, 5))
-        with warnings.catch_warnings():
-            warnings.simplefilter('ignore', category=UserWarning)
-            stdDevChannel = Channel(array).getStandardDeviationFilter(filterSize=3)
-            stdDevChannelPixels = stdDevChannel.pixels
+        stdDevChannel = Channel(array).getStandardDeviationFilter(filterSize=3)
+        stdDevChannelPixels = stdDevChannel.pixels
 
         self.assertTrue(np.allclose(resultArray, stdDevChannelPixels) and isinstance(stdDevChannel, ChannelFloat))
 
-    def testIsodataThreshWarning(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("error", category=UserWarning)
-            with self.assertRaises(UserWarning):
-                self.channelNormalized.getIsodataThresholding()
-
     def testIsodataThresh(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", category=UserWarning)
-            thresh = self.channelNotNormalized.getIsodataThresholding()
-        self.assertIsInstance(thresh, ChannelInt)
 
-    def testOtsuThreshWarning(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("error", category=UserWarning)
-            with self.assertRaises(UserWarning):
-                self.channelNormalized.getOtsuThresholding()
+        thresh = self.channelNotNormalized.getIsodataThresholding()
+        self.assertIsInstance(thresh, ChannelInt)
 
     def testOtsuThresh(self):
         channel = Channel(np.arange(0, 100).reshape((10, 10)).astype(np.float32))
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", category=UserWarning)
-            thresh = channel.getOtsuThresholding()
+        thresh = channel.getOtsuThresholding()
         self.assertIsInstance(thresh, ChannelInt)
-
-    def testAdaptiveThreshMeanWarning(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("error", category=UserWarning)
-            with self.assertRaises(UserWarning):
-                self.channelNormalized.getAdaptiveThresholdMean(3)
 
     def testAdaptiveThreshMean(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", category=UserWarning)
-            thresh = self.channelNotNormalized.getAdaptiveThresholdMean()
+        thresh = self.channelNotNormalized.getAdaptiveThresholdMean()
         self.assertIsInstance(thresh, ChannelInt)
 
-    def testAdaptiveThreshGaussianWarning(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("error", category=UserWarning)
-            with self.assertRaises(UserWarning):
-                self.channelNormalized.getAdaptiveThresholdGaussian(3)
-
     def testAdaptiveThreshGaussian(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", category=UserWarning)
-            thresh = self.channelNotNormalized.getAdaptiveThresholdGaussian()
+
+        thresh = self.channelNotNormalized.getAdaptiveThresholdGaussian()
         self.assertIsInstance(thresh, ChannelInt)
 
     def testHSobelFilter(self):

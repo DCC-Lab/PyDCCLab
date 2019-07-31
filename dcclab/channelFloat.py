@@ -1,4 +1,9 @@
 from .channel import *
+from scipy.signal import convolve2d
+from skimage.filters import *
+import scipy.ndimage.filters as filters
+import warnings
+from skimage.filters.rank import entropy
 
 
 class ChannelFloat(Channel):
@@ -23,7 +28,6 @@ class ChannelFloat(Channel):
         return hist, bins
 
     def getEntropyFilter(self, filterSize: int):
-        warnings.warn("Converting to uint8.")
         pixels = self.convertTo8BitsUnsignedInteger().pixels
         entropyFiltered = entropy(pixels, morphology.selem.square(filterSize, dtype=np.float32))
         return Channel(entropyFiltered.astype(np.float32))
@@ -48,22 +52,18 @@ class ChannelFloat(Channel):
         return Channel(stdFiltered)
 
     def getIsodataThresholding(self):
-        warnings.warn("Converting to 8-bits integer before computing threshold.")
         integerChannel = self.convertTo8BitsUnsignedInteger()
         return integerChannel.getIsodataThresholding()
 
     def getOtsuThresholding(self):
-        warnings.warn("Converting to 8-bits integer before computing threshold")
         integerChannel = self.convertTo8BitsUnsignedInteger()
         return integerChannel.getOtsuThresholding()
 
     def getAdaptiveThresholdMean(self, oddRegionSize: int = 3):
-        warnings.warn("Converting to 8-bits integer before computing threshold")
         integerChannel = self.convertTo8BitsUnsignedInteger()
         return integerChannel.getAdaptiveThresholdMean(oddRegionSize)
 
     def getAdaptiveThresholdGaussian(self, oddRegionSize: int = 3):
-        warnings.warn("Converting to 8-bits integer before computing threshold")
         integerChannel = self.convertTo8BitsUnsignedInteger()
         return integerChannel.getAdaptiveThresholdGaussian(oddRegionSize)
 
@@ -88,3 +88,7 @@ class ChannelFloat(Channel):
     def _convertToUnsignedInt(self, dtype):
         convertedArray = ((np.copy(self.pixels)) * np.iinfo(dtype).max)
         return Channel(convertedArray.astype(dtype))
+
+    def applyPoissonNoise(self, scale: float):
+        noise = np.random.poisson(scale * self.pixels)
+        return Channel(noise + self.pixels)
