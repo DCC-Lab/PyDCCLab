@@ -2,7 +2,7 @@ import os
 import re
 
 
-def findFiles(directory, extension) -> list:
+def findFiles(directory: str, extension: str) -> list:
     # Although os.walk is slow, I haven't found a faster way to find files in a directory and sub directories.
     # In python 3.x, os.walk was modified to use os.scandir, which greatly improved its performances. I doubt
     # there is a faster way to do this.
@@ -12,6 +12,16 @@ def findFiles(directory, extension) -> list:
             if re.search(r'^.*\.{}$'.format(extension), file, re.IGNORECASE):
                 filesFound.append(os.path.join(root, file))
     return filesFound
+
+
+def findFolderInPath(folder: str, path: str):
+    basename = os.path.basename(path)
+    if basename == '':
+        return False
+    elif basename == folder:
+        return folder
+    else:
+        return findFolderInPath(folder, os.path.dirname(path))
 
 
 def sqliteDataTypes() -> list:
@@ -35,4 +45,5 @@ def checkIfValidDataType(dataType: str) -> bool:
 
 
 if __name__ == '__main__':
+    print(findFolderInPath('Usersi', __file__))
     pass
