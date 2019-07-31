@@ -1,4 +1,5 @@
 from dcclab import Metadata
+from shutil import copyfile
 import env
 import unittest
 import os
@@ -7,9 +8,21 @@ import xlwt
 
 class TestMetadata(env.DCCLabTestCase):
     def setUp(self):
-        self.cziPath = os.path.join(str(self.dataDir), 'testCziFile.czi')
-        self.csvPath = os.path.join(str(self.dataDir), 'unittest.csv')
-        self.xlsxPath = os.path.join(str(self.dataDir), 'unittest.xlsx')
+        # Creating specific directories used for research groups.
+        self.pomDir = os.path.join(str(self.dataDir), 'POM')
+        self.pdkDir = os.path.join(str(self.dataDir), 'PDK')
+        if not os.path.exists(self.pomDir):
+            os.mkdir(self.pomDir)
+        if not os.path.exists(self.pdkDir):
+            os.mkdir(self.pdkDir)
+
+        # Copying a .czi file to the right folder.
+        self.cziPath = os.path.join(self.pomDir, 'testCziFile.czi')
+        copyfile(os.path.join(str(self.dataDir), 'testCziFile.czi'), self.cziPath)
+
+        # Creating other test files needed.
+        self.csvPath = os.path.join(self.pomDir, 'unittest.csv')
+        self.xlsxPath = os.path.join(self.pdkDir, 'unittest.xlsx')
 
         with open(self.csvPath, 'w') as file:
             file.write('field_1,field_2,field_3\n')
@@ -37,6 +50,9 @@ class TestMetadata(env.DCCLabTestCase):
     def tearDown(self) -> None:
         os.remove(self.csvPath)
         os.remove(self.xlsxPath)
+        os.remove(self.cziPath)
+        os.rmdir(self.pomDir)
+        os.rmdir(self.pdkDir)
 
     def testWrongFileType(self):
         wrongFile = os.path.join(str(self.dataDir), 'test.tif')
