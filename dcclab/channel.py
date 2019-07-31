@@ -529,7 +529,7 @@ class Channel:
         return channels
 
     ### Spectral analysis methods ###
-    def applyHighPassFilterFromRetcangularMask(self, filterSize: int):
+    def applyHighPassFilterFromRectangularMask(self, filterSize: int):
         fftShiftPixels = self.fourierTransform()
         XY = self.createXYGridsFromArray(fftShiftPixels)
         mask = 1 - self.createRectangularMask(XY, filterSize)
@@ -656,7 +656,7 @@ class Channel:
 
     def powerSpectrumAzimuthalAverage(self) -> np.ndarray:
         powerSpectrumDensity = self.powerSpectrum()
-        ps1D = self.azimuthalAverage(powerSpectrumDensity)
+        ps1D = self.azimuthalAverage(powerSpectrumDensity.T)
         return ps1D
 
     def displayPowerSpectrumAzimuthalAverage(self, logBase: float = None) -> np.ndarray:
@@ -670,7 +670,7 @@ class Channel:
 
     def powerSpectrumAngularAverage(self) -> np.ndarray:
         powerSpectrumDensity = self.powerSpectrum()
-        psAngAvg = self.angularAverage(powerSpectrumDensity)
+        psAngAvg = self.angularAverage(powerSpectrumDensity.T)
         return psAngAvg
 
     def displayPowerSpectrumAngularAverage(self, logBase: float = None, useRadians: bool = False) -> np.ndarray:
@@ -720,7 +720,7 @@ class Channel:
     def createXYGridsFromArray(array: np.ndarray, gridOriginAtCenter: bool = True) -> typing.Tuple[
         np.ndarray, np.ndarray]:
         shape = array.shape
-        x, y = np.indices(shape)
+        y, x = np.indices(shape)
         if gridOriginAtCenter:
             y, x = np.flipud(y - np.max(y) // 2), x - np.max(x) // 2
             if x.shape[1] % 2 == 0:
@@ -806,11 +806,9 @@ class Channel:
         # The angle of a line starting from origin and passing through a pixel is given by arctan(y/x) where (x, y) are
         # the coordinates of each pixel.
         angleMask = np.round(np.arctan2(y, x) * 180 / np.pi).astype(int)
-        upperPartArray = array[:centerY + 1, :]
-        plt.imshow(np.log(upperPartArray))
-        plt.show()
+        upperPartArray = array[:, :centerY + 1]
         index = np.unique(angleMask)
-        average = ndimage.mean(upperPartArray, angleMask, index=index)
+        average = ndimage.mean(upperPartArray, angleMask.T, index=index)
         return np.array(average)
 
 
