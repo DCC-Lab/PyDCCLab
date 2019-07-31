@@ -1,6 +1,8 @@
+from skimage.filters.rank import entropy
 from .channel import *
 import cv2 as cv
 import warnings
+
 
 
 class ChannelInt(Channel):
@@ -156,6 +158,6 @@ class ChannelInt(Channel):
     def _convertToUnsignedInt(self, dtype) -> Channel:
         convertedArray = np.copy(self.pixels) / self._originalFactor * np.iinfo(dtype).max
         return Channel(convertedArray.astype(dtype))
-        
-    def applyPoissonNoise(self):
-        return self.convertToNormalizedFloat().applyPoissonNoise()
+
+    def applyPoissonNoise(self, scale: float):
+        return self.convertToNormalizedFloat().applyPoissonNoise(scale)

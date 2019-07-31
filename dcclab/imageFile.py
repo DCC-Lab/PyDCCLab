@@ -17,11 +17,6 @@ class ImageFile(object):
         """
         return None
 
-    def zStacksData(self):
-        """
-        :return: images data as z-stack if possible
-        """
-        return None
 
     def timeSeriesData(self):
         """
@@ -43,7 +38,7 @@ class ImageFile(object):
 
     def allData(self):
         """
-        :return: all image data as a list (whether it is a time series, a zstack, a time series of zstack...)
+        :return: all image data as a list (whether it is a time series, a zstack...)
         """
         return None
 
@@ -71,11 +66,11 @@ class CZIFile_(ImageFile):
         if axes == "BSCYX0":
             if cziObj.shape[1] != 1:
                 closeCziFileObject(cziObj)
-                raise NotImplementedError("Multiple scenes")
+                raise NotImplementedError("Multiple scenes in file '{}'".format(self.path))
         if axes not in ["BCYX0", "BSCYX0", "YX0"]:
             closeCziFileObject(cziObj)
             raise NotImplementedError(axes)
-        mosaic, self.__indexAndTiles = decodeImages(cziObj)
+        mosaic, self.__indexAndTiles = decodeCZIFile(cziObj)
         try:
             cIndex = axes.index("C")
         except ValueError:

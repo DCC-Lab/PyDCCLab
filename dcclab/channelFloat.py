@@ -1,4 +1,9 @@
 from .channel import *
+from scipy.signal import convolve2d
+from skimage.filters import *
+import scipy.ndimage.filters as filters
+import warnings
+from skimage.filters.rank import entropy
 
 
 class ChannelFloat(Channel):
@@ -83,9 +88,7 @@ class ChannelFloat(Channel):
     def _convertToUnsignedInt(self, dtype):
         convertedArray = ((np.copy(self.pixels)) * np.iinfo(dtype).max)
         return Channel(convertedArray.astype(dtype))
-        
-    def applyPoissonNoise(self):
-        values = len(np.unique(self.pixels))
-        values = 2 ** np.ceil(np.log2(values))
-        noise = np.random.poisson(self.pixels * values) / values
-        return Channel(noise)
+
+    def applyPoissonNoise(self, scale: float):
+        noise = np.random.poisson(scale * self.pixels)
+        return Channel(noise + self.pixels)

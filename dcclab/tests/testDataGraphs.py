@@ -20,180 +20,10 @@ class DataGraphs(env.DCCLabTestCase):
         self.egfp = self.egfp[
             (self.egfp["average"] != "NotYetImplemented") & (self.egfp["average"] != "IndexError")]
 
-    def testAllChannelsAvgVsStdDev(self):
-        avgMC = np.array(self.mCherry["average"], float)
-        stdDevMC = np.array(self.mCherry["stdDev"], float)
-        avgDAPI = np.array(self.dapi["average"], float)
-        stdDevDAPI = np.array(self.dapi["stdDev"], float)
-        avgEGFP = np.array(self.egfp["average"], float)
-        stdDevEGFP = np.array(self.egfp["stdDev"], float)
-        allAvg = np.concatenate((avgMC, avgDAPI, avgEGFP))
-        allStdDev = np.concatenate((stdDevMC, stdDevDAPI, stdDevEGFP))
-        jp = sns.jointplot(allAvg, allStdDev, kind="reg", scatter=False, fit_reg=False)
-        jp.ax_joint.plot(avgMC, stdDevMC, "o", color="red", alpha=0.2, label="mCherry")
-        jp.ax_joint.plot(avgDAPI, stdDevDAPI, "x", color="blue", alpha=0.2, label="DAPI")
-        jp.ax_joint.plot(avgEGFP, stdDevEGFP, "v", color="green", alpha=0.2, label="EGFP")
-        plt.ylabel("Standard Deviation")
-        plt.xlabel("Average")
-        plt.title("Average and standard deviation of images from the POM platform (non normalized images)")
-        plt.legend()
-        plt.show()
-
-    def testAllChannelsAvgVsEntropy(self):
-        avgMC = np.array(self.mCherry["average"], float)
-        entroDevMC = np.array(self.mCherry["entropy"], float)
-        avgDAPI = np.array(self.dapi["average"], float)
-        entroDAPI = np.array(self.dapi["entropy"], float)
-        avgEGFP = np.array(self.egfp["average"], float)
-        entroEGFP = np.array(self.egfp["entropy"], float)
-        allAvg = np.concatenate((avgMC, avgDAPI, avgEGFP))
-        allEntro = np.concatenate((entroDevMC, entroDAPI, entroEGFP))
-        jp = sns.jointplot(allAvg, allEntro, kind="reg", scatter=False, fit_reg=False)
-        jp.ax_joint.plot(avgMC, entroDevMC, "o", color="red", alpha=0.2, label="mCherry")
-        jp.ax_joint.plot(avgDAPI, entroDAPI, "x", color="blue", alpha=0.2, label="DAPI")
-        jp.ax_joint.plot(avgEGFP, entroEGFP, "v", color="green", alpha=0.2, label="EGFP")
-        plt.ylabel("Entropy")
-        plt.xlabel("Average")
-        plt.title("Average and entropy of images from the POM platform (non normalized images)")
-        plt.legend()
-        plt.show()
-
-    def testAllChannelsStdDevVsEntropy(self):
-        stdDevMC = np.array(self.mCherry["stdDev"], float)
-        entroDevMC = np.array(self.mCherry["entropy"], float)
-        stdDevDAPI = np.array(self.dapi["stdDev"], float)
-        entroDAPI = np.array(self.dapi["entropy"], float)
-        stdDevEGFP = np.array(self.egfp["stdDev"], float)
-        entroEGFP = np.array(self.egfp["entropy"], float)
-        allStdDev = np.concatenate((stdDevMC, stdDevDAPI, stdDevEGFP))
-        allEntro = np.concatenate((entroDevMC, entroDAPI, entroEGFP))
-        jp = sns.jointplot(allStdDev, allEntro, kind="reg", scatter=False, fit_reg=False)
-        jp.ax_joint.plot(stdDevMC, entroDevMC, "o", color="red", alpha=0.2, label="mCherry")
-        jp.ax_joint.plot(stdDevDAPI, entroDAPI, "x", color="blue", alpha=0.2, label="DAPI")
-        jp.ax_joint.plot(stdDevEGFP, entroEGFP, "v", color="green", alpha=0.2, label="EGFP")
-        plt.ylabel("Entropy")
-        plt.xlabel("Standard deviation")
-        plt.title("Standard deviation and entropy of images from the POM platform (non normalized images)")
-        plt.legend()
-        plt.show()
-
-    def testAllChannelsAvgVsStdDevN(self):
-        avgMC = np.array(self.mCherry["averageN"], float)
-        stdDevMC = np.array(self.mCherry["stdDevN"], float)
-        avgDAPI = np.array(self.dapi["averageN"], float)
-        stdDevDAPI = np.array(self.dapi["stdDevN"], float)
-        avgEGFP = np.array(self.egfp["averageN"], float)
-        stdDevEGFP = np.array(self.egfp["stdDevN"], float)
-        allAvg = np.concatenate((avgMC, avgDAPI, avgEGFP))
-        allStdDev = np.concatenate((stdDevMC, stdDevDAPI, stdDevEGFP))
-        jp = sns.jointplot(allAvg, allStdDev, kind="reg", scatter=False, fit_reg=False)
-        jp.ax_joint.plot(avgMC, stdDevMC, "o", color="red", alpha=0.2, label="mCherry")
-        jp.ax_joint.plot(avgDAPI, stdDevDAPI, "x", color="blue", alpha=0.2, label="DAPI")
-        jp.ax_joint.plot(avgEGFP, stdDevEGFP, "v", color="green", alpha=0.2, label="EGFP")
-        plt.ylabel("Standard Deviation")
-        plt.xlabel("Average")
-        plt.title("Average and standard deviation of images from the POM platform (normalized images)")
-        plt.legend()
-        plt.show()
-
-    def testAllChannelsAvgVsEntropyN(self):
-        avgMC = np.array(self.mCherry["averageN"], float)
-        entroDevMC = np.array(self.mCherry["entropyN"], float)
-        avgDAPI = np.array(self.dapi["averageN"], float)
-        entroDAPI = np.array(self.dapi["entropyN"], float)
-        avgEGFP = np.array(self.egfp["averageN"], float)
-        entroEGFP = np.array(self.egfp["entropyN"], float)
-        allAvg = np.concatenate((avgMC, avgDAPI, avgEGFP))
-        allEntro = np.concatenate((entroDevMC, entroDAPI, entroEGFP))
-        jp = sns.jointplot(allAvg, allEntro, kind="reg", scatter=False, fit_reg=False)
-        jp.ax_joint.plot(avgMC, entroDevMC, "o", color="red", alpha=0.2, label="mCherry")
-        jp.ax_joint.plot(avgDAPI, entroDAPI, "x", color="blue", alpha=0.2, label="DAPI")
-        jp.ax_joint.plot(avgEGFP, entroEGFP, "v", color="green", alpha=0.2, label="EGFP")
-        plt.ylabel("Entropy")
-        plt.xlabel("Average")
-        plt.title("Average and entropy of images from the POM platform (normalized images)")
-        plt.legend()
-        plt.show()
-
-    def testAllChannelsStdDevVsEntropyN(self):
-        stdDevMC = np.array(self.mCherry["stdDevN"], float)
-        entroDevMC = np.array(self.mCherry["entropyN"], float)
-        stdDevDAPI = np.array(self.dapi["stdDevN"], float)
-        entroDAPI = np.array(self.dapi["entropyN"], float)
-        stdDevEGFP = np.array(self.egfp["stdDevN"], float)
-        entroEGFP = np.array(self.egfp["entropyN"], float)
-        allStdDev = np.concatenate((stdDevMC, stdDevDAPI, stdDevEGFP))
-        allEntro = np.concatenate((entroDevMC, entroDAPI, entroEGFP))
-        jp = sns.jointplot(allStdDev, allEntro, kind="reg", scatter=False, fit_reg=False)
-        jp.ax_joint.plot(stdDevMC, entroDevMC, "o", color="red", alpha=0.2, label="mCherry")
-        jp.ax_joint.plot(stdDevDAPI, entroDAPI, "x", color="blue", alpha=0.2, label="DAPI")
-        jp.ax_joint.plot(stdDevEGFP, entroEGFP, "v", color="green", alpha=0.2, label="EGFP")
-        plt.ylabel("Entropy")
-        plt.xlabel("Standard deviation")
-        plt.title("Standard deviation and entropy of images from the POM platform (normalized images)")
-        plt.legend()
-        plt.show()
-
-    def testAllChannelsStdDevVsMedianN(self):
-        stdDevMC = np.array(self.mCherry["stdDevN"], float)
-        medianMC = np.array(self.mCherry["medianN"], float)
-        stdDevDAPI = np.array(self.dapi["stdDevN"], float)
-        medianDAPI = np.array(self.dapi["medianN"], float)
-        stdDevEGFP = np.array(self.egfp["stdDevN"], float)
-        medianEGFP = np.array(self.egfp["medianN"], float)
-        allStdDev = np.concatenate((stdDevMC, stdDevDAPI, stdDevEGFP))
-        allMedian = np.concatenate((medianMC, medianDAPI, medianEGFP))
-        jp = sns.jointplot(allStdDev, allMedian, kind="reg", scatter=False, fit_reg=False)
-        jp.ax_joint.plot(stdDevMC, medianMC, "o", color="red", alpha=0.2, label="mCherry")
-        jp.ax_joint.plot(stdDevDAPI, medianDAPI, "x", color="blue", alpha=0.2, label="DAPI")
-        jp.ax_joint.plot(stdDevEGFP, medianEGFP, "v", color="green", alpha=0.2, label="EGFP")
-        plt.ylabel("Median")
-        plt.xlabel("Standard deviation")
-        plt.title("Standard deviation and median of images from the POM platform (normalized images)")
-        plt.legend()
-        plt.show()
-
-    def testAllChannelsAverageVsMedianN(self):
-        averageMC = np.array(self.mCherry["averageN"], float)
-        medianMC = np.array(self.mCherry["medianN"], float)
-        averageDAPI = np.array(self.dapi["averageN"], float)
-        medianDAPI = np.array(self.dapi["medianN"], float)
-        averageEGFP = np.array(self.egfp["averageN"], float)
-        medianEGFP = np.array(self.egfp["medianN"], float)
-        allAverage = np.concatenate((averageMC, averageDAPI, averageEGFP))
-        allMedian = np.concatenate((medianMC, medianDAPI, medianEGFP))
-        jp = sns.jointplot(allAverage, allMedian, kind="reg", scatter=False, fit_reg=False)
-        jp.ax_joint.plot(averageMC, medianMC, "o", color="red", alpha=0.2, label="mCherry")
-        jp.ax_joint.plot(averageDAPI, medianDAPI, "x", color="blue", alpha=0.2, label="DAPI")
-        jp.ax_joint.plot(averageEGFP, medianEGFP, "v", color="green", alpha=0.2, label="EGFP")
-        plt.ylabel("Median")
-        plt.xlabel("Average")
-        plt.title("Average and median of images from the POM platform (normalized images)")
-        plt.legend()
-        plt.show()
-
-    def testAllChannelsEntropyVsMedianN(self):
-        entropyMC = np.array(self.mCherry["entropyN"], float)
-        medianMC = np.array(self.mCherry["medianN"], float)
-        entropyDAPI = np.array(self.dapi["entropyN"], float)
-        medianDAPI = np.array(self.dapi["medianN"], float)
-        entropyEGFP = np.array(self.egfp["entropyN"], float)
-        medianEGFP = np.array(self.egfp["medianN"], float)
-        allEntropy = np.concatenate((entropyMC, entropyDAPI, entropyEGFP))
-        allMedian = np.concatenate((medianMC, medianDAPI, medianEGFP))
-        jp = sns.jointplot(allEntropy, allMedian, kind="reg", scatter=False, fit_reg=False)
-        jp.ax_joint.plot(entropyMC, medianMC, "o", color="red", alpha=0.2, label="mCherry")
-        jp.ax_joint.plot(entropyDAPI, medianDAPI, "x", color="blue", alpha=0.2, label="DAPI")
-        jp.ax_joint.plot(entropyEGFP, medianEGFP, "v", color="green", alpha=0.2, label="EGFP")
-        plt.ylabel("Median")
-        plt.xlabel("Entropy")
-        plt.title("Entropy and median of images from the POM platform (normalized images)")
-        plt.legend()
-        plt.show()
-
     def testExtractDataSingleChannel(self):
+        writeFile = open(Path(self.tmpDir / "imagesToCheck.csv"), "w", encoding="utf-8")
+        writeFile.writelines("path,channel,xVal,yVal,graphTitle")
         channels = [self.egfp, self.dapi, self.mCherry]
-        dataNonNormalized = ["average", "stdDev", "entropy"]
         dataNormalized = ["averageN", "stdDevN", "entropyN", "medianN"]
         for channel in channels:
             if self.egfp.equals(channel):
@@ -205,20 +35,6 @@ class DataGraphs(env.DCCLabTestCase):
             else:
                 channelName = "DAPI"
                 color = "blue"
-            for i in range(len(dataNonNormalized)):
-                for j in range(i, len(dataNonNormalized)):
-                    xLabel = dataNonNormalized[i]
-                    yLabel = dataNonNormalized[j]
-                    if j != i:
-                        x = np.array(channel[xLabel], float)
-                        y = np.array(channel[yLabel], float)
-                        jp = sns.jointplot(x, y, kind="reg", scatter=False, fit_reg=False)
-                        jp.ax_joint.plot(x, y, "o", color=color, alpha=0.2)
-                        plt.ylabel(yLabel)
-                        plt.xlabel(xLabel)
-                        plt.title("{} and {} of {} from the POM platform (non normalized images)".format(xLabel, yLabel,
-                                                                                                         channelName))
-                        plt.show()
             for i in range(len(dataNormalized)):
                 for j in range(i, len(dataNormalized)):
                     xLabel = dataNormalized[i]
@@ -226,13 +42,48 @@ class DataGraphs(env.DCCLabTestCase):
                     if j != i:
                         x = np.array(channel[xLabel], float)
                         y = np.array(channel[yLabel], float)
-                        jp = sns.jointplot(x, y, kind="reg", scatter=False, fit_reg=False)
-                        jp.ax_joint.plot(x, y, "o", color=color, alpha=0.2)
+
+                        fig, ax = plt.subplots()
+                        sc = plt.scatter(x, y, color=color, alpha=0.2)
+                        annot = ax.annotate("", xy=(0, 0), xytext=(-100, 20), textcoords="offset points",
+                                            bbox=dict(boxstyle="round", fc="w"),
+                                            arrowprops=dict(arrowstyle="->"))
+                        annot.set_visible(False)
+                        title = "{} and {} of {} from the POM platform (normalized images)".format(xLabel, yLabel,
+                                                                                                   channelName)
+
+                        def update_annot(ind):
+                            pos = sc.get_offsets()[ind["ind"][0]]
+                            annot.xy = pos
+                            path = [np.array(channel["path"])[n] for n in ind["ind"]]
+                            xVal = [np.array(channel[xLabel])[n] for n in ind["ind"]]
+                            yVal = [np.array(channel[yLabel])[n] for n in ind["ind"]]
+                            text = "{}".format(" ".join([channel["path"][n] for n in ind["ind"]]))
+                            annot.set_text(text)
+                            for i in range(len(path)):
+                                writeFile.writelines("\n{},{},{},{},{}".format(path[i], channelName, xVal[i], yVal[i], title))
+
+                        def click(event):
+                            vis = annot.get_visible()
+                            if event.inaxes == ax:
+                                cont, ind = sc.contains(event)
+                                if cont:
+                                    update_annot(ind)
+                                    annot.set_visible(True)
+                                    fig.canvas.draw_idle()
+                                else:
+                                    if vis:
+                                        annot.set_visible(False)
+                                        fig.canvas.draw_idle()
+
+                        fig.canvas.mpl_connect("button_press_event", click)
                         plt.ylabel(yLabel)
                         plt.xlabel(xLabel)
-                        plt.title("{} and {} of {} from the POM platform (normalized images)".format(xLabel, yLabel,
-                                                                                                     channelName))
+                        plt.title(title)
+
                         plt.show()
+
+        writeFile.close()
 
 
 if __name__ == '__main__':

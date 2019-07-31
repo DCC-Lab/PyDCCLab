@@ -1,15 +1,6 @@
-from .imageFile import *
-from .cziUtil import *
 from .imageCollection import *
 from .timeSeries import TimeSeries
-
-"""
-The main goal of this file is to read czi files and extract images data (if it is a zstack, it will be read, if it is 
-a time serie, it will be read...). It will use ImageCollection instances (derived classes, like the zstack specific
-class). It is not the plan to use inheritance because it is unsure of what the structure will be (is it a zstack? or a
-simple single image?). For now, it doesn't use any of ImageCollection derived classes, but a future implementation
-can be done easily because of the current structure.
-"""
+from .zStack import ZStack
 
 
 class CZIFile(ImageFile):
@@ -24,7 +15,7 @@ class CZIFile(ImageFile):
             self.__cziObj = readCziImage(path)
         except ValueError:
             raise InvalidFileFormatException("Not a compatible format for this reader.")
-        self.__mosaic, self.__indexAndTiles = decodeImages(self.__cziObj)
+        self.__mosaic, self.__indexAndTiles = decodeCZIFile(self.__cziObj)
         self.__shape = self.__cziObj.shape
         self.__axes = self.__cziObj.axes
         self.__originalDType = self.__cziObj.dtype
@@ -34,22 +25,29 @@ class CZIFile(ImageFile):
         self.__isZStack = self.__axesDimAndIndex["Z"][0] > 1
         self.__isTimeSeries = self.__axesDimAndIndex["T"][0] > 1
         self.__isScenes = self.__axesDimAndIndex["S"][0] > 1
+
+        # Special cases never encountered. To be implemented if needed.
         if self.__isTimeSeries and self.__isScenes:
             raise NotImplementedError("Time series and scenes combination is not implemented")
         if self.__isTimeSeries and self.__isZStack:
             raise NotImplementedError("Time series and z-stack combination is not implemented")
         if self.__isZStack and self.__isScenes:
             raise NotImplementedError("Z-stack and scenes combination is not implemented")
+
         self.__numberOfChannels = self.__axesDimAndIndex["C"][0]
         self.__tileMap = self.__buildTileMap() if self.__axes != "YX0" else None
 
-    def allData(self):
-        pass
+    def allData(self) -> np.ndarray:
+        return np.squeeze(self.__mosaic)
 
     def imageData(self):
-        image = None
         if not (self.__isScenes or self.__isTimeSeries or self.__isZStack):
-            image = Image(self.__mosaic.squeeze().transpose(1, 2, 0)) if self.__axes != "YX0" else self.__YX0Image()
+            pixels = np.squeeze(self.__mosaic)
+            # We check if ndim == 2 because the Channel dimension may disappear in squeezing if equal to 1
+            if pixels.ndim == 2:
+                shape = pixels.shape
+                pixels = pixels.reshape((1, shape[0], shape[1]))
+            image = Image(pixels.transpose((1, 2, 0))) if self.__axes != "YX0" else self.__YX0Image()
         else:
             raise ValueError("This file contains more than just one image.")
         return image
@@ -60,11 +58,12 @@ class CZIFile(ImageFile):
     def scenesData(self):
         if self.__isScenes:
             scenes = []
-            nbScenes, scenesIndex = self.__axesDimAndIndex["S"]
-            channelIndex = self.__axesDimAndIndex["C"][1]
-            # in case there is only one channel (it would be squeezed by np.squeeze)
-            indexStopSqueeze = channelIndex if nbScenes == 1 else scenesIndex
-            mosaic = self.__squeezeAllExceptChannel()
+            nbScenes = self.__axesDimAndIndex["S"][0]
+            mosaic = np.squeeze(self.__mosaic)
+            # We check if ndim == 3 because the Channel dimension may disappear in squeezing if equal to 1
+            if mosaic.ndim == 3:
+                shape = mosaic.shape
+                mosaic = mosaic.reshape((shape[0], 1, shape[1], shape[2]))
             for i in range(nbScenes):
                 scenes.append(Image(mosaic[i, :, :, :].transpose(1, 2, 0)))
             coll = ImageCollection(scenes)
@@ -76,7 +75,11 @@ class CZIFile(ImageFile):
         if self.__isTimeSeries:
             tSeries = []
             nbTime = self.__axesDimAndIndex["T"][0]
-            mosaic = self.__squeezeAllExceptChannel()
+            mosaic = np.squeeze(self.__mosaic)
+            # We check if ndim == 3 because the Channel dimension may disappear in squeezing if equal to 1
+            if mosaic.ndim == 3:
+                shape = mosaic.shape
+                mosaic = mosaic.reshape((shape[0], 1, shape[1], shape[2]))
             for i in range(nbTime):
                 tSeries.append(Image(mosaic[i, :, :, :].transpose(1, 2, 0)))
             tSeries = TimeSeries(tSeries)
@@ -85,14 +88,26 @@ class CZIFile(ImageFile):
         return tSeries
 
     def zStackData(self):
-        zStack = None
         if self.__isZStack:
+            mosaic = np.copy(self.__mosaic)
+            channelIndex = self.__axesDimAndIndex["C"][-1]
+            zSTackIndex = self.__axesDimAndIndex["Z"][-1]
+            # FIXME Find better way/ more efficient way to swap axes
+            if channelIndex < zSTackIndex:
+                mosaic = np.swapaxes(mosaic, channelIndex, zSTackIndex)
             zStack = []
-            nbStack = self.__axesDimAndIndex["Z"][0]
-            mosaic = self.__mosaic.squeeze()
-            for i in range(nbStack):
-                zStack.append(Image(mosaic[:, i, :, :].transpose(1, 2, 0)))
-        return ZStack(zStack)
+            nbZ = self.__axesDimAndIndex["Z"][0]
+            mosaic = np.squeeze(mosaic)
+            # We check if ndim == 3 because the Channel dimension may disappear in squeezing if equal to 1
+            if mosaic.ndim == 3:
+                shape = mosaic.shape
+                mosaic = mosaic.reshape((shape[0], 1, shape[1], shape[2]))
+            for i in range(nbZ):
+                zStack.append(Image(mosaic[i, :, :, :].transpose(1, 2, 0)))
+            zStack = ZStack(zStack)
+        else:
+            zStack = None
+        return zStack
 
     @property
     def shape(self):
@@ -162,7 +177,8 @@ class CZIFile(ImageFile):
             index = None
             try:
                 index = self.__axes.index(key)
-            except ValueError:
+            except ValueError as e:
+                del e
                 if key == "C":
                     if self.__axes == "YX0":
                         valueReturn = 0
@@ -181,21 +197,3 @@ class CZIFile(ImageFile):
                 closeCziFileObject(self.__cziObj)
         except AttributeError:
             print("Object already deleted")
-
-    def squeezeAllExcept(self, exceptions: str = "C") -> np.ndarray:
-        squeezeList = []
-        exceptionList = []
-        for exception in exceptions:
-            try:
-                exceptionList.append(self.__axesDimAndIndex[exception][1])
-            except KeyError:
-                raise ValueError("\"{}\" is not a valid axis.".format(exception))
-        shape = self.__shape
-        for index in range(len(shape)):
-            if index not in exceptionList and shape[index] == 1:
-                squeezeList.append(index)
-        squeezeTuple = tuple(squeezeList)
-        return np.squeeze(self.__mosaic, axis=squeezeTuple)
-
-    def __squeezeAllExceptChannel(self):
-        return self.squeezeAllExcept("C")
