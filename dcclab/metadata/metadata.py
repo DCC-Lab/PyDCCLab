@@ -19,6 +19,8 @@ class Metadata:
             if not os.path.exists(path):
                 raise ValueError("Cannot load '{0}': file does not exist".format(path))
 
+            print(self.findResearchGroup(path))
+
             self.path = path
             self.__fileObject = None
             for supportedClass in Metadata.supportedClasses:

@@ -55,11 +55,13 @@ class TestMetadata(env.DCCLabTestCase):
         os.rmdir(self.pdkDir)
 
     def testWrongFileType(self):
-        wrongFile = os.path.join(str(self.dataDir), 'test.tif')
+        wrongFile = os.path.join(self.pomDir, 'test.gif')
+        copyfile(os.path.join(str(self.dataDir), 'test.gif'), wrongFile)
         with self.assertRaises(TypeError): Metadata(wrongFile)
+        os.remove(wrongFile)
 
     def testNoFile(self):
-        noFile = os.path.join(str(self.dataDir), 'nonexsitant.file')
+        noFile = os.path.join(self.pomDir, 'nonexsitant.file')
         with self.assertRaises(ValueError): Metadata(noFile)
 
     def testFileTypeIsCzi(self):
