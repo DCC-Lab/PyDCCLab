@@ -84,11 +84,6 @@ class TestChannelInteger(env.DCCLabTestCase):
         computedByClass = Channel(array).getEntropyFilter(filterSize)
         self.assertTrue(resultEntropyImage == computedByClass and isinstance(computedByClass, ChannelFloat))
 
-    def testEntropyWarning16Bits(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("error")
-            with self.assertRaises(UserWarning):
-                self.channelUint16.getEntropyFilter(2)
 
     def testGetStandardDeviation(self):
         array = np.zeros((5, 5), dtype=np.uint16)
@@ -261,6 +256,14 @@ class TestChannelInteger(env.DCCLabTestCase):
     def testApplyYDeriv(self):
         self.channelUint16.applyYDerivative()
         self.assertIsInstance(self.channelUint16, ChannelInt)
+
+    def testNormalizationMinToZeroMaxToOne16Bits(self):
+        for i in range(0, 10):
+            i = np.random.randint(2, 1000)
+            j = np.random.randint(2, 1000)
+            channel = Channel(
+                np.random.randint(0, 2 ** 16 - 1, (i, j)).astype(np.uint16)).convertToNormalizedFloatMinToZeroMaxToOne()
+            self.assertTupleEqual(channel.getExtrema(), (0, 1))
 
 
 if __name__ == '__main__':

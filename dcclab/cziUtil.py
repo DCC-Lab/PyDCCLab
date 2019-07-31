@@ -89,7 +89,7 @@ def getImagesFromCziFileObject(cziObject):
     return np.array(arrayReturn)
 
 
-def decodeImages(cziObj, showProgress=False):
+def decodeCZIFile(cziObj, showProgress=False):
     """Return image data from file(s) as numpy array and returns the list of tiles
 
     This is based on the czifil asarray method except it is modified so the data extraction is only done once.
