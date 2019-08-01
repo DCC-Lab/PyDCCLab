@@ -19,7 +19,8 @@ class Metadata:
             if not os.path.exists(path):
                 raise ValueError("Cannot load '{0}': file does not exist".format(path))
 
-            print(self.findResearchGroup(path))
+            if not self.findResearchGroup(path):
+                raise ValueError("Cannot load '{}' : file is not from a supported research group.".format(path))
 
             self.path = path
             self.__fileObject = None
