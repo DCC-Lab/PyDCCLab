@@ -323,23 +323,11 @@ class Channel:
     def getAverageValueOfPixels(self) -> float:
         return np.average(self.pixels)
 
-    @deprecated("Renamed getStandardDeviation()")
-    def getStandardDeviationOfPixels(self) -> float:
-        return self.getStandardDeviation()
-
     def getStandardDeviation(self) -> float:
         return np.std(self.pixels)
 
-    @deprecated("Renamed getShannonEntropy()")
-    def getShannonEntropyOfPixels(self, base=2) -> float:
-        return self.getShannonEntropy(base=base)
-
     def getShannonEntropy(self, base=2) -> float:
         return measure.shannon_entropy(self.pixels, base)[0]
-
-    @deprecated("Renamed getExtrema()")
-    def getExtremaValuesOfPixels(self) -> typing.Tuple[typing.Union[int, float], typing.Union[int, float]]:
-        return self.getExtrema()
 
     def getExtrema(self) -> typing.Tuple[typing.Union[int, float], typing.Union[int, float]]:
         return np.min(self.pixels), np.max(self.pixels)
@@ -357,17 +345,9 @@ class Channel:
         coordsList = coordsList[0]
         return coordsList
 
-    @deprecated("Renamed getMinimum()")
-    def getMinimumIntensityPixels(self) -> typing.List[typing.Tuple[int, int]]:
-        return self.getMinimum()
-
     def getMinimum(self) -> typing.List[typing.Tuple[int, int]]:
         minimum = self.getExtrema()[0]
         return self.getPixelsOfIntensity(minimum)
-
-    @deprecated("Renamed getMaximum()")
-    def getMaximumIntensityPixels(self) -> typing.List[tuple]:
-        return self.getMaximum()
 
     def getMaximum(self) -> typing.List[tuple]:
         maximum = self.getExtrema()[1]
@@ -388,16 +368,12 @@ class Channel:
     def getVerticalSobelFilter(self):
         pass
 
-    @deprecated("Renamed getSobelFilter()")
-    def getBothDirectionsSobelFilter(self):
-        return self.getSobelFilter()
-
     def getSobelFilter(self):
         pass
 
     def getGlobalThresholding(self, value):
         mask = self.pixels > value
-        return Channel(self.pixels * mask)
+        return Channel(mask)
 
     def getIsodataThresholding(self):
         pass
