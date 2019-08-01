@@ -78,7 +78,7 @@ class TestMetadata(env.DCCLabTestCase):
         mtdt = Metadata(self.xlsxPath)
         self.assertEqual(mtdt.validateResearchGroup(), 'PDK')
 
-    def testValidateResearchGroupValueErrore(self):
+    def testValidateResearchGroupValueError(self):
         mtdt = Metadata(self.cziPath)
         noGroup = os.path.join(str(self.dataDir), 'nonexsitant.file')
         mtdt.path = noGroup
