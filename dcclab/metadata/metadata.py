@@ -27,12 +27,9 @@ class Metadata:
         if path is not None:
             if not os.path.exists(path):
                 raise ValueError("Cannot load '{0}': file does not exist".format(path))
-
             self.path = path
             self.__researchGroup = self.validateResearchGroup()
             self.__fileObject = self.processFile()
-            if self.__fileObject is None:
-                raise TypeError("Cannot read '{0}': not a recognized format ({1}).".format(self.path, Metadata.supportedFormats))
         else:
             self.path = None
             self.__fileObject = None
@@ -45,7 +42,9 @@ class Metadata:
                     return fileObject
                 except:
                     continue
-            return None
+            raise TypeError("Cannot load '{}' : file is not from a recognized format for that research group "
+                            "({}).".format(self.path, Metadata.pomSupportedFormats))
+
         elif self.__researchGroup == 'PDK':
             for supportedClass in Metadata.pdkSupportedClasses:
                 try:
@@ -53,16 +52,15 @@ class Metadata:
                     return fileObject
                 except:
                     continue
-            return None
-        else:
-            return None
+            raise TypeError("Cannot load '{}' : file is not from a recognized format for that research group "
+                            "({}).".format(self.path, Metadata.pdkSupportedFormats))
 
     def validateResearchGroup(self):
         for researchGroup in Metadata.supportedResearchGroups:
             if re.search(r'[\\/]{}[\\/]'.format(researchGroup), self.path):
                 return researchGroup
 
-        raise ValueError("Cannot load '{}' : fiel is not from a recognized research group database "
+        raise ValueError("Cannot load '{}' : file is not from a recognized research group database "
                          "({}).".format(self.path, Metadata.supportedResearchGroups))
 
     @property
