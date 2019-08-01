@@ -394,7 +394,7 @@ class Channel:
     def getBinaryOpening(self, windowSize: int = 3):
         if not self.isBinary:
             raise NotBinaryImageException
-        binaryOpened = morphology.binary_opening(self.pixels, np.ones((windowSize, windowSize))).astype(np.float32)
+        binaryOpened = morphology.binary_opening(self.pixels, np.ones((windowSize, windowSize))).astype(self._originalDType)
         return Channel(binaryOpened)
 
     def getClosing(self, windowSize: int = 3):
@@ -404,7 +404,7 @@ class Channel:
     def getBinaryClosing(self, windowSize: int = 3):
         if not self.isBinary:
             raise NotBinaryImageException
-        binarClosed = morphology.binary_closing(self.pixels, np.ones((windowSize, windowSize))).astype(np.float32)
+        binarClosed = morphology.binary_closing(self.pixels, np.ones((windowSize, windowSize))).astype(self._originalDType)
         return Channel(binarClosed)
 
     def getErosion(self, size: int = 2):
@@ -429,7 +429,8 @@ class Channel:
         sizes = sum(self.pixels, labeled, range(nbObjects + 1))
         return Channel(labeled), nbObjects, sizes
 
-    def getDistanceTranform(self, returnIndices: bool = False) -> np.ndarray:
+    def getDistanceTransform(self, returnIndices: bool = False) -> np.ndarray:
+        # The indices returned (if returned) contains 2 arrays
         if not self.isBinary:
             raise NotBinaryImageException
         distanceTransform = ndimage.distance_transform_edt(self.pixels, return_indices=returnIndices)
@@ -447,7 +448,7 @@ class Channel:
         gaussianBin = gaussianFilter.getOtsuThresholding()
         gaussianBin.display()
         # Compute the distances between each pixels and its nearest 0 value pixel.
-        distanceTransform = gaussianBin.getDistanceTranform()
+        distanceTransform = gaussianBin.getDistanceTransform()
         plt.imshow(distanceTransform.T, cmap="jet")
         plt.show()
         # We then find the local max of the distance transform array
