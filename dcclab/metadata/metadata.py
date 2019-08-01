@@ -3,6 +3,7 @@ from .csvMetadata import CSVMetadata
 from .xlsxMetadata import XLSXMetadata
 from .rawMetadata import RAWMetadata
 import os
+import re
 try:
     import deprecated
 except:
@@ -11,7 +12,7 @@ except:
 
 class Metadata:
     # Supported research groups.
-    supportedResearchGroup = ['POM', 'PDK']
+    supportedResearchGroups = ['POM', 'PDK']
     supportedFormats = ['CZI', 'CSV', 'XLSX', 'RAW']
 
     # Supported classes and formats for POM.
@@ -19,24 +20,25 @@ class Metadata:
     pomSupportedFormats = ['CZI', 'CSV']
 
     # Supported classes and formats for PDK.
-    pdkSupportedClasses = [XLSXMetadata, RAWMetadata]
+    pdkSupportedClasses = [RAWMetadata, XLSXMetadata]
     pdkSupportedFormats = ['XLSX', 'RAW']
 
     def __init__(self, path: str):
         if path is not None:
             if not os.path.exists(path):
                 raise ValueError("Cannot load '{0}': file does not exist".format(path))
+
             self.path = path
+            self.__researchGroup = self.validateResearchGroup()
             self.__fileObject = self.processFile()
             if self.__fileObject is None:
-                raise TypeError("Cannot read '{0}': not a recognized format ({1})".format(self.path, Metadata.supportedFormats))
+                raise TypeError("Cannot read '{0}': not a recognized format ({1}).".format(self.path, Metadata.supportedFormats))
         else:
             self.path = None
             self.__fileObject = None
 
     def processFile(self):
-        researchGroup = self.validateResearchGroup(self.path)
-        if researchGroup == 'POM':
+        if self.__researchGroup == 'POM':
             for supportedClass in Metadata.pomSupportedClasses:
                 try:
                     fileObject = supportedClass(self.path)
@@ -44,7 +46,7 @@ class Metadata:
                 except:
                     continue
             return None
-        elif researchGroup == 'PDK':
+        elif self.__researchGroup == 'PDK':
             for supportedClass in Metadata.pdkSupportedClasses:
                 try:
                     fileObject = supportedClass(self.path)
@@ -55,14 +57,13 @@ class Metadata:
         else:
             return None
 
-    def validateResearchGroup(self, path: str):
-        basename = os.path.basename(path)
-        if basename == '':
-            return False
-        if basename in Metadata.supportedResearchGroup:
-            return basename
-        else:
-            return self.validateResearchGroup(os.path.dirname(path))
+    def validateResearchGroup(self):
+        for researchGroup in Metadata.supportedResearchGroups:
+            if re.search(r'[\\/]{}[\\/]'.format(researchGroup), self.path):
+                return researchGroup
+
+        raise ValueError("Cannot load '{}' : fiel is not from a recognized research group database "
+                         "({}).".format(self.path, Metadata.supportedResearchGroups))
 
     @property
     def metaType(self):
