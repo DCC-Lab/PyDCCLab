@@ -21,23 +21,20 @@ class Metadata:
     pdkSupportedClasses = [XLSXMetadata, RAWMetadata]
     pdkSupportedFormats = ['XLSX', 'RAW']
 
-    supportedClasses = [CZIMetadata, CSVMetadata, XLSXMetadata, RAWMetadata]
-    supportedFormats = ['CZI', 'CSV', 'XLSX', 'RAW']
-
     def __init__(self, path: str):
         if path is not None:
             if not os.path.exists(path):
                 raise ValueError("Cannot load '{0}': file does not exist".format(path))
             self.path = path
-            self.__fileObject = self.validateDataFile()
+            self.__fileObject = self.processFile()
             if self.__fileObject is None:
                 raise TypeError("Cannot read '{0}': not a recognized format ({1})".format(self.path, Metadata.supportedFormats))
         else:
             self.path = None
             self.__fileObject = None
 
-    def validateDataFile(self):
-        researchGroup = self.findResearchGroup(self.path)
+    def processFile(self):
+        researchGroup = self.validateResearchGroup(self.path)
         if researchGroup == 'POM':
             for supportedClass in Metadata.pomSupportedClasses:
                 try:
@@ -57,14 +54,14 @@ class Metadata:
         else:
             return None
 
-    def findResearchGroup(self, path: str):
+    def validateResearchGroup(self, path: str):
         basename = os.path.basename(path)
         if basename == '':
             return False
-        elif basename in Metadata.supportedResearchGroup:
+        if basename in Metadata.supportedResearchGroup:
             return basename
         else:
-            return self.findResearchGroup(os.path.dirname(path))
+            return self.validateResearchGroup(os.path.dirname(path))
 
     @property
     def metaType(self):
