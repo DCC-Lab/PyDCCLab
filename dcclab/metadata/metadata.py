@@ -28,22 +28,10 @@ class Metadata:
         if path is not None:
             if not os.path.exists(path):
                 raise ValueError("Cannot load '{0}': file does not exist".format(path))
-
             self.path = path
             self.__fileObject = self.validateDataFile()
-
-            '''
-            for supportedClass in Metadata.supportedClasses:
-                try:
-                    self.__fileObject = supportedClass(path)
-                    break
-                except:
-                    continue
-            '''
-
             if self.__fileObject is None:
-                message = "Cannot read '{0}': not a recognized format ({1})".format(self.path, Metadata.supportedFormats)
-                raise TypeError(message)
+                raise TypeError("Cannot read '{0}': not a recognized format ({1})".format(self.path, Metadata.supportedFormats))
         else:
             self.path = None
             self.__fileObject = None
