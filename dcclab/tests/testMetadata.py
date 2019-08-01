@@ -64,6 +64,19 @@ class TestMetadata(env.DCCLabTestCase):
         noFile = os.path.join(self.pomDir, 'nonexsitant.file')
         with self.assertRaises(ValueError): Metadata(noFile)
 
+    def testResearchGroupIsPOM(self):
+        mtdt = Metadata(self.cziPath)
+        self.assertEqual(mtdt.findResearchGroup(self.cziPath), 'POM')
+
+    def testResearchGroupIsPDK(self):
+        mtdt = Metadata(self.xlsxPath)
+        self.assertEqual(mtdt.findResearchGroup(self.xlsxPath), 'PDK')
+
+    def testResearchGroupIsFalse(self):
+        mtdt = Metadata(self.cziPath)
+        noGroup = os.path.join(str(self.dataDir), 'nonexsitant.file')
+        self.assertFalse(mtdt.findResearchGroup(noGroup))
+
     def testFileTypeIsCzi(self):
         mtdt = Metadata(self.cziPath)
         self.assertEqual(mtdt.metaType, 'CZI')
