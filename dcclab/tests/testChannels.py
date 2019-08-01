@@ -301,7 +301,7 @@ class TestChannels(env.DCCLabTestCase):
         self.assertIsNotNone(channel)
 
     @patch("matplotlib.pyplot.show", new=Mock())
-    def testMultichannelDisplay(self):
+    def testMultichannelDisplayNoColorMaps(self):
         listOfChannel = []
         nbChannel = np.random.randint(1, 10)
         for i in range(nbChannel):
@@ -309,8 +309,37 @@ class TestChannels(env.DCCLabTestCase):
         returnList = Channel.multiChannelDisplay(listOfChannel)
         self.assertListEqual(returnList, listOfChannel)
 
+    @patch("matplotlib.pyplot.show", new=Mock())
+    def testMultichannelDisplayNoColorMaps(self):
+        listOfChannel = []
+        listOfColorMaps = []
+        nbChannel = np.random.randint(1, 10)
+        for i in range(nbChannel):
+            listOfChannel.append(Channel(np.random.randint(0, 255, (1000, 10000), np.uint8)))
+            listOfColorMaps.append("gray")
+        returnList = Channel.multiChannelDisplay(listOfChannel, listOfColorMaps)
+        self.assertListEqual(returnList, listOfChannel)
 
-class TestChannelsSegmentation(env.DCCLabTestCase):
+    @patch("matplotlib.pyplot.show", new=Mock())
+    def testMultichannelDisplayNoColorMaps(self):
+        listOfChannel = []
+        listOfColorMaps = ["gray"]
+        nbChannel = np.random.randint(1, 10)
+        for i in range(nbChannel):
+            listOfChannel.append(Channel(np.random.randint(0, 255, (1000, 10000), np.uint8)))
+        returnList = Channel.multiChannelDisplay(listOfChannel, listOfColorMaps)
+        self.assertListEqual(returnList, listOfChannel)
+
+    @patch("matplotlib.pyplot.show", new=Mock())
+    def testMultichannelDisplayException(self):
+        listOfChannel = []
+        nbChannel = np.random.randint(1, 10)
+        for i in range(nbChannel):
+            listOfChannel.append(Channel(np.random.randint(0, 255, (1000, 10000), np.uint8)))
+        listOfColorMaps = ["gray"] * (nbChannel + 1)
+        with self.assertRaises(ValueError):
+            Channel.multiChannelDisplay(listOfChannel, listOfColorMaps)
+
     def testNoMaskOnInit(self):
         array = np.array([[0, 1, 2], [0, 1, 2], [0, 1, 2]])
         channel = Channel(array.T)
@@ -379,6 +408,268 @@ class TestChannelsSegmentation(env.DCCLabTestCase):
     #     channel.labelMaskComponents()
     #     channel.analyzeComponents()
     #     channel.saveComponentsStatistics("/tmp/test.json")
+
+    def testRepr(self):
+        array = np.random.randint(0, 255, (1000, 1000), dtype=np.uint8).T
+        channel = Channel(array)
+        self.assertEqual(str(channel), repr(channel))
+
+    def testSetMaskNotBinary(self):
+        with self.assertRaises(NotImplementedError):
+            mask = np.ones((1000, 1000), dtype=float) * 1E-9
+            array = np.random.randint(0, 255, (1000, 1000), dtype=np.uint8).T
+            channel = Channel(array)
+            channel.setMask(Channel(mask))
+
+    def testSetMask(self):
+        mask = np.ones((1000, 1000), dtype=np.uint8)
+        array = np.random.randint(0, 255, (1000, 1000), dtype=np.uint8).T
+        channel = Channel(array)
+        channel.setMask(Channel(mask))
+        self.assertTrue(channel.hasMask)
+
+    def testSetMaskFromThresholdNone(self):
+        with self.assertRaises(NotImplementedError):
+            array = np.random.randint(0, 255, (1000, 1000), dtype=np.uint8).T
+            channel = Channel(array)
+            channel.setMaskFromThreshold(None)
+
+    def testApplyConvolutionSaveOriginal(self):
+        array = np.random.randint(0, 255, (1000, 1000), dtype=np.uint8).T
+        channel = Channel(array)
+        self.assertFalse(channel.hasOriginal)
+        channel.applyConvolution([[0, 0, 1], [1, 0, 0]])
+        self.assertTrue(channel.hasOriginal)
+
+    def testApplyConvolutionNewValues(self):
+        array = np.random.rand(1000, 1000).T
+        channel = Channel(array)
+        channelCopy = channel.copy()
+        channel.applyConvolution([[0, 0, 1], [0, 0, 1], [0, 0, 1]])
+        self.assertNotEqual(channel, channelCopy)
+
+    def testApplyXDerivative(self):
+        array = np.random.rand(1000, 1000).T
+        channel = Channel(array)
+        channelCopy = channel.copy()
+        channel.applyXDerivative()
+        self.assertNotEqual(channel, channelCopy)
+
+    def testApplyYDerivative(self):
+        array = np.random.rand(1000, 1000).T
+        channel = Channel(array)
+        channelCopy = channel.copy()
+        channel.applyYDerivative()
+        self.assertNotEqual(channel, channelCopy)
+
+    def testApplyGaussianFilter(self):
+        array = np.sin(np.array([[i * np.pi / 100 for i in range(100)]] * 100))
+        sigma = np.random.randint(1, 6) * np.random.rand(1) + 0.0001
+        channel = Channel(array)
+        channelCopy = channel.copy()
+        channel.applyGaussianFilter(sigma[0])
+        self.assertNotEqual(channel, channelCopy)
+
+    def testApplyThresholdingNoValue(self):
+        array = np.random.randint(0, 254, (1000, 1000), dtype=np.uint8).T
+        channel = Channel(array)
+        channel.applyThresholding()
+        self.assertTrue(channel.isBinary)
+
+    def testApplyThresholding(self):
+        array = np.random.rand(1000, 1000).T
+        channel = Channel(array)
+        channel.applyThresholding(0.05)
+        self.assertTrue(channel.isBinary)
+
+    def testApplyIsodataThresholding(self):
+        array = np.random.rand(1000, 1000)
+        channel = Channel(array)
+        otherChannel = channel.getIsodataThresholding()
+        channel.applyIsodataThresholding()
+        self.assertEqual(channel, otherChannel)
+        self.assertTrue(channel.isBinary)
+
+    def testApplyOtsuThresholding(self):
+        array = np.random.rand(1000, 1000)
+        channel = Channel(array)
+        otherChannel = channel.getOtsuThresholding()
+        channel.applyOtsuThresholding()
+        self.assertEqual(channel, otherChannel)
+        self.assertTrue(channel.isBinary)
+
+    def testApplyOpeningNotBinary(self):
+        array = np.random.randint(0, 255, (1000, 1000), dtype=np.uint8)
+        channel = Channel(array)
+        otherChannel = channel.getOpening(5)
+        channel.applyOpening(5)
+        self.assertEqual(channel, otherChannel)
+
+    def testApplyOpeningBinary(self):
+        array = np.random.randint(0, 2, (1000, 1000), dtype=np.uint8)
+        channel = Channel(array)
+        otherChannel = channel.getBinaryOpening(9)
+        channel.applyOpening(9)
+        self.assertEqual(channel, otherChannel)
+
+    def testApplyNdImageBinClosingNotBinary(self):
+        array = np.random.rand(100, 1000)
+        channel = Channel(array)
+        with self.assertRaises(TypeError):
+            channel.applyNdImageBinaryClosing()
+
+    def testApplyNdImageBinClosingNoneSize(self):
+        array = np.random.rand(1000, 1000)
+        channel = Channel(array)
+        channel.applyThresholding(channel.getAverageValueOfPixels())
+        channel.applyNdImageBinaryClosing()
+        self.assertFalse(np.array_equal(channel.originalPixels, channel.pixels))
+
+    def testApplyNdImageBinClosing(self):
+        array = np.random.rand(1000, 1000)
+        channel = Channel(array)
+        channel.applyThresholding(channel.getAverageValueOfPixels())
+        channel.applyNdImageBinaryClosing(9)
+        self.assertFalse(np.array_equal(channel.originalPixels, channel.pixels))
+
+    def testApplyNdImageBinOpeningNotBinary(self):
+        array = np.random.rand(100, 1000)
+        channel = Channel(array)
+        with self.assertRaises(TypeError):
+            channel.applyNdImageBinaryOpening()
+
+    def testApplyNdImageBinOpeningNoneSize(self):
+        array = np.random.rand(1000, 1000)
+        channel = Channel(array)
+        channel.applyThresholding(channel.getAverageValueOfPixels())
+        channel.applyNdImageBinaryOpening()
+        self.assertFalse(np.array_equal(channel.originalPixels, channel.pixels))
+
+    def testApplyNdImageBinOpening(self):
+        array = np.random.rand(1000, 1000)
+        channel = Channel(array)
+        channel.applyThresholding(channel.getAverageValueOfPixels())
+        channel.applyNdImageBinaryOpening(9)
+        self.assertFalse(np.array_equal(channel.originalPixels, channel.pixels))
+
+    def testThresholdNoneValue(self):
+        array = np.random.rand(1000, 1000)
+        channel = Channel(array)
+        channel.threshold(None)
+        self.assertTrue(channel.isBinary)
+
+    def testApplyErosion(self):
+        array = np.random.randint(0, 255, (1000, 1000), dtype=np.uint8)
+        channel = Channel(array)
+        channel.applyErosion()
+        self.assertFalse(np.array_equal(channel.originalPixels, channel.pixels))
+
+    def testApplyNoiseFilterWithErosionAndDilation(self):
+        array = np.random.rand(1000, 1000)
+        channel = Channel(array)
+        channel.applyNoiseFilterWithErosionDilation()
+        self.assertFalse(np.array_equal(channel.originalPixels, channel.pixels))
+
+    def testGetBinaryOpeningNotBinary(self):
+        array = np.random.randint(2, 255, (1000, 1000), dtype=np.uint8)
+        channel = Channel(array)
+        with self.assertRaises(NotBinaryImageException):
+            channel.getBinaryOpening()
+
+    def testGetBinaryClosingNotBinary(self):
+        array = np.random.randint(2, 255, (1000, 1000), dtype=np.uint8)
+        channel = Channel(array)
+        with self.assertRaises(NotBinaryImageException):
+            channel.getBinaryClosing()
+
+    def testGetConnectedComponentsNotBinary(self):
+        array = np.random.randint(2, 255, (1000, 1000), dtype=np.uint8)
+        channel = Channel(array)
+        with self.assertRaises(NotBinaryImageException):
+            channel.getConnectedComponents()
+
+    def testGetConnectedComponents(self):
+        array = np.array([[1, 1, 1, 0, 0, 1, 1], [1, 1, 1, 1, 0, 1, 1], [1, 1, 1, 0, 0, 1, 1], [1, 1, 1, 0, 1, 1, 1]],
+                         dtype=bool)
+        channel = Channel(array)
+        tupleConnectedComponents = channel.getConnectedComponents()
+        # Label array equality
+        self.assertTrue(np.array_equal(tupleConnectedComponents[0].pixels, np.array(
+            [[1, 1, 1, 0, 0, 2, 2], [1, 1, 1, 1, 0, 2, 2], [1, 1, 1, 0, 0, 2, 2], [1, 1, 1, 0, 2, 2, 2]],
+            dtype=np.uint8)))
+        # Number of components
+        self.assertEqual(tupleConnectedComponents[1], 2)
+        # Sizes of each component
+        self.assertListEqual(tupleConnectedComponents[-1].tolist(), [0, 13, 9])
+
+    def testDistanceTransformNotBinary(self):
+        array = np.random.randint(0, 2, (1000, 1000), dtype=np.uint8)
+        channel = Channel(array).getEntropyFilter(3)
+        with self.assertRaises(NotBinaryImageException):
+            channel.getDistanceTransform()
+
+    def testDistanceTransformIndicesReturn(self):
+        array = np.zeros((5, 5))
+        array[2, 2] = 1
+        channel = Channel(array)
+        distanceTransformStuff = channel.getDistanceTransform(True)
+        self.assertTrue(np.array_equal(distanceTransformStuff[0], array))
+        self.assertTrue(np.array_equal(distanceTransformStuff[1][-1],
+                                       [[0, 1, 2, 3, 4], [0, 1, 2, 3, 4], [0, 1, 1, 3, 4], [0, 1, 2, 3, 4],
+                                        [0, 1, 2, 3, 4]]))
+        self.assertTrue(np.array_equal(distanceTransformStuff[1][0],
+                                       np.array([[0, 1, 2, 3, 4], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4],
+                                                 [0, 1, 2, 3, 4]]).T))
+
+    def testDistanceTransformNoIndices(self):
+        array = np.array(
+            [[1, 1, 0, 1, 0, 0], [1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1], [0, 0, 1, 0, 0, 1], [1, 1, 0, 1, 1, 1],
+             [0, 0, 1, 0, 0, 0]])
+        distanceTransform = np.array(
+            [[2, 1, 0, 1, 0, 0], [2, 2 ** 0.5, 1, 2 ** 0.5, 1, 1], [1, 1, 2 ** 0.5, 1, 1, 2 ** 0.5], [0, 0, 1, 0, 0, 1],
+             [1, 1, 0, 1, 1, 1], [0, 0, 1, 0, 0, 0]])
+        channel = Channel(array)
+        self.assertTrue(np.array_equal(channel.getDistanceTransform(False), distanceTransform))
+
+    @patch("matplotlib.pyplot.show", new=Mock())
+    def testWatershedSegmentation4Connect(self):
+        x, y = np.indices((1000, 1000))
+        x1, y1, x2, y2 = 500, 502, 190, 360
+        r1, r2 = 250, 175
+        mask_circle1 = (x - x1) ** 2 + (y - y1) ** 2 < r1 ** 2
+        mask_circle2 = (x - x2) ** 2 + (y - y2) ** 2 < r2 ** 2
+        array = np.logical_or(mask_circle1, mask_circle2)
+        noise = np.random.normal(0, 0.11, array.shape)
+        array = np.clip(array + noise, 0, 1)
+        channel = Channel(array)
+        watershedResults = channel.watershedSegmentation(0.5)
+        maskChannel = watershedResults[0]
+        uniqueValues = np.unique(maskChannel.pixels)
+        self.assertListEqual(uniqueValues.tolist(), [0, 1, 2])
+        self.assertEqual(watershedResults[-1], 2)
+
+    @patch("matplotlib.pyplot.show", new=Mock())
+    def testWatershedSegmentation8Connect(self):
+        x, y = np.indices((1000, 1000))
+        x1, y1, x2, y2 = 700, 502, 190, 360
+        r1, r2 = 250, 175
+        mask_circle1 = (x - x1) ** 2 + (y - y1) ** 2 < r1 ** 2
+        mask_circle2 = (x - x2) ** 2 + (y - y2) ** 2 < r2 ** 2
+        array = np.logical_or(mask_circle1, mask_circle2)
+        channel = Channel(array.astype(np.uint8))
+        watershedResults = channel.watershedSegmentation(0, use4Connectivity=False)
+        maskChannel = watershedResults[0]
+        uniqueValues = np.unique(maskChannel.pixels)
+        self.assertListEqual(uniqueValues.tolist(), [0, 1, 2])
+        self.assertEqual(watershedResults[-1], 2)
+        m1 = mask_circle1.astype(np.uint8)
+        m1[mask_circle1] = 2
+        m1[~mask_circle1] = 0
+        m2 = mask_circle2.astype(np.uint8)
+        m2[mask_circle2] = 1
+        m2[~mask_circle2] = 0
+        totalMask = m2 + m1
+        self.assertTrue(np.array_equal(totalMask, maskChannel.pixels))
 
 
 class TestChannelSpectralFiltering(env.DCCLabTestCase):
