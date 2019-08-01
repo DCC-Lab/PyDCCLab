@@ -12,6 +12,7 @@ except:
 class Metadata:
     # Supported research groups.
     supportedResearchGroup = ['POM', 'PDK']
+    supportedFormats = ['CZI', 'CSV', 'XLSX', 'RAW']
 
     # Supported classes and formats for POM.
     pomSupportedClasses = [CZIMetadata, CSVMetadata]

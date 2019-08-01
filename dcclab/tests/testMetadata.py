@@ -48,11 +48,17 @@ class TestMetadata(env.DCCLabTestCase):
         workbook.save(self.xlsxPath)
 
     def tearDown(self) -> None:
-        os.remove(self.csvPath)
-        os.remove(self.xlsxPath)
-        os.remove(self.cziPath)
-        os.rmdir(self.pomDir)
-        os.rmdir(self.pdkDir)
+        if os.path.exists(self.csvPath):
+            os.remove(self.csvPath)
+        if os.path.exists(self.xlsxPath):
+            os.remove(self.xlsxPath)
+        if os.path.exists(self.cziPath):
+            os.remove(self.cziPath)
+
+        if os.listdir(self.pomDir) == 0:
+            os.rmdir(self.pomDir)
+        if os.listdir(self.pdkDir) == 0:
+            os.rmdir(self.pdkDir)
 
     def testWrongFileType(self):
         wrongFile = os.path.join(self.pomDir, 'test.gif')
