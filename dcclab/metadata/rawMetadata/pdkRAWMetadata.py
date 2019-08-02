@@ -4,7 +4,7 @@ import os
 import datetime
 
 
-class RAWMetadata:
+class PDKRAWMetadata:
     # FixMe The PDK .raw files are weird to deal with. Their metadata is contained in others files, .ini and .xml,
     #  that are in the same folder as the .raw file. However, we do not know yet if these files have valuable data.
     #  Also, the .xml file seems rather poor in useful information. For now, the best thing to do is to deal with the

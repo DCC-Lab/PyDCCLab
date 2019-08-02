@@ -1,10 +1,10 @@
-from dcclab import RAWMetadata as mtdt
+from dcclab import PDKRAWMetadata as mtdt
 import env
 import unittest
 import os
 
 
-class TestRawMetadata(env.DCCLabTestCase):
+class TestPDKRAWMetadata(env.DCCLabTestCase):
     def setUp(self) -> None:
         self.rawPath = os.path.join(str(self.dataDir), '20190101_12_12_12_900nm_16x_512x1024_1000f_8dpf_XYT.raw')
         self.iniPath = os.path.join(str(self.dataDir), '20190101_12_12_12_900nm_16x_512x1024_1000f_8dpf_XYT.ini')
