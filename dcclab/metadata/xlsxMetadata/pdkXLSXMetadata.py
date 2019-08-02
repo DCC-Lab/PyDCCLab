@@ -3,7 +3,7 @@ import os
 import re
 
 
-class XLSXMetadata:
+class PDKXLSXMetadata:
     def __init__(self, xlsxPath):
         self.path = xlsxPath
         self.name = self.fileName()

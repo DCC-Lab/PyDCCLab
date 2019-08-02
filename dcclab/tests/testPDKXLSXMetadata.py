@@ -1,4 +1,4 @@
-from dcclab import XLSXMetadata as mtdt
+from dcclab import PDKXLSXMetadata as mtdt
 import xlrd
 import xlwt
 import env
@@ -6,7 +6,7 @@ import unittest
 import os
 
 
-class TestXlsxMetadata(env.DCCLabTestCase):
+class TestPDKXLSXMetadata(env.DCCLabTestCase):
     def setUp(self) -> None:
         self.filePath = os.path.join(str(self.dataDir), 'unittest.xlsx')
         workbook = xlwt.Workbook()
