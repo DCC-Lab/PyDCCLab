@@ -38,11 +38,6 @@ class PDKRAWMetadata:
     def __iniPath(self):
         return re.sub('\.lineshifted\.raw|.raw', '.ini', self.rawPath, re.IGNORECASE)
 
-    def readIniFile(self):
-        with open(self.iniPath, 'r') as file:
-            lines = file.readlines()
-        return lines
-
     def extractDataFromIniFile(self):
         mtdt = PDKTXTMetadata(self.iniPath)
         return mtdt.asDict, mtdt.keys
