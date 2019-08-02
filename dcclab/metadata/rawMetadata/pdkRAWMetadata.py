@@ -36,6 +36,7 @@ class PDKRAWMetadata:
     def __xmlPath(self):
         return re.sub('XYT\.lineshifted\.raw|XYT.raw', 'OME.xml', self.rawPath, re.IGNORECASE)
 
+    # FixMe Currently, we do not know if .xml files associated with .raw files have any valuable metadata.
     def readXmlFile(self):
         tree = et.parse(self.xmlPath)
         return tree.getroot()
@@ -43,8 +44,7 @@ class PDKRAWMetadata:
     @property
     def keys(self):
         keys = {'path': 'TEXT PRIMARY KEY'}
-        keys = keys.update(self.iniKeys)
-        return keys
+        return {**keys, **self.iniKeys}
 
     @property
     def asDict(self):
