@@ -1,5 +1,5 @@
 from .cziMetadata import CZIMetadata
-from .csvMetadata import CSVMetadata
+from .csvMetadata import CSVPOMMetadata
 from .xlsxMetadata import XLSXMetadata
 from .rawMetadata import RAWMetadata
 import os
@@ -16,7 +16,7 @@ class Metadata:
     supportedFormats = ['CZI', 'CSV', 'XLSX', 'RAW']
 
     # Supported classes and formats for POM.
-    pomSupportedClasses = [CZIMetadata, CSVMetadata]
+    pomSupportedClasses = [CZIMetadata, CSVPOMMetadata]
     pomSupportedFormats = ['CZI', 'CSV']
 
     # Supported classes and formats for PDK.
@@ -68,7 +68,7 @@ class Metadata:
         fileType = type(self.__fileObject)
         if fileType == CZIMetadata:
             return 'CZI'
-        elif fileType == CSVMetadata:
+        elif fileType == CSVPOMMetadata:
             return 'CSV'
         elif fileType == XLSXMetadata:
             return 'XLSX'
@@ -81,7 +81,7 @@ class Metadata:
     def metadata(self) -> dict:
         if isinstance(self.__fileObject, CZIMetadata):
             return self.__fileObject.asDict().get('metadata')
-        elif isinstance(self.__fileObject, CSVMetadata) or isinstance(self.__fileObject, XLSXMetadata):
+        elif isinstance(self.__fileObject, CSVPOMMetadata) or isinstance(self.__fileObject, XLSXMetadata):
             return self.__fileObject.asDict
         else:
             return {}
@@ -95,7 +95,7 @@ class Metadata:
 
     @property
     def keys(self) -> dict:
-        if isinstance(self.__fileObject, CZIMetadata) or isinstance(self.__fileObject, CSVMetadata) or \
+        if isinstance(self.__fileObject, CZIMetadata) or isinstance(self.__fileObject, CSVPOMMetadata) or \
                 isinstance(self.__fileObject, XLSXMetadata):
             return self.__fileObject.keys
         else:
