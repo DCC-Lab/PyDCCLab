@@ -30,16 +30,6 @@ class TestPDKRAWMetadata(env.DCCLabTestCase):
         metadata = mtdt(self.rawPath)
         self.assertEqual(metadata.fileName, '20190101_12_12_12_900nm_16x_512x1024_1000f_8dpf_XYT')
 
-    def testIniPath(self):
-        metadata = mtdt(self.rawPath)
-        self.assertEqual(metadata.iniPath, self.iniPath)
-
-    def testIniPathLineShifted(self):
-        filePath = os.path.join(str(self.dataDir),
-                                '20190101_12_12_12_900nm_16x_512x1024_1000f_8dpf_XYT.lineshifted.raw')
-        metadata = mtdt(filePath)
-        self.assertEqual(metadata.iniPath, self.iniPath)
-
     def testXmlPath(self):
         metadata = mtdt(self.rawPath)
         self.assertEqual(metadata.xmlPath, self.xmlPath)
@@ -54,10 +44,6 @@ class TestPDKRAWMetadata(env.DCCLabTestCase):
         metadata = mtdt(self.rawPath)
         self.assertEqual('2019-01-01 12:12:12', metadata.date)
 
-    def testReadIniFile(self):
-        metadata = mtdt(self.rawPath)
-        self.assertTrue(metadata.readIniFile())
-
     def testReadXmlFile(self):
         metadata = mtdt(self.rawPath)
         self.assertTrue(metadata.readXmlFile())
@@ -65,13 +51,6 @@ class TestPDKRAWMetadata(env.DCCLabTestCase):
     def testExtractDataFromIniFile(self):
         metadata = mtdt(self.rawPath)
         self.assertTrue(metadata.extractDataFromIniFile())
-
-    def testGetIniKeys(self):
-        metadata = mtdt(self.rawPath)
-        self.assertEqual(metadata.getIniKeys(), {'no.of.channels': 'INTEGER', 'frame.count': 'INTEGER',
-                                                 'x.pixels': 'INTEGER', 'y.pixels': 'INTEGER', 'x.voltage': 'REAL',
-                                                 'y.voltage': 'REAL', 'pixel.resolution': 'REAL',
-                                                 'Laser.Power': 'REAL'})
 
 
 if __name__ == '__main__':
