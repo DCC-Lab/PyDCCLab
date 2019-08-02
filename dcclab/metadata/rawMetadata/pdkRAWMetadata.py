@@ -1,4 +1,5 @@
 import xml.etree.ElementTree as et
+from dcclab import PDKTXTMetadata
 import re
 import os
 import datetime
@@ -46,20 +47,8 @@ class PDKRAWMetadata:
         return lines
 
     def extractDataFromIniFile(self):
-        keys = ['no.of.channels', 'frame.count', 'x.pixels', 'y.pixels', 'x.voltage', 'y.voltage', 'pixel.resolution',
-                'Laser.Power']
-        iniDict = {}
-        iniLines = self.readIniFile()
-        for line in iniLines:
-            try:
-                line = line.split(' = ')
-                key = line[0]
-                value = line[1].rstrip('\n')
-                if key in keys:
-                    iniDict[key] = value
-            except:
-                pass
-        return iniDict
+        mtdt = PDKTXTMetadata(self.iniPath)
+        return mtdt.asDict
 
     def getIniKeys(self):
         return {'no.of.channels': 'INTEGER', 'frame.count': 'INTEGER', 'x.pixels': 'INTEGER', 'y.pixels': 'INTEGER',

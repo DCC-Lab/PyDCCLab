@@ -1,1 +1,1 @@
-from .pdkTXTMetadata import TXTMetadata
+from .pdkTXTMetadata import PDKTXTMetadata
