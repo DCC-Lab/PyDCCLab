@@ -13,7 +13,6 @@ class PDKRAWMetadata:
     #  placeholders, just in case.
     def __init__(self, rawPath):
         self.rawPath = rawPath
-        # Data from file name.
         self.fileName = self.__fileName()
         self.date = self.__date()
 
@@ -35,11 +34,8 @@ class PDKRAWMetadata:
         date = datetime.datetime.strptime(fileName, '%Y%m%d_%H_%M_%S')
         return '{} {}'.format(date.date(), date.time())
 
-    def __iniPath(self):
-        return re.sub('\.lineshifted\.raw|.raw', '.ini', self.rawPath, re.IGNORECASE)
-
     def extractDataFromIniFile(self):
-        mtdt = PDKTXTMetadata(self.iniPath)
+        mtdt = PDKTXTMetadata(self.rawPath)
         return mtdt.asDict, mtdt.keys
 
     def __xmlPath(self):
@@ -48,3 +44,15 @@ class PDKRAWMetadata:
     def readXmlFile(self):
         tree = et.parse(self.xmlPath)
         return tree.getroot()
+
+    @property
+    def keys(self):
+        keys = {'path': 'TEXT PRIMARY KEY'}
+        keys = keys.update(self.iniKeys)
+        return keys
+
+    @property
+    def asDict(self):
+        dictio = {'path': self.rawPath}
+        dictio = dictio.update(self.iniDict)
+        return dictio
