@@ -6,18 +6,12 @@ import datetime
 
 
 class PDKRAWMetadata:
-    # FixMe The PDK .raw files are weird to deal with. Their metadata is contained in others files, .ini and .xml,
-    #  that are in the same folder as the .raw file. However, we do not know yet if these files have valuable data.
-    #  Also, the .xml file seems rather poor in useful information. For now, the best thing to do is to deal with the
-    #  .xlsx files contained in PDK. The functions to read and extract metadata from .ini and .xml files are
-    #  placeholders, just in case.
     def __init__(self, rawPath):
         self.rawPath = rawPath
         self.fileName = self.__fileName()
         self.date = self.__date()
 
         # Processing .ini file :
-        self.iniPath = self.__iniPath()
         self.iniDict, self.iniKeys = self.extractDataFromIniFile()
 
         # Processing .xml file :
@@ -38,6 +32,7 @@ class PDKRAWMetadata:
         mtdt = PDKTXTMetadata(self.rawPath)
         return mtdt.asDict, mtdt.keys
 
+    # FixMe Currently, we do not know if .xml files associated with .raw files have any valuable metadata.
     def __xmlPath(self):
         return re.sub('XYT\.lineshifted\.raw|XYT.raw', 'OME.xml', self.rawPath, re.IGNORECASE)
 
