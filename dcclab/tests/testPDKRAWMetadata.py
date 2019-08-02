@@ -58,7 +58,12 @@ class TestPDKRAWMetadata(env.DCCLabTestCase):
                                          'x.voltage': 'REAL', 'y.pixels': 'INTEGER', 'y.voltage': 'REAL'})
 
     def testAsDict(self):
-        pass
+        metadata = mtdt(self.rawPath)
+        self.assertEqual(metadata.asDict, {'Laser.Power': '21.500000000000', 'frame.count': '1000.000000000000',
+                                           'no.of.channels': '1.000000000000', 'path': self.rawPath,
+                                           'pixel.resolution': '5.000000000000', 'x.pixels': '1024.000000000000',
+                                           'x.voltage': '5.000000000000', 'y.pixels': '512.000000000000',
+                                           'y.voltage': '1.250000000000'})
 
 
 if __name__ == '__main__':

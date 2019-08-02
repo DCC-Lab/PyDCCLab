@@ -49,5 +49,4 @@ class PDKRAWMetadata:
     @property
     def asDict(self):
         dictio = {'path': self.rawPath}
-        dictio = dictio.update(self.iniDict)
-        return dictio
+        return {**dictio, **self.iniDict}
