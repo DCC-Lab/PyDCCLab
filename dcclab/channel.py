@@ -1,7 +1,7 @@
 import numpy as np
 import typing
 
-from skimage import measure, morphology, feature
+from skimage import measure, morphology, feature, transform
 from scipy.ndimage import label, sum
 import scipy.ndimage as ndimage
 from .DCCExceptions import *
@@ -371,6 +371,11 @@ class Channel:
     def getSobelFilter(self):
         pass
 
+    def getCannyEdgeDetection(self, gaussianStdDev: float = 1, lowerThreshold: float = None,
+                              higherThreshold: float = None):
+        canny = feature.canny(self.pixels, gaussianStdDev, lowerThreshold, higherThreshold)
+        return Channel(canny)
+
     def getGlobalThresholding(self, value):
         mask = self.pixels > value
         return Channel(mask)
@@ -394,7 +399,8 @@ class Channel:
     def getBinaryOpening(self, windowSize: int = 3):
         if not self.isBinary:
             raise NotBinaryImageException
-        binaryOpened = morphology.binary_opening(self.pixels, np.ones((windowSize, windowSize))).astype(self._originalDType)
+        binaryOpened = morphology.binary_opening(self.pixels, np.ones((windowSize, windowSize))).astype(
+            self._originalDType)
         return Channel(binaryOpened)
 
     def getClosing(self, windowSize: int = 3):
@@ -404,7 +410,8 @@ class Channel:
     def getBinaryClosing(self, windowSize: int = 3):
         if not self.isBinary:
             raise NotBinaryImageException
-        binarClosed = morphology.binary_closing(self.pixels, np.ones((windowSize, windowSize))).astype(self._originalDType)
+        binarClosed = morphology.binary_closing(self.pixels, np.ones((windowSize, windowSize))).astype(
+            self._originalDType)
         return Channel(binarClosed)
 
     def getErosion(self, size: int = 2):
@@ -430,14 +437,13 @@ class Channel:
         return Channel(labeled), nbObjects, sizes
 
     def getDistanceTransform(self, returnIndices: bool = False) -> np.ndarray:
-        # The indices returned (if returned) contains 2 arrays
         if not self.isBinary:
             raise NotBinaryImageException
         distanceTransform = ndimage.distance_transform_edt(self.pixels, return_indices=returnIndices)
         return distanceTransform
 
     def watershedSegmentation(self, gaussianFilterStdDev: float = 1.2, localPeaksMinDistance: int = 5,
-                              use4Connectivity: bool = True):
+                              use4Connectivity: bool = True) -> typing.Tuple["Channel", int]:
         ccKernel = None
         if not use4Connectivity:
             ccKernel = np.ones((3, 3))
@@ -472,12 +478,31 @@ class Channel:
         masks = Channel(allMask)
         return masks, len(uniqueLabels) - 1
 
-    def circularHoughTransform(self):
-        # First of all, we must find the edges
-        edges = self.getSobelFilter()
-        radii = np.arange(1, 100, 2)
+    def blobDetection(self, minStdDev: float = 1, maxStdDev: float = 50, threshold: float = 0.2,
+                      overlap: float = 0.5) -> typing.Tuple["Channel", int]:
+        # Not good with low contrast images
+        blobs = feature.blob_log(self.pixels, maxStdDev, minStdDev, threshold=threshold, overlap=overlap)
+        blobsDetected = Channel(np.zeros((self.width, self.height)))
+        # Compute radii
+        blobs[:, 2] = blobs[:, 2] * 2 ** 0.5
+        numberOfBlobs = 0
+        for blob in blobs:
+            y, x, r = blob
+            cv.circle(blobsDetected.pixels, (int(x), int(y)), int(r), 1, 2)
+            numberOfBlobs += 1
+        self.multiChannelDisplay([self, blobsDetected])
+        return blobsDetected, numberOfBlobs
 
-        pass
+    def houghTransform(self, thresholdValue: int = 10, minLineLength: int = 50, maxLineGap: int = 10) -> typing.Tuple[
+        "Channel", int]:
+        # Uses Probabilistic Hough Transform algorithm
+        edges = self.getCannyEdgeDetection()
+        lines = transform.probabilistic_hough_line(edges.pixels, thresholdValue, minLineLength, maxLineGap)
+        houghLines = Channel(np.zeros((self.width, self.height)))
+        for line in lines:
+            cv.line(houghLines.pixels, line[0], line[1], 1, 2)
+        self.multiChannelDisplay([self, houghLines])
+        return houghLines, len(lines)
 
     def convertTo16BitsUnsignedInteger(self):
         pass
