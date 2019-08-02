@@ -1,7 +1,7 @@
 import os
 
 
-class CSVPOMMetadata:
+class POMCSVMetadata:
     def __init__(self, path):
         self.path = path
         self.name = self.fileName()
