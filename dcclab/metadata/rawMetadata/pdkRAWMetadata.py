@@ -17,12 +17,12 @@ class PDKRAWMetadata:
         self.fileName = self.__fileName()
         self.date = self.__date()
 
-        # Getting secondary files for metadata.
+        # Processing .ini file :
         self.iniPath = self.__iniPath()
-        self.xmlPath = self.__xmlPath()
+        self.iniDict, self.iniKeys = self.extractDataFromIniFile()
 
-        # Data from secondary files.
-        self.iniDict = self.extractDataFromIniFile()
+        # Processing .xml file :
+        self.xmlPath = self.__xmlPath()
         self.xmlRoot = self.readXmlFile()
 
     def __fileName(self):
@@ -38,9 +38,6 @@ class PDKRAWMetadata:
     def __iniPath(self):
         return re.sub('\.lineshifted\.raw|.raw', '.ini', self.rawPath, re.IGNORECASE)
 
-    def __xmlPath(self):
-        return re.sub('XYT\.lineshifted\.raw|XYT.raw', 'OME.xml', self.rawPath, re.IGNORECASE)
-
     def readIniFile(self):
         with open(self.iniPath, 'r') as file:
             lines = file.readlines()
@@ -48,11 +45,10 @@ class PDKRAWMetadata:
 
     def extractDataFromIniFile(self):
         mtdt = PDKTXTMetadata(self.iniPath)
-        return mtdt.asDict
+        return mtdt.asDict, mtdt.keys
 
-    def getIniKeys(self):
-        return {'no.of.channels': 'INTEGER', 'frame.count': 'INTEGER', 'x.pixels': 'INTEGER', 'y.pixels': 'INTEGER',
-                'x.voltage': 'REAL', 'y.voltage': 'REAL', 'pixel.resolution': 'REAL', 'Laser.Power': 'REAL'}
+    def __xmlPath(self):
+        return re.sub('XYT\.lineshifted\.raw|XYT.raw', 'OME.xml', self.rawPath, re.IGNORECASE)
 
     def readXmlFile(self):
         tree = et.parse(self.xmlPath)
