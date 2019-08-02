@@ -24,7 +24,6 @@ class TestPDKRAWMetadata(env.DCCLabTestCase):
     def tearDown(self) -> None:
         os.remove(self.iniPath)
         os.remove(self.xmlPath)
-        pass
 
     def testFileName(self):
         metadata = mtdt(self.rawPath)
