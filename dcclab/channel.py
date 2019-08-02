@@ -335,7 +335,7 @@ class Channel:
         return self.getShannonEntropy(base=base)
 
     def getShannonEntropy(self, base=2) -> float:
-        return measure.shannon_entropy(self.pixels, base)[0]
+        return measure.shannon_entropy(self.pixels, base)
 
     @deprecated("Renamed getExtrema()")
     def getExtremaValuesOfPixels(self) -> typing.Tuple[typing.Union[int, float], typing.Union[int, float]]:
