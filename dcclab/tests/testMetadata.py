@@ -55,10 +55,8 @@ class TestMetadata(env.DCCLabTestCase):
         if os.path.exists(self.cziPath):
             os.remove(self.cziPath)
 
-        if os.listdir(self.pomDir) == 0:
-            os.rmdir(self.pomDir)
-        if os.listdir(self.pdkDir) == 0:
-            os.rmdir(self.pdkDir)
+        os.rmdir(self.pomDir)
+        os.rmdir(self.pdkDir)
 
     def testWrongFileType(self):
         wrongFile = os.path.join(self.pomDir, 'test.gif')
