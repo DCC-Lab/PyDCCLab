@@ -1,10 +1,10 @@
 import env
-from dcclab import CSVMetadata as mtdt
+from dcclab import CSVPOMMetadata as mtdt
 import unittest
 import os
 
 
-class TestCsvMetadata(env.DCCLabTestCase):
+class TestCSVPOMMetadata(env.DCCLabTestCase):
     def setUp(self) -> None:
         self.filePath = os.path.join(str(self.dataDir), 'unittest.csv')
 
