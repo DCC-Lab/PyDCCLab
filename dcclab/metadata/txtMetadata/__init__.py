@@ -1,1 +1,1 @@
-from .txtMetadata import TXTMetadata
+from .pdkTXTMetadata import TXTMetadata
