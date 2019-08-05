@@ -126,7 +126,7 @@ class TestMetadata(env.DCCLabTestCase):
         mtdt = Metadata(self.csvPath)
         self.assertTrue(mtdt.keys)
 
-    def testKeysXlsx(self):
+    def testKeysXLSX(self):
         mtdt = Metadata(self.xlsxPath)
         self.assertTrue(mtdt.keys)
 
