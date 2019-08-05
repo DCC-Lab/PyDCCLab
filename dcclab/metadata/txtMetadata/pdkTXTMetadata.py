@@ -33,5 +33,6 @@ class PDKTXTMetadata:
 
     @property
     def keys(self):
-        return {'no.of.channels': 'INTEGER', 'frame.count': 'INTEGER', 'x.pixels': 'INTEGER', 'y.pixels': 'INTEGER',
-                'x.voltage': 'REAL', 'y.voltage': 'REAL', 'pixel.resolution': 'REAL', 'Laser.Power': 'REAL'}
+        return {'ZebrafishRAW': {'no.of.channels': 'INTEGER', 'frame.count': 'INTEGER', 'x.pixels': 'INTEGER',
+                                 'y.pixels': 'INTEGER', 'x.voltage': 'REAL', 'y.voltage': 'REAL',
+                                 'pixel.resolution': 'REAL', 'Laser.Power': 'REAL'}}
