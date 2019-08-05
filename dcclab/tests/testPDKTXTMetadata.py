@@ -40,9 +40,9 @@ class TestPDKTXTMetadata(env.DCCLabTestCase):
     def testKeys(self):
         metadata = mtdt(self.iniPath)
         self.assertEqual(metadata.keys, {'ZebrafishRAW': {'no.of.channels': 'INTEGER', 'frame.count': 'INTEGER',
-                                                          'x.pixels': 'INTEGER', 'y.pixels': 'INTEGER', 'x.voltage':
-                                                              'REAL', 'y.voltage': 'REAL', 'pixel.resolution': 'REAL',
-                                                          'Laser.Power': 'REAL'}})
+                                                          'x.pixels': 'INTEGER', 'y.pixels': 'INTEGER',
+                                                          'x.voltage': 'REAL', 'y.voltage': 'REAL',
+                                                          'pixel.resolution': 'REAL', 'Laser.Power': 'REAL'}})
 
 
 if __name__ == '__maine__':
