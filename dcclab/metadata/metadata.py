@@ -81,7 +81,8 @@ class Metadata:
     def metadata(self) -> dict:
         if isinstance(self.__fileObject, CZIMetadata):
             return self.__fileObject.asDict().get('metadata')
-        elif isinstance(self.__fileObject, POMCSVMetadata) or isinstance(self.__fileObject, PDKXLSXMetadata):
+        elif isinstance(self.__fileObject, POMCSVMetadata) or isinstance(self.__fileObject, PDKXLSXMetadata) \
+                or isinstance(self.__fileObject, PDKRAWMetadata):
             return self.__fileObject.asDict
         else:
             return {}
