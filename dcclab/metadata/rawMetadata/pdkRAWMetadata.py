@@ -43,8 +43,8 @@ class PDKRAWMetadata:
 
     @property
     def keys(self):
-        keys = {'path': 'TEXT PRIMARY KEY'}
-        return {**keys, **self.iniKeys}
+        keys = {'path': 'TEXT PRIMARY KEY', **self.iniKeys}
+        return {'ZebraFishRAW': keys}
 
     @property
     def asDict(self):

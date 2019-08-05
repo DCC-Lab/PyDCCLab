@@ -53,9 +53,11 @@ class TestPDKRAWMetadata(env.DCCLabTestCase):
 
     def testKeys(self):
         metadata = mtdt(self.rawPath)
-        self.assertEqual(metadata.keys, {'Laser.Power': 'REAL', 'frame.count': 'INTEGER', 'no.of.channels': 'INTEGER',
-                                         'path': 'TEXT PRIMARY KEY', 'pixel.resolution': 'REAL', 'x.pixels': 'INTEGER',
-                                         'x.voltage': 'REAL', 'y.pixels': 'INTEGER', 'y.voltage': 'REAL'})
+        self.assertEqual(metadata.keys, {'ZebraFishRAW': {'Laser.Power': 'REAL', 'frame.count': 'INTEGER',
+                                                          'no.of.channels': 'INTEGER', 'path': 'TEXT PRIMARY KEY',
+                                                          'pixel.resolution': 'REAL', 'x.pixels': 'INTEGER',
+                                                          'x.voltage': 'REAL', 'y.pixels': 'INTEGER',
+                                                          'y.voltage': 'REAL'}})
 
     def testAsDict(self):
         metadata = mtdt(self.rawPath)
