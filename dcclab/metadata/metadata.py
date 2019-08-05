@@ -13,7 +13,7 @@ except:
 class Metadata:
     # Supported research groups.
     supportedResearchGroups = ['POM', 'PDK']
-    supportedFormats = ['CZI', 'CSV', 'XLSX', 'RAW']
+    supportedFormats = ['CZI', 'CSV', 'RAW', 'XLSX']
 
     # Supported classes and formats for POM.
     pomSupportedClasses = [CZIMetadata, POMCSVMetadata]
@@ -21,7 +21,7 @@ class Metadata:
 
     # Supported classes and formats for PDK.
     pdkSupportedClasses = [PDKRAWMetadata, PDKXLSXMetadata]
-    pdkSupportedFormats = ['XLSX', 'RAW']
+    pdkSupportedFormats = ['RAW', 'XLSX']
 
     def __init__(self, path: str):
         if path is not None:
