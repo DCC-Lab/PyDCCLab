@@ -21,6 +21,7 @@ def createPDKDatabase():
     with Database(pdkPath, True) as database:
         print('Dropping all existing tables if any...')
         database.dropTable('Files info')
+        database.dropTable('ZebraFishRAW')
         database.commit()
         print('Done.')
 

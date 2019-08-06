@@ -192,13 +192,13 @@ class Database:
             statement = 'DROP TABLE IF EXISTS "{}"'.format(table)
             self.execute(statement)
 
-    def insert(self, table: str, values: dict):
+    def insert(self, table: str, entry: dict):
         if self.isConnected:
             lstKeys = []
             lstValues = []
-            for key in values.keys():
+            for key in entry.keys():
                 lstKeys.append('"{}"'.format(str(key)))
-                lstValues.append('"{}"'.format(str(values[key])))
+                lstValues.append('"{}"'.format(str(entry[key])))
             keys = ','.join(lstKeys)
             values = ','.join(lstValues)
             statement = 'INSERT OR REPLACE INTO "{}" ({}) VALUES ({})'.format(
