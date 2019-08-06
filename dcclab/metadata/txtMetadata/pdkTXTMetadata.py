@@ -23,10 +23,10 @@ class PDKTXTMetadata:
         for line in lines:
             try:
                 line = line.split(' = ')
-                key = line[0].replace('.', '_')
+                key = line[0]
                 value = line[1].rstrip('\n')
                 if key in keys:
-                    dictio[key] = value
+                    dictio[key.replace('.', '_')] = value
             except:
                 pass
         return dictio

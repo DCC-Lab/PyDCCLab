@@ -53,19 +53,19 @@ class TestPDKRAWMetadata(env.DCCLabTestCase):
 
     def testKeys(self):
         metadata = mtdt(self.rawPath)
-        self.assertEqual(metadata.keys, {'ZebraFishRAW': {'Laser.Power': 'REAL', 'frame.count': 'INTEGER',
-                                                          'no.of.channels': 'INTEGER', 'path': 'TEXT PRIMARY KEY',
-                                                          'pixel.resolution': 'REAL', 'x.pixels': 'INTEGER',
-                                                          'x.voltage': 'REAL', 'y.pixels': 'INTEGER',
-                                                          'y.voltage': 'REAL'}})
+        self.assertEqual(metadata.keys, {'ZebraFishRAW': {'Laser_Power': 'REAL', 'frame_count': 'INTEGER',
+                                                          'no_of_channels': 'INTEGER', 'path': 'TEXT PRIMARY KEY',
+                                                          'pixel_resolution': 'REAL', 'x_pixels': 'INTEGER',
+                                                          'x_voltage': 'REAL', 'y_pixels': 'INTEGER',
+                                                          'y_voltage': 'REAL'}})
 
     def testAsDict(self):
         metadata = mtdt(self.rawPath)
-        self.assertEqual(metadata.asDict, {'Laser.Power': '21.500000000000', 'frame.count': '1000.000000000000',
-                                           'no.of.channels': '1.000000000000', 'path': self.rawPath,
-                                           'pixel.resolution': '5.000000000000', 'x.pixels': '1024.000000000000',
-                                           'x.voltage': '5.000000000000', 'y.pixels': '512.000000000000',
-                                           'y.voltage': '1.250000000000'})
+        self.assertEqual(metadata.asDict, {'Laser_Power': '21.500000000000', 'frame_count': '1000.000000000000',
+                                           'no_of_channels': '1.000000000000', 'path': self.rawPath,
+                                           'pixel_resolution': '5.000000000000', 'x_pixels': '1024.000000000000',
+                                           'x_voltage': '5.000000000000', 'y_pixels': '512.000000000000',
+                                           'y_voltage': '1.250000000000'})
 
 
 if __name__ == '__main__':
