@@ -23,7 +23,7 @@ class PDKTXTMetadata:
         for line in lines:
             try:
                 line = line.split(' = ')
-                key = line[0]
+                key = line[0].replace('.', '_')
                 value = line[1].rstrip('\n')
                 if key in keys:
                     dictio[key] = value
@@ -33,5 +33,5 @@ class PDKTXTMetadata:
 
     @property
     def keys(self):
-        return {'no.of.channels': 'INTEGER', 'frame.count': 'INTEGER', 'x.pixels': 'INTEGER', 'y.pixels': 'INTEGER',
-                'x.voltage': 'REAL', 'y.voltage': 'REAL', 'pixel.resolution': 'REAL', 'Laser.Power': 'REAL'}
+        return {'no_of_channels': 'INTEGER', 'frame_count': 'INTEGER', 'x_pixels': 'INTEGER', 'y_pixels': 'INTEGER',
+                'x_voltage': 'REAL', 'y_voltage': 'REAL', 'pixel_resolution': 'REAL', 'Laser_Power': 'REAL'}
