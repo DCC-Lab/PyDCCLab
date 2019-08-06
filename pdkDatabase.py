@@ -60,9 +60,23 @@ def createPDKDatabase():
         database.commit()
         print('xlsxMetadata was processed for {} sheet(s)...'.format(len(entries)))
 
-        # Skip the raw files for now.  # TODO
-        print('Metadata related to raw files cannot be processed for the moment.')
+        # Skip the raw files for now.
+        print('Creating tables for the .raw metadata...')
+        rawMetadata = Metadata(files[0])
+        database.beginTransaction()
+        database.createTable(rawMetadata.keys)
+        database.commit()
+        print('...Done!')
 
+        # We insert the .raw Metadata into the tables.
+        print('Inserting metadata into the database...')
+        database.beginTransaction()
+        for file in files:
+            print('Processing {}...'.format(file))
+            rawMetadata = Metadata(file)
+            database.insert('ZebraFishRAW', rawMetadata.metadata)
+        database.commit()
+        print('{} czi files were processed!'.format(len(files)))
     print('Database was successfully created.')
 
 
