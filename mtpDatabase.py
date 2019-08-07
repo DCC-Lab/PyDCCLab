@@ -171,21 +171,21 @@ def addSCSVToPOMDatabase():
         entries = dapiMetadata.metadata
         database.beginTransaction()
         for line in entries.keys():
-            database.insert('query_DAPI_results.csv', entries[line])
+            database.insert('query_DAPI_results', entries[line])
         database.commit()
         print('query_DAPI_results was processed for {} lines...'.format(len(entries)))
 
         entries = egfpMetadata.metadata
         database.beginTransaction()
         for line in entries.keys():
-            database.insert('query_egfp_results.csv', entries[line])
+            database.insert('query_egfp_results', entries[line])
         database.commit()
         print('query_egfp_results was processed for {} lines...'.format(len(entries)))
 
         entries = mcherMetadata.metadata
         database.beginTransaction()
         for line in entries.keys():
-            database.insert('query_mcher_results.csv', entries[line])
+            database.insert('query_mcher_results', entries[line])
         database.commit()
         print('query_mcher_results was processed for {} lines...'.format(len(entries)))
     print('Database was successfully created.')
