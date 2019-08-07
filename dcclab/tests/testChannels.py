@@ -817,59 +817,35 @@ class TestChannelSpectralFiltering(env.DCCLabTestCase):
         self.assertAlmostEqual(np.sqrt(ps[centerY, centerX] * sumToMultiply),
                                np.sum(channel.pixels))
 
+    def testPowerSpectrumMaxValueInCenter(self):
+        oddXodd = Channel(np.arange(0, 25).reshape((5, 5)).T)
+        oddXeven = Channel(np.arange(0, 20).reshape((5, 4)).T)
+        evenXeven = Channel(np.arange(0, 36).reshape((6, 6)).T)
+        evenXodd = Channel(np.arange(0, 20).reshape((4, 5)).T)
+        listPS = [oddXodd.powerSpectrum(), oddXeven.powerSpectrum(), evenXeven.powerSpectrum(),
+                  evenXodd.powerSpectrum()]
+        for ps in listPS:
+            centerX, centerY = ps.shape[0] // 2, ps.shape[1] // 2
+            self.assertEqual(ps.max(), ps[centerX, centerY], msg=ps.shape)
+
     def testAzimuthalAverage(self):
-        # Shift 0 to the right!!
         array = np.array([[2, 2, 2, 2], [2, 1, 1, 1], [2, 1, 0, 1], [2, 1, 1, 1]], dtype=np.uint8)
         azmAvg = Channel.azimuthalAverage(array).tolist()
-        self.assertListEqual(azmAvg, [0 * 1 / 1, 1 * 8 / 8, 2 * 7 / 7])
+        self.assertListEqual(azmAvg, (
+                    np.array([0 * 1 / 1, 1 * 8 / 8, 2 * 7 / 7]) / np.sum([0 * 1 / 1, 1 * 8 / 8, 2 * 7 / 7])).tolist())
+        self.assertAlmostEqual(np.sum(azmAvg), 1)
 
-    # def testPowerSpectrumCircle(self):
-    #     import skimage.morphology.selem as selem
-    #     mask = selem.disk(100)
-    #     array = np.zeros((500, 500), dtype=np.uint8)
-    #     array[500 // 2 - 100:500 // 2 + 100 + 1, 500 // 2 - 100:500 // 2 + 100 + 1] = mask
-    #     channel = Channel(array)
-    #     channel.display()
-    #     rectangle = channel.applyLowPassFilterFromRectangularMask(4)
-    #     rectangle.display()
-    #     sigmoid = channel.applyLowPassFilterFromSigmoidMask(4)
-    #     sigmoid.display()
-    #     channel.displayPowerSpectrum(True)
-    #
-    # def testWeirdFunction(self):
-    #     array = np.ones((1000, 1000))
-    #     x, y = Channel.createXYGridsFromArray(array)
-    #     sin = np.sin
-    #     cos = np.cos
-    #     tan = np.tan
-    #     array_ = sin(cos(tan(x / 150 * y / 150))) <= sin(cos(tan(x / 150))) + sin(cos(tan(y / 150)))
-    #     plt.show()
-    #     channel = Channel(array_.astype(np.uint8))
-    #     channel.display()
-    #     channel.displayPowerSpectrum()
-    #
-    # def testOtherWeirdFunction(self):
-    #     array = np.ones((1000, 1000))
-    #     x, y = Channel.createXYGridsFromArray(array)
-    #     sin = np.sin
-    #     cos = np.cos
-    #     array_ = sin(sin(x / 50) + cos(y / 50)) >= cos(sin(x * y / (50 ** 2)) + cos(x / 50))
-    #     channel = Channel(array_.astype(np.uint8))
-    #     channel.display()
-    #     channel.displayPowerSpectrum()
-    #     channel.displayPhaseSpectrum()
-    #
-    # def testImage(self):
-    #     path = Path(self.dataDir / "testCziFileTwoChannels.czi")
-    #     image = Image(path=path)
-    #     channel = image.channels[0]
-    #     # channel2 = image.channels[1]
-    #     # channel.displayPowerSpectrumDensityAzimuthalAverage(2)
-    #     # channel.displayPowerSpectrum()
-    #     noise = channel.applyGaussianNoise(0, 10)
-    #     filtered = noise.applyLowPassFilterFromSigmoidMask(50, 1 / 8)
-    #     filtered2 = noise.applyLowPassFilterFromSigmoidMask(50, 1 / 4)
-    #     Channel.multiChannelDisplay([noise, filtered, filtered2])
+    def testAngularAverage(self):
+        array = [[3 - abs(i)] * 8 for i in range(-2, 3)]
+        array = np.concatenate((array, array))
+        angAvg, index = Channel.angularAverage(array)
+        tempIndex = np.array([[79, 68, 59], [76, 63, 53], [72, 56, 45], [63, 45, 34], [45, 27, 18], [0, 0, 0]])
+        supposedIndex = np.concatenate((np.array([[129, 135, 143, 153, 166, 180]]).T, 180 - np.fliplr(tempIndex),
+                                        np.array([[90, 90, 90, 90, 90, 180]]).T, tempIndex), 1)
+        self.assertListEqual(np.unique(supposedIndex).tolist(), index.tolist())
+        supposedAngAvg = [1, 1, 1, 2, 2, 2, 3, 1, 2, 1, 3, 2, 1, 1.8, 1, 2, 3, 1, 2, 1, 3, 2, 1, 2, 3, 2, 1.5, 1, 1, 1]
+        self.assertListEqual(angAvg.tolist(), (np.array(supposedAngAvg) / np.sum(supposedAngAvg)).tolist())
+        self.assertAlmostEqual(np.sum(angAvg), 1)
 
 
 if __name__ == '__main__':
