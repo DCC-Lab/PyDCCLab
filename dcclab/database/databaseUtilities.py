@@ -38,10 +38,13 @@ def sqliteDataTypes() -> list:
 
 
 def checkIfValidDataType(dataType: str) -> bool:
-    for dType in sqliteDataTypes():
-        if re.search(dType, dataType, re.IGNORECASE):
-            return True
-    return False
+    try:
+        for dType in sqliteDataTypes():
+            if re.search(dType, dataType, re.IGNORECASE):
+                return True
+        return False
+    except:
+        return False
 
 
 if __name__ == '__main__':
