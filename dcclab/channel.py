@@ -449,14 +449,10 @@ class Channel:
             ccKernel = np.ones((3, 3))
         # First, we apply a gaussian filter in order to remove some noise in the channel and smooth it.
         gaussianFilter = self.getGaussianFilter(gaussianFilterStdDev)
-        self.multiChannelDisplay([self, gaussianFilter])
         # We can now threshold the filtered channel in order to have a binary channel.
         gaussianBin = gaussianFilter.getOtsuThresholding()
-        gaussianBin.display()
         # Compute the distances between each pixels and its nearest 0 value pixel.
         distanceTransform = gaussianBin.getDistanceTransform()
-        plt.imshow(distanceTransform.T, cmap="jet")
-        plt.show()
         # We then find the local max of the distance transform array
         localMax = feature.peak_local_max(distanceTransform, indices=False, min_distance=localPeaksMinDistance,
                                           labels=gaussianBin.pixels)
@@ -670,17 +666,19 @@ class Channel:
         plt.show()
         return ps1D
 
-    def powerSpectrumAngularAverage(self) -> np.ndarray:
+    def powerSpectrumAngularAverage(self, returnIndex: bool = False) -> typing.Union[
+        np.ndarray, typing.Tuple[np.ndarray, np.ndarray]]:
         powerSpectrumDensity = self.powerSpectrum()
-        psAngAvg = self.angularAverage(powerSpectrumDensity.T)
-        return psAngAvg
+        psAngAvg, index = self.angularAverage(powerSpectrumDensity.T)
+        returnValues = psAngAvg if not returnIndex else (psAngAvg, index)
+        return returnValues
 
     def displayPowerSpectrumAngularAverage(self, logBase: float = None, useRadians: bool = False) -> np.ndarray:
-        psAngAvg = self.powerSpectrumAngularAverage()
-        x = range(len(psAngAvg))
+        psAngAvg, index = self.powerSpectrumAngularAverage(True)
+        x = index
         label = "degrees"
         if useRadians:
-            x = np.array(x) / 180 * np.pi
+            x = x / 180 * np.pi
             label = "radians"
         plt.plot(x, psAngAvg)
         if logBase is not None:
@@ -796,11 +794,18 @@ class Channel:
         """
         x, y = Channel.createXYGridsFromArray(array)
         radii = ((x ** 2 + y ** 2) ** (1 / 2)).astype(int)
+        # carre = np.maximum(np.abs(x), np.abs(y))
         index = np.unique(radii)
-        return np.array(ndimage.mean(array, radii, index=index))
+        average = ndimage.mean(array, radii, index=index)
+        # averageSquare = ndimage.mean(array, x, index = np.unique(x))
+        # averageSquare = averageSquare
+        # plt.plot(range(len(averageSquare)), averageSquare)
+        # plt.yscale("log", basey=2)
+        # plt.show()
+        return np.array(average) / np.sum(average)
 
     @staticmethod
-    def angularAverage(array: np.ndarray) -> np.ndarray:
+    def angularAverage(array: np.ndarray) -> typing.Tuple[np.ndarray, np.ndarray]:
         x, y = Channel.createXYGridsFromArray(array)
         centerY = y.shape[0] // 2
         # We only take the 1st and 2nd quadrant because the 3rd and 4th are just a reflection.
@@ -808,10 +813,10 @@ class Channel:
         # The angle of a line starting from origin and passing through a pixel is given by arctan(y/x) where (x, y) are
         # the coordinates of each pixel.
         angleMask = np.round(np.arctan2(y, x) * 180 / np.pi).astype(int)
-        upperPartArray = array[:, :centerY + 1]
+        upperPartArray = array[:centerY + 1, :]
         index = np.unique(angleMask)
-        average = ndimage.mean(upperPartArray, angleMask.T, index=index)
-        return np.array(average)
+        average = ndimage.mean(upperPartArray, angleMask, index=index)
+        return np.array(average) / np.sum(average), index
 
 
 from .channelFloat import ChannelFloat
