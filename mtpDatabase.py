@@ -169,11 +169,8 @@ def addSCSVToPOMDatabase():
         # We insert the metadata into the tables.
         print('Inserting metadata into the database...')
         entries = dapiMetadata.metadata
-        print(entries)
         database.beginTransaction()
         for line in entries.keys():
-            print(line)
-            print(entries[line])
             database.insert('query_DAPI_results', entries[line])
         database.commit()
         print('query_DAPI_results was processed for {} lines...'.format(len(entries)))
