@@ -192,5 +192,6 @@ def addSCSVToPOMDatabase():
 
 
 if __name__ == '__main__':
-    createMTPDatabase()
+    #createMTPDatabase()
     #queryViralVectors()
+    addSCSVToPOMDatabase()
