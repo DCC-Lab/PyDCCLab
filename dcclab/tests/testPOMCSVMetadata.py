@@ -1,44 +1,103 @@
-import env
 from dcclab import POMCSVMetadata as mtdt
+import env
 import unittest
 import os
 
 
 class TestPOMCSVMetadata(env.DCCLabTestCase):
     def setUp(self) -> None:
-        self.filePath = os.path.join(str(self.dataDir), 'unittest.csv')
+        self.csvPath = os.path.join(str(self.dataDir), 'unittest.csv')
 
-        with open(self.filePath, 'w') as file:
-            file.write('field_1,field_2,field_3\n')
+        with open(self.csvPath, 'w') as file:
+            file.write('field_1,field_2,path\n')
             file.write('INTEGER,REAL,TEXT\n')
             file.write('100,0.123,apple\n')
             file.write('200,0.456,orange\n')
 
+        self.scsvPath = os.path.join(str(self.dataDir), 'unittest.scsv')
+        with open(self.scsvPath, 'w') as file:
+            file.write('field_1;field_2;path\n')
+            file.write('INTEGER;REAL;TEXT\n')
+            file.write('100;0.123;apple\n')
+            file.write('200;0.456;orange\n')
+
     def tearDown(self) -> None:
-        os.remove(self.filePath)
+        os.remove(self.csvPath)
+        os.remove(self.scsvPath)
 
-    def testHeader(self):
-        metadata = mtdt(self.filePath)
-        header = metadata.header
-        self.assertEqual(header[0], 'field_1,field_2,field_3\n')
+    def testColumnsCSV(self):
+        metadata = mtdt(self.csvPath)
+        self.assertEqual(metadata.columns, ['field_1', 'field_2', 'path'])
 
-    def testBody(self):
-        metadata = mtdt(self.filePath)
+    def testColumnsSCSV(self):
+        metadata = mtdt(self.scsvPath)
+        self.assertEqual(metadata.columns, ['field_1', 'field_2', 'path'])
+
+    def testTypesCSV(self):
+        metadata = mtdt(self.csvPath)
+        self.assertEqual(metadata.types, ['INTEGER', 'REAL', 'TEXT'])
+
+    def testTypesSCSV(self):
+        metadata = mtdt(self.scsvPath)
+        self.assertEqual(metadata.types, ['INTEGER', 'REAL', 'TEXT'])
+
+    def testTypesNoTypesCSV(self):
+        self.csvPath = os.path.join(str(self.dataDir), 'unittest.csv')
+        with open(self.csvPath, 'w') as file:
+            file.write('field_1,field_2,path\n')
+            file.write('100,0.123,apple\n')
+            file.write('200,0.456,orange\n')
+
+        metadata = mtdt(self.csvPath)
+        self.assertEqual(metadata.types, ['TEXT', 'TEXT', 'TEXT PRIMARY KEY'])
+
+    def testTypesNoTypesSCSV(self):
+        self.scsvPath = os.path.join(str(self.dataDir), 'unittest.scsv')
+        with open(self.scsvPath, 'w') as file:
+            file.write('field_1,field_2,path\n')
+            file.write('100,0.123,apple\n')
+            file.write('200,0.456,orange\n')
+
+        metadata = mtdt(self.scsvPath)
+        self.assertEqual(metadata.types, ['TEXT', 'TEXT', 'TEXT PRIMARY KEY'])
+
+    def testBodyCSV(self):
+        metadata = mtdt(self.csvPath)
         body = metadata.body
         self.assertEqual(body[0], '100,0.123,apple\n')
 
-    def testKeys(self):
-        metadata = mtdt(self.filePath)
+    def testBodySCSV(self):
+        metadata = mtdt(self.scsvPath)
+        body = metadata.body
+        self.assertEqual(body[0], '100,0;123;apple\n')
+
+    def testKeysCSV(self):
+        metadata = mtdt(self.csvPath)
         keys = metadata.keys['unittest']
         self.assertEqual(keys['field_1'], 'INTEGER')
 
-    def testLines(self):
-        metadata = mtdt(self.filePath)
+    def testKeysSCSV(self):
+        metadata = mtdt(self.scsvPath)
+        keys = metadata.keys['unittest']
+        self.assertEqual(keys['field_1'], 'INTEGER')
+
+    def testLinesCSV(self):
+        metadata = mtdt(self.csvPath)
         lines = metadata.lines
         self.assertEqual(lines[0], ['100', '0.123', 'apple'])
 
-    def testAsDict(self):
-        metadata = mtdt(self.filePath)
+    def testLinesSCSV(self):
+        metadata = mtdt(self.scsvPath)
+        lines = metadata.lines
+        self.assertEqual(lines[0], ['100', '0.123', 'apple'])
+
+    def testAsDictCSV(self):
+        metadata = mtdt(self.csvPath)
+        dictio = metadata.asDict
+        self.assertEqual(dictio[0]['field_1'], '100')
+
+    def testAsDictSCSV(self):
+        metadata = mtdt(self.scsvPath)
         dictio = metadata.asDict
         self.assertEqual(dictio[0]['field_1'], '100')
 

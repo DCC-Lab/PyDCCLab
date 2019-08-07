@@ -83,4 +83,3 @@ def createPDKDatabase():
 
 if __name__ == '__main__':
     createPDKDatabase()
-    pass

@@ -1,3 +1,4 @@
+from dcclab import checkIfValidDataType
 import os
 
 
@@ -6,61 +7,86 @@ class POMCSVMetadata:
         self.path = path
         self.name = self.fileName()
 
-        # This is a quick test to catch if the file is of a valid type BEFORE we try to process it.
-        self.canReadFile()
-
-    def canReadFile(self):
-        try:
-            with open(self.path, 'r') as file:
-                file.readline()
-        except:
-            raise
+        self.separator = self.findSeparator()
+        self.body = self.__body()
+        self.columns = self.__columns()
+        self.types = self.__types()
 
     def fileName(self):
         file = os.path.basename(self.path)
         return os.path.splitext(file)[0]
 
-    @property
-    def header(self) -> list:
-        with open(self.path, 'r') as file:
-            return file.readlines()[:2]
+    def findSeparator(self):
+        separator = None
+        try:
+            with open(self.path, 'r') as file:
+                line = file.readline()
 
-    @property
-    def body(self) -> list:
+                if len(line.split(',')) >= 2:
+                    separator = ','
+                elif len(line.split(';')) >= 2:
+                    separator = ';'
+        except:
+            raise
+        return separator
+
+    def __body(self) -> list:
         with open(self.path, 'r') as file:
-            return file.readlines()[2:]
+            return file.readlines()
+
+    def __columns(self) -> list:
+        columns = str(self.body[0]).rstrip('\n').split(self.separator)
+        self.body = self.body[1:]
+        return columns
+
+    def __types(self) -> list:
+        removeLine = True
+        types = str(self.body[0]).rstrip('\n').split(self.separator)
+        iter = 0
+        while iter < len(types):
+            if not checkIfValidDataType(types[iter]):
+                removeLine = False
+                if self.columns[iter] == 'path':
+                    types[iter] = 'TEXT PRIMARY KEY'
+                else:
+                    types[iter] = 'TEXT'
+            iter += 1
+
+        if removeLine:
+            self.body = self.body[1:]
+
+        return types
 
     @property
     def keys(self) -> dict:
-        csvHeader = self.header
-        keys = csvHeader[0].rstrip('\n').split(',')
-        types = csvHeader[1].rstrip('\n').split(',')
+        columns = self.columns
+        types = self.types
 
-        csvHeaderAsDict = {}
-        for key, type in zip(keys, types):
-            csvHeaderAsDict[key] = type
+        keys = {}
+        for column, type in zip(columns, types):
+            keys[column] = type
 
-        return {self.name: csvHeaderAsDict}
+        return {self.name: keys}
 
     @property
     def lines(self) -> list:
-        csvLines = self.body
+        lines = self.body
 
         formattedLines = []
-        for line in csvLines:
-            formattedLines.append(line.rstrip('\n').split(','))
+        for line in lines:
+            formattedLines.append(line.rstrip('\n').split(self.separator))
 
         return formattedLines
 
     @property
     def asDict(self) -> dict:
-        keys = self.header[0].rstrip('\n').split(',')
+        columns = self.columns
         dictio = {}
         iter = 0
         for line in self.lines:
             metadataAsDict = {}
-            for key, value in zip(keys, line):
-                metadataAsDict[key] = value
+            for column, value in zip(columns, line):
+                metadataAsDict[column] = value
             dictio[iter] = metadataAsDict
             iter += 1
         return dictio
