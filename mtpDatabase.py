@@ -169,8 +169,10 @@ def addSCSVToPOMDatabase():
         # We insert the metadata into the tables.
         print('Inserting metadata into the database...')
         entries = dapiMetadata.metadata
+        print(entries)
         database.beginTransaction()
         for line in entries.keys():
+            print(line)
             print(entries[line])
             database.insert('query_DAPI_results', entries[line])
         database.commit()
@@ -179,7 +181,6 @@ def addSCSVToPOMDatabase():
         entries = egfpMetadata.metadata
         database.beginTransaction()
         for line in entries.keys():
-            print(entries[line])
             database.insert('query_egfp_results', entries[line])
         database.commit()
         print('query_egfp_results was processed for {} lines...'.format(len(entries)))
@@ -187,7 +188,6 @@ def addSCSVToPOMDatabase():
         entries = mcherMetadata.metadata
         database.beginTransaction()
         for line in entries.keys():
-            print(entries[line])
             database.insert('query_mcher_results', entries[line])
         database.commit()
         print('query_mcher_results was processed for {} lines...'.format(len(entries)))
