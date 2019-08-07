@@ -146,9 +146,9 @@ def addSCSVToPOMDatabase():
         dapiPath = os.path.join(directory, 'dcclab', 'POM', 'MTPDatabaseRessources', 'query_DAPI_results.csv')
         egfpPath = os.path.join(directory, 'dcclab', 'POM', 'MTPDatabaseRessources', 'query_egfp_results.csv')
         mcherPath = os.path.join(directory, 'dcclab', 'POM', 'MTPDatabaseRessources', 'query_mcher_results.csv')
-        print('Path to mice data is : {}'.format(dapiPath))
-        print('Path to util data is : {}'.format(egfpPath))
-        print('Path to util data is : {}'.format(mcherPath))
+        print('Path to query_DAPI_results data is : {}'.format(dapiPath))
+        print('Path to query_egfp_results data is : {}'.format(egfpPath))
+        print('Path to query_mcher_results data is : {}'.format(mcherPath))
 
         # Now, we extract the metadata from our files.
         print('Extracting metadata from .csv files...')
@@ -171,23 +171,23 @@ def addSCSVToPOMDatabase():
         entries = dapiMetadata.metadata
         database.beginTransaction()
         for line in entries.keys():
-            database.insert('Data-souris', entries[line])
+            database.insert('query_DAPI_results.csv', entries[line])
         database.commit()
-        print('Data-souris was processed for {} lines...'.format(len(entries)))
+        print('query_DAPI_results was processed for {} lines...'.format(len(entries)))
 
         entries = egfpMetadata.metadata
         database.beginTransaction()
         for line in entries.keys():
-            database.insert('Data-Utilisation', entries[line])
+            database.insert('query_egfp_results.csv', entries[line])
         database.commit()
-        print('Data-Utilisation was processed for {} lines...'.format(len(entries)))
+        print('query_egfp_results was processed for {} lines...'.format(len(entries)))
 
         entries = mcherMetadata.metadata
         database.beginTransaction()
         for line in entries.keys():
-            database.insert('Data-Utilisation', entries[line])
+            database.insert('query_mcher_results.csv', entries[line])
         database.commit()
-        print('Data-Utilisation was processed for {} lines...'.format(len(entries)))
+        print('query_mcher_results was processed for {} lines...'.format(len(entries)))
     print('Database was successfully created.')
 
 
