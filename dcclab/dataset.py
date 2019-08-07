@@ -72,6 +72,9 @@ class Dataset:
 
         self.loadAllCollections()
         self.report()
+    @property
+    def isSemantic(self):
+        return self.info["type"] is not None    
 
     def loadAllCollections(self):
         folders = self.getFolders(self.directory)
@@ -224,7 +227,11 @@ class Dataset:
 
     @staticmethod
     def getFolders(source):
-        return list(os.walk(source))[0][1]
+        paths = list(os.walk(source)) 
+        if len(paths) == 0:
+            raise FileNotFoundError()
+
+        return paths[0][1]
 
     @staticmethod
     def getFiles(source, absolute=False):
