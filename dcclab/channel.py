@@ -6,6 +6,9 @@ from scipy.ndimage import label, sum
 import scipy.ndimage as ndimage
 from .DCCExceptions import *
 import cv2 as cv
+from aicssegmentation.core.pre_processing_utils import *
+from aicssegmentation.core.seg_dot import *
+from aicssegmentation.core.vessel import *
 
 import matplotlib.pyplot as plt
 import json
@@ -466,14 +469,10 @@ class Channel:
             ccKernel = np.ones((3, 3))
         # First, we apply a gaussian filter in order to remove some noise in the channel and smooth it.
         gaussianFilter = self.getGaussianFilter(gaussianFilterStdDev)
-        self.multiChannelDisplay([self, gaussianFilter])
         # We can now threshold the filtered channel in order to have a binary channel.
         gaussianBin = gaussianFilter.getOtsuThresholding()
-        gaussianBin.display()
         # Compute the distances between each pixels and its nearest 0 value pixel.
         distanceTransform = gaussianBin.getDistanceTranform()
-        plt.imshow(distanceTransform.T, cmap="jet")
-        plt.show()
         # We then find the local max of the distance transform array
         localMax = feature.peak_local_max(distanceTransform, indices=False, min_distance=localPeaksMinDistance,
                                           labels=gaussianBin.pixels)
@@ -488,19 +487,74 @@ class Channel:
                 # label = 0 means background
                 continue
 
-            mask = np.zeros(self.shape, dtype=np.uint8)
+            mask = np.zeros(self.shape, dtype=np.uint16)
             mask[labels == label] = 255
             allMask[labels == label] = label
 
         masks = Channel(allMask)
         return masks, len(uniqueLabels) - 1
 
-    def circularHoughTransform(self):
-        # First of all, we must find the edges
-        edges = self.getSobelFilter()
-        radii = np.arange(1, 100, 2)
+    def dotsLikeStructureSegmentation(self, spotFilterScales: list, spotFilterCutoffs: list,
+                                      watershedMinDistanceOfPeaks: int = 5) -> typing.Tuple["Channel", int]:
+        # To use when the image contains dot-like structures, like little round cells. Not too good with neurons tho
+        if len(spotFilterScales) == 0 or len(spotFilterCutoffs) == 0:
+            raise ValueError("The lists of parameters must have at least one element.")
+        if len(spotFilterCutoffs) != len(spotFilterScales):
+            raise ValueError("The lists of parameters must have the same number of elements.")
+        normalizedChannel = self.intensityScaleNormalization()
+        # FIXME Find a way to get a std deviation automatically (depending on noise)?
+        smooth = normalizedChannel.getGaussianFilter(1)
+        # FIXME Find a way to get params automatically?
+        spotFilterParams = [[spotFilterScales[i], spotFilterCutoffs[i]] for i in range(len(spotFilterScales))]
+        spotFiltered = Channel(dot_3d_wrapper(smooth.pixels, spotFilterParams).astype(np.uint8))
+        spotFiltered.display()
+        watershed = spotFiltered.watershedSegmentation(0, watershedMinDistanceOfPeaks)
+        return watershed
 
-        pass
+    def curviLinearLikeStructuresSegmentation(self, filamentFilterScales: list, filamentFilterCutoffs: list):
+        if len(filamentFilterScales) == 0 or len(filamentFilterCutoffs) == 0:
+            raise ValueError("The lists of parameters must have at least one element.")
+        if len(filamentFilterCutoffs) != len(filamentFilterScales):
+            raise ValueError("The lists of parameters must have the same number of elements.")
+        normalizedChannel = self.intensityScaleNormalization()
+        smooth = edge_preserving_smoothing_3d(normalizedChannel.pixels)
+        filamentFilterParameters = [[filamentFilterScales[i], filamentFilterCutoffs[i]] for i in
+                                    range(len(filamentFilterScales))]
+        filamentFiltered = filament_2d_wrapper(smooth, filamentFilterParameters)
+        plt.imshow(filamentFiltered)
+        plt.show()
+
+    def intensityScaleNormalization(self, scaleParam: list = None) -> ["Channel"]:
+        # Adapted from the Allen Institute segmentation module. This is from a method suggesting scale parameters
+        # but it actually doesn't return them (just printing them on console).
+        normParam = scaleParam
+        if scaleParam is not None and len(scaleParam) != 2:
+            raise ValueError("The list of scale parameters must contain 2 values.")
+        if normParam is None:
+            percentile99 = np.percentile(self.pixels, 99.99)
+            mean = self.getAverageValueOfPixels()
+            stdDev = self.getStandardDeviation()
+            maxRatio = 0
+            for tempMaxRatio in np.arange(0.5, 1000, 0.5):
+                if mean + stdDev * tempMaxRatio > percentile99:
+                    if mean + stdDev * tempMaxRatio > self.getExtrema()[1]:
+                        maxRatio = tempMaxRatio - 0.5
+                    else:
+                        maxRatio = tempMaxRatio
+                    break
+            minRatio = 0
+            for tempMinRatio in np.arange(0.5, 1000, 0.5):
+                if mean - stdDev * tempMinRatio < self.getExtrema()[0]:
+                    minRatio = tempMinRatio - 0.5
+                    break
+            normParam = [minRatio, maxRatio]
+            normalizedPixels = intensity_normalization(self.pixels, normParam)
+
+            # This should not happen but just in case
+            # FIXME find a better way (in Channel, ChannelFloat or ChannelInt init?) to have only positive values
+            if np.min(normalizedPixels) < 0 or np.max(normalizedPixels):
+                normalizedPixels = np.clip(normalizedPixels, 0, 1)
+            return Channel(normalizedPixels)
 
     def convertTo16BitsUnsignedInteger(self):
         pass
