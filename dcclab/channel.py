@@ -511,7 +511,8 @@ class Channel:
         watershed = spotFiltered.watershedSegmentation(0, watershedMinDistanceOfPeaks)
         return watershed
 
-    def curviLinearLikeStructuresSegmentation(self, filamentFilterScales: list, filamentFilterCutoffs: list):
+    def curviLinearLikeStructuresSegmentation(self, filamentFilterScales: list, filamentFilterCutoffs: list) -> [
+        "Channel"]:
         if len(filamentFilterScales) == 0 or len(filamentFilterCutoffs) == 0:
             raise ValueError("The lists of parameters must have at least one element.")
         if len(filamentFilterCutoffs) != len(filamentFilterScales):
@@ -521,8 +522,7 @@ class Channel:
         filamentFilterParameters = [[filamentFilterScales[i], filamentFilterCutoffs[i]] for i in
                                     range(len(filamentFilterScales))]
         filamentFiltered = filament_2d_wrapper(smooth, filamentFilterParameters)
-        plt.imshow(filamentFiltered)
-        plt.show()
+        return Channel(filamentFiltered.astype(np.uint8))
 
     def intensityScaleNormalization(self, scaleParam: list = None) -> ["Channel"]:
         # Adapted from the Allen Institute segmentation module. This is from a method suggesting scale parameters
