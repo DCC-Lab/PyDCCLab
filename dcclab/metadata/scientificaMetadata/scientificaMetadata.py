@@ -1,14 +1,14 @@
-import xml.etree.ElementTree as et
 from ..txtMetadata.pdkTXTMetadata import PDKTXTMetadata
-import re
 import os
 import datetime
 
 
-class PDKRAWMetadata:
+class scientificaMetadata:
     def __init__(self, rawPath):
-        self.rawPath = rawPath
+        self.scientificaPath = os.path.dirname(rawPath)
+        print(self.scientificaPath)
         self.fileName = self.__fileName()
+        print(self.fileName)
         self.date = self.__date()
 
         # Processing .ini file :
@@ -19,7 +19,8 @@ class PDKRAWMetadata:
         #self.xmlRoot = self.readXmlFile()
 
     def __fileName(self):
-        file = os.path.basename(self.rawPath)
+        file = os.path.basename(self.scientificaPath)
+        print(file)
         return os.path.splitext(file)[0]
 
     def __date(self):
@@ -29,7 +30,7 @@ class PDKRAWMetadata:
         return '{} {}'.format(date.date(), date.time())
 
     def extractDataFromIniFile(self):
-        mtdt = PDKTXTMetadata(self.rawPath)
+        mtdt = PDKTXTMetadata(self.scientificaPath)
         return mtdt.asDict, mtdt.keys
 
     # FixMe Currently, we do not know if .xml files associated with .raw files have any valuable metadata.
@@ -48,5 +49,5 @@ class PDKRAWMetadata:
 
     @property
     def asDict(self):
-        dictio = {'path': self.rawPath}
+        dictio = {'path': self.scientificaPath}
         return {**dictio, **self.iniDict}

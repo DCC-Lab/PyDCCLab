@@ -4,6 +4,6 @@ namespace because it is simpler for everyone """
 from .csvMetadata import *
 from .cziMetadata import *
 from .txtMetadata import *
-from .rawMetadata import *
+from .scientificaMetadata import *
 from .xlsxMetadata import *
 from .metadata import *

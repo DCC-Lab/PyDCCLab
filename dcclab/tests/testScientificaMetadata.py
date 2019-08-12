@@ -1,14 +1,15 @@
-from dcclab import PDKRAWMetadata as mtdt
+from dcclab import scientificaMetadata as mtdt
 import env
 import unittest
 import os
 
 
-class TestPDKRAWMetadata(env.DCCLabTestCase):
+class TestScientificaMetadata(env.DCCLabTestCase):
     def setUp(self) -> None:
-        self.rawPath = os.path.join(str(self.dataDir), '20190101_12_12_12_900nm_16x_512x1024_1000f_8dpf_XYT.raw')
-        self.iniPath = os.path.join(str(self.dataDir), '20190101_12_12_12_900nm_16x_512x1024_1000f_8dpf_XYT.ini')
-        self.xmlPath = os.path.join(str(self.dataDir), '20190101_12_12_12_900nm_16x_512x1024_1000f_8dpf_OME.xml')
+        self.scientificaDir = os.path.join(self.dataDir, '20190101_12_12_12_900nm_16x_512x1024_1000f_8dpf')
+        os.mkdir(self.scientificaDir)
+        self.iniPath = os.path.join(self.scientificaDir, '20190101_12_12_12_900nm_16x_512x1024_1000f_8dpf_XYT.ini')
+        self.xmlPath = os.path.join(self.scientificaDir, '20190101_12_12_12_900nm_16x_512x1024_1000f_8dpf_OME.xml')
         with open(self.iniPath, 'w') as file:
             file.write('[_]\nTest_File = This is a test file\nno.of.channels = 1.000000000000\nblank_line = blank\n'
                        'frame.count = 1000.000000000000\n\nx.pixels = 1024.000000000000\ny.pixels = 512.000000000000\n'
@@ -25,20 +26,22 @@ class TestPDKRAWMetadata(env.DCCLabTestCase):
         os.remove(self.iniPath)
         os.remove(self.xmlPath)
 
+        os.rmdir(self.scientificaDir)
+
     def testFileName(self):
-        metadata = mtdt(self.rawPath)
+        metadata = mtdt(self.scientificaDir)
         self.assertEqual(metadata.fileName, '20190101_12_12_12_900nm_16x_512x1024_1000f_8dpf_XYT')
 
     def testDate(self):
-        metadata = mtdt(self.rawPath)
+        metadata = mtdt(self.scientificaDir)
         self.assertEqual('2019-01-01 12:12:12', metadata.date)
 
     def testExtractDataFromIniFile(self):
-        metadata = mtdt(self.rawPath)
+        metadata = mtdt(self.scientificaDir)
         self.assertTrue(metadata.extractDataFromIniFile())
 
     def testXmlPath(self):
-        metadata = mtdt(self.rawPath)
+        metadata = mtdt(self.scientificaDir)
         self.assertEqual(metadata.xmlPath, self.xmlPath)
 
     def testXmlPathLineShifted(self):
@@ -48,11 +51,11 @@ class TestPDKRAWMetadata(env.DCCLabTestCase):
         self.assertEqual(metadata.xmlPath, self.xmlPath)
 
     def testReadXmlFile(self):
-        metadata = mtdt(self.rawPath)
+        metadata = mtdt(self.scientificaDir)
         self.assertTrue(metadata.readXmlFile())
 
     def testKeys(self):
-        metadata = mtdt(self.rawPath)
+        metadata = mtdt(self.scientificaDir)
         self.assertEqual(metadata.keys, {'ZebraFishRAW': {'Laser_Power': 'REAL', 'frame_count': 'INTEGER',
                                                           'no_of_channels': 'INTEGER', 'path': 'TEXT PRIMARY KEY',
                                                           'pixel_resolution': 'REAL', 'x_pixels': 'INTEGER',
@@ -60,9 +63,9 @@ class TestPDKRAWMetadata(env.DCCLabTestCase):
                                                           'y_voltage': 'REAL'}})
 
     def testAsDict(self):
-        metadata = mtdt(self.rawPath)
+        metadata = mtdt(self.scientificaDir)
         self.assertEqual(metadata.asDict, {'Laser_Power': '21.500000000000', 'frame_count': '1000.000000000000',
-                                           'no_of_channels': '1.000000000000', 'path': self.rawPath,
+                                           'no_of_channels': '1.000000000000', 'path': self.scientificaDir,
                                            'pixel_resolution': '5.000000000000', 'x_pixels': '1024.000000000000',
                                            'x_voltage': '5.000000000000', 'y_pixels': '512.000000000000',
                                            'y_voltage': '1.250000000000'})

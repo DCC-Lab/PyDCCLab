@@ -1,7 +1,7 @@
 from .cziMetadata import CZIMetadata
 from .csvMetadata import CSVMetadata
 from .xlsxMetadata import PDKXLSXMetadata
-from .rawMetadata import PDKRAWMetadata
+from .scientificaMetadata import scientificaMetadata
 import os
 import re
 try:
@@ -20,7 +20,7 @@ class Metadata:
     pomSupportedFormats = ['CZI', 'CSV']
 
     # Supported classes and formats for PDK.
-    pdkSupportedClasses = [PDKRAWMetadata, PDKXLSXMetadata]
+    pdkSupportedClasses = [scientificaMetadata, PDKXLSXMetadata]
     pdkSupportedFormats = ['RAW', 'XLSX']
 
     def __init__(self, path: str):
@@ -72,7 +72,7 @@ class Metadata:
             return 'CSV'
         elif fileType == PDKXLSXMetadata:
             return 'XLSX'
-        elif fileType == PDKRAWMetadata:
+        elif fileType == scientificaMetadata:
             return 'RAW'
         else:
             return None
@@ -82,7 +82,7 @@ class Metadata:
         if isinstance(self.__fileObject, CZIMetadata):
             return self.__fileObject.asDict().get('metadata')
         elif isinstance(self.__fileObject, CSVMetadata) or isinstance(self.__fileObject, PDKXLSXMetadata) \
-                or isinstance(self.__fileObject, PDKRAWMetadata):
+                or isinstance(self.__fileObject, scientificaMetadata):
             return self.__fileObject.asDict
         else:
             return {}
