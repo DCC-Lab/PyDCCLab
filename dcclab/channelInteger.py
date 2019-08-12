@@ -101,7 +101,7 @@ class ChannelInt(Channel):
             if distances[i] is not None and 0 <= distances[i] < binWidth:
                 thresh = binsCenters[i]
         threshArray = self.pixels >= thresh
-        return Channel(threshArray.astype(np.uint8))
+        return Channel(threshArray)
 
     def getOtsuThresholding(self) -> Channel:
         """
@@ -139,7 +139,7 @@ class ChannelInt(Channel):
         threshArray = cv.adaptiveThreshold(self.convertTo8BitsUnsignedInteger().pixels, 1,
                                            cv.ADAPTIVE_THRESH_GAUSSIAN_C,
                                            cv.THRESH_BINARY, oddRegionSize, 0)
-        return Channel(threshArray.astype(np.uint8))
+        return Channel(threshArray)
 
     def convertTo8BitsUnsignedInteger(self) -> Channel:
         return self._convertToUnsignedInt(np.uint8)
