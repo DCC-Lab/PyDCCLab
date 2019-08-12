@@ -115,7 +115,7 @@ class TestChannelInteger(env.DCCLabTestCase):
         for i in range(1, 4):
             for j in range(1, 4):
                 array[i][j] = 1
-        channel = Channel(array)
+        channel = Channel(array.T)
         sobelResult = np.array([[0.25, 0.75, 1, 0.75, 0.25], [0.25, 0.75, 1, 0.75, 0.25], [0, 0, 0, 0, 0],
                                 [-0.25, -0.75, -1, -0.75, -0.25], [-0.25, -0.75, -1, -0.75, -0.25]]) / 255
         # Remove false edges:
