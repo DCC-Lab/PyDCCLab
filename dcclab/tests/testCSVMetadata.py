@@ -1,10 +1,10 @@
-from dcclab import POMCSVMetadata as mtdt
+from dcclab import CSVMetadata as mtdt
 import env
 import unittest
 import os
 
 
-class TestPOMCSVMetadata(env.DCCLabTestCase):
+class TestCSVMetadata(env.DCCLabTestCase):
     def setUp(self) -> None:
         self.csvPath = os.path.join(str(self.dataDir), 'unittest.csv')
 
@@ -69,7 +69,7 @@ class TestPOMCSVMetadata(env.DCCLabTestCase):
     def testBodySCSV(self):
         metadata = mtdt(self.scsvPath)
         body = metadata.body
-        self.assertEqual(body[0], '100,0;123;apple\n')
+        self.assertEqual(body[0], '100;0.123;apple\n')
 
     def testKeysCSV(self):
         metadata = mtdt(self.csvPath)

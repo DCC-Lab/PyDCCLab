@@ -2,13 +2,15 @@ from dcclab import checkIfValidDataType
 import os
 
 
-class POMCSVMetadata:
+class CSVMetadata:
+    # We assume Comma Separated Values (CSV) by default but it could be Semi-Colon Separated Values (SCSV).
+    # The findSeparator method is the best way I could come up with to differentiate the two.
     def __init__(self, path):
         self.path = path
         self.name = self.fileName()
 
-        self.separator = self.findSeparator()
         self.body = self.__body()
+        self.separator = self.findSeparator()
         self.columns = self.__columns()
         self.types = self.__types()
 
@@ -17,15 +19,14 @@ class POMCSVMetadata:
         return os.path.splitext(file)[0]
 
     def findSeparator(self):
-        separator = None
+        separator = ','
         try:
-            with open(self.path, 'r') as file:
-                line = file.readline()
-
-                if len(line.split(',')) >= 2:
-                    separator = ','
-                elif len(line.split(';')) >= 2:
-                    separator = ';'
+            titleLine = self.body[0]
+            endLine = self.body[len(self.body) - 1]
+            if len(titleLine.split(';')) == len(endLine.split(';')) and len(titleLine.split(';')) >= 2:
+                separator = ';'
+            elif len(titleLine.split(',')) == len(endLine.split(',')) and len(titleLine.split(',')) >= 2:
+                separator = ','
         except:
             raise
         return separator
