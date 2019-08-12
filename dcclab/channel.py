@@ -6,9 +6,6 @@ from scipy.ndimage import label, sum
 import scipy.ndimage as ndimage
 from .DCCExceptions import *
 import cv2 as cv
-from aicssegmentation.core.pre_processing_utils import *
-from aicssegmentation.core.seg_dot import *
-from aicssegmentation.core.vessel import *
 
 import matplotlib.pyplot as plt
 import json
@@ -479,6 +476,11 @@ class Channel:
 
     def dotsLikeStructureSegmentation(self, spotFilterScales: list, spotFilterCutoffs: list,
                                       watershedMinDistanceOfPeaks: int = 5) -> typing.Tuple["Channel", int]:
+        try:
+            from aicssegmentation.core.seg_dot import dot_3d_wrapper
+        except:
+            raise NotImplementedError("dot_3d_wrapper not implemented. Must import aicssegmentation.")
+
         # To use when the image contains dot-like structures, like little round cells. Not too good with neurons tho
         if len(spotFilterScales) == 0 or len(spotFilterCutoffs) == 0:
             raise ValueError("The lists of parameters must have at least one element.")
@@ -490,12 +492,19 @@ class Channel:
         # FIXME Find a way to get params automatically?
         spotFilterParams = [[spotFilterScales[i], spotFilterCutoffs[i]] for i in range(len(spotFilterScales))]
         spotFiltered = Channel(dot_3d_wrapper(smooth.pixels, spotFilterParams).astype(np.uint8))
+
         spotFiltered.display()
         watershed = spotFiltered.watershedSegmentation(0, watershedMinDistanceOfPeaks)
         return watershed
 
     def curviLinearLikeStructuresSegmentation(self, filamentFilterScales: list, filamentFilterCutoffs: list) -> [
         "Channel"]:
+        try:
+            from aicssegmentation.core.pre_processing_utils import edge_preserving_smoothing_3d
+            from aicssegmentation.core.vessel import filament_2d_wrapper
+        except:
+            raise NotImplementedError("dot_3d_wrapper not implemented. Must import aicssegmentation.")
+
         if len(filamentFilterScales) == 0 or len(filamentFilterCutoffs) == 0:
             raise ValueError("The lists of parameters must have at least one element.")
         if len(filamentFilterCutoffs) != len(filamentFilterScales):
