@@ -113,7 +113,7 @@ class Image:
         if self.shape[-1] not in [1, 3]:
             Channel.multiChannelDisplay(self.channels)
         else:
-            plt.imshow(self.asArray().squeeze().T, cmap=colorMap)
+            plt.imshow(self.asArray().squeeze().swapaxes(0, 1), cmap=colorMap)
             plt.show()
 
     def channelsFromArray(self, array):
