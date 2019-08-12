@@ -1,18 +1,14 @@
 import numpy as np
 import typing
 
-from skimage import measure, morphology
-from skimage.filters.rank import entropy
-from skimage.filters import *
-
-from scipy.signal import convolve2d
-from scipy.ndimage import label, sum, filters
+from skimage import measure, morphology, feature, transform
+from scipy.ndimage import label, sum
 import scipy.ndimage as ndimage
 from .DCCExceptions import *
+import cv2 as cv
 
 import matplotlib.pyplot as plt
 import json
-import warnings
 
 try:
     from deprecated import deprecated
@@ -32,7 +28,11 @@ class Channel:
                 raise PixelTypeException("Can't read images of type {}".format(pixels.dtype))
 
     def __init__(self, pixels: np.ndarray):
-        pixels.squeeze()
+        """
+        Creates a Channel object from an array of pixels.
+        :param pixels: Numpy array of integers or floats. Must be in the shape (X, Y), width x height
+        """
+        pixels.squeeze()  # in case the array is nested in useless dimensions
         if pixels.ndim != 2:
             raise DimensionException(pixels.ndim)
         self._pixels = np.copy(pixels)
@@ -47,6 +47,9 @@ class Channel:
 
     def __str__(self) -> str:
         return str(self.pixels)
+
+    def __repr__(self) -> str:
+        return self.__str__()
 
     @property
     def pixels(self) -> np.ndarray:
@@ -81,8 +84,8 @@ class Channel:
             return False
         return np.array_equal(self.pixels, other.pixels)
 
-    def copy(self) -> np.ndarray:
-        return np.copy(self.pixels)
+    def copy(self):
+        return Channel(np.copy(self.pixels))
 
     @property
     def isBinary(self) -> bool:
@@ -97,7 +100,7 @@ class Channel:
     """ Display-related functions """
 
     def display(self, colorMap=None):
-        plt.imshow(self.pixels, cmap=colorMap)
+        plt.imshow(self.pixels.T, cmap=colorMap)
         plt.show()
         return self
 
@@ -126,7 +129,7 @@ class Channel:
             raise Exception("Channel has no mask")
 
     def analyzeComponents(self) -> dict:
-        if self.isLabelled:
+        if self.hasLabelledComponents:
             maskSizes = ndimage.sum(self.mask.pixels, self.labelledComponents, range(1, self.numberOfComponents + 1))
             sumValues = ndimage.sum(self.pixels, self.labelledComponents, range(1, self.numberOfComponents + 1))
             centersOfMass = ndimage.center_of_mass(self.pixels, self.labelledComponents,
@@ -154,6 +157,12 @@ class Channel:
             file.write(jsonParams)
 
     """ Manipulation-related functions """
+
+    def convertToNormalizedFloat(self):
+        pass
+
+    def convertToNormalizedFloatMinToZeroMaxToOne(self):
+        pass
 
     def convertToNormalizedFloat(self):
         pass
@@ -261,7 +270,7 @@ class Channel:
             result = self.getClosing(size)
         self._pixels = result.pixels
 
-    def applyNdImageBinaryOpening(self, size: int=None, iterations: int = 1):
+    def applyNdImageBinaryOpening(self, size: int = None, iterations: int = 1):
         # fixme: mask.applyOpening already exist: but ndimage method differs from morphology
         self.saveOriginal()
         if not self.isBinary:
@@ -271,7 +280,7 @@ class Channel:
             struct = np.ones((size, size))
         self._pixels = ndimage.binary_opening(self.pixels, struct, iterations=iterations)
 
-    def applyNdImageBinaryClosing(self, size: int=None, iterations: int = 1):
+    def applyNdImageBinaryClosing(self, size: int = None, iterations: int = 1):
         self.saveOriginal()
         if not self.isBinary:
             raise TypeError("Channel has to be binary")
@@ -314,26 +323,18 @@ class Channel:
     def getAverageValueOfPixels(self) -> float:
         return np.average(self.pixels)
 
-    @deprecated("Renamed getStandardDeviation()")
-    def getStandardDeviationOfPixels(self) -> float:
-        return self.getStandardDeviation()
-
     def getStandardDeviation(self) -> float:
         return np.std(self.pixels)
-
-    @deprecated("Renamed getShannonEntropy()")
-    def getShannonEntropyOfPixels(self, base=2) -> float:
-        return self.getShannonEntropy(base=base)
 
     def getShannonEntropy(self, base=2) -> float:
         return measure.shannon_entropy(self.pixels, base)
 
-    @deprecated("Renamed getExtrema()")
-    def getExtremaValuesOfPixels(self) -> typing.Tuple[int, int]:
-        return self.getExtrema()
-
-    def getExtrema(self) -> typing.Tuple[int, int]:
+    def getExtrema(self) -> typing.Tuple[typing.Union[int, float], typing.Union[int, float]]:
         return np.min(self.pixels), np.max(self.pixels)
+
+    def getMedian(self):
+        median = np.median(self.pixels)
+        return median
 
     def getPixelsOfIntensity(self, intensity: float) -> typing.List[tuple]:
         coordsList = []
@@ -344,20 +345,12 @@ class Channel:
         coordsList = coordsList[0]
         return coordsList
 
-    @deprecated("Renamed getMinimum()")
-    def getMinimumIntensityPixels(self) -> typing.List[typing.Tuple[int, int]]:
-        return self.getMinimum()
-
     def getMinimum(self) -> typing.List[typing.Tuple[int, int]]:
-        minimum = self.getExtremaValuesOfPixels()[0]
+        minimum = self.getExtrema()[0]
         return self.getPixelsOfIntensity(minimum)
 
-    @deprecated("Renamed getMaximum()")
-    def getMaximumIntensityPixels(self) -> typing.List[tuple]:
-        return self.getMaximum()
-
     def getMaximum(self) -> typing.List[tuple]:
-        maximum = self.getExtremaValuesOfPixels()[1]
+        maximum = self.getExtrema()[1]
         return self.getPixelsOfIntensity(maximum)
 
     def getEntropyFilter(self, filterSize: int):
@@ -375,16 +368,17 @@ class Channel:
     def getVerticalSobelFilter(self):
         pass
 
-    @deprecated("Renamed getSobelFilter()")
-    def getBothDirectionsSobelFilter(self):
-        return self.getSobelFilter()
-
     def getSobelFilter(self):
         pass
 
+    def getCannyEdgeDetection(self, gaussianStdDev: float = 1, lowerThreshold: float = None,
+                              higherThreshold: float = None):
+        canny = feature.canny(self.pixels, gaussianStdDev, lowerThreshold, higherThreshold)
+        return Channel(canny)
+
     def getGlobalThresholding(self, value):
         mask = self.pixels > value
-        return Channel(self.pixels * mask)
+        return Channel(mask)
 
     def getIsodataThresholding(self):
         pass
@@ -405,7 +399,8 @@ class Channel:
     def getBinaryOpening(self, windowSize: int = 3):
         if not self.isBinary:
             raise NotBinaryImageException
-        binaryOpened = morphology.binary_opening(self.pixels, np.ones((windowSize, windowSize))).astype(np.float32)
+        binaryOpened = morphology.binary_opening(self.pixels, np.ones((windowSize, windowSize))).astype(
+            self._originalDType)
         return Channel(binaryOpened)
 
     def getClosing(self, windowSize: int = 3):
@@ -415,7 +410,8 @@ class Channel:
     def getBinaryClosing(self, windowSize: int = 3):
         if not self.isBinary:
             raise NotBinaryImageException
-        binarClosed = morphology.binary_closing(self.pixels, np.ones((windowSize, windowSize))).astype(np.float32)
+        binarClosed = morphology.binary_closing(self.pixels, np.ones((windowSize, windowSize))).astype(
+            self._originalDType)
         return Channel(binarClosed)
 
     def getErosion(self, size: int = 2):
@@ -440,6 +436,70 @@ class Channel:
         sizes = sum(self.pixels, labeled, range(nbObjects + 1))
         return Channel(labeled), nbObjects, sizes
 
+    def getDistanceTransform(self, returnIndices: bool = False) -> np.ndarray:
+        if not self.isBinary:
+            raise NotBinaryImageException
+        distanceTransform = ndimage.distance_transform_edt(self.pixels, return_indices=returnIndices)
+        return distanceTransform
+
+    def watershedSegmentation(self, gaussianFilterStdDev: float = 1.2, localPeaksMinDistance: int = 5,
+                              use4Connectivity: bool = True) -> typing.Tuple["Channel", int]:
+        ccKernel = None
+        if not use4Connectivity:
+            ccKernel = np.ones((3, 3))
+        # First, we apply a gaussian filter in order to remove some noise in the channel and smooth it.
+        gaussianFilter = self.getGaussianFilter(gaussianFilterStdDev)
+        # We can now threshold the filtered channel in order to have a binary channel.
+        gaussianBin = gaussianFilter.getOtsuThresholding()
+        # Compute the distances between each pixels and its nearest 0 value pixel.
+        distanceTransform = gaussianBin.getDistanceTransform()
+        # We then find the local max of the distance transform array
+        localMax = feature.peak_local_max(distanceTransform, indices=False, min_distance=localPeaksMinDistance,
+                                          labels=gaussianBin.pixels)
+        # Let's get the markers of the connected components
+        markers = Channel(localMax).getConnectedComponents(connectionStructure=ccKernel)[0].pixels
+        # Find labels of the different object in the image
+        labels = morphology.watershed(-distanceTransform, markers, mask=gaussianBin.pixels)
+        uniqueLabels = np.unique(labels)
+        allMask = np.zeros(self.shape, dtype=np.uint8)
+        for label in uniqueLabels:
+            if label == 0:
+                # label = 0 means background
+                continue
+
+            mask = np.zeros(self.shape, dtype=np.uint8)
+            mask[labels == label] = 255
+            allMask[labels == label] = label
+
+        masks = Channel(allMask)
+        return masks, len(uniqueLabels) - 1
+
+    def blobDetection(self, minStdDev: float = 1, maxStdDev: float = 50, threshold: float = 0.2,
+                      overlap: float = 0.5) -> typing.Tuple["Channel", int]:
+        # Not good with low contrast images
+        blobs = feature.blob_log(self.pixels, maxStdDev, minStdDev, threshold=threshold, overlap=overlap)
+        blobsDetected = Channel(np.zeros((self.width, self.height)))
+        # Compute radii
+        blobs[:, 2] = blobs[:, 2] * 2 ** 0.5
+        numberOfBlobs = 0
+        for blob in blobs:
+            y, x, r = blob
+            cv.circle(blobsDetected.pixels, (int(x), int(y)), int(r), 1, 2)
+            numberOfBlobs += 1
+        self.multiChannelDisplay([self, blobsDetected])
+        return blobsDetected, numberOfBlobs
+
+    def houghTransform(self, thresholdValue: int = 10, minLineLength: int = 50, maxLineGap: int = 10) -> typing.Tuple[
+        "Channel", int]:
+        # Uses Probabilistic Hough Transform algorithm
+        edges = self.getCannyEdgeDetection()
+        lines = transform.probabilistic_hough_line(edges.pixels, thresholdValue, minLineLength, maxLineGap)
+        houghLines = Channel(np.zeros((self.width, self.height)))
+        for line in lines:
+            cv.line(houghLines.pixels, line[0], line[1], 1, 2)
+        self.multiChannelDisplay([self, houghLines])
+        return houghLines, len(lines)
+
     def convertTo16BitsUnsignedInteger(self):
         pass
 
@@ -450,13 +510,313 @@ class Channel:
         pass
 
     @staticmethod
-    def multiChannelDisplay(channels: list):
+    def multiChannelDisplay(channels: list, colorMaps: list = None) -> list:
+        if colorMaps is not None and len(channels) != len(colorMaps) and len(colorMaps) != 1:
+            raise ValueError(
+                "'channels' and 'colorMaps' must have the same length or 'colorMaps' must have a single element.")
+
         nrows = int(np.ceil(len(channels) / 4))
         ncols = len(channels) if len(channels) < 4 else 4
         for i in range(len(channels)):
             plt.subplot(nrows, ncols, i + 1)
-            plt.imshow(channels[i].pixels)
+            colorMap = None
+            if colorMaps is not None:
+                colorMap = colorMaps[i % len(colorMaps)]
+            plt.imshow(channels[i].pixels.T, cmap=colorMap)
         plt.show()
+        return channels
+
+    ### Spectral analysis methods ###
+    def applyHighPassFilterFromRectangularMask(self, filterSize: int):
+        fftShiftPixels = self.fourierTransform()
+        XY = self.createXYGridsFromArray(fftShiftPixels)
+        mask = 1 - self.createRectangularMask(XY, filterSize)
+        fftShiftPixelsWithMask = fftShiftPixels * mask
+        ifftShift = np.fft.ifftshift(fftShiftPixelsWithMask)
+        filteredPixels = np.abs(np.fft.ifft2(ifftShift))
+        return Channel(filteredPixels)
+
+    def applyLowPassFilterFromRectangularMask(self, filterSize: int):
+        fftShiftPixels = self.fourierTransform()
+        XY = self.createXYGridsFromArray(fftShiftPixels)
+        mask = self.createRectangularMask(XY, filterSize)
+        fftShiftPixelsWithMask = fftShiftPixels * mask
+        ifftShift = np.fft.ifftshift(fftShiftPixelsWithMask)
+        filteredPixels = np.abs(np.fft.ifft2(ifftShift))
+        return Channel(filteredPixels)
+
+    def applyBandpassFilterFromRectangularMask(self, cutIn: int, cutOff: int):
+        fftShiftPixels = self.fourierTransform()
+        XY = self.createXYGridsFromArray(fftShiftPixels)
+        lowPassMask = self.createRectangularMask(XY, cutIn)
+        highPassMask = 1 - self.createRectangularMask(XY, cutOff)
+        bandpass = 1 - (lowPassMask + highPassMask)
+        fftFiltered = fftShiftPixels * bandpass
+        ifftShift = np.fft.ifftshift(fftFiltered)
+        filteredPixels = np.abs(np.fft.ifft2(ifftShift))
+        return Channel(filteredPixels)
+
+    def applyLowPassFilterFromGaussianMask(self, FWHM: float):
+        fftPixels = self.fourierTransform(True)
+        x, y = self.createXYGridsFromArray(fftPixels)
+        sigma = FWHM / (2 * np.sqrt(2 * np.log(2)))
+        gauss = self.createGaussianMask((x, y), sigma)
+        fftFiltered = fftPixels * gauss
+        ifftShift = np.fft.ifftshift(fftFiltered)
+        filteredPixels = np.abs(np.fft.ifft2(ifftShift))
+        return Channel(filteredPixels)
+
+    def applyHighPassFilterFromGaussianMask(self, FWHM: float):
+        fftPixels = self.fourierTransform()
+        x, y = self.createXYGridsFromArray(fftPixels)
+        sigma = FWHM / (2 * np.sqrt(2 * np.log(2)))
+        gauss = 1 - self.createGaussianMask((x, y), sigma)
+        fftFiltered = fftPixels * gauss
+        ifftShift = np.fft.ifftshift(fftFiltered)
+        filteredPixels = np.abs(np.fft.ifft2(ifftShift))
+        return Channel(filteredPixels)
+
+    def applyBandpassFilterFromGaussianMask(self, parameter):
+        # todo
+        pass
+
+    def applyLowPassFilterFromSigmoidMask(self, topRadius: float, inflectionPointSlope: float = 1 / 4):
+        fftPixels = self.fourierTransform()
+        x, y = self.createXYGridsFromArray(fftPixels)
+        sigmoid = self.createSigmoidMask((x, y), topRadius, inflectionPointSlope)
+        fftFiltered = fftPixels * sigmoid
+        ifftShift = np.fft.ifftshift(fftFiltered)
+        filteredPixels = np.abs(np.fft.ifft2(ifftShift))
+        return Channel(filteredPixels)
+
+    def applyHighPassFilterFromSigmoidMask(self, bottomRadius: float, inflectionPointSlope: float = 1 / 4):
+        fftPixels = self.fourierTransform()
+        x, y = self.createXYGridsFromArray(fftPixels)
+        sigmoid = 1 - self.createSigmoidMask((x, y), bottomRadius, inflectionPointSlope)
+        fftFiltered = fftPixels * sigmoid
+        ifftShift = np.fft.ifftshift(fftFiltered)
+        filteredPixels = np.abs(np.fft.ifft2(ifftShift))
+        return Channel(filteredPixels)
+
+    def applyBandpassFilterFromSigmoidMask(self, cutIn: int, cutOff: int, inflectionPointSlope: float = 1 / 4):
+        fftPixels = self.fourierTransform()
+        XY = self.createXYGridsFromArray(fftPixels)
+        lowPass = self.createSigmoidMask(XY, cutIn, inflectionPointSlope)
+        highPass = 1 - self.createSigmoidMask(XY, cutOff, inflectionPointSlope)
+        bandpass = 1 - (lowPass + highPass)
+        fftFiltered = fftPixels * bandpass
+        ifftShift = np.fft.ifftshift(fftFiltered)
+        filteredPixels = np.abs(np.fft.ifft2(ifftShift))
+        return Channel(filteredPixels)
+
+    def applyLowPassFilterFromCircularMask(self, radius: float):
+        fftPixels = self.fourierTransform()
+        XY = self.createXYGridsFromArray(fftPixels)
+        mask = self.createCircularMask(XY, radius)
+        fftFiltered = fftPixels * mask
+        ifftShift = np.fft.ifftshift(fftFiltered)
+        filteredPixels = np.abs(np.fft.ifft2(ifftShift))
+        return Channel(filteredPixels)
+
+    def applyHighPassFilterFromCircularMask(self, radius: float):
+        fftPixels = self.fourierTransform()
+        XY = self.createXYGridsFromArray(fftPixels)
+        mask = 1 - self.createCircularMask(XY, radius)
+        fftFiltered = fftPixels * mask
+        ifftShift = np.fft.ifftshift(fftFiltered)
+        filteredPixels = np.abs(np.fft.ifft2(ifftShift))
+        return Channel(filteredPixels)
+
+    def applyBandpassFilterFromCircularMask(self, cutIn: float, cutOff: float):
+        fftPixels = self.fourierTransform()
+        x, y = self.createXYGridsFromArray(fftPixels)
+        mask = ((x ** 2 + y ** 2) ** (1 / 2) - cutIn) ** 2 <= cutOff ** 2
+        fftFiltered = fftPixels * mask.astype(np.uint8)
+        ifftShift = np.fft.ifftshift(fftFiltered)
+        filteredPixels = np.abs(np.fft.ifft2(ifftShift))
+        return Channel(filteredPixels)
+
+    def powerSpectrum(self) -> np.ndarray:
+        fftShiftPixels = self.fourierTransform()
+        powerSpectrum = (np.abs(fftShiftPixels)) ** 2
+        powerSpectrum /= np.sum(powerSpectrum)
+        return powerSpectrum
+
+    def displayPowerSpectrum(self, logScale: bool = True) -> np.ndarray:
+        powerSpectrum = self.powerSpectrum()
+        cols, rows = powerSpectrum.T.shape
+        if logScale:
+            powerSpectrum = np.log(powerSpectrum)
+        plt.imshow(powerSpectrum.T, extent=(-cols // 2, cols // 2, -rows // 2, rows // 2))
+        plt.colorbar()
+        plt.show()
+        return powerSpectrum
+
+    def powerSpectrumAzimuthalAverage(self) -> np.ndarray:
+        powerSpectrumDensity = self.powerSpectrum()
+        ps1D = self.azimuthalAverage(powerSpectrumDensity.T)
+        return ps1D
+
+    def displayPowerSpectrumAzimuthalAverage(self, logBase: float = None) -> np.ndarray:
+        ps1D = self.powerSpectrumAzimuthalAverage()
+        x = range(len(ps1D))
+        plt.plot(x, ps1D)
+        if logBase is not None:
+            plt.yscale("log", basey=logBase)
+        plt.show()
+        return ps1D
+
+    def powerSpectrumAngularAverage(self, returnIndex: bool = False) -> typing.Union[
+        np.ndarray, typing.Tuple[np.ndarray, np.ndarray]]:
+        powerSpectrumDensity = self.powerSpectrum()
+        psAngAvg, index = self.angularAverage(powerSpectrumDensity.T)
+        returnValues = psAngAvg if not returnIndex else (psAngAvg, index)
+        return returnValues
+
+    def displayPowerSpectrumAngularAverage(self, logBase: float = None, useRadians: bool = False) -> np.ndarray:
+        psAngAvg, index = self.powerSpectrumAngularAverage(True)
+        x = index
+        label = "degrees"
+        if useRadians:
+            x = x / 180 * np.pi
+            label = "radians"
+        plt.plot(x, psAngAvg)
+        if logBase is not None:
+            plt.yscale("log", basey=logBase)
+        plt.xlabel("Angle [{}]".format(label))
+        plt.show()
+        return psAngAvg
+
+    def fourierTransform(self, shift: bool = True) -> np.ndarray:
+        pixels = self.pixels
+        fftPixels = np.fft.fft2(pixels)
+        if shift:
+            fftPixels = np.fft.fftshift(fftPixels)
+        return fftPixels
+
+    def applyGaussianNoise(self, sigma: float, mean: float = 0):
+        cols, rows = self.shape
+        gauss = np.random.normal(mean, sigma, (rows, cols))
+        gauss = np.clip(gauss.reshape(rows, cols), 0, np.max(gauss))
+        noise = self.pixels + gauss.astype(self._originalDType)
+        return Channel(noise)
+
+    def applyPoissonNoise(self, scale: float):
+        pass
+
+    def phaseSpectrum(self, radians: bool = True) -> np.ndarray:
+        fftPixels = self.fourierTransform()
+        angles = np.angle(fftPixels, not radians)
+        return angles
+
+    def displayPhaseSpectrum(self, radians: bool = True) -> np.ndarray:
+        phaseSpectrum = self.phaseSpectrum(radians)
+        rows, cols = phaseSpectrum.shape
+        plt.imshow(phaseSpectrum, extent=(-cols // 2, cols // 2, -rows // 2, rows // 2))
+        plt.show()
+        return phaseSpectrum
+
+    @staticmethod
+    def createXYGridsFromArray(array: np.ndarray, gridOriginAtCenter: bool = True) -> typing.Tuple[
+        np.ndarray, np.ndarray]:
+        shape = array.shape
+        y, x = np.indices(shape)
+        if gridOriginAtCenter:
+            y, x = np.flipud(y - np.max(y) // 2), x - np.max(x) // 2
+            if x.shape[1] % 2 == 0:
+                x -= 1
+        return x, y
+
+    @staticmethod
+    def createGaussianMask(XYGrids: typing.Tuple[np.ndarray, np.ndarray], sigma: float) -> np.ndarray:
+        x, y = XYGrids
+        gauss = np.exp(-(x ** 2 + y ** 2) / (2 * sigma ** 2))
+        return gauss
+
+    @staticmethod
+    def createSigmoidMask(XYGrids: typing.Tuple[np.ndarray, np.ndarray], radius: float,
+                          inflectionPointSlope: float = 1 / 4) -> np.ndarray:
+        """
+        Create a sigmoid mask with the same shape as the image to mask.
+        :param XYGrids: Tuple with an array containing the x indices and another containing the y indices. The origin
+        must be at the center of the arrays.
+        Example:
+        x : [[-1 0 1]
+             [-1 0 1]
+             [-1 0 1]]
+        y : [[1 1 1]
+             [0 0 0]
+             [-1 -1 -1]]
+        :param radius: Radius of the top of the sigmoid function
+        :param inflectionPointSlope: The slope at the inflection point. The general sigmoid function is:
+        S(x) = 1/(1 + exp(-lambda x)
+        where lambda is proportional to the inflection slope (slope = lambda / 4).
+        :return: Array of values in the range [0, 1] following a 2D centered sigmoid function
+        """
+        x, y = XYGrids
+        expArg = -4 * inflectionPointSlope * (radius - np.sqrt(x ** 2 + y ** 2))
+        # Overflow occuring when the xp arg is  >ln(1.7976931348623157e+308) which is a little bigger than 709
+        expArg[expArg > 709] = 709
+        sigmoid = 1 / (1 + np.exp(expArg))
+        return sigmoid
+
+    @staticmethod
+    def createRectangularMask(XYGrids: typing.Tuple[np.ndarray, np.ndarray], size: int) -> np.ndarray:
+        x, y = XYGrids
+        demiSize1 = size // 2
+        demiSize2 = demiSize1 if size % 2 == 0 else demiSize1 + 1
+        maskX = ((x < 0) & (np.abs(x) < demiSize2)) | (~(x < 0) & (np.abs(x) <= demiSize1))
+        maskY = ((y < 0) & (np.abs(y) < demiSize2)) | (~(y < 0) & (np.abs(y) <= demiSize1))
+        mask = maskX & maskY
+        return mask.astype(np.uint8)
+
+    @staticmethod
+    def createCircularMask(XYGrids: typing.Tuple[np.ndarray, np.ndarray], radius: float) -> np.ndarray:
+        x, y = XYGrids
+        mask = (x ** 2 + y ** 2 - radius ** 2) <= 0
+        return mask.astype(np.uint8)
+
+    @staticmethod
+    def azimuthalAverage(array: np.ndarray) -> np.ndarray:
+        """
+        Computes the average value of the array for element with the same radius label.
+        Example:
+        array = [0,1,2]
+                [2,2,3]
+                [1,4,2]
+        radiiLabel = [1,1,1]
+                     [1,0,1]
+                     [1,1,1]
+        The average (depending on the radius value) is then computed. For this example, the average would be:
+        avg = [2, 1.875] (2 for the mean of radius 0, 1.875 for the mean of radius 1)
+        :param array: Array to use for the computation of the mean
+        :return: An array containing the mean of each radius present (the index of the array represent the radius value)
+        """
+        x, y = Channel.createXYGridsFromArray(array)
+        radii = ((x ** 2 + y ** 2) ** (1 / 2)).astype(int)
+        # carre = np.maximum(np.abs(x), np.abs(y))
+        index = np.unique(radii)
+        average = ndimage.mean(array, radii, index=index)
+        # averageSquare = ndimage.mean(array, x, index = np.unique(x))
+        # averageSquare = averageSquare
+        # plt.plot(range(len(averageSquare)), averageSquare)
+        # plt.yscale("log", basey=2)
+        # plt.show()
+        return np.array(average) / np.sum(average)
+
+    @staticmethod
+    def angularAverage(array: np.ndarray) -> typing.Tuple[np.ndarray, np.ndarray]:
+        x, y = Channel.createXYGridsFromArray(array)
+        centerY = y.shape[0] // 2
+        # We only take the 1st and 2nd quadrant because the 3rd and 4th are just a reflection.
+        x, y = x[:centerY + 1, :], y[:centerY + 1, :]
+        # The angle of a line starting from origin and passing through a pixel is given by arctan(y/x) where (x, y) are
+        # the coordinates of each pixel.
+        angleMask = np.round(np.arctan2(y, x) * 180 / np.pi).astype(int)
+        upperPartArray = array[:centerY + 1, :]
+        index = np.unique(angleMask)
+        average = ndimage.mean(upperPartArray, angleMask, index=index)
+        return np.array(average) / np.sum(average), index
 
 
 from .channelFloat import ChannelFloat

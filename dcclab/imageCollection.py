@@ -245,11 +245,11 @@ class ImageCollection:
 
     def setMasks(self, masks: ['Channel']):
         if len(masks) == len(self.images):
-            for mask in masks:
-                for image in self.images:
-                    image.setMask(mask)
+            for image, mask in zip(self.images, masks):
+                image.setMask(mask)
         else:
-            raise NotImplementedError("Must provide one mask per channel for each image, may be different")
+            # todo: Must provide one mask per channel for each image
+            raise NotImplementedError
 
     def setMaskFromThreshold(self, value=None):
         for image in self.images:

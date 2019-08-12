@@ -1,38 +1,31 @@
-import env
 from dcclab import Database as db
+from datetime import date
+from zipfile import ZipFile
+import env
 import unittest
 import os
-from pathlib import Path, PureWindowsPath
-import tempfile
+
 
 class TestDatabase(env.DCCLabTestCase):
     def setUp(self):
-        self.directory = self.dataDir
-        self.filePath = os.path.join(self.tmpDir, 'unittest.db')
-        self.wrongFile = os.path.join(self.directory, 'wrongfile.db')
+        self.filePath = os.path.join(str(self.dataDir), 'unittest.db')
+        self.wrongFile = os.path.join(str(self.dataDir), 'wrongfile.db')
 
-        # For testing purpose, a fake database has to be built.
-        self.database = db(self.filePath, writePermission=True)
-        self.database.connect()
+        with db(self.filePath, True) as testDB:
+            testDB.beginTransaction()
+            testTable = {'test_table': {'column_1': 'INTEGER PRIMARY KEY', 'column_2': 'TEXT', 'column_3': 'REAL',
+                                        'file_path': 'TEXT'}}
+            testDB.createTable(testTable)
+            testDB.commit()
 
-        # We create a fake table.
-        self.database.begin()
-        testTable = {'test_table': {'column_1': 'INTEGER PRIMARY KEY', 'column_2': 'TEXT', 'column_3': 'REAL'}}
-        self.database.createTable(testTable)
-        self.database.commit()
-
-        # We create fake data and insert it into the table.
-        self.database.begin()
-        frstValue = {'column_1': 1234, 'column_2': 'abcd', 'column_3': 0.1234}
-        scndValue = {'column_1': 5678, 'column_2': 'efgh', 'column_3': 0.5678}
-        self.database.insert('test_table', frstValue)
-        self.database.insert('test_table', scndValue)
-        self.database.commit()
-        self.database.disconnect()
+            testDB.beginTransaction()
+            frstValue = {'column_1': 1234, 'column_2': 'abcd', 'column_3': 0.1234}
+            scndValue = {'column_1': 5678, 'column_2': 'efgh', 'column_3': 0.5678}
+            testDB.insert('test_table', frstValue)
+            testDB.insert('test_table', scndValue)
+            testDB.commit()
 
     def tearDown(self):
-        # At the end of the test, we delete the database.
-        self.database.disconnect()
         os.remove(self.filePath)
 
     def testConnectSuccessful(self):
@@ -81,7 +74,7 @@ class TestDatabase(env.DCCLabTestCase):
         database.disconnect()
 
     def testIsNotConnected(self):
-        database = db("blablabla")
+        database = db("notADatabase")
         self.assertFalse(database.isConnected)
 
     def testChangeConnectionModeToValidMode(self):
@@ -94,12 +87,14 @@ class TestDatabase(env.DCCLabTestCase):
     def testPathReadOnlyMode(self):
         database = db('unittest.db', writePermission=False)
         self.assertEqual(database.path, 'file:unittest.db?mode=ro')
+        database.disconnect()
 
     # Linux and MacOS are 'posix', windows is 'nt'.
     @unittest.skipIf(os.name == 'posix', reason='Path is a Windows Path.')
     def testWindowsPathToPosix(self):
         database = db(r'C:\sqlite3\Database\test.db', writePermission=True)
         self.assertEqual(database.path, 'file:C:/sqlite3/Database/test.db?mode=rwc')
+        database.disconnect()
 
     def testCommit(self):  # TODO Is there anything else we could test for Commit?
         database = db(self.filePath, writePermission=True)
@@ -118,13 +113,13 @@ class TestDatabase(env.DCCLabTestCase):
         database.connect()
 
         testValue = {'column_1': 9101, 'column_2': 'plop', 'column_3': 0.9101}
-        database.begin()
+        database.beginTransaction()
         database.insert('test_table', testValue)
         database.rollback()
 
-        database.begin()
+        database.beginTransaction()
         row = database.select('test_table', 'column_1', 'column_1=9101')
-        database.end()
+        database.endTransaction()
         self.assertFalse(row)
         database.disconnect()
 
@@ -132,7 +127,7 @@ class TestDatabase(env.DCCLabTestCase):
         database = db(self.filePath, writePermission=True)
         database.connect()
 
-        statement = 'DROP TABLE IF EXISTS test_table'
+        statement = 'DROP TABLE IF EXISTS "test_table"'
         database.execute(statement)
         database.commit()
 
@@ -144,6 +139,7 @@ class TestDatabase(env.DCCLabTestCase):
         database.connect()
 
         self.assertEqual(database.tables[0], 'test_table')
+        database.disconnect()
 
     def testSelectResultsFound(self):
         database = db(self.filePath)
@@ -152,6 +148,7 @@ class TestDatabase(env.DCCLabTestCase):
         rows = database.select('test_table', 'column_1', 'column_3<1')
         for row in rows:
             self.assertTrue(row['column_1'] == 1234 or 5678)
+        database.disconnect()
 
     def testSelectNoResultsFound(self):
         database = db(self.filePath)
@@ -159,6 +156,7 @@ class TestDatabase(env.DCCLabTestCase):
 
         rows = database.select('test_table', 'column_1', 'column_2="aaaa"')
         self.assertFalse(rows)
+        database.disconnect()
 
     def testCreateTable(self):
         database = db(self.filePath, writePermission=True)
@@ -169,6 +167,7 @@ class TestDatabase(env.DCCLabTestCase):
         database.commit()
 
         self.assertTrue(database.tables.index('new_table'))
+        database.disconnect()
 
     def testDropTable(self):
         database = db(self.filePath, writePermission=True)
@@ -178,6 +177,7 @@ class TestDatabase(env.DCCLabTestCase):
         database.commit()
 
         self.assertFalse(database.tables)
+        database.disconnect()
 
     def testInsert(self):
         database = db(self.filePath, writePermission=True)
@@ -195,6 +195,7 @@ class TestDatabase(env.DCCLabTestCase):
         database = db(self.filePath, writePermission=True)
         database.connect()
         self.assertEqual(database.mode, 'rwc')
+        database.disconnect()
 
     def testFetchAll(self):
         database = db(self.filePath)
@@ -204,6 +205,7 @@ class TestDatabase(env.DCCLabTestCase):
         rows = database.fetchAll()
         for row in rows:
             self.assertTrue(row['column_1'] == 1234 or 5678)
+        database.disconnect()
 
     def testFetchOne(self):
         database = db(self.filePath)
@@ -218,6 +220,42 @@ class TestDatabase(env.DCCLabTestCase):
 
         row = database.fetchOne()
         self.assertFalse(row)
+
+        database.disconnect()
+
+    def testContextManager(self):
+        with db(self.filePath) as database:
+            self.assertTrue(database.isConnected)
+
+        self.assertFalse(database.isConnected)
+
+    def testCreateArchive(self):
+        textFile = os.path.join(str(self.dataDir), 'ziptest.txt')
+        with open(textFile, 'w') as testFile:
+            testFile.write('This is a test file to be deleted.')
+
+        with db(self.filePath, True) as database:
+            database.dropTable('test_table')
+            database.commit()
+
+            testTable = {'test_table': {'column_1': 'INTEGER PRIMARY KEY', 'column_2': 'TEXT', 'column_3': 'REAL',
+                                        'file_path': 'TEXT'}}
+            database.createTable(testTable)
+            database.commit()
+
+            testValue = {'column_1': 9876, 'column_2': 'bleh', 'column_3': 0.1121, 'file_path': textFile}
+            database.insert('test_table', testValue)
+            database.commit()
+
+            database.select('test_table')
+            database.createArchive()
+
+        archive = '{}_query_archive.zip'.format(str(date.today()).replace('-', ''))
+        with ZipFile(archive) as zeep:
+            self.assertTrue(zeep.namelist())
+
+        os.remove(textFile)
+        os.remove(archive)
 
 
 if __name__ == '__main__':
