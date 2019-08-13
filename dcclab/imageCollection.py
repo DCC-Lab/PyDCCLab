@@ -224,6 +224,28 @@ class ImageCollection:
         for image in self.images:
             image.labelMaskComponents()
 
+    def setLabelledComponents(self, labels: ['Channel']):
+        if len(labels) == len(self.images):
+            for image, label in zip(self.images, labels):
+                image.setLabelledComponents(label)
+        else:
+            # todo: Must provide one mask per channel for each image
+            raise NotImplementedError
+
+    @property
+    def labelInfo(self) -> dict:
+        uniqueValues = dict()
+        for image in self.images:
+            for channel in image.channels:
+                # todo: check if its semantic ?
+                values, counts = np.unique(channel.labelledComponents, return_counts=True)
+                for value, count in zip(values, counts):
+                    if value not in uniqueValues:
+                        uniqueValues[value] = int(count)
+                    else:
+                        uniqueValues[value] += count
+        return uniqueValues
+
     def analyzeComponents(self):
         for image in self.images:
             image.analyzeComponents()
