@@ -18,6 +18,7 @@ from .pathPattern import *
 from .cziFile import *
 from .movieFile import *
 from .lifFile import *
+from .dataset import *
 
 from .database import *
 from .metadata import *
