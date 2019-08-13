@@ -1,7 +1,7 @@
 import numpy as np
 import typing
 
-from skimage import measure, morphology, feature
+from skimage import measure, morphology, feature, transform
 from scipy.ndimage import label, sum
 import scipy.ndimage as ndimage
 from .DCCExceptions import *
@@ -331,23 +331,11 @@ class Channel:
     def getAverageValueOfPixels(self) -> float:
         return np.average(self.pixels)
 
-    @deprecated("Renamed getStandardDeviation()")
-    def getStandardDeviationOfPixels(self) -> float:
-        return self.getStandardDeviation()
-
     def getStandardDeviation(self) -> float:
         return np.std(self.pixels)
 
-    @deprecated("Renamed getShannonEntropy()")
-    def getShannonEntropyOfPixels(self, base=2) -> float:
-        return self.getShannonEntropy(base=base)
-
     def getShannonEntropy(self, base=2) -> float:
-        return measure.shannon_entropy(self.pixels, base)[0]
-
-    @deprecated("Renamed getExtrema()")
-    def getExtremaValuesOfPixels(self) -> typing.Tuple[typing.Union[int, float], typing.Union[int, float]]:
-        return self.getExtrema()
+        return measure.shannon_entropy(self.pixels, base)
 
     def getExtrema(self) -> typing.Tuple[typing.Union[int, float], typing.Union[int, float]]:
         return np.min(self.pixels), np.max(self.pixels)
@@ -365,17 +353,9 @@ class Channel:
         coordsList = coordsList[0]
         return coordsList
 
-    @deprecated("Renamed getMinimum()")
-    def getMinimumIntensityPixels(self) -> typing.List[typing.Tuple[int, int]]:
-        return self.getMinimum()
-
     def getMinimum(self) -> typing.List[typing.Tuple[int, int]]:
         minimum = self.getExtrema()[0]
         return self.getPixelsOfIntensity(minimum)
-
-    @deprecated("Renamed getMaximum()")
-    def getMaximumIntensityPixels(self) -> typing.List[tuple]:
-        return self.getMaximum()
 
     def getMaximum(self) -> typing.List[tuple]:
         maximum = self.getExtrema()[1]
@@ -396,16 +376,17 @@ class Channel:
     def getVerticalSobelFilter(self):
         pass
 
-    @deprecated("Renamed getSobelFilter()")
-    def getBothDirectionsSobelFilter(self):
-        return self.getSobelFilter()
-
     def getSobelFilter(self):
         pass
 
+    def getCannyEdgeDetection(self, gaussianStdDev: float = 1, lowerThreshold: float = None,
+                              higherThreshold: float = None):
+        canny = feature.canny(self.pixels, gaussianStdDev, lowerThreshold, higherThreshold)
+        return Channel(canny)
+
     def getGlobalThresholding(self, value):
         mask = self.pixels > value
-        return Channel(self.pixels * mask)
+        return Channel(mask)
 
     def getIsodataThresholding(self):
         pass
@@ -426,7 +407,8 @@ class Channel:
     def getBinaryOpening(self, windowSize: int = 3):
         if not self.isBinary:
             raise NotBinaryImageException
-        binaryOpened = morphology.binary_opening(self.pixels, np.ones((windowSize, windowSize))).astype(np.float32)
+        binaryOpened = morphology.binary_opening(self.pixels, np.ones((windowSize, windowSize))).astype(
+            self._originalDType)
         return Channel(binaryOpened)
 
     def getClosing(self, windowSize: int = 3):
@@ -436,7 +418,8 @@ class Channel:
     def getBinaryClosing(self, windowSize: int = 3):
         if not self.isBinary:
             raise NotBinaryImageException
-        binarClosed = morphology.binary_closing(self.pixels, np.ones((windowSize, windowSize))).astype(np.float32)
+        binarClosed = morphology.binary_closing(self.pixels, np.ones((windowSize, windowSize))).astype(
+            self._originalDType)
         return Channel(binarClosed)
 
     def getErosion(self, size: int = 2):
@@ -461,27 +444,23 @@ class Channel:
         sizes = sum(self.pixels, labeled, range(nbObjects + 1))
         return Channel(labeled), nbObjects, sizes
 
-    def getDistanceTranform(self, returnIndices: bool = False) -> np.ndarray:
+    def getDistanceTransform(self, returnIndices: bool = False) -> np.ndarray:
         if not self.isBinary:
             raise NotBinaryImageException
         distanceTransform = ndimage.distance_transform_edt(self.pixels, return_indices=returnIndices)
         return distanceTransform
 
     def watershedSegmentation(self, gaussianFilterStdDev: float = 1.2, localPeaksMinDistance: int = 5,
-                              use4Connectivity: bool = True):
+                              use4Connectivity: bool = True) -> typing.Tuple["Channel", int]:
         ccKernel = None
         if not use4Connectivity:
             ccKernel = np.ones((3, 3))
         # First, we apply a gaussian filter in order to remove some noise in the channel and smooth it.
         gaussianFilter = self.getGaussianFilter(gaussianFilterStdDev)
-        self.multiChannelDisplay([self, gaussianFilter])
         # We can now threshold the filtered channel in order to have a binary channel.
         gaussianBin = gaussianFilter.getOtsuThresholding()
-        gaussianBin.display()
         # Compute the distances between each pixels and its nearest 0 value pixel.
-        distanceTransform = gaussianBin.getDistanceTranform()
-        plt.imshow(distanceTransform.T, cmap="jet")
-        plt.show()
+        distanceTransform = gaussianBin.getDistanceTransform()
         # We then find the local max of the distance transform array
         localMax = feature.peak_local_max(distanceTransform, indices=False, min_distance=localPeaksMinDistance,
                                           labels=gaussianBin.pixels)
@@ -503,12 +482,31 @@ class Channel:
         masks = Channel(allMask)
         return masks, len(uniqueLabels) - 1
 
-    def circularHoughTransform(self):
-        # First of all, we must find the edges
-        edges = self.getSobelFilter()
-        radii = np.arange(1, 100, 2)
+    def blobDetection(self, minStdDev: float = 1, maxStdDev: float = 50, threshold: float = 0.2,
+                      overlap: float = 0.5) -> typing.Tuple["Channel", int]:
+        # Not good with low contrast images
+        blobs = feature.blob_log(self.pixels, maxStdDev, minStdDev, threshold=threshold, overlap=overlap)
+        blobsDetected = Channel(np.zeros((self.width, self.height)))
+        # Compute radii
+        blobs[:, 2] = blobs[:, 2] * 2 ** 0.5
+        numberOfBlobs = 0
+        for blob in blobs:
+            y, x, r = blob
+            cv.circle(blobsDetected.pixels, (int(x), int(y)), int(r), 1, 2)
+            numberOfBlobs += 1
+        self.multiChannelDisplay([self, blobsDetected])
+        return blobsDetected, numberOfBlobs
 
-        pass
+    def houghTransform(self, thresholdValue: int = 10, minLineLength: int = 50, maxLineGap: int = 10) -> typing.Tuple[
+        "Channel", int]:
+        # Uses Probabilistic Hough Transform algorithm
+        edges = self.getCannyEdgeDetection()
+        lines = transform.probabilistic_hough_line(edges.pixels, thresholdValue, minLineLength, maxLineGap)
+        houghLines = Channel(np.zeros((self.width, self.height)))
+        for line in lines:
+            cv.line(houghLines.pixels, line[0], line[1], 1, 2)
+        self.multiChannelDisplay([self, houghLines])
+        return houghLines, len(lines)
 
     def convertTo16BitsUnsignedInteger(self):
         pass
@@ -537,7 +535,7 @@ class Channel:
         return channels
 
     ### Spectral analysis methods ###
-    def applyHighPassFilterFromRetcangularMask(self, filterSize: int):
+    def applyHighPassFilterFromRectangularMask(self, filterSize: int):
         fftShiftPixels = self.fourierTransform()
         XY = self.createXYGridsFromArray(fftShiftPixels)
         mask = 1 - self.createRectangularMask(XY, filterSize)
@@ -654,27 +652,18 @@ class Channel:
 
     def displayPowerSpectrum(self, logScale: bool = True) -> np.ndarray:
         powerSpectrum = self.powerSpectrum()
-        rows, cols = powerSpectrum.shape
+        cols, rows = powerSpectrum.T.shape
         if logScale:
             powerSpectrum = np.log(powerSpectrum)
-        plt.imshow(powerSpectrum, extent=(-cols // 2, cols // 2, -rows // 2, rows // 2))
+        plt.imshow(powerSpectrum.T, extent=(-cols // 2, cols // 2, -rows // 2, rows // 2))
         plt.colorbar()
         plt.show()
         return powerSpectrum
 
     def powerSpectrumAzimuthalAverage(self) -> np.ndarray:
         powerSpectrumDensity = self.powerSpectrum()
-        ps1D = self.azimuthalAverage(powerSpectrumDensity)
+        ps1D = self.azimuthalAverage(powerSpectrumDensity.T)
         return ps1D
-
-    def powerSpectrumAngularAverage(self) -> np.ndarray:
-        powerSpectrumDensity = self.powerSpectrum()
-        x, y = self.createXYGridsFromArray(powerSpectrumDensity)
-
-        minTheta = (np.arctan2(y, x + 1) * 180 / np.pi).astype(int)
-        maxTheta = (np.arctan2(y + 1, x) * 180 / np.pi).astype(int)
-        plt.imshow(np.concatenate((minTheta, maxTheta)))
-        plt.show()
 
     def displayPowerSpectrumAzimuthalAverage(self, logBase: float = None) -> np.ndarray:
         ps1D = self.powerSpectrumAzimuthalAverage()
@@ -685,6 +674,27 @@ class Channel:
         plt.show()
         return ps1D
 
+    def powerSpectrumAngularAverage(self, returnIndex: bool = False) -> typing.Union[
+        np.ndarray, typing.Tuple[np.ndarray, np.ndarray]]:
+        powerSpectrumDensity = self.powerSpectrum()
+        psAngAvg, index = self.angularAverage(powerSpectrumDensity.T)
+        returnValues = psAngAvg if not returnIndex else (psAngAvg, index)
+        return returnValues
+
+    def displayPowerSpectrumAngularAverage(self, logBase: float = None, useRadians: bool = False) -> np.ndarray:
+        psAngAvg, index = self.powerSpectrumAngularAverage(True)
+        x = index
+        label = "degrees"
+        if useRadians:
+            x = x / 180 * np.pi
+            label = "radians"
+        plt.plot(x, psAngAvg)
+        if logBase is not None:
+            plt.yscale("log", basey=logBase)
+        plt.xlabel("Angle [{}]".format(label))
+        plt.show()
+        return psAngAvg
+
     def fourierTransform(self, shift: bool = True) -> np.ndarray:
         pixels = self.pixels
         fftPixels = np.fft.fft2(pixels)
@@ -693,7 +703,7 @@ class Channel:
         return fftPixels
 
     def applyGaussianNoise(self, sigma: float, mean: float = 0):
-        rows, cols = self.shape
+        cols, rows = self.shape
         gauss = np.random.normal(mean, sigma, (rows, cols))
         gauss = np.clip(gauss.reshape(rows, cols), 0, np.max(gauss))
         noise = self.pixels + gauss.astype(self._originalDType)
@@ -792,8 +802,29 @@ class Channel:
         """
         x, y = Channel.createXYGridsFromArray(array)
         radii = ((x ** 2 + y ** 2) ** (1 / 2)).astype(int)
+        # carre = np.maximum(np.abs(x), np.abs(y))
         index = np.unique(radii)
-        return ndimage.mean(array, radii, index=index)
+        average = ndimage.mean(array, radii, index=index)
+        # averageSquare = ndimage.mean(array, x, index = np.unique(x))
+        # averageSquare = averageSquare
+        # plt.plot(range(len(averageSquare)), averageSquare)
+        # plt.yscale("log", basey=2)
+        # plt.show()
+        return np.array(average) / np.sum(average)
+
+    @staticmethod
+    def angularAverage(array: np.ndarray) -> typing.Tuple[np.ndarray, np.ndarray]:
+        x, y = Channel.createXYGridsFromArray(array)
+        centerY = y.shape[0] // 2
+        # We only take the 1st and 2nd quadrant because the 3rd and 4th are just a reflection.
+        x, y = x[:centerY + 1, :], y[:centerY + 1, :]
+        # The angle of a line starting from origin and passing through a pixel is given by arctan(y/x) where (x, y) are
+        # the coordinates of each pixel.
+        angleMask = np.round(np.arctan2(y, x) * 180 / np.pi).astype(int)
+        upperPartArray = array[:centerY + 1, :]
+        index = np.unique(angleMask)
+        average = ndimage.mean(upperPartArray, angleMask, index=index)
+        return np.array(average) / np.sum(average), index
 
 
 from .channelFloat import ChannelFloat
