@@ -169,11 +169,11 @@ class Channel:
     def convertToNormalizedFloat(self):
         pass
 
-    def convertToNormalizedFloatMinToZeroMaxToOne(self):
-        pass
+    def convertToNormalizedFloatMinToZeroMaxToOne(self) -> "Channel":
+        newChannelPixels = np.copy(self.pixels) - self.getExtrema()[0]  # We put the min to 0
+        newChannelPixels = newChannelPixels / np.nanmax(newChannelPixels)  # We put the maximum to 1
+        return Channel(newChannelPixels)
 
-    def convertToNormalizedFloat(self):
-        pass
 
     def filterNoise(self):
         self.applyNoiseFilter()
@@ -653,7 +653,7 @@ class Channel:
 
     def displayPowerSpectrum(self, logScale: bool = True) -> np.ndarray:
         powerSpectrum = self.powerSpectrum()
-        cols, rows = powerSpectrum.T.shape
+        cols, rows = powerSpectrum.shape
         if logScale:
             powerSpectrum = np.log(powerSpectrum)
         plt.imshow(powerSpectrum.T, extent=(-cols // 2, cols // 2, -rows // 2, rows // 2))
