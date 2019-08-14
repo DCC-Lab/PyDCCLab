@@ -174,7 +174,6 @@ class TestChannels(env.DCCLabTestCase):
 
     def testGetShannonEntropyArbitraryBase(self):
         def entropy(array, base):
-            numberPixels = array.shape[0] * array.shape[1]
             _, counts = np.unique(array, return_counts=True)
             probArray = counts / np.sum(counts)
             logArray = np.log(probArray) / np.log(base)
@@ -186,9 +185,9 @@ class TestChannels(env.DCCLabTestCase):
             baseCoeff = np.random.randint(1, 10, size=(1,))
             base = np.random.rand() * baseCoeff
         channel = Channel(np.random.randint(1, 255, (100, 100), dtype=np.uint8).T)
-        skimageEntropy = channel.getShannonEntropy(base)
+        channelEntropyMedthod = channel.getShannonEntropy(base)
         testEntropy = entropy(channel.pixels, base)
-        self.assertAlmostEqual(testEntropy, skimageEntropy)
+        self.assertAlmostEqual(testEntropy, channelEntropyMedthod)
 
     def testGetExtrema(self):
         array = np.arange(0, 25, dtype=np.uint8).reshape((5, 5))
@@ -832,7 +831,7 @@ class TestChannelSpectralFiltering(env.DCCLabTestCase):
         array = np.array([[2, 2, 2, 2], [2, 1, 1, 1], [2, 1, 0, 1], [2, 1, 1, 1]], dtype=np.uint8)
         azmAvg = Channel.azimuthalAverage(array).tolist()
         self.assertListEqual(azmAvg, (
-                    np.array([0 * 1 / 1, 1 * 8 / 8, 2 * 7 / 7]) / np.sum([0 * 1 / 1, 1 * 8 / 8, 2 * 7 / 7])).tolist())
+                np.array([0 * 1 / 1, 1 * 8 / 8, 2 * 7 / 7]) / np.sum([0 * 1 / 1, 1 * 8 / 8, 2 * 7 / 7])).tolist())
         self.assertAlmostEqual(np.sum(azmAvg), 1)
 
     def testAngularAverage(self):
