@@ -703,13 +703,13 @@ class TestChannelSpectralFiltering(env.DCCLabTestCase):
         self.assertEqual(fftChannelShift[centerY, centerX], fftChannel[0, 0])
 
     def testHighPassFilterRectMask(self):
-        image = Image(path=Path(self.dataDir / "testCziFileTwoChannels.czi"))
+        image = Image(path=Path(self.dataDir / "testCziFile.czi"))
         channel = image.channels[0]
         fftChannel = channel.applyHighPassFilterFromRectangularMask(30)
         self.assertFalse(np.allclose(channel.pixels, fftChannel.pixels))
 
     def testLowPassFilterRectMask(self):
-        image = Image(path=Path(self.dataDir / "testCziFileTwoChannels.czi"))
+        image = Image(path=Path(self.dataDir / "testCziFile.czi"))
         channel = image.channels[0]
         fftChannel = channel.applyLowPassFilterFromRectangularMask(40)
         self.assertFalse(np.allclose(channel.pixels, fftChannel.pixels))
@@ -797,7 +797,7 @@ class TestChannelSpectralFiltering(env.DCCLabTestCase):
         self.assertTrue(np.allclose(mask, handComputedMask))
 
     def testPowerSpectrum(self):
-        image = Image(path=Path(self.dataDir / "testCziFileTwoChannels.czi"))
+        image = Image(path=Path(self.dataDir / "testCziFile.czi"))
         channel = image.channels[-1]
         fftChannel = np.fft.fft2(channel.pixels)
         fftShiftChannel = np.fft.fftshift(fftChannel)
