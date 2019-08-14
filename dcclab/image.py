@@ -17,7 +17,7 @@ class Image:
         self._getSupportedFormats()  # FIXME
 
         if path is not None:
-            if not os.path.exists(path):
+            if not os.path.exists(str(path)):
                 raise ValueError("Cannot load '{0}': file does not exist".format(path))
 
             self.path = path
@@ -113,7 +113,7 @@ class Image:
         if self.shape[-1] not in [1, 3]:
             Channel.multiChannelDisplay(self.channels)
         else:
-            plt.imshow(self.asArray().squeeze().T, cmap=colorMap)
+            plt.imshow(self.asArray().squeeze().swapaxes(0, 1), cmap=colorMap)
             plt.show()
 
     def channelsFromArray(self, array):
@@ -158,6 +158,10 @@ class Image:
     def labelMaskComponents(self):
         for channel in self.channels:
             channel.labelMaskComponents()
+
+    def setLabelledComponents(self, label: 'Channel'):
+        for channel in self.channels:
+            channel.setLabelledComponents(label.pixels)
 
     def analyzeComponents(self):
         for channel in self.channels:
