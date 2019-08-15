@@ -125,7 +125,14 @@ class MovieFile(ImageFile):
         return frameData
 
     def readRawDCCLabFrame(self) -> np.ndarray:
-        raise NotImplementedError("Not yet implemented")
+        frameData = None
+        binaryData = self.movieHandle.read(self.frameSize)
+        if len(binaryData) == self.frameSize:
+            frameData = np.frombuffer(binaryData,dtype=self.sampleType)
+            # Data is stored x,y interleaved channels
+            frameData = np.reshape(frameData, (self.frameShape[0],self.frameShape[1],self.frameShape[2]))
+
+        return frameData
 
     def appendNextFrame(self) -> np.array:
         frameData = self.readNextFrame()
