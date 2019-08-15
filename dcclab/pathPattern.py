@@ -2,17 +2,18 @@ import re
 import os
 from pathlib import Path, PureWindowsPath
 
+
 class PathPattern:
-    def __init__(self, pattern:str):
-        self.pattern = pattern
-        re.compile(pattern) # will raise exception if needed
+    def __init__(self, pattern: str):
+        self.pattern = repr(pattern)
+        re.compile(self.pattern)  # will raise exception if needed
 
     @property
     def directory(self):
         dirName = os.path.dirname(self.pattern)
         if dirName == '':
             dirName = '.'
-        return str(Path(dirName)) # converts to native Windows or Unix
+        return str(Path(dirName))  # converts to native Windows or Unix
 
     @property
     def basePattern(self):
@@ -68,12 +69,12 @@ class PathPattern:
         paths = []
         for filename in os.listdir(self.directory):
             if re.match(self.basePattern, filename):
-                filePath = os.path.join(self.directory,filename)
+                filePath = os.path.join(self.directory, filename)
                 paths.append(filePath)
         paths.sort()
         return paths
 
-    def filePathWithIndex(self, i:int, j:int = None, k:int = None):
+    def filePathWithIndex(self, i: int, j: int = None, k: int = None):
         if self.isReadPattern:
             raise ValueError("Patterns with capture groups are for reading files, not writing")
 
@@ -84,7 +85,8 @@ class PathPattern:
             passedArguments = 3
 
         if self.numberOfFormatGroups != passedArguments:
-            raise ValueError("Pattern has {0} indices, only passed {1}".format(self.numberOfFormatGroups, passedArguments))
+            raise ValueError(
+                "Pattern has {0} indices, only passed {1}".format(self.numberOfFormatGroups, passedArguments))
 
         if self.numberOfFormatGroups == 1:
             filePath = self.pattern.format(i)
@@ -94,4 +96,3 @@ class PathPattern:
             filePath = self.pattern.format(i, j, k)
 
         return filePath
-
