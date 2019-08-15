@@ -2,9 +2,11 @@ from dcclab import checkIfValidDataType
 import os
 
 
-class CSVMetadata:
-    # We assume Comma Separated Values (CSV) by default but it could be Semi-Colon Separated Values (SCSV).
-    # The findSeparator method is the best way I could come up with to differentiate the two.
+class DTFMetadata:
+    # Delimited Text Files are files where the text is formatted as columns by a delimiter.
+    # The most common DTF files are .CSV (Comma Separated Values), .SCSV (Semi-Colon Separated Values)
+    # and .TSV (Tab Separated Values). The findSeparator method is the best way I could come up with to find
+    # that delimiter.
     def __init__(self, path):
         self.path = path
         self.name = self.fileName()
@@ -27,6 +29,8 @@ class CSVMetadata:
                 separator = ';'
             elif len(titleLine.split(',')) == len(endLine.split(',')) and len(titleLine.split(',')) >= 2:
                 separator = ','
+            elif len(titleLine.split('\t')) == len(endLine.split('\t')) and len(titleLine.split('\t')) >= 2:
+                separator = '\t'
         except:
             raise
         return separator
