@@ -1,8 +1,9 @@
 from .cziMetadata import CZIMetadata
 from .csvMetadata import CSVMetadata
-from .xlsxMetadata import XLSXMetadata
-from .rawMetadata import RAWMetadata
+from .xlsxMetadata import PDKXLSXMetadata
+from .scientificaMetadata import scientificaMetadata
 import os
+import re
 try:
     import deprecated
 except:
@@ -10,28 +11,58 @@ except:
 
 
 class Metadata:
-    supportedClasses = [CZIMetadata, CSVMetadata, XLSXMetadata, RAWMetadata]
-    supportedFormats = ['CZI', 'CSV', 'XLSX', 'RAW']
+    # Supported research groups.
+    supportedResearchGroups = ['POM', 'PDK']
+    supportedFormats = ['CZI', 'CSV', 'RAW', 'XLSX']
+
+    # Supported classes and formats for POM.
+    pomSupportedClasses = [CZIMetadata, CSVMetadata]
+    pomSupportedFormats = ['CZI', 'CSV']
+
+    # Supported classes and formats for PDK.
+    pdkSupportedClasses = [scientificaMetadata, PDKXLSXMetadata]
+    pdkSupportedFormats = ['RAW', 'XLSX']
+
 
     def __init__(self, path: str):
         if path is not None:
             if not os.path.exists(path):
                 raise ValueError("Cannot load '{0}': file does not exist".format(path))
-
             self.path = path
-            self.__fileObject = None
-            for supportedClass in Metadata.supportedClasses:
-                try:
-                    self.__fileObject = supportedClass(path)
-                    break
-                except:
-                    continue
-            if self.__fileObject is None:
-                message = "Cannot read '{0}': not a recognized format ({1})".format(self.path, Metadata.supportedFormats)
-                raise TypeError(message)
+            self.__researchGroup = self.validateResearchGroup()
+            self.__fileObject = self.processFile()
         else:
             self.path = None
             self.__fileObject = None
+
+    def processFile(self):
+        if self.__researchGroup == 'POM':
+            for supportedClass in Metadata.pomSupportedClasses:
+                try:
+                    fileObject = supportedClass(self.path)
+                    return fileObject
+                except:
+                    continue
+            raise TypeError("Cannot load '{}' : file is not from a recognized format for that research group "
+                            "({}).".format(self.path, Metadata.pomSupportedFormats))
+
+        elif self.__researchGroup == 'PDK':
+            for supportedClass in Metadata.pdkSupportedClasses:
+                try:
+                    fileObject = supportedClass(self.path)
+                    return fileObject
+                except:
+                    continue
+            raise TypeError("Cannot load '{}' : file is not from a recognized format for that research group "
+                            "({}).".format(self.path, Metadata.pdkSupportedFormats))
+
+    def validateResearchGroup(self):
+        for researchGroup in Metadata.supportedResearchGroups:
+            if re.search(r'[\\/]{}[\\/]'.format(researchGroup), self.path):
+                return researchGroup
+
+        raise ValueError("Cannot load '{}' : file is not from a recognized research group database "
+                         "({}).".format(self.path, Metadata.supportedResearchGroups))
 
     @property
     def metaType(self):
@@ -40,9 +71,9 @@ class Metadata:
             return 'CZI'
         elif fileType == CSVMetadata:
             return 'CSV'
-        elif fileType == XLSXMetadata:
+        elif fileType == PDKXLSXMetadata:
             return 'XLSX'
-        elif fileType == RAWMetadata:
+        elif fileType == scientificaMetadata:
             return 'RAW'
         else:
             return None
@@ -51,7 +82,8 @@ class Metadata:
     def metadata(self) -> dict:
         if isinstance(self.__fileObject, CZIMetadata):
             return self.__fileObject.asDict().get('metadata')
-        elif isinstance(self.__fileObject, CSVMetadata) or isinstance(self.__fileObject, XLSXMetadata):
+        elif isinstance(self.__fileObject, CSVMetadata) or isinstance(self.__fileObject, PDKXLSXMetadata) \
+                or isinstance(self.__fileObject, scientificaMetadata):
             return self.__fileObject.asDict
         else:
             return {}
@@ -65,8 +97,4 @@ class Metadata:
 
     @property
     def keys(self) -> dict:
-        if isinstance(self.__fileObject, CZIMetadata) or isinstance(self.__fileObject, CSVMetadata) or \
-                isinstance(self.__fileObject, XLSXMetadata):
-            return self.__fileObject.keys
-        else:
-            return {}
+        return self.__fileObject.keys
