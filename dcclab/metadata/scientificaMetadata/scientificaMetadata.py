@@ -51,3 +51,4 @@ class scientificaMetadata:
     def asDict(self):
         dictio = {'path': self.scientificaPath}
         return {**dictio, **self.iniDict}
+
