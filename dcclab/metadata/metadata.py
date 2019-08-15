@@ -23,6 +23,7 @@ class Metadata:
     pdkSupportedClasses = [scientificaMetadata, PDKXLSXMetadata]
     pdkSupportedFormats = ['RAW', 'XLSX']
 
+
     def __init__(self, path: str):
         if path is not None:
             if not os.path.exists(path):
