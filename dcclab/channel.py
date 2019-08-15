@@ -656,7 +656,7 @@ class Channel:
 
     def displayPowerSpectrum(self, logScale: bool = True) -> np.ndarray:
         powerSpectrum = self.powerSpectrum()
-        cols, rows = powerSpectrum.T.shape
+        cols, rows = powerSpectrum.shape
         if logScale:
             powerSpectrum = np.log(powerSpectrum)
         plt.imshow(powerSpectrum.T, extent=(-cols // 2, cols // 2, -rows // 2, rows // 2))
