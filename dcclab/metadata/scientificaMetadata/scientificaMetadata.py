@@ -1,14 +1,14 @@
 from ..txtMetadata.pdkTXTMetadata import PDKTXTMetadata
+import re
 import os
 import datetime
 
 
 class scientificaMetadata:
-    def __init__(self, rawPath):
-        self.scientificaPath = os.path.dirname(rawPath)
-        print(self.scientificaPath)
+    def __init__(self, sciPath):
+        self.sciPath = sciPath
+        self.rawPath, self.iniPath, self.xmlPath = self.findFiles()
         self.fileName = self.__fileName()
-        print(self.fileName)
         self.date = self.__date()
 
         # Processing .ini file :
@@ -18,9 +18,22 @@ class scientificaMetadata:
         #self.xmlPath = self.__xmlPath()
         #self.xmlRoot = self.readXmlFile()
 
+    def findFiles(self):
+        # TODO Name to be reworked.
+        rawFile, iniFile, xmlPath = None, None, None
+        files = os.listdir(self.sciPath)
+        for file in files:
+            if re.search('.raw$', file, re.IGNORECASE):
+                rawFile = os.path.join(self.sciPath, file)
+            if re.search('.ini$', file, re.IGNORECASE):
+                iniFile = os.path.join(self.sciPath, file)
+            if re.search('.xml$', file, re.IGNORECASE):
+                xmlPath = os.path.join(self.sciPath, file)
+
+        return rawFile, iniFile, xmlPath
+
     def __fileName(self):
-        file = os.path.basename(self.scientificaPath)
-        print(file)
+        file = os.path.basename(self.sciPath)
         return os.path.splitext(file)[0]
 
     def __date(self):
@@ -30,7 +43,7 @@ class scientificaMetadata:
         return '{} {}'.format(date.date(), date.time())
 
     def extractDataFromIniFile(self):
-        mtdt = PDKTXTMetadata(self.scientificaPath)
+        mtdt = PDKTXTMetadata(self.iniPath)
         return mtdt.asDict, mtdt.keys
 
     # FixMe Currently, we do not know if .xml files associated with .raw files have any valuable metadata.
@@ -49,6 +62,6 @@ class scientificaMetadata:
 
     @property
     def asDict(self):
-        dictio = {'path': self.scientificaPath}
+        dictio = {'path': self.sciPath}
         return {**dictio, **self.iniDict}
 
