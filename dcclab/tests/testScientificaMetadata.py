@@ -6,16 +6,21 @@ import os
 
 class TestScientificaMetadata(env.DCCLabTestCase):
     def setUp(self) -> None:
-        self.scientificaDir = os.path.join(self.dataDir, '20190101_12_12_12_900nm_16x_512x1024_1000f_8dpf')
-        os.mkdir(self.scientificaDir)
-        self.iniPath = os.path.join(self.scientificaDir, '20190101_12_12_12_900nm_16x_512x1024_1000f_8dpf_XYT.ini')
-        self.xmlPath = os.path.join(self.scientificaDir, '20190101_12_12_12_900nm_16x_512x1024_1000f_8dpf_OME.xml')
+        self.sciDir = os.path.join(str(self.dataDir), '20190101_12_12_12_900nm_16x_512x1024_1000f_8dpf')
+        os.mkdir(self.sciDir)
+
+        self.rawPath = os.path.join(self.sciDir, '20190101_12_12_12_900nm_16x_512x1024_1000f_8dpf_XYT.raw')
+        with open(self.rawPath, 'w') as file:
+            file.write('TEST RAW FILE.')
+
+        self.iniPath = os.path.join(self.sciDir, '20190101_12_12_12_900nm_16x_512x1024_1000f_8dpf_XYT.ini')
         with open(self.iniPath, 'w') as file:
             file.write('[_]\nTest_File = This is a test file\nno.of.channels = 1.000000000000\nblank_line = blank\n'
                        'frame.count = 1000.000000000000\n\nx.pixels = 1024.000000000000\ny.pixels = 512.000000000000\n'
                        'x.voltage = 5.000000000000\ny.voltage = 1.250000000000\n\nwrong.line = bleh\n'
                        'pixel.resolution = 5.000000000000\nLaser.Power = 21.500000000000\n')
 
+        self.xmlPath = os.path.join(self.sciDir, '20190101_12_12_12_900nm_16x_512x1024_1000f_8dpf_OME.xml')
         with open(self.xmlPath, 'w') as file:
             file.write('<TEST>\n')
             file.write('\t<items>\n')
@@ -23,39 +28,37 @@ class TestScientificaMetadata(env.DCCLabTestCase):
             file.write('</TEST>\n')
 
     def tearDown(self) -> None:
+        os.remove(self.rawPath)
         os.remove(self.iniPath)
         os.remove(self.xmlPath)
-
-        os.rmdir(self.scientificaDir)
+        os.rmdir(self.sciDir)
 
     def testFileName(self):
-        metadata = mtdt(self.scientificaDir)
-        self.assertEqual(metadata.fileName, '20190101_12_12_12_900nm_16x_512x1024_1000f_8dpf_XYT')
+        metadata = mtdt(self.sciDir)
+        self.assertEqual('20190101_12_12_12_900nm_16x_512x1024_1000f_8dpf', metadata.fileName)
+
+    def testRawPath(self):
+        metadata = mtdt(self.sciDir)
+        self.assertEqual(self.rawPath, metadata.rawPath)
+
+    def testIniPath(self):
+        metadata = mtdt(self.sciDir)
+        self.assertEqual(self.iniPath, metadata.iniPath)
+
+    def testXmlPath(self):
+        metadata = mtdt(self.sciDir)
+        self.assertEqual(self.xmlPath, metadata.xmlPath)
 
     def testDate(self):
-        metadata = mtdt(self.scientificaDir)
+        metadata = mtdt(self.sciDir)
         self.assertEqual('2019-01-01 12:12:12', metadata.date)
 
     def testExtractDataFromIniFile(self):
-        metadata = mtdt(self.scientificaDir)
+        metadata = mtdt(self.sciDir)
         self.assertTrue(metadata.extractDataFromIniFile())
 
-    def testXmlPath(self):
-        metadata = mtdt(self.scientificaDir)
-        self.assertEqual(metadata.xmlPath, self.xmlPath)
-
-    def testXmlPathLineShifted(self):
-        filePath = os.path.join(str(self.dataDir),
-                                '20190101_12_12_12_900nm_16x_512x1024_1000f_8dpf_XYT.lineshifted.raw')
-        metadata = mtdt(filePath)
-        self.assertEqual(metadata.xmlPath, self.xmlPath)
-
-    def testReadXmlFile(self):
-        metadata = mtdt(self.scientificaDir)
-        self.assertTrue(metadata.readXmlFile())
-
     def testKeys(self):
-        metadata = mtdt(self.scientificaDir)
+        metadata = mtdt(self.sciDir)
         self.assertEqual(metadata.keys, {'ZebraFishRAW': {'Laser_Power': 'REAL', 'frame_count': 'INTEGER',
                                                           'no_of_channels': 'INTEGER', 'path': 'TEXT PRIMARY KEY',
                                                           'pixel_resolution': 'REAL', 'x_pixels': 'INTEGER',
@@ -63,9 +66,9 @@ class TestScientificaMetadata(env.DCCLabTestCase):
                                                           'y_voltage': 'REAL'}})
 
     def testAsDict(self):
-        metadata = mtdt(self.scientificaDir)
+        metadata = mtdt(self.sciDir)
         self.assertEqual(metadata.asDict, {'Laser_Power': '21.500000000000', 'frame_count': '1000.000000000000',
-                                           'no_of_channels': '1.000000000000', 'path': self.scientificaDir,
+                                           'no_of_channels': '1.000000000000', 'path': self.sciDir,
                                            'pixel_resolution': '5.000000000000', 'x_pixels': '1024.000000000000',
                                            'x_voltage': '5.000000000000', 'y_pixels': '512.000000000000',
                                            'y_voltage': '1.250000000000'})
