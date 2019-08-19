@@ -1,1 +1,0 @@
-from .scientificaMetadata import scientificaMetadata

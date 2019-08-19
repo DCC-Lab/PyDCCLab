@@ -4,10 +4,10 @@ import os
 import datetime
 
 
-class scientificaMetadata:
+class sciMetadata:
     def __init__(self, sciPath):
         self.sciPath = sciPath
-        self.rawPath, self.iniPath, self.xmlPath = self.findFiles()
+        self.rawPath, self.iniPath, self.xmlPath = self.confirmFolderHasScientificaFiles()
         self.fileName = self.__fileName()
         self.date = self.__date()
 
@@ -18,19 +18,21 @@ class scientificaMetadata:
         #self.xmlPath = self.__xmlPath()
         #self.xmlRoot = self.readXmlFile()
 
-    def findFiles(self):
-        # TODO Name to be reworked.
-        rawFile, iniFile, xmlPath = None, None, None
+    def confirmFolderHasScientificaFiles(self):
+        rawPath, iniPath, xmlPath = None, None, None
         files = os.listdir(self.sciPath)
         for file in files:
-            if re.search('.raw$', file, re.IGNORECASE):
-                rawFile = os.path.join(self.sciPath, file)
-            if re.search('.ini$', file, re.IGNORECASE):
-                iniFile = os.path.join(self.sciPath, file)
-            if re.search('.xml$', file, re.IGNORECASE):
+            if rawPath is None and re.search('.raw$', file, re.IGNORECASE):
+                rawPath = os.path.join(self.sciPath, file)
+            elif iniPath is None and re.search('.ini$', file, re.IGNORECASE):
+                iniPath = os.path.join(self.sciPath, file)
+            elif xmlPath is None and re.search('.xml$', file, re.IGNORECASE):
                 xmlPath = os.path.join(self.sciPath, file)
 
-        return rawFile, iniFile, xmlPath
+        if rawPath is None or iniPath is None or xmlPath is None:
+            raise FileNotFoundError("The Scientifica folder is missing essential file types.")
+
+        return rawPath, iniPath, xmlPath
 
     def __fileName(self):
         file = os.path.basename(self.sciPath)
@@ -57,11 +59,11 @@ class scientificaMetadata:
 
     @property
     def keys(self):
-        keys = {'path': 'TEXT PRIMARY KEY', **self.iniKeys}
+        keys = {'path': 'TEXT PRIMARY KEY', 'raw_path': 'TEXT', 'ini_path': 'TEXT', 'xml_path': 'TEXT', **self.iniKeys}
         return {'ZebraFishRAW': keys}
 
     @property
     def asDict(self):
-        dictio = {'path': self.sciPath}
+        dictio = {'path': self.sciPath, 'raw_path': self.rawPath, 'ini_path': self.iniPath, 'xml_path': self.xmlPath}
         return {**dictio, **self.iniDict}
 
