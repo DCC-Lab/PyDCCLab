@@ -1,37 +1,13 @@
-import xlrd
-import os
+from .xlsxMetadata import XLSXMetadata
 import re
 
 
-class PDKXLSXMetadata:
+class PDKXLSXMetadata(XLSXMetadata):
     def __init__(self, xlsxPath):
-        self.path = xlsxPath
-        self.name = self.fileName()
+        super().__init__(xlsxPath)
 
-        self.workbook = self.getWorkbook()
-        self.worksheets = self.getWorksheets()
-        self.keys = self.getKeys()
-
-    def fileName(self):
-        file = os.path.basename(self.path)
-        return os.path.splitext(file)[0]
-
-    def getWorkbook(self) -> xlrd.book:
-        try:
-            return xlrd.open_workbook(self.path)
-        except:
-            raise
-
-    def getWorksheets(self):
-        worksheets = []
-        try:
-            for sheet in range(self.workbook.nsheets):
-                worksheets.append(self.workbook.sheet_by_index(sheet))
-            return worksheets
-        except:
-            return worksheets
-
-    def getKeys(self) -> dict:
+    @property
+    def keys(self) -> dict:
         keys = {}
         try:
             for worksheet in self.worksheets:
