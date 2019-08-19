@@ -1,18 +1,9 @@
-import re
+from .txtMetadata import TXTMetadata
 
 
-class PDKTXTMetadata:
+class PDKTXTMetadata(TXTMetadata):
     def __init__(self, path):
-        self.path = path
-        self.iniPath = self.__iniPath()
-
-    def __iniPath(self):
-        return re.sub('\.lineshifted\.raw|.raw', '.ini', self.path, re.IGNORECASE)
-
-    def readFile(self):
-        with open(self.iniPath, 'r') as file:
-            lines = file.readlines()
-        return lines
+        super().__init__(path)
 
     @property
     def asDict(self):
