@@ -1,10 +1,10 @@
-from dcclab import scientificaMetadata as mtdt
+from dcclab import sciMetadata as mtdt
 import env
 import unittest
 import os
 
 
-class TestScientificaMetadata(env.DCCLabTestCase):
+class TestSciMetadata(env.DCCLabTestCase):
     def setUp(self) -> None:
         self.sciDir = os.path.join(str(self.dataDir), '20190101_12_12_12_900nm_16x_512x1024_1000f_8dpf')
         os.mkdir(self.sciDir)
@@ -28,10 +28,25 @@ class TestScientificaMetadata(env.DCCLabTestCase):
             file.write('</TEST>\n')
 
     def tearDown(self) -> None:
-        os.remove(self.rawPath)
-        os.remove(self.iniPath)
-        os.remove(self.xmlPath)
+        if os.path.exists(self.rawPath):
+            os.remove(self.rawPath)
+        if os.path.exists(self.iniPath):
+            os.remove(self.iniPath)
+        if os.path.exists(self.xmlPath):
+            os.remove(self.xmlPath)
         os.rmdir(self.sciDir)
+
+    def testconfirmFolderHasScientificaFilesAllFiles(self):
+        metadata = mtdt(self.sciDir)
+        testRaw, testIni, testXml = metadata.confirmFolderHasScientificaFiles()
+        self.assertEqual(testRaw, self.rawPath)
+        self.assertEqual(testIni, self.iniPath)
+        self.assertEqual(testXml, self.xmlPath)
+
+    def testconfirmFolderHasScientificaFilesMissingFiles(self):
+        metadata = mtdt(self.sciDir)
+        os.remove(self.iniPath)
+        with self.assertRaises(FileNotFoundError): metadata.confirmFolderHasScientificaFiles()
 
     def testFileName(self):
         metadata = mtdt(self.sciDir)
@@ -59,19 +74,19 @@ class TestScientificaMetadata(env.DCCLabTestCase):
 
     def testKeys(self):
         metadata = mtdt(self.sciDir)
-        self.assertEqual(metadata.keys, {'ZebraFishRAW': {'Laser_Power': 'REAL', 'frame_count': 'INTEGER',
-                                                          'no_of_channels': 'INTEGER', 'path': 'TEXT PRIMARY KEY',
-                                                          'pixel_resolution': 'REAL', 'x_pixels': 'INTEGER',
-                                                          'x_voltage': 'REAL', 'y_pixels': 'INTEGER',
-                                                          'y_voltage': 'REAL'}})
+        self.assertEqual({'ZebraFishRAW': {'Laser_Power': 'REAL', 'frame_count': 'INTEGER', 'ini_path': 'TEXT',
+                                           'no_of_channels': 'INTEGER', 'path': 'TEXT PRIMARY KEY',
+                                           'pixel_resolution': 'REAL', 'raw_path': 'TEXT', 'x_pixels': 'INTEGER',
+                                           'x_voltage': 'REAL', 'xml_path': 'TEXT', 'y_pixels': 'INTEGER',
+                                           'y_voltage': 'REAL'}}, metadata.keys)
 
     def testAsDict(self):
         metadata = mtdt(self.sciDir)
-        self.assertEqual(metadata.asDict, {'Laser_Power': '21.500000000000', 'frame_count': '1000.000000000000',
-                                           'no_of_channels': '1.000000000000', 'path': self.sciDir,
-                                           'pixel_resolution': '5.000000000000', 'x_pixels': '1024.000000000000',
-                                           'x_voltage': '5.000000000000', 'y_pixels': '512.000000000000',
-                                           'y_voltage': '1.250000000000'})
+        self.assertEqual(
+            {'Laser_Power': '21.500000000000', 'frame_count': '1000.000000000000', 'ini_path': self.iniPath,
+             'no_of_channels': '1.000000000000', 'path': self.sciDir, 'pixel_resolution': '5.000000000000',
+             'raw_path': self.rawPath, 'x_pixels': '1024.000000000000', 'x_voltage': '5.000000000000',
+             'xml_path': self.xmlPath, 'y_pixels': '512.000000000000', 'y_voltage': '1.250000000000'}, metadata.asDict)
 
 
 if __name__ == '__main__':
