@@ -16,28 +16,20 @@ class TestMetadata(env.DCCLabTestCase):
         if not os.path.exists(self.pdkDir):
             os.mkdir(self.pdkDir)
 
-        # Copying a .czi file to the right folder.
+        # Test file for CZI Metadata.
         self.cziPath = os.path.join(self.pomDir, 'testCziFile.czi')
         copyfile(os.path.join(str(self.dataDir), 'testCziFile.czi'), self.cziPath)
-        self.rawPath = os.path.join(self.pdkDir, '20190101_12_12_12_900nm_16x_512x1024_1000f_8dpf_XYT.raw')
-        copyfile(os.path.join(str(self.dataDir), 'testMovie.raw'), self.rawPath)
 
-        # Creating other test files needed.
+        # Test file for DTF metadata.
         self.csvPath = os.path.join(self.pomDir, 'unittest.csv')
-        self.xlsxPath = os.path.join(self.pdkDir, 'unittest.xlsx')
-        self.iniPath = os.path.join(self.pdkDir, '20190101_12_12_12_900nm_16x_512x1024_1000f_8dpf_XYT.ini')
-        with open(self.iniPath, 'w') as file:
-            file.write('[_]\nTest_File = This is a test file\nno.of.channels = 1.000000000000\nblank_line = blank\n'
-                       'frame.count = 1000.000000000000\n\nx.pixels = 1024.000000000000\ny.pixels = 512.000000000000\n'
-                       'x.voltage = 5.000000000000\ny.voltage = 1.250000000000\n\nwrong.line = bleh\n'
-                       'pixel.resolution = 5.000000000000\nLaser.Power = 21.500000000000\n')
-
         with open(self.csvPath, 'w') as file:
             file.write('field_1,field_2,field_3\n')
             file.write('INTEGER,REAL,TEXT\n')
             file.write('100,0.123,apple\n')
             file.write('200,0.456,orange\n')
 
+        # Test file for XLSX metadata.
+        self.xlsxPath = os.path.join(self.pdkDir, 'unittest.xlsx')
         workbook = xlwt.Workbook()
         sheet = workbook.add_sheet('test_1')
         sheet.write(0, 0, 'test_column_1')
@@ -55,6 +47,28 @@ class TestMetadata(env.DCCLabTestCase):
         sheet.write(2, 1, '\\test\\02')
         workbook.save(self.xlsxPath)
 
+        # Test files for Scientifica metadata.
+        self.sciDir = os.path.join(self.pdkDir, '20190101_12_12_12_900nm_16x_512x1024_1000f_8dpf')
+        os.mkdir(self.sciDir)
+
+        self.rawPath = os.path.join(self.sciDir, '20190101_12_12_12_900nm_16x_512x1024_1000f_8dpf_XYT.raw')
+        with open(self.rawPath, 'w') as file:
+            file.write('TEST RAW FILE.')
+
+        self.iniPath = os.path.join(self.sciDir, '20190101_12_12_12_900nm_16x_512x1024_1000f_8dpf_XYT.ini')
+        with open(self.iniPath, 'w') as file:
+            file.write('[_]\nTest_File = This is a test file\nno.of.channels = 1.000000000000\nblank_line = blank\n'
+                       'frame.count = 1000.000000000000\n\nx.pixels = 1024.000000000000\ny.pixels = 512.000000000000\n'
+                       'x.voltage = 5.000000000000\ny.voltage = 1.250000000000\n\nwrong.line = bleh\n'
+                       'pixel.resolution = 5.000000000000\nLaser.Power = 21.500000000000\n')
+
+        self.xmlPath = os.path.join(self.sciDir, '20190101_12_12_12_900nm_16x_512x1024_1000f_8dpf_OME.xml')
+        with open(self.xmlPath, 'w') as file:
+            file.write('<TEST>\n')
+            file.write('\t<items>\n')
+            file.write('\t</items>\n')
+            file.write('</TEST>\n')
+
     def tearDown(self) -> None:
         if os.path.exists(self.csvPath):
             os.remove(self.csvPath)
@@ -66,7 +80,10 @@ class TestMetadata(env.DCCLabTestCase):
             os.remove(self.rawPath)
         if os.path.exists(self.iniPath):
             os.remove(self.iniPath)
+        if os.path.exists(self.xmlPath):
+            os.remove(self.xmlPath)
 
+        os.rmdir(self.sciDir)
         os.rmdir(self.pomDir)
         os.rmdir(self.pdkDir)
 
@@ -96,19 +113,19 @@ class TestMetadata(env.DCCLabTestCase):
 
     def testFileTypeIsCzi(self):
         mtdt = Metadata(self.cziPath)
-        self.assertEqual(mtdt.metaType, 'CZI')
+        self.assertEqual('CZI', mtdt.metaType)
 
     def testFileTypeIsCsv(self):
         mtdt = Metadata(self.csvPath)
-        self.assertEqual(mtdt.metaType, 'CSV')
+        self.assertEqual('DTF', mtdt.metaType)
 
     def testFileTypeIsXlsx(self):
         mtdt = Metadata(self.xlsxPath)
-        self.assertEqual(mtdt.metaType, 'XLSX')
+        self.assertEqual('XLSX', mtdt.metaType)
 
-    def testFileTypeIsRAW(self):
-        mtdt = Metadata(self.rawPath)
-        self.assertEqual(mtdt.metaType, 'RAW')
+    def testFileTypeIsSCIENTIFICA(self):
+        mtdt = Metadata(self.sciDir)
+        self.assertEqual('SCIENTIFICA', mtdt.metaType)
 
     def testMetadataCZI(self):
         mtdt = Metadata(self.cziPath)
@@ -123,7 +140,7 @@ class TestMetadata(env.DCCLabTestCase):
         self.assertTrue(mtdt.metadata)
 
     def testMetadataRAW(self):
-        mtdt = Metadata(self.rawPath)
+        mtdt = Metadata(self.sciDir)
         self.assertTrue(mtdt.metadata)
 
     def testChannelsCZI(self):
@@ -138,8 +155,8 @@ class TestMetadata(env.DCCLabTestCase):
         mtdt = Metadata(self.xlsxPath)
         self.assertFalse(mtdt.channels)
 
-    def testChannelsRAW(self):
-        mtdt = Metadata(self.rawPath)
+    def testChannelsSCIENTIFICA(self):
+        mtdt = Metadata(self.sciDir)
         self.assertFalse(mtdt.channels)
 
     def testKeysCZI(self):
@@ -155,7 +172,7 @@ class TestMetadata(env.DCCLabTestCase):
         self.assertTrue(mtdt.keys)
 
     def testKeysRAW(self):
-        mtdt = Metadata(self.rawPath)
+        mtdt = Metadata(self.sciDir)
         self.assertTrue(mtdt.keys)
 
 
