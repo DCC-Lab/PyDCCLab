@@ -15,7 +15,7 @@ def createMTPDatabase():
     mtpPath = os.path.join(directory, 'dcclab', 'database', 'mtp.db')
     print('Path to database "mtp.db" is : {}'.format(mtpPath))
 
-    # We create a database object in rwc mode. If it doesn't exist, we create it.
+    # We create a database object in rwc mode. If the database doesn't exist, we create it.
     # Then we connect to the database.
     # Database is in asynchronous mode for faster inserts.
     print('Connecting to database...')
@@ -33,8 +33,8 @@ def createMTPDatabase():
 
         # Now, we need paths to our metadata (the .czi files and the .csv files.)
         # For the .csv, we have :
-        micePath = os.path.join(directory, 'dcclab', 'database', 'Data-souris.csv')
-        utilPath = os.path.join(directory, 'dcclab', 'database', 'Data-Utilisation.csv')
+        micePath = os.path.join(directory, 'dcclab', 'POM', 'MTPDatabaseRessources', 'Data-souris.csv')
+        utilPath = os.path.join(directory, 'dcclab', 'POM', 'MTPDatabaseRessources', 'Data-Utilisation.csv')
         print('Path to mice data is : {}'.format(micePath))
         print('Path to util data is : {}'.format(utilPath))
 
@@ -117,7 +117,81 @@ def queryViralVectors():
                     file.write(path['file_path'] + '\n')
 
 
+def addSCSVToPOMDatabase():
+    # Current directory is :
+    print('Beginning process...')
+    directory = os.path.dirname(__file__)
+    print('Directory is : {}'.format(directory))
+
+    # Path to the Molecular Tools Platform database is :
+    mtpPath = os.path.join(directory, 'dcclab', 'database', 'mtp.db')
+    print('Path to database "mtp.db" is : {}'.format(mtpPath))
+
+    # We create a database object in rwc mode. If the database doesn't exist, we create it.
+    # Then we connect to the database.
+    # Database is in asynchronous mode for faster inserts.
+    print('Connecting to database...')
+    with Database(mtpPath, True) as database:
+        print('Dropping all existing tables if any...')
+        database.dropTable('query_DAPI_results')
+        database.dropTable('query_egfp_results')
+        database.dropTable('query_mcher_results')
+        database.commit()
+        print('Done.')
+
+        print("WARNING : Database is in asynchronous mode.")
+        database.asynchronous()
+
+        # Now, we need paths to our queries (.csv files).
+        dapiPath = os.path.join(directory, 'dcclab', 'POM', 'MTPDatabaseRessources', 'query_DAPI_results.csv')
+        egfpPath = os.path.join(directory, 'dcclab', 'POM', 'MTPDatabaseRessources', 'query_egfp_results.csv')
+        mcherPath = os.path.join(directory, 'dcclab', 'POM', 'MTPDatabaseRessources', 'query_mcher_results.csv')
+        print('Path to query_DAPI_results data is : {}'.format(dapiPath))
+        print('Path to query_egfp_results data is : {}'.format(egfpPath))
+        print('Path to query_mcher_results data is : {}'.format(mcherPath))
+
+        # Now, we extract the metadata from our files.
+        print('Extracting metadata from .csv files...')
+        dapiMetadata = Metadata(dapiPath)
+        egfpMetadata = Metadata(egfpPath)
+        mcherMetadata = Metadata(mcherPath)
+        print('...Done!')
+
+        # We create tables for the metadata.
+        print('Creating tables for the .csv metadata...')
+        database.beginTransaction()
+        database.createTable(dapiMetadata.keys)
+        database.createTable(egfpMetadata.keys)
+        database.createTable(mcherMetadata.keys)
+        database.commit()
+        print('...Done!')
+
+        # We insert the metadata into the tables.
+        print('Inserting metadata into the database...')
+        entries = dapiMetadata.metadata
+        database.beginTransaction()
+        for line in entries.keys():
+            database.insert('query_DAPI_results', entries[line])
+        database.commit()
+        print('query_DAPI_results was processed for {} lines...'.format(len(entries)))
+
+        entries = egfpMetadata.metadata
+        database.beginTransaction()
+        for line in entries.keys():
+            database.insert('query_egfp_results', entries[line])
+        database.commit()
+        print('query_egfp_results was processed for {} lines...'.format(len(entries)))
+
+        entries = mcherMetadata.metadata
+        database.beginTransaction()
+        for line in entries.keys():
+            database.insert('query_mcher_results', entries[line])
+        database.commit()
+        print('query_mcher_results was processed for {} lines...'.format(len(entries)))
+    print('Database was successfully created.')
+
+
 if __name__ == '__main__':
-    createMTPDatabase()
+    #createMTPDatabase()
     #queryViralVectors()
-    pass
+    addSCSVToPOMDatabase()
