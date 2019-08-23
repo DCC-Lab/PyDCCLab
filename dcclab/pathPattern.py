@@ -5,8 +5,10 @@ from pathlib import Path, PureWindowsPath
 
 class PathPattern:
     def __init__(self, pattern: str):
-        self.pattern = repr(pattern)
-        re.compile(self.pattern)  # will raise exception if needed
+        self.pattern = pattern
+        self.normalizedPathPattern = str(Path(pattern))
+        self.escapedPathPattern = re.escape(self.normalizedPathPattern)
+        re.compile(self.escapedPathPattern) # will raise exception if needed
 
     @property
     def directory(self):
@@ -17,7 +19,7 @@ class PathPattern:
 
     @property
     def basePattern(self):
-        return str(Path(os.path.basename(self.pattern)))
+        return os.path.basename(self.pattern)
 
     @property
     def extension(self):

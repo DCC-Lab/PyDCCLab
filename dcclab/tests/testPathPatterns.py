@@ -72,21 +72,74 @@ class TestPatterns(env.DCCLabTestCase):
         self.assertTrue(pat.isReadPattern)
         self.assertFalse(pat.isWritePattern)
 
-    def testExtension(self):
+    def testOsPathModule(self):
+        self.assertTrue('test.tiff' == os.path.basename(r"test.tiff"))
+        self.assertTrue('test.tiff' == os.path.basename(r"/Users/test.tiff"))
+
+    def testUnixPathPatternPattern(self):
+        pat = PathPattern(r"/Users/dccote/test.tiff")
+        self.assertEqual(pat.pattern, "/Users/dccote/test.tiff")
+        self.assertEqual(pat.pattern, r"/Users/dccote/test.tiff")
+        self.assertEqual(pat.normalizedPathPattern, r"/Users/dccote/test.tiff")
+        self.assertEqual(pat.escapedPathPattern, r"/Users/dccote/test.tiff")
+
+    def testWindowsPathPatternPattern(self):
+        pat = PathPattern(r'C:\Users\dccote\test.tiff')
+        self.assertEqual(pat.pattern, r'C:\Users\dccote\test.tiff')
+        self.assertEqual(pat.normalizedPathPattern, r'C:\Users\dccote\test\\.tiff')
+        self.assertEqual(pat.escapedPathPattern, r'C:\\Users\\dccote\\test.tiff')
+
+    def testUnixPattern(self):
+        pat = PathPattern(r"/Users/dccote/test.tiff")
+        self.assertEqual(pat.pattern, "/Users/dccote/test.tiff")
+
+    def testWindowsPattern(self):
+        pat = PathPattern(r'C:\Users\dccote\test.tiff')
+        self.assertEqual(pat.pattern, r'C:\Users\dccote\test.tiff')
+
+    def testUnixExtension(self):
         pat = PathPattern(r'/Users/dccote/test.tiff')
         self.assertEqual(pat.extension, "tiff")
 
-    def testDirectory(self):
+    def testWindowsExtension(self):
+        pat = PathPattern(r'C:\Users\dccote\test.tiff')
+        self.assertEqual(pat.extension, "tiff")
+
+    def testUnixDirectory(self):
         pat = PathPattern(r'/Users/dccote/test.tiff')
         self.assertEqual(pat.directory, "/Users/dccote")
+
+    def testWindowsDirectory(self):
+        pat = PathPattern(r'C:\Users\dccote\test.tiff')
+        self.assertEqual(pat.directory, r'C:\Users\dccote')
 
     def testEmptyDirectory(self):
         pat = PathPattern(r'test.tiff')
         self.assertEqual(pat.directory, ".")
 
-    def testBasename(self):
-        pat = PathPattern(r'/Users/dccote/test.tiff')
+    def testUnixBasename(self):
+        pat = PathPattern("/Users/dccote/test.tiff")
         self.assertEqual(pat.basePattern, "test.tiff")
+
+    def testUnixBasename2(self):
+        pat = PathPattern("/Users/dccote/test.tif")
+        self.assertEqual(pat.basePattern, "test.tif")
+
+    def testUnixBasename3(self):
+        pat = PathPattern("/Users/dccote/test/")
+        self.assertEqual(pat.basePattern, "")
+
+    def testWindowsBasename(self):
+        pat = PathPattern(r'C:\Users\dccote\test.tiff')
+        self.assertEqual(pat.basePattern, "test.tiff")
+
+    def testWindowsBasename2(self):
+        pat = PathPattern(r'C:\Users\dccote\test.tif')
+        self.assertEqual(pat.basePattern, "test.tif")
+
+    def testWindowsBasename3(self):
+        pat = PathPattern(r'C:\Users\dccote\test')
+        self.assertEqual(pat.basePattern, "")
 
     def testBasenameWithFormats(self):
         pat = PathPattern(r'/Users/dccote/test-{0}.tiff')
