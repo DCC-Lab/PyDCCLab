@@ -1,4 +1,4 @@
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as et
 from .cziChannel import CZIChannel as chnnl
 from .cziFilter import CZIFilter as fltr
 from dcclab.cziUtil import readCziImage, extractMetadataFromCziFileObject
@@ -89,7 +89,7 @@ class CZIMetadata:
         cziImageObject = self.cziImageObjectFromPath()
         stringXML = self.xmlFromCziImageObject(cziImageObject)
         cziImageObject.close()
-        return ET.fromstring(stringXML)
+        return et.fromstring(stringXML)
 
     def checkIfElementHasChildren(self, element):
         if element is None:
