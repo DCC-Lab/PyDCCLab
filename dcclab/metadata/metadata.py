@@ -1,7 +1,7 @@
 from .cziMetadata import CZIMetadata
-from .csvMetadata import CSVMetadata
+from .dtfMetadata import DTFMetadata
 from .xlsxMetadata import PDKXLSXMetadata
-from .scientificaMetadata import scientificaMetadata
+from .sciMetadata import sciMetadata
 import os
 import re
 try:
@@ -13,16 +13,15 @@ except:
 class Metadata:
     # Supported research groups.
     supportedResearchGroups = ['POM', 'PDK']
-    supportedFormats = ['CZI', 'CSV', 'RAW', 'XLSX']
+    supportedFormats = ['CZI', 'DTF', 'SCIENTIFICA', 'XLSX']
 
     # Supported classes and formats for POM.
-    pomSupportedClasses = [CZIMetadata, CSVMetadata]
-    pomSupportedFormats = ['CZI', 'CSV']
+    pomSupportedClasses = [CZIMetadata, DTFMetadata]
+    pomSupportedFormats = ['CZI', 'DTF']
 
     # Supported classes and formats for PDK.
-    pdkSupportedClasses = [scientificaMetadata, PDKXLSXMetadata]
-    pdkSupportedFormats = ['RAW', 'XLSX']
-
+    pdkSupportedClasses = [sciMetadata, PDKXLSXMetadata]
+    pdkSupportedFormats = ['SCIENTIFICA', 'XLSX']
 
     def __init__(self, path: str):
         if path is not None:
@@ -69,12 +68,12 @@ class Metadata:
         fileType = type(self.__fileObject)
         if fileType == CZIMetadata:
             return 'CZI'
-        elif fileType == CSVMetadata:
-            return 'CSV'
+        elif fileType == DTFMetadata:
+            return 'DTF'
         elif fileType == PDKXLSXMetadata:
             return 'XLSX'
-        elif fileType == scientificaMetadata:
-            return 'RAW'
+        elif fileType == sciMetadata:
+            return 'SCIENTIFICA'
         else:
             return None
 
@@ -82,8 +81,8 @@ class Metadata:
     def metadata(self) -> dict:
         if isinstance(self.__fileObject, CZIMetadata):
             return self.__fileObject.asDict().get('metadata')
-        elif isinstance(self.__fileObject, CSVMetadata) or isinstance(self.__fileObject, PDKXLSXMetadata) \
-                or isinstance(self.__fileObject, scientificaMetadata):
+        elif isinstance(self.__fileObject, DTFMetadata) or isinstance(self.__fileObject, PDKXLSXMetadata) \
+                or isinstance(self.__fileObject, sciMetadata):
             return self.__fileObject.asDict
         else:
             return {}

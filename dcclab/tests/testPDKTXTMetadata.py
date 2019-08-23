@@ -1,4 +1,4 @@
-from dcclab import PDKTXTMetadata as mtdt
+from dcclab import PDKTXTMetadata as pdkMtdt
 import unittest
 import env
 import os
@@ -16,32 +16,22 @@ class TestPDKTXTMetadata(env.DCCLabTestCase):
     def tearDown(self) -> None:
         os.remove(self.iniPath)
 
-    def testIniPath(self):
-        metadata = mtdt(self.iniPath)
-        realPath = os.path.join(str(self.dataDir), '20190101_12_12_12_900nm_16x_512x1024_1000f_8dpf_XYT.ini')
-        self.assertEqual(metadata.iniPath, realPath)
-
-    def testIniPathLineshifted(self):
-        metadata = mtdt(self.iniPath)
-        metadata.path = '20190101_12_12_12_900nm_16x_512x1024_1000f_8dpf_XYT.lineshifted.raw'
-        self.assertEqual(metadata._PDKTXTMetadata__iniPath(), '20190101_12_12_12_900nm_16x_512x1024_1000f_8dpf_XYT.ini')
-
     def testReadFile(self):
-        metadata = mtdt(self.iniPath)
+        metadata = pdkMtdt(self.iniPath)
         self.assertTrue(metadata.readFile())
 
     def testAsDict(self):
-        metadata = mtdt(self.iniPath)
-        self.assertEqual(metadata.asDict, {'Laser.Power': '21.500000000000', 'frame.count': '1000.000000000000',
-                                           'no.of.channels': '1.000000000000', 'pixel.resolution': '5.000000000000',
-                                           'x.pixels': '1024.000000000000', 'x.voltage': '5.000000000000',
-                                           'y.pixels': '512.000000000000', 'y.voltage': '1.250000000000'})
+        metadata = pdkMtdt(self.iniPath)
+        self.assertEqual(
+            {'Laser_Power': '21.500000000000', 'frame_count': '1000.000000000000', 'no_of_channels': '1.000000000000',
+             'pixel_resolution': '5.000000000000', 'x_pixels': '1024.000000000000', 'x_voltage': '5.000000000000',
+             'y_pixels': '512.000000000000', 'y_voltage': '1.250000000000'}, metadata.asDict)
 
     def testKeys(self):
-        metadata = mtdt(self.iniPath)
-        self.assertEqual(metadata.keys, {'no.of.channels': 'INTEGER', 'frame.count': 'INTEGER', 'x.pixels': 'INTEGER',
-                                         'y.pixels': 'INTEGER', 'x.voltage': 'REAL', 'y.voltage': 'REAL',
-                                         'pixel.resolution': 'REAL', 'Laser.Power': 'REAL'})
+        metadata = pdkMtdt(self.iniPath)
+        self.assertEqual(
+            {'Laser_Power': 'REAL', 'frame_count': 'INTEGER', 'no_of_channels': 'INTEGER', 'pixel_resolution': 'REAL',
+             'x_pixels': 'INTEGER', 'x_voltage': 'REAL', 'y_pixels': 'INTEGER', 'y_voltage': 'REAL'}, metadata.keys)
 
 
 if __name__ == '__maine__':

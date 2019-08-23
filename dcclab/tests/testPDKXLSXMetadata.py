@@ -43,7 +43,7 @@ class TestPDKXLSXMetadata(env.DCCLabTestCase):
         for sheet in sheets:
             self.assertTrue(type(sheet), xlrd.sheet.Sheet)
 
-    def testGetKeys(self):
+    def testKeys(self):
         metadata = mtdt(self.filePath)
         keys = metadata.keys
         self.assertTrue(keys)
