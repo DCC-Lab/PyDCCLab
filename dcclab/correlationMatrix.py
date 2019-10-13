@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from .DCCExceptions import *
 import seaborn as sns
+import matplotlib.pyplot as plt
 
 
 class CSVReader:
@@ -25,6 +26,11 @@ class CSVReader:
         df = df.astype(castValuesTo)
         return (np.array(df), firstColumn) if dataframeDropFirstColumn else np.array(df)
 
+    def dropColumns(self, columnsToDrop: tuple = None):
+        if columnsToDrop is not None:
+            for column in columnsToDrop:
+                self.dataframe.drop(self.dataframe.columns[column], axis=1, inplace=True)
+
 
 class CorrelationMatrix:
 
@@ -36,7 +42,10 @@ class CorrelationMatrix:
     def computeCorrelationMatrix(self, rowsAreParameters: bool = False):
         return np.corrcoef(self.array, rowvar=rowsAreParameters)
 
-    def displayCorrelationMatrix(self, cmap: str = None, annotations: bool = True, colorbar: bool = True):
+    def displayCorrelationMatrix(self, cmap: str = None, annotations: bool = True, colorbar: bool = True,
+                                 tickLabel: list = "auto"):
         correlationMatrix = self.computeCorrelationMatrix()
-        ax = sns.heatmap(correlationMatrix, vmin=-1, vmax=1, cmap=cmap, annot=annotations, cbar=colorbar)
-        ax.plot()
+        heatmap = sns.heatmap(correlationMatrix, vmin=-1, vmax=1, cmap=cmap, annot=annotations, cbar=colorbar,
+                              xticklabels=tickLabel, yticklabels=tickLabel)
+        plt.show()
+        return correlationMatrix

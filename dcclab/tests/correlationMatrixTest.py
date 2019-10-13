@@ -76,6 +76,16 @@ class TestCSVReader(env.DCCLabTestCase):
         arrayFloat = csvReader1.dataframeAsArray(False)
         self.assertFalse(np.array_equal(arrayInt, arrayFloat))
 
+    def testDropColumns(self):
+        comaSep = Path(self.dataDir / "testCSVReader.csv")
+        comaSep2 = Path(self.dataDir / "testCSVReader.csv")
+        csvReader1 = CSVReader(comaSep)
+        dataframeNoTouch = CSVReader(comaSep2)
+        csvReader1.dropColumns((1, 2))
+        originalArray = dataframeNoTouch.dataframeAsArray(False)
+        removedColumns = csvReader1.dataframeAsArray(False)
+        self.assertFalse(np.array_equal(originalArray, removedColumns))
+
 
 class TestCorrelationMatrix(env.DCCLabTestCase):
 
@@ -104,6 +114,12 @@ class TestCorrelationMatrix(env.DCCLabTestCase):
         correlationMatrix = corr.computeCorrelationMatrix(True)
         print(correlationMatrix)
         self.assertIsInstance(correlationMatrix, np.ndarray)
+
+    def testCorrelationMatrixValues(self):
+        array = np.array([[10, 13, 1], [11, 14, 1], [10, 15, 0]])
+        corr = CorrelationMatrix(array)
+        correlationMatrix = corr.computeCorrelationMatrix()
+        print(correlationMatrix)
 
 
 if __name__ == '__main__':
