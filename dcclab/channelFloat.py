@@ -77,7 +77,7 @@ class ChannelFloat(Channel):
 
     def getSobelFilter(self) -> Channel:
         sobelHV = sobel(self.pixels.T)
-        return Channel(sobelHV.T)
+        return Channel(sobelHV)
 
     def convertTo8BitsUnsignedInteger(self):
         return self._convertToUnsignedInt(np.uint8)

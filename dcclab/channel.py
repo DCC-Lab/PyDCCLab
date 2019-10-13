@@ -100,7 +100,7 @@ class Channel:
     """ Display-related functions """
 
     def display(self, colorMap=None):
-        plt.imshow(self.pixels.T, cmap=colorMap)
+        plt.imshow(self.pixels.copy().T, cmap=colorMap)
         plt.show()
         return self
 
@@ -500,8 +500,6 @@ class Channel:
         # FIXME Find a way to get params automatically?
         spotFilterParams = [[spotFilterScales[i], spotFilterCutoffs[i]] for i in range(len(spotFilterScales))]
         spotFiltered = Channel(dot_3d_wrapper(smooth.pixels, spotFilterParams).astype(np.uint8))
-
-        spotFiltered.display()
         watershed = spotFiltered.watershedSegmentation(0, watershedMinDistanceOfPeaks)
         return watershed
 
@@ -518,6 +516,7 @@ class Channel:
         if len(filamentFilterCutoffs) != len(filamentFilterScales):
             raise ValueError("The lists of parameters must have the same number of elements.")
         normalizedChannel = self.intensityScaleNormalization()
+        # For some reason, edge_preserving_smoothing_3d transposes the array. Can't access code deeper from itk
         smooth = edge_preserving_smoothing_3d(normalizedChannel.pixels)
         filamentFilterParameters = [[filamentFilterScales[i], filamentFilterCutoffs[i]] for i in
                                     range(len(filamentFilterScales))]
@@ -527,6 +526,7 @@ class Channel:
     def intensityScaleNormalization(self, scaleParam: list = None) -> ["Channel"]:
         # Adapted from the Allen Institute segmentation module. This is from a method suggesting scale parameters
         # but it actually doesn't return them (just printing them on console).
+        from aicssegmentation.core.pre_processing_utils import intensity_normalization
         normParam = scaleParam
         if scaleParam is not None and len(scaleParam) != 2:
             raise ValueError("The list of scale parameters must contain 2 values.")
@@ -726,7 +726,7 @@ class Channel:
 
     def displayPowerSpectrum(self, logScale: bool = True) -> np.ndarray:
         powerSpectrum = self.powerSpectrum()
-        cols, rows = powerSpectrum.T.shape
+        cols, rows = powerSpectrum.shape
         if logScale:
             powerSpectrum = np.log(powerSpectrum)
         plt.imshow(powerSpectrum.T, extent=(-cols // 2, cols // 2, -rows // 2, rows // 2))
