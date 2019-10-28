@@ -47,7 +47,7 @@ class TestChannelFloat(env.DCCLabTestCase):
         resultArray = [[0.5, 0.5, 0, 0, 1 / 3, 1 / 3], [0, 1 / 3, 1 / 3, 1, 1, 0], [0.25, 1.75 / 3, 0.5 / 3, 1, 0.5, 0],
                        [0, 0, 0, 0, 0.0025 / 3, 0.0025 / 3]]
         resultArray = np.array(resultArray).T
-        self.assertTrue(np.array_equal(Channel(array.T).convolveWith([[1, 0, 3]]).pixels, resultArray))
+        self.assertTrue(np.allclose(Channel(array.T).convolveWith([[1, 0, 3]]).pixels, resultArray))
 
     def testGaussianFilter(self):
         sigma = 0.4

@@ -335,7 +335,11 @@ class Channel:
         return np.std(self.pixels)
 
     def getShannonEntropy(self, base=2) -> float:
-        return measure.shannon_entropy(self.pixels, base)
+        _, counts = np.unique(self.pixels, return_counts=True)
+        probArray = counts / np.sum(counts)
+        logArray = np.log(probArray) / np.log(base)
+        entropy = -np.sum(probArray * logArray)
+        return entropy
 
 
     def getExtrema(self) -> typing.Tuple[typing.Union[int, float], typing.Union[int, float]]:

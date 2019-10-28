@@ -6,8 +6,10 @@ import matplotlib.pyplot as plt
 from typing import List, Union
 import sys
 
+
 class ImageCollection:
-    def __init__(self, images: List['Image']=None, imagesArray: np.ndarray=None, pathPattern: str=None):
+
+    def __init__(self, images: List['Image'] = None, imagesArray: np.ndarray = None, pathPattern: str = None):
         self.__images = []
         if images is not None:
             if not all(isinstance(image, Image) for image in images):
@@ -21,15 +23,14 @@ class ImageCollection:
         # dimensions:x,y,c,z,t and '.' (any)
         # 0,1,2 are always x,y and c
         self.axes = ('.')
-        self.shape = (len(self.__images),)
-
+        self.__shape = (len(self.__images),)
 
     @property
     def dimension(self):
-        return len(self.shape)
+        return len(self.__shape)
 
     def reshape(self, tuple):
-        self.shape = tuple
+        self.__shape = tuple
         self.axes = ()
         product = 1
         for i in tuple:
@@ -41,23 +42,23 @@ class ImageCollection:
             indices = index
             newIndex = 0
             if len(indices) == 2:
-                newIndex = indices[1] * self.shape[0] + indices[0]
+                newIndex = indices[1] * self.__shape[0] + indices[0]
             elif len(indices) == 3:
-                newIndex = indices[2] * self.shape[1]*self.shape[0] + indices[1] * self.shape[0] + indices[0]
+                newIndex = indices[2] * self.__shape[1] * self.__shape[0] + indices[1] * self.__shape[0] + indices[0]
             else:
                 raise NotImplementedError("Only 2D and 3D collections are supported at this time")
             return self.images[newIndex]
         else:
             return self.images[index]
 
-    def save(self, pathOrPattern:str):
+    def save(self, pathOrPattern: str):
         pattern = PathPattern(pathOrPattern)
         if pattern.isWritePattern:
             for (i, image) in enumerate(self.images):
                 path = pattern.filePathWithIndex(i)
                 image.save(path)
         else:
-            raise ValueError("To save files in ImageCollection, use a Python format-string such as Image-{0:03d}.tiff")            
+            raise ValueError("To save files in ImageCollection, use a Python format-string such as Image-{0:03d}.tiff")
 
     @property
     def images(self):
@@ -169,7 +170,7 @@ class ImageCollection:
         if imagesArray.ndim == 4:
             nbOfImages = imagesArray.shape[3]
             for i in range(nbOfImages):
-                self.progressBar(i, nbOfImages-1)
+                self.progressBar(i, nbOfImages - 1)
                 image = Image(imagesArray[:, :, :, i])
                 self.__images.append(image)
             print("\n")  # end progress bar
@@ -334,12 +335,12 @@ class ImageCollection:
         for image in self.images:
             image.applyNoiseFilterWithErosionDilation(erosion_size, dilation_size, closing_size)
 
-    def applyOpeningToMask(self, size: int=None, iterations: int = 1):
+    def applyOpeningToMask(self, size: int = None, iterations: int = 1):
         assert self.hasMask, "Mask is not present."
         for image in self.images:
             image.applyOpeningToMask(size, iterations)
 
-    def applyClosingToMask(self, size: int=None, iterations: int = 1):
+    def applyClosingToMask(self, size: int = None, iterations: int = 1):
         assert self.hasMask, "Mask is not present."
         for image in self.images:
             image.applyClosingToMask(size, iterations)
@@ -347,7 +348,7 @@ class ImageCollection:
     @staticmethod
     def progressBar(value, endvalue, bar_length=20):
         percent = float(value) / endvalue
-        arrow = '-' * int(round(percent * bar_length)-1) + '>'
+        arrow = '-' * int(round(percent * bar_length) - 1) + '>'
         spaces = ' ' * (bar_length - len(arrow))
 
         sys.stdout.write("\r   [{0}] {1}%".format(arrow + spaces, int(round(percent * 100))))
