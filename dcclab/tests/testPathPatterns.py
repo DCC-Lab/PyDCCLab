@@ -6,7 +6,7 @@ import re
 import time
 
 from dcclab import PathPattern
-from pathlib import Path, PureWindowsPath
+from pathlib import Path, PureWindowsPath, PurePosixPath
 
 class TestPatterns(env.DCCLabTestCase):
     def testInit(self):
@@ -72,11 +72,29 @@ class TestPatterns(env.DCCLabTestCase):
         self.assertTrue(pat.isReadPattern)
         self.assertFalse(pat.isWritePattern)
 
-    def testExtension(self):
+    def testOsPathModule(self):
+        self.assertTrue('test.tiff' == os.path.basename(r"test.tiff"))
+        self.assertTrue('test.tiff' == os.path.basename(r"/Users/test.tiff"))
+
+    # def testPathLib(self):
+    #     self.assertEqual(r"c:\daniel\test.tiff", str(PureWindowsPath(r"c:\daniel\test.tiff")))
+    #     self.assertEqual(r"c:/daniel/test.tiff", Path(PureWindowsPath(r"c:\daniel\test.tiff")))
+
+    def testUnixPathPatternPattern(self):
+        pat = PathPattern(r"/Users/dccote/test.tiff")
+        self.assertEqual(pat.pattern, "/Users/dccote/test.tiff")
+        self.assertEqual(pat.pattern, r"/Users/dccote/test.tiff")
+        self.assertEqual(str(pat.normalizedPathPattern), r"/Users/dccote/test.tiff")
+
+    def testUnixPattern(self):
+        pat = PathPattern(r"/Users/dccote/test.tiff")
+        self.assertEqual(pat.pattern, "/Users/dccote/test.tiff")
+
+    def testUnixExtension(self):
         pat = PathPattern(r'/Users/dccote/test.tiff')
         self.assertEqual(pat.extension, "tiff")
 
-    def testDirectory(self):
+    def testUnixDirectory(self):
         pat = PathPattern(r'/Users/dccote/test.tiff')
         self.assertEqual(pat.directory, "/Users/dccote")
 
@@ -84,9 +102,17 @@ class TestPatterns(env.DCCLabTestCase):
         pat = PathPattern(r'test.tiff')
         self.assertEqual(pat.directory, ".")
 
-    def testBasename(self):
-        pat = PathPattern(r'/Users/dccote/test.tiff')
+    def testUnixBasename(self):
+        pat = PathPattern("/Users/dccote/test.tiff")
         self.assertEqual(pat.basePattern, "test.tiff")
+
+    def testUnixBasename2(self):
+        pat = PathPattern("/Users/dccote/test.tif")
+        self.assertEqual(pat.basePattern, "test.tif")
+
+    def testUnixBasename3(self):
+        pat = PathPattern("/Users/dccote/test/")
+        self.assertEqual(pat.basePattern, "")
 
     def testBasenameWithFormats(self):
         pat = PathPattern(r'/Users/dccote/test-{0}.tiff')
@@ -170,6 +196,42 @@ class TestPatterns(env.DCCLabTestCase):
                 for k in range(4):
                     with self.assertRaises(ValueError):
                         pat.filePathWithIndex(i,j,k)
+
+    def testWindowsPathPatternPattern(self):
+        with self.assertRaises(ValueError):
+            pat = PathPattern(r'C:\Users\dccote\test.tiff')
+
+    @unittest.skip("Windows file name not supported: unable to separate separator from regex special patterns")
+    def testWindowsPattern(self):
+        pat = PathPattern(r'C:\Users\dccote\test.tiff')
+        self.assertEqual(pat.pattern, r'C:\Users\dccote\test.tiff')
+
+    @unittest.skip("Windows file name not supported: unable to separate separator from regex special patterns")
+    def testWindowsExtension(self):
+        pat = PathPattern(r'C:\Users\dccote\test.tiff')
+        self.assertEqual(pat.extension, "tiff")
+
+    @unittest.skip("Windows file name not supported: unable to separate separator from regex special patterns")
+    def testWindowsDirectory(self):
+        pat = PathPattern(r'C:\Users\dccote\test.tiff')
+        self.assertEqual(pat.directory, r'C:\Users\dccote')
+
+    @unittest.skip("Windows file name not supported: unable to separate separator from regex special patterns")
+    def testWindowsBasename(self):
+        pat = PathPattern(r'C:\\Users\\dccote\\test.tiff')
+        self.assertEqual(pat.basePattern, "test.tiff")
+
+    @unittest.skip("Windows file name not supported: unable to separate separator from regex special patterns")
+    def testWindowsBasename2(self):
+        pat = PathPattern(r'C:\Users\dccote\test.tif')
+        self.assertEqual(pat.basePattern, "test.tif")
+
+    @unittest.skip("Windows file name not supported: unable to separate separator from regex special patterns")
+    def testWindowsBasename3(self):
+        pat = PathPattern(r'C:\Users\dccote\test')
+        self.assertEqual(pat.basePattern, "")
+
+
 
 if __name__ == '__main__':
     unittest.main()
