@@ -335,7 +335,11 @@ class Channel:
         return np.std(self.pixels)
 
     def getShannonEntropy(self, base=2) -> float:
-        return measure.shannon_entropy(self.pixels, base)
+        _, counts = np.unique(self.pixels, return_counts=True)
+        probArray = counts / np.sum(counts)
+        logArray = np.log(probArray) / np.log(base)
+        entropy = -np.sum(probArray * logArray)
+        return entropy
 
     def getExtrema(self) -> typing.Tuple[typing.Union[int, float], typing.Union[int, float]]:
         return np.min(self.pixels), np.max(self.pixels)
@@ -652,7 +656,7 @@ class Channel:
 
     def displayPowerSpectrum(self, logScale: bool = True) -> np.ndarray:
         powerSpectrum = self.powerSpectrum()
-        cols, rows = powerSpectrum.T.shape
+        cols, rows = powerSpectrum.shape
         if logScale:
             powerSpectrum = np.log(powerSpectrum)
         plt.imshow(powerSpectrum.T, extent=(-cols // 2, cols // 2, -rows // 2, rows // 2))

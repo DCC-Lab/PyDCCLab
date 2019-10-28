@@ -116,8 +116,8 @@ class TestChannelInteger(env.DCCLabTestCase):
             for j in range(1, 4):
                 array[i][j] = 1
         channel = Channel(array.T)
-        sobelResult = np.array([[0.25, 0.75, 1, 0.75, 0.25], [0.25, 0.75, 1, 0.75, 0.25], [0, 0, 0, 0, 0],
-                                [-0.25, -0.75, -1, -0.75, -0.25], [-0.25, -0.75, -1, -0.75, -0.25]]) / 255
+        sobelResult = (np.array([[0.25, 0.75, 1, 0.75, 0.25], [0.25, 0.75, 1, 0.75, 0.25], [0, 0, 0, 0, 0],
+                                [-0.25, -0.75, -1, -0.75, -0.25], [-0.25, -0.75, -1, -0.75, -0.25]]) / 255).T
         # Remove false edges:
         sobelResult[0, :] = 0
         sobelResult[-1, :] = 0
@@ -126,7 +126,8 @@ class TestChannelInteger(env.DCCLabTestCase):
         with warnings.catch_warnings():
             warnings.simplefilter('ignore', category=UserWarning)
             computedSobel = channel.getHorizontalSobelFilter()
-        self.assertTrue(np.array_equal(computedSobel.pixels, sobelResult) and isinstance(computedSobel, ChannelFloat))
+        self.assertTrue(np.allclose(computedSobel.pixels, sobelResult))
+        self.assertIsInstance(computedSobel, ChannelFloat)
 
     def testGetVerticalSobelFilter(self):
         array = np.zeros((5, 5), dtype=np.uint8)
@@ -135,7 +136,7 @@ class TestChannelInteger(env.DCCLabTestCase):
                 array[i][j] = 1
         channel = Channel(array)
         sobelResult = (np.array([[0.25, 0.75, 1, 0.75, 0.25], [0.25, 0.75, 1, 0.75, 0.25], [0, 0, 0, 0, 0],
-                                 [-0.25, -0.75, -1, -0.75, -0.25], [-0.25, -0.75, -1, -0.75, -0.25]]) / 255).T
+                                 [-0.25, -0.75, -1, -0.75, -0.25], [-0.25, -0.75, -1, -0.75, -0.25]]) / 255)
         # Remove false edges:
         sobelResult[0, :] = 0
         sobelResult[-1, :] = 0
@@ -144,7 +145,8 @@ class TestChannelInteger(env.DCCLabTestCase):
         with warnings.catch_warnings():
             warnings.simplefilter('ignore', category=UserWarning)
             computedSobel = channel.getVerticalSobelFilter()
-        self.assertTrue(np.array_equal(computedSobel.pixels, sobelResult) and isinstance(computedSobel, ChannelFloat))
+        self.assertTrue(np.allclose(computedSobel.pixels, sobelResult))
+        self.assertIsInstance(computedSobel, ChannelFloat)
 
     def testGetSobelFilter(self):
         array = np.zeros((5, 5), dtype=np.uint8)
@@ -164,7 +166,8 @@ class TestChannelInteger(env.DCCLabTestCase):
             warnings.simplefilter('ignore', category=UserWarning)
             computedSobel = channel.getSobelFilter()
         sobelResult = np.sqrt(HSobelResult ** 2 + VSobelResult ** 2) / np.sqrt(2)
-        self.assertTrue(np.array_equal(computedSobel.pixels, sobelResult) and isinstance(computedSobel, ChannelFloat))
+        self.assertTrue(np.allclose(computedSobel.pixels, sobelResult))
+        self.assertIsInstance(computedSobel, ChannelFloat)
 
     def testIsodataThresh(self):
         # Calculation by hand
@@ -234,7 +237,7 @@ class TestChannelInteger(env.DCCLabTestCase):
 
     def testConvertToNormalizedFloatValues(self):
         array = np.ones((100, 100), dtype=np.uint8) * 78
-        self.assertTrue(np.array_equal(Channel(array).convertToNormalizedFloat().pixels, array / 255))
+        self.assertTrue(np.allclose(Channel(array).convertToNormalizedFloat().pixels, array / 255))
 
     def testConvertToNormalizedFloatFromUint16(self):
         array = np.ones((10000, 1000), dtype=np.uint16) * 2500
@@ -242,7 +245,7 @@ class TestChannelInteger(env.DCCLabTestCase):
 
     def testConvertToNormalizedFloatFromUint16Values(self):
         array = np.ones((100, 100), dtype=np.uint16) * 7800
-        self.assertTrue(np.array_equal(Channel(array).convertToNormalizedFloat().pixels, array / (2 ** 16 - 1)))
+        self.assertTrue(np.allclose(Channel(array).convertToNormalizedFloat().pixels, array / (2 ** 16 - 1)))
 
     def testOtsuThreshError(self):
         array = np.ones((100, 100), dtype=np.uint16)

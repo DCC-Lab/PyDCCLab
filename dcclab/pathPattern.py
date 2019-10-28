@@ -1,22 +1,41 @@
 import re
 import os
-from pathlib import Path, PureWindowsPath
+from pathlib import Path, PureWindowsPath, PurePosixPath
+
 
 class PathPattern:
-    def __init__(self, pattern:str):
-        self.pattern = pattern
-        re.compile(pattern) # will raise exception if needed
+    def __init__(self, pattern: str):
+        self.pattern = pattern #unadulterated pattern, as passed.        
+        self.normalizedPathPattern = PurePosixPath(self.pattern)
+
+        try:
+            re.compile( str(self.normalizedPathPattern) ) # will raise exception if needed
+        except :
+            raise ValueError(r"""Invalid regex: a common error is to use Windows path (with backslahes \\).
+                Normalize your path with "/" instead of "\" as a separator. 
+                Windows path cannot be used directly: it is not possible to decide
+                the meaning of escaped characters:  C:\newbie\dccote\test.tiff  Is it a newline character? 
+                The solution could be to have the user escape everything but then the newline must be "unescaped"
+                for the regex.""")
 
     @property
     def directory(self):
-        dirName = os.path.dirname(self.pattern)
+        dirName = os.path.dirname(self.normalizedPathPattern)
         if dirName == '':
             dirName = '.'
-        return str(Path(dirName)) # converts to native Windows or Unix
+        return dirName  # DOES NOT convert to native Windows or Unix
+
+    @property
+    def nativeDirectory(self):
+        return str(Path(self.directory))
 
     @property
     def basePattern(self):
-        return str(Path(os.path.basename(self.pattern)))
+        return os.path.basename(self.pattern)
+
+    @property
+    def nativeBasePattern(self):
+        return str(Path(self.basePattern))
 
     @property
     def extension(self):
@@ -68,12 +87,12 @@ class PathPattern:
         paths = []
         for filename in os.listdir(self.directory):
             if re.match(self.basePattern, filename):
-                filePath = os.path.join(self.directory,filename)
+                filePath = os.path.join(self.directory, filename)
                 paths.append(filePath)
         paths.sort()
         return paths
 
-    def filePathWithIndex(self, i:int, j:int = None, k:int = None):
+    def filePathWithIndex(self, i: int, j: int = None, k: int = None):
         if self.isReadPattern:
             raise ValueError("Patterns with capture groups are for reading files, not writing")
 
@@ -84,7 +103,8 @@ class PathPattern:
             passedArguments = 3
 
         if self.numberOfFormatGroups != passedArguments:
-            raise ValueError("Pattern has {0} indices, only passed {1}".format(self.numberOfFormatGroups, passedArguments))
+            raise ValueError(
+                "Pattern has {0} indices, only passed {1}".format(self.numberOfFormatGroups, passedArguments))
 
         if self.numberOfFormatGroups == 1:
             filePath = self.pattern.format(i)
@@ -94,4 +114,3 @@ class PathPattern:
             filePath = self.pattern.format(i, j, k)
 
         return filePath
-
