@@ -42,6 +42,96 @@ class TestChannels(env.DCCLabTestCase):
         channel = Channel(pixels=array.T)
         self.assertEqual(str(array.T), str(channel))
 
+    def testAddWithOtherChannel(self):
+        array = np.array([[3, 3, 3, 3], [3, 3, 3, 3], [3, 3, 3, 3], [3, 3, 3, 3]])
+        channel1 = Channel(pixels=array.T)
+        array2 = np.array([[1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1]])
+        channel2 = Channel(pixels=array2.T)
+        sub = channel1 + channel2
+        supposedSub = Channel(pixels=np.array([[4] * 4, [4] * 4, [4] * 4, [4] * 4]).T)
+        self.assertTrue(np.array_equal(sub.pixels, supposedSub.pixels))
+
+    def testAddWithFloat(self):
+        array = np.array([[3, 3, 3, 3], [3, 3, 3, 3], [3, 3, 3, 3], [3, 3, 3, 3]])
+        channel1 = Channel(pixels=array.T)
+        sub = channel1 + 1.9  # 1.1
+        supposedSub = Channel(
+            pixels=np.array([[3 + 1.9] * 4, [3 + 1.9] * 4, [3 + 1.9] * 4, [3 + 1.9] * 4]))
+        self.assertTrue(np.array_equal(sub.pixels, supposedSub.pixels))
+
+    def testAddWithInt(self):
+        array = np.array([[3, 3, 3, 3], [3, 3, 3, 3], [3, 3, 3, 3], [3, 3, 3, 3]])
+        channel1 = Channel(pixels=array.T)
+        sub = channel1 + 1
+        supposedSub = Channel(
+            pixels=np.array([[4, 4, 4, 4], [4, 4, 4, 4], [4, 4, 4, 4], [4, 4, 4, 4]]))
+        self.assertTrue(np.array_equal(sub.pixels, supposedSub.pixels))
+
+    def testAddWithInvalidType(self):
+        import numpy.core._exceptions as npExcep
+        array = np.array([[3, 3, 3, 3], [3, 3, 3, 3], [3, 3, 3, 3], [3, 3, 3, 3]])
+        channel1 = Channel(pixels=array.T)
+        with self.assertRaises(npExcep.UFuncTypeError):
+            channel1 + "a"
+
+    def testAddWithInvalidShape(self):
+        array = np.array([[3, 3, 3, 3], [3, 3, 3, 3], [3, 3, 3, 3], [3, 3, 3, 3]])
+        channel1 = Channel(pixels=array.T)
+        otherChannel = Channel(pixels=np.random.randint(0, 100, (10, 10)))
+        with self.assertRaises(ValueError):
+            channel1 + otherChannel
+
+    def testAddWithOtherObject(self):
+        import datetime
+        channel = Channel(pixels=np.random.randint(0, 200, (10, 10)).T)
+        with self.assertRaises(TypeError):
+            channel + datetime.datetime.now()
+
+    def testSubWithOtherChannel(self):
+        array = np.array([[3, 3, 3, 3], [3, 3, 3, 3], [3, 3, 3, 3], [3, 3, 3, 3]])
+        channel1 = Channel(pixels=array.T)
+        array2 = np.array([[1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1]])
+        channel2 = Channel(pixels=array2.T)
+        sub = channel1 - channel2
+        supposedSub = Channel(pixels=np.array([[2, 2, 2, 2], [2, 2, 2, 2], [2, 2, 2, 2], [2, 2, 2, 2]]).T)
+        self.assertTrue(np.array_equal(sub.pixels, supposedSub.pixels))
+
+    def testSubWithFloat(self):
+        array = np.array([[3, 3, 3, 3], [3, 3, 3, 3], [3, 3, 3, 3], [3, 3, 3, 3]])
+        channel1 = Channel(pixels=array.T)
+        sub = channel1 - 1.9  # 1.1
+        supposedSub = Channel(
+            pixels=np.array([[1.1, 1.1, 1.1, 1.1], [1.1, 1.1, 1.1, 1.1], [1.1, 1.1, 1.1, 1.1], [1.1, 1.1, 1.1, 1.1]]))
+        self.assertTrue(np.array_equal(sub.pixels, supposedSub.pixels))
+
+    def testSubdWithInt(self):
+        array = np.array([[3, 3, 3, 3], [3, 3, 3, 3], [3, 3, 3, 3], [3, 3, 3, 3]])
+        channel1 = Channel(pixels=array.T)
+        sub = channel1 - 1
+        supposedSub = Channel(
+            pixels=np.array([[2, 2, 2, 2], [2, 2, 2, 2], [2, 2, 2, 2], [2, 2, 2, 2]]))
+        self.assertTrue(np.array_equal(sub.pixels, supposedSub.pixels))
+
+    def testSubWithInvalidType(self):
+        import numpy.core._exceptions as npExcep
+        array = np.array([[3, 3, 3, 3], [3, 3, 3, 3], [3, 3, 3, 3], [3, 3, 3, 3]])
+        channel1 = Channel(pixels=array.T)
+        with self.assertRaises(npExcep.UFuncTypeError):
+            channel1 - "a"
+
+    def testSubWithInvalidShape(self):
+        array = np.array([[3, 3, 3, 3], [3, 3, 3, 3], [3, 3, 3, 3], [3, 3, 3, 3]])
+        channel1 = Channel(pixels=array.T)
+        otherChannel = Channel(pixels=np.random.randint(0, 100, (10, 10)))
+        with self.assertRaises(ValueError):
+            channel1 - otherChannel
+
+    def testSubWithOtherObject(self):
+        import datetime
+        channel = Channel(pixels=np.random.randint(0, 200, (10, 10)).T)
+        with self.assertRaises(TypeError):
+            channel - datetime.datetime.now()
+
     def testInitCopiesPixels(self):
         array = np.random.randint(low=0, high=255, size=(100, 200))
         channel = Channel(pixels=array.T)
