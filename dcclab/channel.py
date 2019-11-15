@@ -169,11 +169,11 @@ class Channel:
     def convertToNormalizedFloat(self):
         pass
 
-    def convertToNormalizedFloatMinToZeroMaxToOne(self):
-        pass
+    def convertToNormalizedFloatMinToZeroMaxToOne(self) -> "Channel":
+        newChannelPixels = np.copy(self.pixels) - self.getExtrema()[0]  # We put the min to 0
+        newChannelPixels = newChannelPixels / np.nanmax(newChannelPixels)  # We put the maximum to 1
+        return Channel(newChannelPixels)
 
-    def convertToNormalizedFloat(self):
-        pass
 
     def filterNoise(self):
         self.applyNoiseFilter()
@@ -340,6 +340,7 @@ class Channel:
         logArray = np.log(probArray) / np.log(base)
         entropy = -np.sum(probArray * logArray)
         return entropy
+
 
     def getExtrema(self) -> typing.Tuple[typing.Union[int, float], typing.Union[int, float]]:
         return np.min(self.pixels), np.max(self.pixels)

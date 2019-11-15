@@ -92,3 +92,4 @@ class ChannelFloat(Channel):
     def applyPoissonNoise(self, scale: float):
         noise = np.random.poisson(scale * self.pixels)
         return Channel(noise + self.pixels)
+
