@@ -100,7 +100,7 @@ class Channel:
     """ Display-related functions """
 
     def display(self, colorMap=None):
-        plt.imshow(self.pixels.T, cmap=colorMap)
+        plt.imshow(self.pixels.copy().T, cmap=colorMap)
         plt.show()
         return self
 
@@ -480,12 +480,86 @@ class Channel:
                 # label = 0 means background
                 continue
 
-            mask = np.zeros(self.shape, dtype=np.uint8)
+            mask = np.zeros(self.shape, dtype=np.uint16)
             mask[labels == label] = 255
             allMask[labels == label] = label
 
         masks = Channel(allMask)
         return masks, len(uniqueLabels) - 1
+
+    def dotsLikeStructureSegmentation(self, spotFilterScales: list, spotFilterCutoffs: list,
+                                      watershedMinDistanceOfPeaks: int = 5) -> typing.Tuple["Channel", int]:
+        try:
+            from aicssegmentation.core.seg_dot import dot_3d_wrapper
+        except:
+            raise NotImplementedError("dot_3d_wrapper not implemented. Must import aicssegmentation.")
+
+        # To use when the image contains dot-like structures, like little round cells. Not too good with neurons tho
+        if len(spotFilterScales) == 0 or len(spotFilterCutoffs) == 0:
+            raise ValueError("The lists of parameters must have at least one element.")
+        if len(spotFilterCutoffs) != len(spotFilterScales):
+            raise ValueError("The lists of parameters must have the same number of elements.")
+        normalizedChannel = self.intensityScaleNormalization()
+        # FIXME Find a way to get a std deviation automatically (depending on noise)?
+        smooth = normalizedChannel.getGaussianFilter(1)
+        # FIXME Find a way to get params automatically?
+        spotFilterParams = [[spotFilterScales[i], spotFilterCutoffs[i]] for i in range(len(spotFilterScales))]
+        spotFiltered = Channel(dot_3d_wrapper(smooth.pixels, spotFilterParams).astype(np.uint8))
+        watershed = spotFiltered.watershedSegmentation(0, watershedMinDistanceOfPeaks)
+        return watershed
+
+    def curviLinearLikeStructuresSegmentation(self, filamentFilterScales: list, filamentFilterCutoffs: list) -> [
+        "Channel"]:
+        try:
+            from aicssegmentation.core.pre_processing_utils import edge_preserving_smoothing_3d
+            from aicssegmentation.core.vessel import filament_2d_wrapper
+        except:
+            raise NotImplementedError("dot_3d_wrapper not implemented. Must import aicssegmentation.")
+
+        if len(filamentFilterScales) == 0 or len(filamentFilterCutoffs) == 0:
+            raise ValueError("The lists of parameters must have at least one element.")
+        if len(filamentFilterCutoffs) != len(filamentFilterScales):
+            raise ValueError("The lists of parameters must have the same number of elements.")
+        normalizedChannel = self.intensityScaleNormalization()
+        # For some reason, edge_preserving_smoothing_3d transposes the array. Can't access code deeper from itk
+        smooth = edge_preserving_smoothing_3d(normalizedChannel.pixels)
+        filamentFilterParameters = [[filamentFilterScales[i], filamentFilterCutoffs[i]] for i in
+                                    range(len(filamentFilterScales))]
+        filamentFiltered = filament_2d_wrapper(smooth, filamentFilterParameters)
+        return Channel(filamentFiltered.astype(np.uint8))
+
+    def intensityScaleNormalization(self, scaleParam: list = None) -> ["Channel"]:
+        # Adapted from the Allen Institute segmentation module. This is from a method suggesting scale parameters
+        # but it actually doesn't return them (just printing them on console).
+        from aicssegmentation.core.pre_processing_utils import intensity_normalization
+        normParam = scaleParam
+        if scaleParam is not None and len(scaleParam) != 2:
+            raise ValueError("The list of scale parameters must contain 2 values.")
+        if normParam is None:
+            percentile99 = np.percentile(self.pixels, 99.99)
+            mean = self.getAverageValueOfPixels()
+            stdDev = self.getStandardDeviation()
+            maxRatio = 0
+            for tempMaxRatio in np.arange(0.5, 1000, 0.5):
+                if mean + stdDev * tempMaxRatio > percentile99:
+                    if mean + stdDev * tempMaxRatio > self.getExtrema()[1]:
+                        maxRatio = tempMaxRatio - 0.5
+                    else:
+                        maxRatio = tempMaxRatio
+                    break
+            minRatio = 0
+            for tempMinRatio in np.arange(0.5, 1000, 0.5):
+                if mean - stdDev * tempMinRatio < self.getExtrema()[0]:
+                    minRatio = tempMinRatio - 0.5
+                    break
+            normParam = [minRatio, maxRatio]
+            normalizedPixels = intensity_normalization(self.pixels, normParam)
+
+            # This should not happen but just in case
+            # FIXME find a better way (in Channel, ChannelFloat or ChannelInt init?) to have only positive values
+            if np.min(normalizedPixels) < 0 or np.max(normalizedPixels):
+                normalizedPixels = np.clip(normalizedPixels, 0, 1)
+            return Channel(normalizedPixels)
 
     def blobDetection(self, minStdDev: float = 1, maxStdDev: float = 50, threshold: float = 0.2,
                       overlap: float = 0.5) -> typing.Tuple["Channel", int]:
