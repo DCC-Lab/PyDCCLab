@@ -77,7 +77,7 @@ class ChannelFloat(Channel):
 
     def getSobelFilter(self) -> Channel:
         sobelHV = sobel(self.pixels.T)
-        return Channel(sobelHV.T)
+        return Channel(sobelHV)
 
     def convertTo8BitsUnsignedInteger(self):
         return self._convertToUnsignedInt(np.uint8)
@@ -89,6 +89,14 @@ class ChannelFloat(Channel):
         convertedArray = ((np.copy(self.pixels)) * np.iinfo(dtype).max)
         return Channel(convertedArray.astype(dtype))
 
+    def convertToNormalizedFloatMinToZeroMaxToOne(self):
+        minimum = self.getExtrema()[0]
+        minTo0 = self.pixels - minimum
+        maximum = np.max(minTo0)
+        maxTo1 = minTo0 / maximum
+        return Channel(maxTo1)
+
     def applyPoissonNoise(self, scale: float):
         noise = np.random.poisson(scale * self.pixels)
         return Channel(noise + self.pixels)
+

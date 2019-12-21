@@ -150,10 +150,6 @@ class ChannelInt(Channel):
     def convertToNormalizedFloat(self) -> Channel:
         return Channel(np.copy(self.pixels) / self._originalFactor)
 
-    def convertToNormalizedFloatMinToZeroMaxToOne(self) -> Channel:
-        newChannelPixels = np.copy(self.pixels) - self.getExtrema()[0]  # We put the min to 0
-        newChannelPixels = newChannelPixels / np.nanmax(newChannelPixels)  # We put the maximum to 1
-        return Channel(newChannelPixels)
 
     def _convertToUnsignedInt(self, dtype) -> Channel:
         convertedArray = np.copy(self.pixels) / self._originalFactor * np.iinfo(dtype).max
