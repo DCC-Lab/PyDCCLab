@@ -1,3 +1,5 @@
+from numpy.distutils.system_info import numarray_info
+
 import env
 from dcclab import *
 import unittest
@@ -160,6 +162,150 @@ class TestCorrelationMatrix(env.DCCLabTestCase):
             cm.showCorrelationMatrix()
         except:
             self.fail("Exception raised.")
+
+
+class TestPermutationCorrelations(env.DCCLabTestCase):
+
+    def testConstructorNoDataframeOrArray(self):
+        with self.assertRaises(ValueError):
+            PermutationCorrelations()
+
+    def testConstructorDataframeAndArray(self):
+        array = np.random.randint(0, 120, (10, 100))
+        df = pd.DataFrame(array)
+        with self.assertRaises(ValueError):
+            PermutationCorrelations(array=array, dataframe=df)
+
+    def testConstructorDataframeIsNotPandasDataframe(self):
+        array = np.random.randint(0, 10, (10, 10))
+        with self.assertRaises(TypeError):
+            PermutationCorrelations(dataframe=array)
+
+    def testConstructorValidArray(self):
+        array = np.random.randint(0, 100, (10, 10))
+        try:
+            PermutationCorrelations(array=array)
+        except:
+            self.fail("Exception raised.")
+
+    def testConstructorValidDataframe(self):
+        array = np.random.randint(0, 100, (10, 10))
+        df = pd.DataFrame(array)
+        try:
+            PermutationCorrelations(dataframe=df)
+        except:
+            self.fail("Exception raised.")
+
+    def testAttributesAreValid(self):
+        nbCols = 5
+        nbRows = 100
+        nbPermutations = 1000
+        columns = ["a", "b", "c", "d", "e"]
+        array = np.random.randint(0, 100, (nbRows, nbCols))
+        df = pd.DataFrame(array, columns=columns)
+        per = PermutationCorrelations(array=array, headers=columns, numberOfPermutations=nbPermutations)
+        self.assertEqual(per.nbRows, nbRows)
+        self.assertEqual(per.nbColumns, nbCols)
+        self.assertEqual(per.numberOfPermutations, nbPermutations)
+        self.assertTrue(df.equals(per.dataframe))
+        self.assertIsNone(per.correlationTensor)
+        self.assertIsNone(per.arrayOfPermutations)
+
+    def testPermutationsComputationNoDropNoColumnMixing(self):
+        array = np.array([[i for i in range(10)] for _ in range(10)])
+        nbPermutations = 10
+        per = PermutationCorrelations(array=array, numberOfPermutations=nbPermutations)
+        per._computePermutations()
+        for i in range(per.arrayOfPermutations.shape[-1]):
+            # Since each column contains the same element (col 1 = [1,1,1,,...], etc),
+            # each permutation should keep the columns intact
+            self.assertTrue(np.array_equal(per.arrayOfPermutations[:, :, i], array))
+
+    def testPermutationsComputationNoDropNotSameArray(self):
+        array = np.random.randint(0, 255, (10, 300))
+        nbPermutations = 10
+        tensor = np.dstack([array for _ in range(nbPermutations + 1)])
+        per = PermutationCorrelations(array=array, numberOfPermutations=nbPermutations)
+        per._computePermutations()
+        self.assertFalse(np.array_equal(per.arrayOfPermutations, tensor))
+
+    def testPermutationsComputationsDropColumnsChanged(self):
+        array = np.random.randint(0, 100, (500, 10))
+        per = PermutationCorrelations(array=array, numberOfPermutations=10)
+        originialColumns = per.columns
+        per._computePermutations([i for i in range(9)])
+        self.assertFalse(np.array_equal(originialColumns, per.columns))
+
+    def testPermutationsComputationsDropColumnsByName(self):
+        columns = ["A", "B", "C"]
+        array = np.random.randint(0, 155, (50, 3))
+        nbPermutations = 100
+        per = PermutationCorrelations(array=array, headers=columns, numberOfPermutations=nbPermutations)
+        per._computePermutations(["C"])
+        del columns[-1]
+        self.assertTrue(np.array_equal(columns, per.columns))
+
+    def testPermutationsComputationsDropColumnsNotValid(self):
+        with self.assertRaises(ValueError):
+            PermutationCorrelations(array=np.zeros((10, 10)))._computePermutations(["toto", 214, 1e34])
+
+    def testPermutationsComputationsFirstSliceIsNoPermutatition(self):
+        array = np.random.randint(0, 157, (50, 3))
+        nbPermutations = 10
+        per = PermutationCorrelations(array=array, numberOfPermutations=nbPermutations)
+        per._computePermutations()
+        self.assertTrue(np.array_equal(array, per.arrayOfPermutations[:, :, 0]))
+
+    def testCorrelationTensorFirstSliceIsOriginalCorrelationMatrix(self):
+        array = np.random.randint(0, 100, (500, 3))
+        nbPermutations = 10
+        per = PermutationCorrelations(array=array, numberOfPermutations=nbPermutations)
+        per.computeCorrelationTensor()
+        originalCorr = pd.DataFrame(array).corr()
+        self.assertTrue(np.array_equal(originalCorr, per.correlationTensor[:, :, 0]))
+
+    def testCorrelationTensorShape(self):
+        nbColumns = 15
+        array = np.random.randint(0, 200, (500, nbColumns))
+        nbPermutations = 10
+        per = PermutationCorrelations(array=array, numberOfPermutations=nbPermutations)
+        per.computeCorrelationTensor()
+        self.assertTupleEqual((nbColumns, nbColumns, nbPermutations + 1), per.correlationTensor.shape)
+
+    def testPValueResultKeys(self):
+        array = np.random.randint(0, 255, (300, 15))
+        headers = [chr(i) for i in range(97, 97 + 15)]
+        nbPerm = 10
+        per = PermutationCorrelations(array=array, headers=headers, numberOfPermutations=nbPerm)
+        per.computeCorrelationTensor()
+        pvaluesKeys = list(per.computePValue().keys())
+        pvaluesKeys.sort(key=lambda key: ord(key[0]))
+        supposedKeys = []
+        for i in range(len(headers)):
+            for j in range(i + 1, len(headers)):
+                supposedKeys.append(f"{headers[i]} - {headers[j]}")
+        self.assertListEqual(pvaluesKeys, supposedKeys)
+
+    def testComputePValuesAccurate(self):
+        array1 = np.array([[1, 0.5, 0.3], [-0.5, 1, -0.05], [0.3, 0.5, 1]])
+        array2 = np.array([[1, 0.005, -0.3], [0.5, 1, 0.5], [-0.3, 0.005, 1]])
+        array3 = np.array([[1, 0.98, 0.402], [0.0000003, 1, 0.0000003], [0.402, 0.98, 1]])
+        array4 = np.array([[1, 0.997, 0.98], [0.001, 1, 0.001], [0.98, 0.997, 1]])
+        tensor = np.dstack([array1, array2, array3, array4])
+        columns = ["A", "B", "C"]
+        nonCorrolatedArray = np.random.randint(0, 255, (10, 3))
+        per = PermutationCorrelations(array=nonCorrolatedArray, headers=columns, numberOfPermutations=3)
+        # Setting the value of an attribute for test purpose only. Please don't do that at home!!
+        per.correlationTensor = tensor
+        pvalues = per.computePValue()
+        supposedPValues = {"A - B": 2 / 3, "A - C": 2 / 3, "B - C": 0}
+        self.assertDictEqual(pvalues, supposedPValues)
+
+    def testComputePValuesNoCorrelationTensor(self):
+        array = np.random.randint(0, 255, (500, 15))
+        per = PermutationCorrelations(array=array)
+        with self.assertRaises(ValueError):
+            per.computePValue()
 
 
 class TestDataframeUtils(env.DCCLabTestCase):
