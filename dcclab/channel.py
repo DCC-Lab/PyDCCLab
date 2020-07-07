@@ -188,7 +188,6 @@ class Channel:
         newChannelPixels = newChannelPixels / np.nanmax(newChannelPixels)  # We put the maximum to 1
         return Channel(newChannelPixels)
 
-
     def filterNoise(self):
         self.applyNoiseFilter()
 
@@ -355,7 +354,6 @@ class Channel:
         entropy = -np.sum(probArray * logArray)
         return entropy
 
-
     def getExtrema(self) -> typing.Tuple[typing.Union[int, float], typing.Union[int, float]]:
         return np.min(self.pixels), np.max(self.pixels)
 
@@ -397,6 +395,12 @@ class Channel:
 
     def getSobelFilter(self):
         pass
+
+    def normalizeWithGaussianFilter(self, sigma: float):
+        gaussFilter = self.getGaussianFilter(sigma)
+        mean = self.getAverageValueOfPixels()
+        norm = self.pixels / gaussFilter.pixels - mean
+        return Channel(norm)
 
     def getCannyEdgeDetection(self, gaussianStdDev: float = 1, lowerThreshold: float = None,
                               higherThreshold: float = None):
