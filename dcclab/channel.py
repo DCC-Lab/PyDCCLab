@@ -51,6 +51,20 @@ class Channel:
     def __repr__(self) -> str:
         return self.__str__()
 
+    def __sub__(self, other):
+        if isinstance(other, Channel):
+            substraction = self.pixels - other.pixels
+        else:
+            substraction = self.pixels - other
+        return Channel(pixels=substraction)
+
+    def __add__(self, other):
+        if isinstance(other, Channel):
+            addition = self.pixels + other.pixels
+        else:
+            addition = self.pixels + other
+        return Channel(pixels=addition)
+
     @property
     def pixels(self) -> np.ndarray:
         return self._pixels
