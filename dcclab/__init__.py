@@ -21,6 +21,7 @@ from .dataset import *
 from .correlationMatrix import *
 from .database import *
 from .metadata import *
+from . import speckleAnalysis
 
 __version__ = "0.9.5"
 __author__ = "Daniel Cote <dccote@cervo.ulaval.ca>"
