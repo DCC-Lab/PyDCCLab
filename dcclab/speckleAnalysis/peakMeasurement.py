@@ -1,5 +1,6 @@
 import numpy as np
 import math
+import warnings
 
 
 class HalfWidthAtHalfMaximumOneDimension:
@@ -19,29 +20,69 @@ class HalfWidthAtHalfMaximumOneDimension:
             raise TypeError("The data must be within a numpy array.")
         if data.ndim != 1:
             raise ValueError("The data must be in one dimension.")
-        self.__data = data
-        self.__sideOfPeak = "left" if positiveSlopeSideOfPeak else "right"
+        self._data = data
+        self._sideOfPeak = "left" if positiveSlopeSideOfPeak else "right"
+        self.HWHM = None
         self.report = None
 
-    def findHWHMWithinError(self, error=0.05):
+    def findHWHM(self):
+        raise NotImplementedError("This method must be implemented by subclasses.")
+
+    def __str__(self):
+        # Don't want to raise an error
+        return "TO IMPLEMENT IN SUBCLASSES"
+
+
+class HalfWidthAtHalfMaximumNeighborsAveraging(HalfWidthAtHalfMaximumOneDimension):
+
+    def __init__(self, data: np.ndarray, maximum: float = None, positiveSlopeSideOfPeak: bool = None,
+                 errorRange: float = 20 / 100):
+        self.__error = errorRange
+        self.__dataUsed = None
+        super(HalfWidthAtHalfMaximumNeighborsAveraging, self).__init__(data, maximum, positiveSlopeSideOfPeak)
+
+    def findHWHM(self):
+        if self.HWHM is not None:
+            msg = "The half width at half maximum is already computed. You can access it with the attribute 'HWHM'."
+            warnings.warn(msg, UserWarning)
+            return self.HWHM
+        error = self.__error
         halfMax = self.maximum / 2
         inferiorBound = halfMax - halfMax * error
         superiorBound = halfMax + halfMax * error
-        pointsForHWHM = np.where((self.__data >= inferiorBound) & (self.__data <= superiorBound))[0]
+        pointsForHWHM = np.where((self._data >= inferiorBound) & (self._data <= superiorBound))[0]
         nbPoints = len(pointsForHWHM)
         if nbPoints == 0:
             raise ValueError("The error is too small. Not enough values were found to compute the HWHM.")
         mean = np.mean(pointsForHWHM)
         left = 0
         right = mean
-        if self.__sideOfPeak == "left":
+        if self._sideOfPeak == "left":
             left = mean
-            right = len(self.__data)
+            right = len(self._data)
         HWHM = right - left
-        self.report = self._errorStatsReport(pointsForHWHM)
+        self.HWHM = HWHM
+        self.__dataUsed = pointsForHWHM
         return HWHM
 
-    def findHWHMWithLinearFit(self, maxNbPoints: int = 3, moreInUpperPart: bool = True):
+
+class HalfWidthAtHalfMaximumLinearFit(HalfWidthAtHalfMaximumOneDimension):
+
+    def __init__(self, data: np.ndarray, maximum: float = None, positiveSlopeSideOfPeak: bool = None,
+                 maxNumberOfPoints: int = 10, moreInUpperPart: bool = True):
+        self.__maxNbPts = maxNumberOfPoints
+        self.__dataUsed = None
+        self.__moreInUpperPart = moreInUpperPart
+        self.__fitInfo = None
+        super(HalfWidthAtHalfMaximumLinearFit, self).__init__(data, maximum, positiveSlopeSideOfPeak)
+
+    def findHWHM(self):
+        if self.HWHM is not None:
+            msg = "The half width at half maximum is already computed. You can access it with the attribute 'HWHM'."
+            warnings.warn(msg, UserWarning)
+            return self.HWHM
+        maxNbPoints = self.__maxNbPts
+        moreInUpperPart = self.__moreInUpperPart
         if maxNbPoints < 2:
             raise ValueError("There should be at least 2 points for the linear fit.")
         halfMax = self.maximum / 2
@@ -52,12 +93,12 @@ class HalfWidthAtHalfMaximumOneDimension:
             temp = upperKs
             upperKs = lowerKs
             lowerKs = temp
-        lows, highs, lIndices, hIndices = splitInTwoWithMiddleValue(halfMax, self.__data, True)
+        lows, highs, lIndices, hIndices = splitInTwoWithMiddleValue(halfMax, self._data, True)
         lows = lows[:lowerKs]
         highs = highs[-upperKs:]
         lIndices = lIndices[:lowerKs]
         hIndices = hIndices[-upperKs:]
-        if self.__sideOfPeak == "left":
+        if self._sideOfPeak == "left":
             lows = lows[-lowerKs:]
             highs = highs[:upperKs]
             lIndices = lIndices[-lowerKs:]
@@ -67,42 +108,38 @@ class HalfWidthAtHalfMaximumOneDimension:
         (slope, zero), covMat = np.polyfit(xData, yData, 1, full=False,
                                            cov=True)
         left = findXWithY(halfMax, slope, zero)
-        right = len(self.__data)
-        if self.__sideOfPeak == "right":
+        right = len(self._data)
+        if self._sideOfPeak == "right":
             right = findXWithY(halfMax, slope, zero)
             left = 0
         HWHM = right - left
-        self.report = self._linearFitStatsReport(xData, slope, zero, covMat)
+        self.HWHM = HWHM
+        self.__dataUsed = (lows, highs, lIndices, hIndices)
+        self.__fitInfo = (slope, zero, covMat)
         return HWHM
 
-    def _errorStatsReport(self, dataUsed: np.ndarray):
-        nbPoints = len(dataUsed)
-        mean = np.mean(dataUsed)
-        stdDev = np.std(dataUsed)
-        report = f"HWHM error method: {mean} average, {stdDev} standard deviation, {nbPoints} points used."
-        return report
 
-    def _linearFitStatsReport(self, dataUsed: np.ndarray, slope: float, zero: float, covMat: np.ndarray):
-        nbPoints = len(dataUsed)
-        slopeError, zeroError = np.diag(covMat) ** 0.5
-        report = f"HWHM linear fit method: {nbPoints} points used, "
-        report += f"({slope} ± {slopeError}) slope, ({zero} ± {zeroError}) error\n"
-        report += "*uncertainty is taken as the square root of the fit's covariance matrix diagonal*"
-        return report
+class FullWidthAtHalfMaximumNeighborsAveraging(HalfWidthAtHalfMaximumNeighborsAveraging):
+
+    def __init__(self, data: np.ndarray, maximum: float = None, errorRange: float = 20 / 100):
+        self.FWHM = None
+        super(FullWidthAtHalfMaximumNeighborsAveraging, self).__init__(data, maximum, errorRange=errorRange)
+
+    def findFWHM(self):
+        self.FWHM = self.findHWHM() * 2
+        return self.FWHM
 
 
-class FullWidthAtHalfMaximumOneDimension(HalfWidthAtHalfMaximumOneDimension):
+class FullWidthAtHalfMaximumLinearFit(HalfWidthAtHalfMaximumLinearFit):
+    def __init__(self, data: np.ndarray, maximum: float = None, maximumNumberOfPoints: int = 10,
+                 moreInUpperPart: boo = True):
+        self.FWHM = None
+        super(FullWidthAtHalfMaximumLinearFit, self).__init__(data, maximum, None, maximumNumberOfPoints,
+                                                              moreInUpperPart)
 
-    def __init__(self, data: np.ndarray, maximum: float = None):
-        super(FullWidthAtHalfMaximumOneDimension, self).__init__(data, maximum)
-
-    def findFWHMWithinError(self, error: float = 0.05):
-        HWHM = self.findHWHMWithinError(error)
-        return 2 * HWHM
-
-    def findFWHMWithLinearFit(self, maxNbPoints: int = 3, moreInUpperPart: bool = True):
-        HWHM = self.findHWHMWithLinearFit(maxNbPoints, moreInUpperPart)
-        return 2 * HWHM
+    def findFWHM(self):
+        self.FWHM = self.findHWHM() * 2
+        return self.FWHM
 
 
 def splitInTwoWithMiddleValue(middleValue: float, array: np.ndarray, returnIndices: bool = False):
@@ -115,14 +152,6 @@ def splitInTwoWithMiddleValue(middleValue: float, array: np.ndarray, returnIndic
     if not returnIndices:
         return lowerValues, upperValues
     return lowerValues, upperValues, lower, upper
-
-
-def linearEquation(y1, y2, x1, x2):
-    deltaY = y2 - y1
-    deltaX = x2 - x1
-    slope = deltaY / deltaX
-    zero = y1 - slope * x1
-    return slope, zero
 
 
 def findXWithY(y, slope, zero):
