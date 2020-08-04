@@ -87,8 +87,8 @@ class Autocorrelation:
             ax1.set_xlabel("Horizontal position $x$ [pixel]")
 
             ax2.plot(vSlice)
-            ax1.set_title(f"Vertical slice (at index {indices[1]})")
-            ax1.set_xlabel("Vertical position $y$ [pixel]")
+            ax2.set_title(f"Vertical slice (at index {indices[1]})")
+            ax2.set_xlabel("Vertical position $y$ [pixel]")
 
             ylabel = "Normalized autocorrelation coefficient [-]"
             fig.text(0.06, 0.5, ylabel, ha='center', va='center', rotation='vertical')
