@@ -29,8 +29,7 @@ class HalfWidthAtHalfMaximumOneDimension:
         raise NotImplementedError("This method must be implemented by subclasses.")
 
     def __str__(self):
-        # Don't want to raise an error
-        return "TO IMPLEMENT IN SUBCLASSES"
+        return "General HwHM/FWHM finding method"
 
 
 class HalfWidthAtHalfMaximumNeighborsAveraging(HalfWidthAtHalfMaximumOneDimension):
@@ -64,6 +63,11 @@ class HalfWidthAtHalfMaximumNeighborsAveraging(HalfWidthAtHalfMaximumOneDimensio
         self.HWHM = HWHM
         self.__dataUsed = pointsForHWHM
         return HWHM
+
+    def __str__(self):
+        msg = f"Error/neighbors average method (±{self.__error * 100}%).\n"
+        msg += "For more info, see the method's 'fullMethodInfo'."
+        return msg
 
 
 class HalfWidthAtHalfMaximumLinearFit(HalfWidthAtHalfMaximumOneDimension):
@@ -118,6 +122,11 @@ class HalfWidthAtHalfMaximumLinearFit(HalfWidthAtHalfMaximumOneDimension):
         self.__fitInfo = (slope, zero, covMat)
         return HWHM
 
+    def __str__(self):
+        msg = f"Linear fit method (max of {self.__maxNbPts} points).\n"
+        msg += "For more info, see the method's 'fullMethodInfo'."
+        return msg
+
 
 class FullWidthAtHalfMaximumNeighborsAveraging(HalfWidthAtHalfMaximumNeighborsAveraging):
 
@@ -129,10 +138,15 @@ class FullWidthAtHalfMaximumNeighborsAveraging(HalfWidthAtHalfMaximumNeighborsAv
         self.FWHM = self.findHWHM() * 2
         return self.FWHM
 
+    def __str__(self):
+        msgBase = super(FullWidthAtHalfMaximumNeighborsAveraging, self).__str__()
+        msgBase += "** Info only on the HWHM finding **"
+        return msgBase
+
 
 class FullWidthAtHalfMaximumLinearFit(HalfWidthAtHalfMaximumLinearFit):
     def __init__(self, data: np.ndarray, maximum: float = None, maximumNumberOfPoints: int = 10,
-                 moreInUpperPart: boo = True):
+                 moreInUpperPart: bool = True):
         self.FWHM = None
         super(FullWidthAtHalfMaximumLinearFit, self).__init__(data, maximum, None, maximumNumberOfPoints,
                                                               moreInUpperPart)
@@ -140,6 +154,11 @@ class FullWidthAtHalfMaximumLinearFit(HalfWidthAtHalfMaximumLinearFit):
     def findFWHM(self):
         self.FWHM = self.findHWHM() * 2
         return self.FWHM
+
+    def __str__(self):
+        msgBase = super(FullWidthAtHalfMaximumLinearFit, self).__str__()
+        msgBase += "** Info only on the HWHM finding **"
+        return msgBase
 
 
 def splitInTwoWithMiddleValue(middleValue: float, array: np.ndarray, returnIndices: bool = False):
