@@ -50,9 +50,11 @@ class SpeckleCaracerization:
         if cleanedAxis == "horizontal":
             FWHM = peakMeasurement.FullWidthAtHalfMaximumNeighborsAveraging(self.__horizontalSlice, 1, averageRange)
             FWHM_value = FWHM.findFWHM()
+            self.__horizontalFWHMFindingMethod = FWHM
         elif cleanedAxis == "vertical":
             FWHM = peakMeasurement.FullWidthAtHalfMaximumNeighborsAveraging(self.__verticalSlice, 1, averageRange)
             FWHM_value = FWHM.findFWHM()
+            self.__verticalFWHMFindingMethod = FWHM
         else:
             raise ValueError(f"Axis '{axis}' not supported. Try 'horizontal' or 'vertical'.")
         return FWHM_value
@@ -139,6 +141,6 @@ class SpeckleCaracerization:
         return maxPossible
 
     def FWHMFindingMethodInfo(self):
-        msg = f"Vertical FWHM finding method : {self.__verticalFWHMFindingMethod}\n"
-        msg += f"Horizontal FWHM finding method : {self.__horizontalFWHMFindingMethod}"
+        msg = f"Vertical FWHM finding method : {str(self.__verticalFWHMFindingMethod)}\n"
+        msg += f"Horizontal FWHM finding method : {str(self.__horizontalFWHMFindingMethod)}"
         return msg
