@@ -49,12 +49,59 @@ class SpeckleStatsReport:
     def localContrast(self):
         return self.__localContrast
 
+    @classmethod
+    def __imageDisplayPrep(cls, axis, image: np.ndarray, title: str, colorMap: str):
+        axis.imshow(image, colorMap)
+        axis.set_title(title)
+        return axis
+
+    @classmethod
+    def __plotDisplayPrep(cls, axis, data: np.ndarray, title: str, xlabel: str, ylabel: str = None):
+        axis.plot(data)
+        axis.set_title(title)
+        axis.set_xlabel(xlabel)
+        if ylabel is not None:
+            axis.set_ylabel(ylabel)
+        return axis
+
+    @classmethod
+    def __histogramDisplayPrep(cls, axis, data: np.ndarray, title: str, xlabel: str, ylabel: str, bins):
+        if data.ndim != 1:
+            data = data.ravel()
+        axis.hist(data, bins)
+        axis.set_title(title)
+        axis.set_xlabel(xlabel)
+        axis.set_ylabel(ylabel)
+        return axis
+
+    def __intensityHistogramDisplayPrep(self, axis):
+        title = f"Intensity histogram\n({len(self.__intensityBins) - 1} bins, ranging from {self.__intensityBins[0]} to"
+        title += f" {self.__intensityBins[-1]})"
+        return self.__histogramDisplayPrep(axis, self.__image, title, "Intensity value [-]", "Count [-]",
+                                           self.__intensityBins)
+
+    def __localContrastHistogramDisplayPrep(self, axis):
+        title = f"Local contrast histogram\n({len(self.__localContrastBins) - 1} bins, ranging"
+        title += f" from {np.round(self.__localContrastBins[0], 2)} to {np.round(self.__localContrastBins[-1], 2)})"
+        self.__histogramDisplayPrep(axis, self.__localContrast, title, "Local contrast value [-]", "Count [-]",
+                                    self.__localContrastBins)
+
+    def __displaySpeckleImagePrep(self, axis, colorMap: str):
+        return self.__imageDisplayPrep(axis, self.__image, "Speckle image", colorMap)
+
+    def __displayAutocorrPrep(self, axis, colorMap: str):
+        return self.__imageDisplayPrep(axis, self.__autocorrelation, "Full normalized autocorrelation", colorMap)
+
+    def __displayLocalContrastPrep(self, axis, colorMap: str):
+        return self.__imageDisplayPrep(axis, self.__localContrast,
+                                       f"Local contrast (kernel size of {self.__localContrastKernelSize})", colorMap)
+
     def displaySpeckleImage(self, colorMap: str = None):
-        plt.imshow(self.__image, colorMap)
+        self.__displaySpeckleImagePrep(plt.subplots()[-1], colorMap)
         plt.show()
 
     def displayFullAutocorrelation(self, colorMap: str = None, showColorBar: bool = True):
-        plt.imshow(self.__autocorrelation, colorMap)
+        self.__displayAutocorrPrep(plt.subplots()[-1], colorMap)
         if showColorBar:
             plt.colorbar()
         plt.show()
@@ -63,13 +110,10 @@ class SpeckleStatsReport:
         fig, (ax1, ax2) = plt.subplots(2, sharey="col")
         fig.suptitle("Autocorrelation slices")
 
-        ax1.plot(self.__horizontalSlice)
-        ax1.set_title(f"Central horizontal slice")
-        ax1.set_xlabel("Horizontal position $x$ [pixel]")
+        self.__plotDisplayPrep(ax1, self.__horizontalSlice, "Central horizontal slice",
+                               "Horizontal position $x$ [pixel]")
 
-        ax2.plot(self.__verticalSlice)
-        ax2.set_title(f"Central vertical slice")
-        ax2.set_xlabel("Vertical position $y$ [pixel]")
+        self.__plotDisplayPrep(ax2, self.__verticalSlice, "Central vertical slice", "Vertical position $y$ [pixel]")
 
         ylabel = "Normalized autocorrelation coefficient [-]"
         fig.text(0.06, 0.5, ylabel, ha='center', va='center', rotation='vertical')
@@ -77,19 +121,20 @@ class SpeckleStatsReport:
         plt.show()
 
     def displayIntensityHistogram(self):
-        plt.hist(self.__image.ravel(), self.__intensityBins)
+        self.__intensityHistogramDisplayPrep(plt.subplots()[-1])
         plt.show()
 
     def displayLocalContrastHistogram(self):
-        plt.hist(self.__localContrast.ravel(), self.__localContrastBins)
+        self.__localContrastHistogramDisplayPrep(plt.subplots()[-1])
         plt.show()
 
-    def textReport(self, split: bool = False):
-        header = "========== Statistical properties of the speckle image ==========\n"
-        basicStats = f"Mean intensity : {self.meanIntensity}\nIntensity std deviation : {self.stdDevIntensity}\n"
-        basicStats += f"Maximum intensity : {self.maxIntensity}\nMinimum intensity : {self.minIntensity}\n"
-        basicStats += f"Global contrast : {self.globalContrast}\nContrast modulation : {self.contrastModulation}\n"
-        midSection = "========== Statistical properties of the speckles ==========\n"
+    def speckleImageStats(self):
+        intenityStats = f"Mean intensity : {self.meanIntensity}\nIntensity std deviation : {self.stdDevIntensity}\n"
+        intenityStats += f"Maximum intensity : {self.maxIntensity}\nMinimum intensity : {self.minIntensity}\n"
+        intenityStats += f"Global contrast : {self.globalContrast}\nContrast modulation : {self.contrastModulation}\n"
+        return intenityStats
+
+    def specklesStats(self):
         speckleStats = f"Vertical diam. : {self.verticalFWHM} pixels\nHorizontal diam. : {self.horizontalFWHM} pixels\n"
         speckleStats += self.__speckleCaracterizationObj.FWHMFindingMethodInfo() + "\n"
         fullyDeveloped = "This is not a fully developed speckle pattern\n"
@@ -100,60 +145,55 @@ class SpeckleStatsReport:
             fullyDeveloped += "(based on the intensity histogram, its maximum is at 0, assuming exponential " \
                               "distribution)\n"
         speckleStats += fullyDeveloped
+        return speckleStats
+
+    def localContrastStats(self):
         localContrastStats = f"Local contrast mean : {np.mean(self.__localContrast)}\n"
         localContrastStats += f"Local contrast std deviation : {np.std(self.__localContrast)}\n"
         localContrastStats += f"Local contrast median : {np.median(self.__localContrast)}\n"
         localContrastStats += f"Local contrast min : {np.min(self.__localContrast)}\n"
         localContrastStats += f"Local contrast max : {np.max(self.__localContrast)}"
-        if split:
-            allText = (header + basicStats, midSection + speckleStats + localContrastStats)
-        else:
-            allText = header + basicStats + midSection + speckleStats + localContrastStats
+        return localContrastStats
+
+    def textReport(self):
+        header = "========== Statistical properties of the speckle image ==========\n"
+        midSection = "========== Statistical properties of the speckles ==========\n"
+        basicStats = self.speckleImageStats()
+        speckleStats = self.specklesStats()
+        localContrastStats = self.localContrastStats()
+        allText = header + basicStats + midSection + speckleStats + localContrastStats
         return allText
 
     def __str__(self):
         return self.textReport()
 
-    def speckleStatsReport(self, saveName: str = None):
+    def fullGraphicsReport(self, saveName: str = None):
         fig, axes = plt.subplots(3, 2)
-        fig.subplots_adjust(hspace=0.4)
+        fig.subplots_adjust(hspace=0.4, wspace=0.1)
         ax1 = axes[0, 0]  # Top left
         ax2 = axes[0, 1]  # Top right
         ax3 = axes[1, 0]  # Bottom left
         ax4 = axes[1, 1]  # Bottom right
-        ##### Text info #####
         gs = axes[2, 0].get_gridspec()
         for ax in axes[2, 0:]:
             ax.remove()
         axBig = fig.add_subplot(gs[2, 0:])
         fig.suptitle(f"Speckles statistical report of\n{self.__imagePath}")
 
-        ax1.imshow(self.__image)
-        ax1.set_title("Speckle image")
+        self.__displaySpeckleImagePrep(ax1, None)
 
-        ax2.imshow(self.__localContrast)
-        ax2.set_title(f"Local contrast (kernel size of {self.__localContrastKernelSize})")
+        self.__displayLocalContrastPrep(ax2, None)
 
-        ax3.hist(self.__image.ravel(), self.__intensityBins)
-        title = f"Intensity histogram\n({len(self.__intensityBins) - 1} bins, ranging from {self.__intensityBins[0]} to "
-        title += f"{self.__intensityBins[-1]})"
-        ax3.set_title(title)
-        ax3.set_xlabel("Intensity value [-]")
-        ax3.set_ylabel("Count [-]")
+        self.__intensityHistogramDisplayPrep(ax3)
 
-        ax4.hist(self.__localContrast.ravel(), self.__localContrastBins)
-        title = f"Local contrast histogram\n({len(self.__localContrastBins) - 1} bins, ranging"
-        title += f" from {np.round(self.__localContrastBins[0], 2)} to {np.round(self.__localContrastBins[-1], 2)})"
-        ax4.set_title(title)
-        ax4.set_xlabel("Local contrast value [-]")
-        ax4.set_ylabel("Count [-]")
+        self.__localContrastHistogramDisplayPrep(ax4)
 
-        text = self.textReport(False)
+        text = self.textReport()
         axBig.text(0.5, -0.1, text, ha="center", fontsize=8)
         axBig.axis("off")
-        mng = plt.get_current_fig_manager()
-        mng.resize(*mng.window.maxsize())  # Works only with Tk backend I think... This is only for aesthetic
-        fig.set_size_inches((8.5, 11), forward=False)
+        # mng = plt.get_current_fig_manager()
+        # mng.resize(*mng.window.maxsize())  # Works only with Tk backend I think... This is only for aesthetic
+        fig.set_size_inches((8.5, 11), forward=False)  # For saving purpose
         if saveName is not None:
             plt.savefig(fname=saveName, dpi=1000)
         plt.show()
@@ -165,4 +205,4 @@ class SpeckleStatsReport:
 if __name__ == '__main__':
     path = r"..\speckleAnalysis\circularWithPhasesSimulations\4pixelsCircularWithPhasesSimulations.tiff"
     ssr = SpeckleStatsReport(path, averageRange=20 / 100)
-    ssr.speckleStatsReport("test.pdf")
+    ssr.fullGraphicsReport("test.pdf")
