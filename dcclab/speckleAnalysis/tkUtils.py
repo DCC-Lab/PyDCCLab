@@ -7,7 +7,7 @@ from matplotlib.figure import Figure
 
 class MatplotlibFigureEmbedder:
 
-    def __init__(self, root: Tk, figure: Figure):
+    def __init__(self, root, figure: Figure):
         self.root = root
         self.figure = figure
 
