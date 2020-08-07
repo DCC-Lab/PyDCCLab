@@ -1,5 +1,4 @@
 from dcclab.speckleAnalysis import autocorrelation, peakMeasurement
-import matplotlib.pyplot as plt
 from scipy.signal import convolve2d
 import numpy as np
 
@@ -68,23 +67,17 @@ class SpeckleCaracerization:
             vertical = self.computeFWHMOfSpecificAxisWithNeighborsAveraging("vertical", *args, **kwargs)
             horizontal = self.computeFWHMOfSpecificAxisWithNeighborsAveraging("horizontal", *args, **kwargs)
         else:
-            raise ValueError(f"Method '{method}' not supported. Try 'linear' or 'error'.")
+            raise ValueError(f"Method '{method}' not supported. Try 'linear' or 'mean'.")
         return vertical, horizontal
 
-    def intensityHistogram(self, nbBins: int = 256, showHistogram: bool = True):
-        hist, bins, _ = plt.hist(self.__image.ravel(), nbBins, (0, self.__maxPossibleIntensityValue()))
-        plt.xlabel("Bin [-]")
-        plt.ylabel("Number of occurrences [-]")
-        plt.title(f"Intensity histogram of the speckle pattern, with {nbBins} bins.")
-        if showHistogram:
-            plt.show()
-        plt.close()
+    def intensityHistogram(self, nbBins: int = 256):
+        hist, bins = np.histogram(self.__image.ravel(), nbBins, (0, self.__maxPossibleIntensityValue()))
         self.__intensityHistInfo = (hist, bins, nbBins)
         return hist, bins
 
     def isFullyDevelopedSpecklePattern(self, nbBins: int = 256):
         if self.__intensityHistInfo[-1] != nbBins:
-            self.intensityHistogram(nbBins, False)
+            self.intensityHistogram(nbBins)
         hist, bins, _ = self.__intensityHistInfo
         if np.argmax(hist) == 0:  # If the maximum of the intensity distribution is at index 0, we suppose exp dist.
             return True
@@ -122,12 +115,9 @@ class SpeckleCaracerization:
         stdImageWindowed = ((squaredImageFilter - n * windowedAverage ** 2) / (n - 1)) ** 0.5
         return stdImageWindowed / windowedAverage
 
-    def localContrastHistogram(self, nbBins: int = 256, kernelSize: int = 7, showHistogram: bool = True):
+    def localContrastHistogram(self, nbBins: int = 256, kernelSize: int = 7):
         contrastImage = self.localContrast(kernelSize)
-        hist, bins, _ = plt.hist(contrastImage.ravel(), nbBins)
-        if showHistogram:
-            plt.show()
-        plt.close()
+        hist, bins = np.histogram(contrastImage.ravel(), nbBins)
         return hist, bins
 
     def __maxPossibleIntensityValue(self):
