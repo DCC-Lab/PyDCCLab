@@ -14,7 +14,7 @@ class FileReader:
         if path.endswith(".tif") or path.endswith(".tiff"):
             pixels = tifffile.imread(path)
         else:
-            pixels = cv2.imread(path)
+            pixels = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
         return pixels.T  # we want shape[0] as the width and shape[1] as the height
 
 
