@@ -50,6 +50,8 @@ class Autocorrelation:
         self._autocorrelationWithFourierTransform()  # Compute the autocorrelation
 
     def _gaussianNormalization(self, filterStdDev: float = 75):
+        if filterStdDev <= 0:
+            raise ValueError("The gaussian filter's standard deviation must be positive and non zero.")
         filteredImage = gaussian_filter(self.__image, filterStdDev)
         self.__image = self.__image / filteredImage - np.mean(self.__image)
 
@@ -60,8 +62,9 @@ class Autocorrelation:
         self.__autocorrelation = (ifft - np.mean(self.__image) ** 2) / np.var(self.__image)
         self.__slicesObj = AutocorrelationSlices(self.__autocorrelation)
 
-
     def _medianFilter(self, filterSize: int = 3):
+        if filterSize < 2:
+            raise ValueError("The size of the median filter must be at least 2.")
         self.__image = median_filter(self.__image, filterSize)
 
     def showImage(self):
