@@ -36,7 +36,11 @@ class HalfWidthAtHalfMaximumNeighborsAveraging(HalfWidthAtHalfMaximumOneDimensio
 
     def __init__(self, data: np.ndarray, maximum: float = None, positiveSlopeSideOfPeak: bool = None,
                  errorRange: float = 20 / 100):
-        self.__error = errorRange
+        if not (0 <= errorRange < 1):
+            raise ValueError("The range of neighbors must lie in the half open interval (0, 1].")
+        if errorRange > 0.5:
+            warnings.warn("A large range can lead to inaccurate results for the HWHM (and diameter) measurement.")
+        self.__range = errorRange
         self.__dataUsed = None
         super(HalfWidthAtHalfMaximumNeighborsAveraging, self).__init__(data, maximum, positiveSlopeSideOfPeak)
 
@@ -45,14 +49,14 @@ class HalfWidthAtHalfMaximumNeighborsAveraging(HalfWidthAtHalfMaximumOneDimensio
             msg = "The half width at half maximum is already computed. You can access it with the attribute 'HWHM'."
             warnings.warn(msg, UserWarning)
             return self.HWHM
-        error = self.__error
+        range = self.__range
         halfMax = self.maximum / 2
-        inferiorBound = halfMax - halfMax * error
-        superiorBound = halfMax + halfMax * error
+        inferiorBound = halfMax - halfMax * range
+        superiorBound = halfMax + halfMax * range
         pointsForHWHM = np.where((self._data >= inferiorBound) & (self._data <= superiorBound))[0]
         nbPoints = len(pointsForHWHM)
         if nbPoints == 0:
-            raise ValueError("The error is too small. Not enough values were found to compute the HWHM.")
+            raise ValueError("The range is too small. Not enough values were found to compute the HWHM.")
         mean = np.mean(pointsForHWHM)
         left = 0
         right = mean
@@ -65,7 +69,7 @@ class HalfWidthAtHalfMaximumNeighborsAveraging(HalfWidthAtHalfMaximumOneDimensio
         return HWHM
 
     def __str__(self):
-        msg = f"Error/neighbors average method (±{self.__error * 100}%).\n"
+        msg = f"Error/neighbors average method (±{self.__range * 100}%).\n"
         msg += "For more info, see the method's 'fullMethodInfo'."
         return msg
 
