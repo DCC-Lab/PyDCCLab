@@ -84,19 +84,19 @@ class SpeckleCaracerization:
         return False
 
     def meanIntensity(self):
-        return np.mean(self.__image)
+        return np.mean(self.__image).item()
 
     def stdDevIntensity(self):
-        return np.std(self.__image)
+        return np.std(self.__image).item()
 
     def medianIntensity(self):
-        return np.median(self.__image)
+        return np.median(self.__image).item()
 
     def maxIntensity(self):
-        return np.max(self.__image)
+        return np.max(self.__image).item()
 
     def minIntensity(self):
-        return np.min(self.__image)
+        return np.min(self.__image).item()
 
     def contrastModulation(self):
         return (self.maxIntensity() - self.minIntensity()) / (self.maxIntensity() + self.minIntensity())
@@ -109,8 +109,10 @@ class SpeckleCaracerization:
             raise ValueError("The size of the local contrast kernel must be at least 2.")
         kernel = np.ones((kernelSize, kernelSize))
         n = kernel.size
-        windowedAverage = convolve2d(self.__image, kernel, "valid") / n
-        squaredImageFilter = convolve2d(self.__image ** 2, kernel, "valid")
+        tempImage = self.__image.astype(float)
+        # Put image in float 64 bits, because there can be overflows otherwise
+        windowedAverage = convolve2d(kernel, tempImage, "valid") / n
+        squaredImageFilter = convolve2d(kernel, tempImage ** 2, "valid")
         # Compute de sample standard deviation
         stdImageWindowed = ((squaredImageFilter - n * windowedAverage ** 2) / (n - 1)) ** 0.5
         return stdImageWindowed / windowedAverage
@@ -134,3 +136,11 @@ class SpeckleCaracerization:
         msg = f"Vertical FWHM finding method : {str(self.__verticalFWHMFindingMethod)}\n"
         msg += f"Horizontal FWHM finding method : {str(self.__horizontalFWHMFindingMethod)}"
         return msg
+
+
+if __name__ == '__main__':
+    path = r"C:\Users\goubi\PycharmProjects\HiLoZebrafish\SpeckleSizeCode\MATLAB\\"
+    path += r"20190924-200ms_20mW_Ave15_Gray_10X0.4_18.tif"
+    path = r"C:\Users\goubi\Desktop\testSpeckle.jpg"
+    car = SpeckleCaracerization(path)
+    car.localContrast(7)
