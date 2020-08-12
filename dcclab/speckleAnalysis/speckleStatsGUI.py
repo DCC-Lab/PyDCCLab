@@ -1,46 +1,17 @@
 from tkinter import filedialog, Tk, ttk, END, StringVar, messagebox, DISABLED, NORMAL, Text, Toplevel
-from dcclab.speckleAnalysis import speckleStatsReport, tkUtils
+from dcclab.speckleAnalysis import speckleStatsReport, utils
 import matplotlib.pyplot as plt
 import warnings
 
-gaussianStdHelp = "The image is normalized with a gaussian filter of a certain standard deviation.\nThis standard " \
-                  "deviation can be seen as the 'size' of the filter.\nThe default value might be good enough in a " \
-                  "lot of cases.\nThis normalization is good to remove intensity gradient or non uniformity."
-medianFilterSizeHelp = "The image is filtered with a median filter of a certain size.\nThis size is important if the" \
-                       " noise is intense, because a small filter may not be optimal.\nFor small salt & pepper noise," \
-                       " a filter of a few pixels (less than 10) me be good enough.\nThe default value may be good." \
-                       "\nThis filter is  important for speckle imaging, because there can be photon noise."
-localContrastSizeHelp = "The computation of the local contrast requires a kernel size that determines the number of" \
-                        " neighbors used to compute the local contrast.\nThe local contrast may be an interesting and" \
-                        " important parameter in speckle imaging.\nThe local contrast kernel is based on the method " \
-                        "used by Donald D. Duncan and al. in Statistics of local speckle contrast."
-intensityHistBinsHelp = "The image intensity can be represented by an histogram.\nTo do so, a number of bins is " \
-                        "required.\nThis number can be seen as the 'precision' of the histogram: if it is a small " \
-                        "number, we may not have a good overview of the speckle intensity distribution.\nHowever, " \
-                        "using a big number may have the same effect: if it is too large, we may have empty bins." \
-                        "\nThe default value may be enough for images encoded in 8 bits unsigned integers, of floats." \
-                        "\nWe can extract statistical properties of the speckles with this graph." \
-                        "\nWe can extract statistical properties of the speckles with this graph."
-localContrastBinsHelp = "The local contrast value can be represented as an histogram.\nTo do so, a number of bins is" \
-                        " required.\nThis number can be seen as the 'precision' of the histogram: if it is a small " \
-                        "number, we may not have a good overview of the speckle intensity distribution.\nHowever, " \
-                        "using a big number may have the same effect: if it is too large, we may have empty bins." \
-                        "\nThe default value may be enough for images encoded in 8 bits unsigned integers, of floats." \
-                        "\nWe can extract statistical properties of the speckles with this graph."
-methodHelp = "There is currently two possible methods that can be used to find the average speckle diameter.\nThe " \
-             "speckle diameter is very close to the autocorrelation of the speckle image.\nSince the autocorrelation" \
-             " is discrete, there is not an absolute way to find the full or the half width at the half maximum\n(" \
-             "since the autocorrelation is normalized at a maximum of approximately 1, the half maximum is considered" \
-             " at 0.5).\n\nThe first method uses a certain range of neighbors (define by a percentage) of upper and" \
-             " lower neighbors. The mean value is then computed and this is the value that is kept to compute the" \
-             " average diameter.\n\nThe second method is close to the first one, but instead of taking the mean, a " \
-             "linear fit is done."
-methodParamsHelp = "Neighbors method parameters:\nThe maximum range.\nIt is a number between 0 and 1 (a percentage) " \
-                   "and it is used to find neighbors within 0.5 ± percentage.\n\n" \
-                   "Linear fit method parameters:\nTme maximum number of neighbors.\nIt is an integer and it is used" \
-                   " to find half this number of neighbors in the upper part (where y > 0.5) and the other half" \
-                   " contains neighbors in the lower part (where y < 0.5).\nIn some cases, there may be not enough" \
-                   " neighbors in the upper part, so that is why it is the maximum and not the absolute."
+infoFile = "paramsInfo.json"
+paramsInfo = utils.jsonToDict(infoFile)
+gaussianStdHelp = paramsInfo["gaussianStdHelp"]
+medianFilterSizeHelp = paramsInfo["medianFilterSizeHelp"]
+localContrastSizeHelp = paramsInfo["localContrastSizeHelp"]
+intensityHistBinsHelp = paramsInfo["intensityHistBinsHelp"]
+localContrastBinsHelp = paramsInfo["localContrastBinsHelp"]
+methodHelp = paramsInfo["methodHelp"]
+methodParamsHelp = paramsInfo["methodParamsHelp"]
 
 
 class SpeckleStatsGUI(Tk):
@@ -91,49 +62,49 @@ class SpeckleStatsGUI(Tk):
         gaussianStdDev = ttk.Entry(paramsTab)
         gaussianStdDev.insert(END, "75")
         gaussianStdDev.grid(column=1, row=0, padx=30, pady=30)
-        tkUtils.ToolTipBind(gaussStdLabel, gaussianStdHelp)
+        utils.ToolTipBind(gaussStdLabel, gaussianStdHelp)
 
         medianFilterLabel = ttk.Label(paramsTab, text="Median filter size : ")
         medianFilterLabel.grid(column=0, row=1, padx=30, pady=30)
         medianFilterSize = ttk.Entry(paramsTab)
         medianFilterSize.insert(END, "3")
         medianFilterSize.grid(column=1, row=1, padx=30, pady=30)
-        tkUtils.ToolTipBind(medianFilterLabel, medianFilterSizeHelp)
+        utils.ToolTipBind(medianFilterLabel, medianFilterSizeHelp)
 
         localContrastSizeLabel = ttk.Label(paramsTab, text="Local contrast kernel size : ")
         localContrastSizeLabel.grid(column=0, row=2, padx=30, pady=30)
         localContrastKernelSize = ttk.Entry(paramsTab)
         localContrastKernelSize.insert(END, "7")
         localContrastKernelSize.grid(column=1, row=2, padx=30, pady=30)
-        tkUtils.ToolTipBind(localContrastSizeLabel, localContrastSizeHelp)
+        utils.ToolTipBind(localContrastSizeLabel, localContrastSizeHelp)
 
         intensityHistLabel = ttk.Label(paramsTab, text="Intensity histogram number of bins : ")
         intensityHistLabel.grid(column=2, row=0, padx=30, pady=30)
         nbBinsIntensityHist = ttk.Entry(paramsTab)
         nbBinsIntensityHist.insert(END, "256")
         nbBinsIntensityHist.grid(column=3, row=0, padx=30, pady=30)
-        tkUtils.ToolTipBind(intensityHistLabel, intensityHistBinsHelp)
+        utils.ToolTipBind(intensityHistLabel, intensityHistBinsHelp)
 
         localContrastBinsLabel = ttk.Label(paramsTab, text="Local contrast histogram number of bins : ")
         localContrastBinsLabel.grid(column=2, row=1, padx=30, pady=30)
         nbBinsLocalContrast = ttk.Entry(paramsTab)
         nbBinsLocalContrast.insert(END, "256")
         nbBinsLocalContrast.grid(column=3, row=1, padx=30, pady=30)
-        tkUtils.ToolTipBind(localContrastBinsLabel, localContrastBinsHelp)
+        utils.ToolTipBind(localContrastBinsLabel, localContrastBinsHelp)
 
         methodLabel = ttk.Label(paramsTab, text="FWHM/diameter finding method : ")
         methodLabel.grid(column=2, row=2, padx=30, pady=30)
         choices = ["Neighbors average", "Linear fit"]
         method = ttk.OptionMenu(paramsTab, methodVar, choices[0], *choices)
         method.grid(column=3, row=2, padx=30, pady=30)
-        tkUtils.ToolTipBind(methodLabel, methodHelp)
+        utils.ToolTipBind(methodLabel, methodHelp)
 
         FWHMFindingParamLabel = ttk.Label(paramsTab, text=FWHMFindingMethodParamTextDefault)
         FWHMFindingParamLabel.grid(column=2, row=3, padx=30, pady=30)
         FWHMFindingMethodParam = ttk.Entry(paramsTab)
         FWHMFindingMethodParam.insert(END, "0.2")
         FWHMFindingMethodParam.grid(column=3, row=3, padx=30, pady=30)
-        tkUtils.ToolTipBind(FWHMFindingParamLabel, methodParamsHelp)
+        utils.ToolTipBind(FWHMFindingParamLabel, methodParamsHelp)
 
         def onFWHMFindingMethodChange(*args):
             if methodVar.get() == "Neighbors average":
@@ -254,13 +225,13 @@ class SpeckleStatsGUI(Tk):
         imageFig = plt.figure()
         imageAx = imageFig.add_subplot(111)
         self.__speckleReport._displaySpeckleImagePrep(imageAx, "gray")
-        embedImage = tkUtils.MatplotlibFigureEmbedder(speckleImageDisplay, imageFig)
+        embedImage = utils.MatplotlibFigureEmbedder(speckleImageDisplay, imageFig)
         imageDetachButton = ttk.Button(speckleImageImages, text="Detach", command=self.__speckleImageDetach)
         histDetachButton = ttk.Button(speckleImageImages, text="Detach", command=self.__intensityHistDetach)
         imageHist = plt.figure()
         histAx = imageHist.add_subplot(111)
         self.__speckleReport._intensityHistogramDisplayPrep(histAx)
-        embedHist = tkUtils.MatplotlibFigureEmbedder(intensityHistogram, imageHist)
+        embedHist = utils.MatplotlibFigureEmbedder(intensityHistogram, imageHist)
         imageStatsText = self.__speckleReport.speckleImageStats()
         imageStats = Text(speckleImageStatsTab, height=8, width=100)
         imageStats.insert(END, imageStatsText)
@@ -285,14 +256,14 @@ class SpeckleStatsGUI(Tk):
         autocorrFig = plt.figure()
         autocorrFigAxe = autocorrFig.add_subplot(111)
         self.__speckleReport._displayAutocorrPrep(autocorrFigAxe, None, True, autocorrFig)
-        embedImage = tkUtils.MatplotlibFigureEmbedder(speckleAutocorrDisplay, autocorrFig)
+        embedImage = utils.MatplotlibFigureEmbedder(speckleAutocorrDisplay, autocorrFig)
         autocorrDetachButton = ttk.Button(specklAutocorrImages, text="Detach", command=self.__fullAutocorrDetach)
         slicesDetachButton = ttk.Button(specklAutocorrImages, text="Detach", command=self.__autocorrSlicesDetach)
         slicesFig = plt.figure()
         ax1 = slicesFig.add_subplot(211)
         ax2 = slicesFig.add_subplot(212)
         self.__speckleReport._displayAutocorrSlicesPrep(slicesFig, ax1, ax2)
-        embedAutocorrSlices = tkUtils.MatplotlibFigureEmbedder(speckleAutocorrSlices, slicesFig)
+        embedAutocorrSlices = utils.MatplotlibFigureEmbedder(speckleAutocorrSlices, slicesFig)
         autocorrStatsText = self.__speckleReport.specklesStats()
         autocorrStats = Text(speckleAutocorrStatsTab, height=8, width=100)
         autocorrStats.insert(END, autocorrStatsText)
@@ -318,13 +289,13 @@ class SpeckleStatsGUI(Tk):
         localContrastFig = plt.figure()
         localContrastAx = localContrastFig.add_subplot(111)
         self.__speckleReport._displayLocalContrastPrep(localContrastAx, None)
-        embedImage = tkUtils.MatplotlibFigureEmbedder(localContrastImage, localContrastFig)
+        embedImage = utils.MatplotlibFigureEmbedder(localContrastImage, localContrastFig)
         imageDetachButton = ttk.Button(localContrastImages, text="Detach", command=self.__localContrastDetach)
         histDetachButton = ttk.Button(localContrastImages, text="Detach", command=self.__localContrastHistDetach)
         imageHist = plt.figure()
         histAx = imageHist.add_subplot(111)
         self.__speckleReport._localContrastHistogramDisplayPrep(histAx)
-        embedHist = tkUtils.MatplotlibFigureEmbedder(localContrastHist, imageHist)
+        embedHist = utils.MatplotlibFigureEmbedder(localContrastHist, imageHist)
         imageStatsText = self.__speckleReport.localContrastStats()
         imageStats = Text(localContrastStatsTab, height=8, width=100)
         imageStats.insert(END, imageStatsText)
