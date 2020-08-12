@@ -29,13 +29,17 @@ class Autocorrelation:
 
     @property
     def image(self):
-        return self.__image.copy()
+        return self.__image.copy().T
+
+    @property
+    def original(self):
+        return self.__original.copy().T
 
     @property
     def autocorrelation(self):
         if self.__autocorrelation is None:
             return None
-        return self.__autocorrelation.copy()
+        return self.__autocorrelation.copy().T
 
     def getSlices(self, indices: tuple = None):
         if self.__slicesObj is None:
