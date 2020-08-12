@@ -195,6 +195,7 @@ class SpeckleStatsReport:
     def fullGrahicsReportCreation(self, saveName: str = None):
         if self.__fullReport is None:
             fig = plt.figure()
+            fig.set_size_inches((8.5, 11), forward=False)  # For saving purpose
             ax1 = fig.add_subplot(321)
             ax2 = fig.add_subplot(322)
             ax3 = fig.add_subplot(323)
@@ -207,7 +208,7 @@ class SpeckleStatsReport:
             for ax in axes:
                 ax.remove()
             axBig = fig.add_subplot(gs[:])
-            fig.suptitle(f"Speckles statistical report of\n{self.__imagePath}")
+            fig.suptitle(f"Speckles statistical report of\n{self.__imagePath}", wrap=True)
 
             self._displaySpeckleImagePrep(ax1, None)
 
@@ -220,7 +221,7 @@ class SpeckleStatsReport:
             text = self.textReport()
             axBig.text(0.5, -0.1, text, ha="center", fontsize=8)
             axBig.axis("off")
-            fig.set_size_inches((8.5, 11), forward=False)  # For saving purpose
+
             self.__fullReport = fig
 
         if saveName is not None:
@@ -237,5 +238,7 @@ class SpeckleStatsReport:
 
 if __name__ == '__main__':
     path = r"..\speckleAnalysis\circularWithPhasesSimulations\4pixelsCircularWithPhasesSimulations.tiff"
+    path = r"C:\Users\goubi\PycharmProjects\HiLoZebrafish\SpeckleSizeCode\MATLAB\\"
+    path += r"20190924-200ms_20mW_Ave15_Gray_10X0.4_20.tif"
+    path = r"C:\Users\goubi\Desktop\testSpeckle.jpg"
     ssr = SpeckleStatsReport(path, averageRange=20 / 100)
-    ssr.displayAutocorrelationSlices()
