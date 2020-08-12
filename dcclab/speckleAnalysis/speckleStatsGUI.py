@@ -1,4 +1,4 @@
-from tkinter import filedialog, Tk, ttk, END, StringVar, messagebox, DISABLED, NORMAL, Text
+from tkinter import filedialog, Tk, ttk, END, StringVar, messagebox, DISABLED, NORMAL, Text, Toplevel
 from dcclab.speckleAnalysis import speckleStatsReport, tkUtils
 import matplotlib.pyplot as plt
 import warnings
@@ -203,6 +203,12 @@ class SpeckleStatsGUI(Tk):
         return entryRightType, msg
 
     def __speckleAnalysis(self, kwargs: dict):
+        self.withdraw()
+        self.__progressBarsRoot = Toplevel()
+        self.__progressBarsRoot.title("Please wait")
+        self.__progressBarsRoot.geometry("%dx%d%+d%+d" % (249, 81, 250, 125))
+        ttk.Label(self.__progressBarsRoot, text="Generating stats...").grid(column=0, row=0, padx=10, pady=10)
+        self.__progressBarsRoot.update()
         try:
             with warnings.catch_warnings(record=True) as w:
                 warnings.simplefilter("always")
@@ -210,113 +216,130 @@ class SpeckleStatsGUI(Tk):
                 w = {str(warn): warn.message for warn in w}  # Sometimes two warnings from the "same" source
         except Exception as e:
             messagebox.showerror("Oops!", str(e))
+            self.__progressBarsRoot.destroy()
+            self.deiconify()
             return
         for warn in w:
             messagebox.showwarning("Watch out!", w[warn])
-
-        # TODO : Progress bar to display generation progress?
-
-        self.__speckleImageStatsTab()
-        self.__speckleAutocorrelationStatsTab()
-        self.__localContrastStatsTab()
+        ttk.Label(self.__progressBarsRoot, text="Done!").grid(column=1, row=0, padx=10, pady=10)
+        ttk.Label(self.__progressBarsRoot, text="Generating visuals...").grid(column=0, row=1, padx=10, pady=10)
+        generatingVisuals = ttk.Progressbar(self.__progressBarsRoot, orient="horizontal", length=100,
+                                            mode="determinate")
+        generatingVisuals["maximum"] = 3
+        generatingVisuals.grid(column=1, row=1, padx=10, pady=10)
+        self.__progressBarsRoot.update()
+        speckleImageStatsTab = self.__speckleImageStatsTab()
+        generatingVisuals["value"] = 1
+        self.__progressBarsRoot.update()
+        speckleAutocorrStatsTab = self.__speckleAutocorrelationStatsTab()
+        generatingVisuals["value"] = 2
+        self.__progressBarsRoot.update()
+        localContrastStatsTab = self.__localContrastStatsTab()
+        generatingVisuals["value"] = 3
+        self.__progressBarsRoot.update()
         self.__fullReportPreviewButton["state"] = NORMAL
         self.__saveFullReportButton["state"] = NORMAL
+        self.tabPane.add(speckleImageStatsTab, text=f"Speckle image stats")
+        self.tabPane.add(speckleAutocorrStatsTab, text=f"Speckle autocorrelation stats")
+        self.tabPane.add(localContrastStatsTab, text=f"Speckle local contrast stats")
+        self.tabPane.select(speckleImageStatsTab)
+        self.deiconify()
+        self.__progressBarsRoot.destroy()
 
     def __speckleImageStatsTab(self):
         speckleImageStatsTab = ttk.Frame(self.tabPane)
-        self.tabPane.add(speckleImageStatsTab, text=f"Speckle image stats")
-        self.tabPane.select(speckleImageStatsTab)
         speckleImageImages = ttk.Frame(speckleImageStatsTab)
-        speckleImageImages.pack()
         speckleImageDisplay = ttk.Frame(speckleImageImages)
         intensityHistogram = ttk.Frame(speckleImageImages)
-        speckleImageDisplay.grid(column=1, row=0, padx=5, pady=5)
-        intensityHistogram.grid(column=2, row=0, padx=5, pady=5)
         imageFig = plt.figure()
         imageAx = imageFig.add_subplot(111)
         self.__speckleReport._displaySpeckleImagePrep(imageAx, "gray")
         embedImage = tkUtils.MatplotlibFigureEmbedder(speckleImageDisplay, imageFig)
-        embedImage.embed(False)
         imageDetachButton = ttk.Button(speckleImageImages, text="Detach", command=self.__speckleImageDetach)
-        imageDetachButton.grid(column=0, row=0, padx=5, pady=5)
         histDetachButton = ttk.Button(speckleImageImages, text="Detach", command=self.__intensityHistDetach)
-        histDetachButton.grid(column=3, row=0, padx=5, pady=5)
         imageHist = plt.figure()
         histAx = imageHist.add_subplot(111)
         self.__speckleReport._intensityHistogramDisplayPrep(histAx)
         embedHist = tkUtils.MatplotlibFigureEmbedder(intensityHistogram, imageHist)
-        embedHist.embed(False)
         imageStatsText = self.__speckleReport.speckleImageStats()
         imageStats = Text(speckleImageStatsTab, height=8, width=100)
         imageStats.insert(END, imageStatsText)
         imageStats["state"] = DISABLED
+        speckleImageImages.pack()
+        speckleImageDisplay.grid(column=1, row=0, padx=5, pady=5)
+        intensityHistogram.grid(column=2, row=0, padx=5, pady=5)
+        embedImage.embed(False)
+        imageDetachButton.grid(column=0, row=0, padx=5, pady=5)
+        histDetachButton.grid(column=3, row=0, padx=5, pady=5)
+        embedHist.embed(False)
         imageStats.pack()
         self.__tabsWidgets.extend([speckleImageStatsTab, speckleImageImages, speckleImageDisplay, intensityHistogram,
                                    imageDetachButton, histDetachButton, imageStats])
+        return speckleImageStatsTab
 
     def __speckleAutocorrelationStatsTab(self):
         speckleAutocorrStatsTab = ttk.Frame(self.tabPane)
-        self.tabPane.add(speckleAutocorrStatsTab, text=f"Speckle autocorrelation stats")
         specklAutocorrImages = ttk.Frame(speckleAutocorrStatsTab)
-        specklAutocorrImages.pack()
         speckleAutocorrDisplay = ttk.Frame(specklAutocorrImages)
         speckleAutocorrSlices = ttk.Frame(specklAutocorrImages)
-        speckleAutocorrDisplay.grid(column=1, row=0, padx=5, pady=5)
-        speckleAutocorrSlices.grid(column=2, row=0, padx=5, pady=5)
         autocorrFig = plt.figure()
         autocorrFigAxe = autocorrFig.add_subplot(111)
         self.__speckleReport._displayAutocorrPrep(autocorrFigAxe, None, True, autocorrFig)
         embedImage = tkUtils.MatplotlibFigureEmbedder(speckleAutocorrDisplay, autocorrFig)
-        embedImage.embed(False)
         autocorrDetachButton = ttk.Button(specklAutocorrImages, text="Detach", command=self.__fullAutocorrDetach)
-        autocorrDetachButton.grid(column=0, row=0, padx=5, pady=5)
         slicesDetachButton = ttk.Button(specklAutocorrImages, text="Detach", command=self.__autocorrSlicesDetach)
-        slicesDetachButton.grid(column=3, row=0, padx=5, pady=5)
         slicesFig = plt.figure()
         ax1 = slicesFig.add_subplot(211)
         ax2 = slicesFig.add_subplot(212)
         self.__speckleReport._displayAutocorrSlicesPrep(slicesFig, ax1, ax2)
         embedAutocorrSlices = tkUtils.MatplotlibFigureEmbedder(speckleAutocorrSlices, slicesFig)
-        embedAutocorrSlices.embed(False)
         autocorrStatsText = self.__speckleReport.specklesStats()
         autocorrStats = Text(speckleAutocorrStatsTab, height=8, width=100)
         autocorrStats.insert(END, autocorrStatsText)
         autocorrStats["state"] = DISABLED
+        specklAutocorrImages.pack()
+        speckleAutocorrDisplay.grid(column=1, row=0, padx=5, pady=5)
+        speckleAutocorrSlices.grid(column=2, row=0, padx=5, pady=5)
+        embedImage.embed(False)
+        autocorrDetachButton.grid(column=0, row=0, padx=5, pady=5)
+        slicesDetachButton.grid(column=3, row=0, padx=5, pady=5)
+        embedAutocorrSlices.embed(False)
         autocorrStats.pack()
         self.__tabsWidgets.extend(
             [speckleAutocorrStatsTab, specklAutocorrImages, speckleAutocorrDisplay, speckleAutocorrSlices,
              autocorrDetachButton, slicesDetachButton, autocorrStats])
+        return speckleAutocorrStatsTab
 
     def __localContrastStatsTab(self):
         localContrastStatsTab = ttk.Frame(self.tabPane)
-        self.tabPane.add(localContrastStatsTab, text=f"Speckle local contrast stats")
         localContrastImages = ttk.Frame(localContrastStatsTab)
-        localContrastImages.pack()
         localContrastImage = ttk.Frame(localContrastImages)
         localContrastHist = ttk.Frame(localContrastImages)
-        localContrastImage.grid(column=1, row=0, padx=5, pady=5)
-        localContrastHist.grid(column=2, row=0, padx=5, pady=5)
         localContrastFig = plt.figure()
         localContrastAx = localContrastFig.add_subplot(111)
         self.__speckleReport._displayLocalContrastPrep(localContrastAx, None)
         embedImage = tkUtils.MatplotlibFigureEmbedder(localContrastImage, localContrastFig)
-        embedImage.embed(False)
         imageDetachButton = ttk.Button(localContrastImages, text="Detach", command=self.__localContrastDetach)
-        imageDetachButton.grid(column=0, row=0, padx=5, pady=5)
         histDetachButton = ttk.Button(localContrastImages, text="Detach", command=self.__localContrastHistDetach)
-        histDetachButton.grid(column=3, row=0, padx=5, pady=5)
         imageHist = plt.figure()
         histAx = imageHist.add_subplot(111)
         self.__speckleReport._localContrastHistogramDisplayPrep(histAx)
         embedHist = tkUtils.MatplotlibFigureEmbedder(localContrastHist, imageHist)
-        embedHist.embed(False)
         imageStatsText = self.__speckleReport.localContrastStats()
         imageStats = Text(localContrastStatsTab, height=8, width=100)
         imageStats.insert(END, imageStatsText)
         imageStats["state"] = DISABLED
+        localContrastImages.pack()
+        localContrastImage.grid(column=1, row=0, padx=5, pady=5)
+        localContrastHist.grid(column=2, row=0, padx=5, pady=5)
+        embedImage.embed(False)
+        imageDetachButton.grid(column=0, row=0, padx=5, pady=5)
+        histDetachButton.grid(column=3, row=0, padx=5, pady=5)
+        embedHist.embed(False)
         imageStats.pack()
         self.__tabsWidgets.extend([localContrastStatsTab, localContrastImages, localContrastImage, localContrastHist,
                                    imageDetachButton, histDetachButton, imageStats])
+        return localContrastStatsTab
 
     def __fullReportPreview(self):
         msg = "When saving the report to pdf, the layout changes a little to fit into 8.5 inches by 11 inches."
@@ -324,6 +347,7 @@ class SpeckleStatsGUI(Tk):
         self.__speckleReport.fullGraphicsReportDisplay()
 
     def __saveFullReport(self):
+
         savedFname = filedialog.asksaveasfilename(title="Save report...",
                                                   filetypes=[("Portable Document FIle", "*.pdf")])
         if not savedFname.endswith(".pdf"):
