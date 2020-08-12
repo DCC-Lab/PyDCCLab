@@ -1,4 +1,5 @@
 from tkinter import TOP, BOTH, Toplevel, Label, Widget, LEFT, SOLID
+import json
 
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg, NavigationToolbar2Tk)
@@ -68,3 +69,14 @@ class ToolTipBind:
 
         rootWidget.bind("<Enter>", enterHover)
         rootWidget.bind("<Leave>", leaveHover)
+
+
+def jsonToDict(filepath: str):
+    with open(filepath, "r") as f:
+        d = json.load(f)
+    return d
+
+
+def dictToJson(filepath: str, d: dict):
+    with open(filepath, "w") as f:
+        json.dump(d, f)
