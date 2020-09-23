@@ -102,15 +102,16 @@ class HalfWidthAtHalfMaximumLinearFit(HalfWidthAtHalfMaximumOneDimension):
             upperKs = lowerKs
             lowerKs = temp
         lows, highs, lIndices, hIndices = splitInTwoWithMiddleValue(halfMax, self._data, True)
-        lows = lows[:lowerKs]
-        highs = highs[-upperKs:]
-        lIndices = lIndices[:lowerKs]
-        hIndices = hIndices[-upperKs:]
         if self._sideOfPeak == "left":
             lows = lows[-lowerKs:]
             highs = highs[:upperKs]
             lIndices = lIndices[-lowerKs:]
             hIndices = hIndices[:upperKs]
+        else:
+            lows = lows[:lowerKs]
+            highs = highs[-upperKs:]
+            lIndices = lIndices[:lowerKs]
+            hIndices = hIndices[-upperKs:]
         xData = np.append(lIndices, hIndices)
         yData = np.append(lows, highs)
         (slope, zero), covMat = np.polyfit(xData, yData, 1, full=False,
