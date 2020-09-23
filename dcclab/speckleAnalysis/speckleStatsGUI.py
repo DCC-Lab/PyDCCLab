@@ -359,6 +359,10 @@ class SpeckleStatsGUI(Tk):
             self.quit()
 
 
-if __name__ == '__main__':
+def start():
     app = SpeckleStatsGUI()
     app.mainloop()
+
+
+if __name__ == '__main__':
+    start()
