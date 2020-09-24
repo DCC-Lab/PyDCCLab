@@ -116,10 +116,14 @@ class SpeckleStatsReport:
         fig.text(0.04, 0.5, ylabel, ha='center', va='center', rotation='vertical')
         fig.subplots_adjust(hspace=0.6)
 
-    def displaySpeckleImage(self, colorMap: str = None):
+    def displaySpeckleImage(self, colorMap: str = None, connectYZoom:callable=None, connectXZoom:callable=None):
         fig = plt.figure()
         ax = fig.add_subplot()
         self._displaySpeckleImagePrep(ax, colorMap)
+        if connectXZoom is not None:
+            ax.callbacks.connect('xlim_changed', connectXZoom)
+        if connectYZoom is not None:
+            ax.callbacks.connect('ylim_changed', connectYZoom)
         fig.show()
 
     def displayFullAutocorrelation(self, colorMap: str = None, showColorBar: bool = True):
