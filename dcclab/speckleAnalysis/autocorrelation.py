@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import tifffile
 from scipy.ndimage import gaussian_filter, median_filter
-from scipy.signal import correlate2d
 import cv2
 
 
@@ -21,8 +20,11 @@ class FileReader:
 class Autocorrelation:
     # FIXME: Use pydcclab when ok
 
-    def __init__(self, imagePath: str):
-        self.__image = FileReader.readFile(imagePath)
+    def __init__(self, imagePath: str, imageFromArray: np.ndarray = None):
+        if imageFromArray is not None:
+            self.__image = imageFromArray.copy()
+        else:
+            self.__image = FileReader.readFile(imagePath)
         self.__original = self.image
         self.__autocorrelation = None
         self.__slicesObj = None
@@ -54,7 +56,9 @@ class Autocorrelation:
         self._autocorrelationWithFourierTransform()  # Compute the autocorrelation
 
     def _gaussianNormalization(self, filterStdDev: float = 75):
-        if filterStdDev <= 0:
+        if filterStdDev == 0:
+            return
+        if filterStdDev < 0:
             raise ValueError("The gaussian filter's standard deviation must be positive and non zero.")
         filteredImage = gaussian_filter(self.__image, filterStdDev)
         self.__image = self.__image / filteredImage - np.mean(self.__image)
@@ -67,6 +71,8 @@ class Autocorrelation:
         self.__slicesObj = AutocorrelationSlices(self.__autocorrelation)
 
     def _medianFilter(self, filterSize: int = 3):
+        if filterSize == 0:
+            return
         if filterSize < 2:
             raise ValueError("The size of the median filter must be at least 2.")
         self.__image = median_filter(self.__image, filterSize)
