@@ -5,9 +5,12 @@ import numpy as np
 
 class SpeckleCaracerization:
 
-    def __init__(self, imagePath: str, gaussianFilterNormalizationStdDev: float = 75, medianFilterSize: int = 3):
+    def __init__(self, imagePath: str, gaussianFilterNormalizationStdDev: float = 75, medianFilterSize: int = 3,
+                 imageFromArray: np.ndarray = None):
         self.__fileName = imagePath
-        self.__autocorrObj = autocorrelation.Autocorrelation(imagePath)
+        if imageFromArray is not None:
+            self.__fileName = "Image from custom array"
+        self.__autocorrObj = autocorrelation.Autocorrelation(imagePath, imageFromArray=imageFromArray)
         self.__image = self.__autocorrObj.image
         self.__autocorrObj.computeAutocorrelation(gaussianFilterNormalizationStdDev, medianFilterSize)
         self.__autocorrelation = self.__autocorrObj.autocorrelation
@@ -15,10 +18,15 @@ class SpeckleCaracerization:
         self.__intensityHistInfo = (None, None, None)
         self.__verticalFWHMFindingMethod = None
         self.__horizontalFWHMFindingMethod = None
+        self.__originalParams = (gaussianFilterNormalizationStdDev, medianFilterSize)
 
     @property
     def speckleImage(self):
         return self.__image
+
+    @property
+    def speckleImageAfterFilters(self):
+        return self.__autocorrObj.image
 
     @property
     def fullAutocorrelation(self):
@@ -27,6 +35,27 @@ class SpeckleCaracerization:
     @property
     def autocorrelationSlices(self):
         return self.__verticalSlice, self.__horizontalSlice
+
+    def crop(self, xStart: int, xEnd: int, yStart: int, yEnd: int, **kwargs):
+        newImage = self.__image[int(xStart):int(xEnd), int(yStart):int(yEnd)]
+        if kwargs is None:
+            return SpeckleCaracerization(
+                self.__fileName + f" - Cropped (x = {xStart} to {xEnd}, y = {yStart} to {yEnd})",
+                *self.__originalParams, imageFromArray=newImage)
+        else:
+            return SpeckleCaracerization(
+                self.__fileName + f" - Cropped (x = {xStart} to {xEnd}, y = {yStart} to {yEnd})",
+                imageFromArray=newImage, **kwargs)
+
+    def centeredCrop(self, width: int, height: int, **kwargs):
+        halfWidth = width / 2
+        halfHeight = height / 2
+        shape = self.__image.shape
+        xStart = shape[0] // 2 - np.ceil(halfWidth)
+        xEnd = shape[0] // 2 + np.floor(halfWidth)
+        yStart = shape[1] // 2 - np.ceil(halfHeight)
+        yEnd = shape[1] // 2 + np.ceil(halfHeight)
+        return self.crop(xStart, xEnd, yStart, yEnd, **kwargs)
 
     def computeFWHMOfSpecificAxisWithLinearFit(self, axis: str, maxNbPoints: int = 3, moreInUpperPart: bool = True):
         cleanedAxis = axis.lower().strip()
@@ -142,5 +171,8 @@ if __name__ == '__main__':
     path = r"C:\Users\goubi\PycharmProjects\HiLoZebrafish\SpeckleSizeCode\MATLAB\\"
     path += r"20190924-200ms_20mW_Ave15_Gray_10X0.4_18.tif"
     path = r"C:\Users\goubi\Desktop\testSpeckle.jpg"
+    path = r"C:\Users\goubi\Desktop\Maîtrise\SpeckleData\202009 21-23\20200923-LiquidFITC-Speckles"
+    path += r"\20200923-liquidFITC-Speckles-1-8.tif"
     car = SpeckleCaracerization(path)
-    car.localContrast(7)
+    carCropped = car.centeredCrop(300, 300, gaussianFilterNormalizationStdDev=0)
+    print(carCropped.computeFWHMBothAxes())
