@@ -31,6 +31,7 @@ class SpeckleStatsGUI(Tk):
         self.__parametersTab()
         self.__speckleReport = None
         self.__tabsWidgets = []
+        self.__tabsFigures = []
         self.__fullReportPreviewButton = ttk.Button(header, text="Full report preview",
                                                     command=self.__fullReportPreview)
         self.__fullReportPreviewButton["state"] = DISABLED
@@ -38,15 +39,22 @@ class SpeckleStatsGUI(Tk):
         self.__saveFullReportButton = ttk.Button(header, text="Save report to PDF", command=self.__saveFullReport)
         self.__saveFullReportButton["state"] = DISABLED
         self.__saveFullReportButton.grid(column=2, row=0, padx=30, pady=30)
+        self.__croppedLims = None
 
     def __speckleImageChooser(self):
         supportedFiles = [("Image files", "*.png;*.jpg;*.jpeg;*.gif;*.tif;*.tiff")]
         speckleImagePath = filedialog.askopenfilename(title="Please select a speckle image...",
                                                       filetypes=supportedFiles)
-        if self.filename is not None:
+        self.__changeImageEvent(speckleImagePath)
+
+    def __changeImageEvent(self, fname: str, newImage: np.ndarray = None):
+        if newImage is not None:
             self.__clearTabPaneExceptFirst()
-        if speckleImagePath != '':
-            self.filename = speckleImagePath
+            self.filename = fname
+            self.title(f"Speckle Analysis DCCLab ({self.filename})")
+        if fname is not None and fname != "":
+            self.__clearTabPaneExceptFirst()
+            self.filename = fname
             self.title(f"Speckle Analysis DCCLab ({self.filename})")
             self.continueButton["state"] = NORMAL
 
@@ -118,7 +126,7 @@ class SpeckleStatsGUI(Tk):
 
         methodVar.trace("w", onFWHMFindingMethodChange)
 
-        def continueButtonMethod(*args):
+        def continueButtonMethod(*args,  ):
             method = methodVar.get()
             if method == "Neighbors average":
                 method = "mean"
@@ -217,6 +225,14 @@ class SpeckleStatsGUI(Tk):
         self.deiconify()
         self.__progressBarsRoot.destroy()
 
+    def onXLimsChange(self, event):
+        print(event.get_xlim())
+        self.__croppedLims[0] = event.get_xlim()
+
+    def onYLimsChange(self, event):
+        print(event.get_ylim())
+        self.__croppedLims[1] = event.get_ylim()
+
     def __speckleImageStatsTab(self):
         speckleImageStatsTab = ttk.Frame(self.tabPane)
         speckleImageImages = ttk.Frame(speckleImageStatsTab)
@@ -225,8 +241,9 @@ class SpeckleStatsGUI(Tk):
         imageFig = plt.figure()
         imageAx = imageFig.add_subplot(111)
         self.__speckleReport._displaySpeckleImagePrep(imageAx, "gray")
+        self.__croppedLims = [imageAx.get_xlim(), imageAx.get_ylim()]
         embedImage = utils.MatplotlibFigureEmbedder(speckleImageDisplay, imageFig)
-        imageDetachButton = ttk.Button(speckleImageImages, text="Detach", command=self.__speckleImageDetach)
+        imageDetachButton = ttk.Button(speckleImageImages, text="Detach/crop", command=self.__speckleImageDetach)
         histDetachButton = ttk.Button(speckleImageImages, text="Detach", command=self.__intensityHistDetach)
         imageHist = plt.figure()
         histAx = imageHist.add_subplot(111)
@@ -246,6 +263,7 @@ class SpeckleStatsGUI(Tk):
         imageStats.pack()
         self.__tabsWidgets.extend([speckleImageStatsTab, speckleImageImages, speckleImageDisplay, intensityHistogram,
                                    imageDetachButton, histDetachButton, imageStats])
+        self.__tabsFigures.extend([imageFig, imageHist])
         return speckleImageStatsTab
 
     def __speckleAutocorrelationStatsTab(self):
@@ -279,6 +297,7 @@ class SpeckleStatsGUI(Tk):
         self.__tabsWidgets.extend(
             [speckleAutocorrStatsTab, specklAutocorrImages, speckleAutocorrDisplay, speckleAutocorrSlices,
              autocorrDetachButton, slicesDetachButton, autocorrStats])
+        self.__tabsFigures.extend([autocorrFig, slicesFig])
         return speckleAutocorrStatsTab
 
     def __localContrastStatsTab(self):
@@ -310,6 +329,7 @@ class SpeckleStatsGUI(Tk):
         imageStats.pack()
         self.__tabsWidgets.extend([localContrastStatsTab, localContrastImages, localContrastImage, localContrastHist,
                                    imageDetachButton, histDetachButton, imageStats])
+        self.__tabsFigures.extend([localContrastFig, imageHist])
         return localContrastStatsTab
 
     def __fullReportPreview(self):
@@ -333,7 +353,7 @@ class SpeckleStatsGUI(Tk):
         self.__speckleReport.displayLocalContrast()
 
     def __speckleImageDetach(self):
-        self.__speckleReport.displaySpeckleImage("gray")
+        self.__speckleReport.displaySpeckleImage("gray", self.onYLimsChange, self.onXLimsChange)
 
     def __intensityHistDetach(self):
         self.__speckleReport.displayIntensityHistogram()
@@ -353,6 +373,10 @@ class SpeckleStatsGUI(Tk):
         for widget in self.__tabsWidgets:
             widget.destroy()
         self.__tabsWidgets.clear()
+        for figure in self.__tabsFigures:
+            plt.close(figure)
+        plt.close("all")
+        self.__tabsFigures.clear()
 
     def __close_app(self):
         if messagebox.askokcancel("Close", "Are you sure you want to quit? All unsaved progress will be lost."):
