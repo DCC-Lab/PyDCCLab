@@ -2,6 +2,7 @@ from tkinter import filedialog, Tk, ttk, END, StringVar, messagebox, DISABLED, N
 from dcclab.speckleAnalysis import speckleStatsReport, utils
 import matplotlib.pyplot as plt
 import warnings
+import numpy as np
 
 infoFile = "paramsInfo.json"
 paramsInfo = utils.jsonToDict(infoFile)
