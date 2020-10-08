@@ -1,5 +1,6 @@
 from tkinter import TOP, BOTH, Toplevel, Label, Widget, LEFT, SOLID
 import json
+import re
 
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg, NavigationToolbar2Tk)
@@ -80,3 +81,13 @@ def jsonToDict(filepath: str):
 def dictToJson(filepath: str, d: dict):
     with open(filepath, "w") as f:
         json.dump(d, f)
+
+
+def twoListsIntersection(l1, l2):
+    return [element for element in l1 if element in l2]
+
+
+def sortedAlphanumeric(data):
+    convert = lambda text: int(text) if text.isdigit() else text.lower()
+    alphanumKey = lambda key: [convert(c) for c in re.split('([0-9]+)', key)]
+    return sorted(data, key=alphanumKey)
