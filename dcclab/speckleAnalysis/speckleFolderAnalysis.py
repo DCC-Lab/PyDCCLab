@@ -111,18 +111,26 @@ class SpeckleFolderCaracterizations:
         nbFiles = len(self.__allFiles)
         i = 0
         for file in self.__allFiles:
-            shortFnames.append(os.path.split(file)[-1])
-            obj = caracterization.SpeckleCaracerization(file, **self.__caracKwargs)
-            if self.__cropSize is not None:
-                obj = obj.centeredCrop(self.__cropSize[0], self.__cropSize[1], **self.__caracKwargs)
-            im = obj.speckleImageAfterFilters
-            # plt.imshow(im, cmap="gray")
-            # plt.show()
-            caracObjs.append(obj)
-            diams.append(sum(obj.computeFWHMBothAxes(**diametersComputationKwargs)) / 2)
-            globalContrasts.append(obj.globalContrast())
-            visibilities.append(obj.contrastModulation())
-            fullyDeveloped.append(obj.isFullyDevelopedSpecklePattern())
+            sName = os.path.split(file)[-1]
+            shortFnames.append(sName)
+            try:
+                obj = caracterization.SpeckleCaracerization(file, **self.__caracKwargs)
+                if self.__cropSize is not None:
+                    obj = obj.centeredCrop(self.__cropSize[0], self.__cropSize[1], **self.__caracKwargs)
+                im = obj.speckleImageAfterFilters
+                # plt.imshow(im, cmap="gray")
+                # plt.show()
+                caracObjs.append(obj)
+                diams.append(sum(obj.computeFWHMBothAxes(**diametersComputationKwargs)) / 2)
+                globalContrasts.append(obj.globalContrast())
+                visibilities.append(obj.contrastModulation())
+                fullyDeveloped.append(obj.isFullyDevelopedSpecklePattern())
+            except:
+                diams.append(np.nan)
+                globalContrasts.append(np.nan)
+                visibilities.append(np.nan)
+                fullyDeveloped.append(-1)
+                print(f"Problem with {sName}")
             i += 1
             print(f"Number of patterns treated : {i}/{nbFiles}")
         self.__allCaracObj = caracObjs
@@ -130,8 +138,8 @@ class SpeckleFolderCaracterizations:
 
 
 if __name__ == '__main__':
-    fullPath = r"C:\Users\goubi\Desktop\Maîtrise\SpeckleData\20201005-FITCImaging-20201006T202446Z-001\20201005-FITCImaging\20201005-FITC-LSR-Ap-2"
+    fullPath = r"C:\Users\goubi\Desktop\Maîtrise\SpeckleData\20201016-FITCSpeckles-0p5Objective\20201016-Speckles-2"
     dirpath = r"C:\Users\goubi\Desktop\Maîtrise\SpeckleData\202009 21-23\20200923-LiquidFITC-Speckles"
     speckleInfo = SpeckleFolderCaracterizations(fullPath, cropAroundCenter=(300, 300),
-                                                gaussianFilterNormalizationStdDev=50, medianFilterSize=0)
-    speckleInfo.allDataToCSV(averageRange=0.3)
+                                                gaussianFilterNormalizationStdDev=75, medianFilterSize=0)
+    speckleInfo.allDataToCSV("20201016-FITCSpeckles-0p5Objective_20201016-Speckles-2_75std.csv", averageRange=0.3)
