@@ -232,9 +232,12 @@ class SpeckleStatsReport:
             self.__fullReport.savefig(fname=saveName, dpi=1000)
         return self.__fullReport
 
-    def fullGraphicsReportDisplay(self, saveName: str = None):
+    def fullGraphicsReportDisplay(self, saveName: str = None, useInGUI:bool=True):
         fig = self.fullGrahicsReportCreation(saveName)
-        fig.show()
+        if useInGUI:
+            fig.show()
+        else:
+            plt.show()
 
     def fullMethodInfo(self):
         raise NotImplementedError("To do")
@@ -242,7 +245,8 @@ class SpeckleStatsReport:
 
 if __name__ == '__main__':
     path = r"..\speckleAnalysis\circularWithPhasesSimulations\4pixelsCircularWithPhasesSimulations.tiff"
-    path = r"C:\Users\goubi\PycharmProjects\HiLoZebrafish\SpeckleSizeCode\MATLAB\\"
-    path += r"20190924-200ms_20mW_Ave15_Gray_10X0.4_20.tif"
-    path = r"C:\Users\goubi\Desktop\testSpeckle.jpg"
+    # path = r"C:\Users\goubi\PycharmProjects\HiLoZebrafish\SpeckleSizeCode\MATLAB\\"
+    # path += r"20190924-200ms_20mW_Ave15_Gray_10X0.4_20.tif"
+    # path = r"C:\Users\goubi\Desktop\testSpeckle.jpg"
     ssr = SpeckleStatsReport(path, averageRange=20 / 100)
+    ssr.fullGraphicsReportDisplay(None, False)
