@@ -5,12 +5,13 @@ import numpy as np
 
 class SpeckleCaracerization:
 
-    def __init__(self, imagePath: str, gaussianFilterNormalizationStdDev: float = 75, medianFilterSize: int = 3,
-                 imageFromArray: np.ndarray = None):
+    def __init__(self, imagePath: str, backgroundImage: str = None, gaussianFilterNormalizationStdDev: float = 75,
+                 medianFilterSize: int = 3, imageFromArray: np.ndarray = None):
         self.__fileName = imagePath
         if imageFromArray is not None:
             self.__fileName = "Image from custom array"
-        self.__autocorrObj = autocorrelation.Autocorrelation(imagePath, imageFromArray=imageFromArray)
+        self.__autocorrObj = autocorrelation.Autocorrelation(imagePath, imageFromArray=imageFromArray,
+                                                             backgroundImage=backgroundImage)
         self.__image = self.__autocorrObj.image
         self.__autocorrObj.computeAutocorrelation(gaussianFilterNormalizationStdDev, medianFilterSize)
         self.__autocorrelation = self.__autocorrObj.autocorrelation

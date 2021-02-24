@@ -43,8 +43,8 @@ class FilesFinder:
 
 class SpeckleFolderCaracterizations:
 
-    def __init__(self, directoryPath: str, specificKeywords: tuple = None, specificExtensions: tuple = None,
-                 cropAroundCenter: tuple = None, **kwargs):
+    def __init__(self, directoryPath: str, backgroundImage: str = None, specificKeywords: tuple = None,
+                 specificExtensions: tuple = None, cropAroundCenter: tuple = None, **kwargs):
         self.__allFilesObj = FilesFinder(directoryPath)
         if specificExtensions is not None and specificKeywords is not None:
             allFilesExtensions = self.__allFilesObj.returnSpecificExtensions(specificExtensions, False)
@@ -61,15 +61,18 @@ class SpeckleFolderCaracterizations:
         self.__caracKwargs = kwargs
         self.__allCaracObj = None
         self.__cropSize = cropAroundCenter
+        self.__bgImage = backgroundImage
 
     def __createAllCaracterizationObjects(self):
         kwargs = self.__caracKwargs
         if self.__cropSize is None:
-            self.__allCaracObj = [caracterization.SpeckleCaracerization(file, **kwargs) for file in self.__allFiles]
+            self.__allCaracObj = [caracterization.SpeckleCaracerization(file, self.__bgImage, **kwargs) for file in
+                                  self.__allFiles]
         else:
-            self.__allCaracObj = [caracterization.SpeckleCaracerization(file, **kwargs).centeredCrop(self.__cropSize[0],
-                                                                                                     self.__cropSize[1])
-                                  for file in self.__allFiles]
+            self.__allCaracObj = [
+                caracterization.SpeckleCaracerization(file, self.__bgImage, **kwargs).centeredCrop(self.__cropSize[0],
+                                                                                                   self.__cropSize[1])
+                for file in self.__allFiles]
 
     def allDiameters(self, method: str = "mean", *args, **kwargs):
         if self.__allCaracObj is None:

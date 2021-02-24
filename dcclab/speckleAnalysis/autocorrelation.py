@@ -9,22 +9,38 @@ class FileReader:
     # FIXME: This is only until pydcclab is ok
 
     @staticmethod
-    def readFile(path: str):
+    def readFile(path: str, bgImage: str = None):
+        """
+        Method used to read an image file. Optionally, this method can be used to remove background. Background removal
+        is done by subtracting the background image from the current image we want to read. If a value comes out
+        negative, it is clipped to 0.
+        :param path: The path of the image we want to analyze.
+        :param bgImage: (optional) The path of the background image (set to None by default).
+        :return: The image as a NumPy array, with dimensions (width, height).
+        """
         if path.endswith(".tif") or path.endswith(".tiff"):
             pixels = tifffile.imread(path)
         else:
             pixels = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
+
+        if bgImage is not None:
+            if bgImage.endswith(".tif") or bgImage.endswith(".tiff"):
+                bg = tifffile.imread(path)
+            else:
+                bg = cv2.imread(bgImage, cv2.IMREAD_GRAYSCALE)
+            pixels = pixels - bg
+        pixels[pixels < 0] = 0
         return pixels.T  # we want shape[0] as the width and shape[1] as the height
 
 
 class Autocorrelation:
     # FIXME: Use pydcclab when ok
 
-    def __init__(self, imagePath: str, imageFromArray: np.ndarray = None):
+    def __init__(self, imagePath: str, imageFromArray: np.ndarray = None, backgroundImage:str=None):
         if imageFromArray is not None:
             self.__image = imageFromArray.copy()
         else:
-            self.__image = FileReader.readFile(imagePath)
+            self.__image = FileReader.readFile(imagePath, backgroundImage)
         self.__original = self.image
         self.__autocorrelation = None
         self.__slicesObj = None

@@ -5,12 +5,12 @@ import numpy as np
 
 class SpeckleStatsReport:
 
-    def __init__(self, imagePath: str, gaussianFilterNormalizationStdDev: float = 75, medianFilterSize: int = 3,
-                 localContrastKernelSize: int = 7, intensityHistogramBins: int = 256,
+    def __init__(self, imagePath: str, backgroundImage: str = None, gaussianFilterNormalizationStdDev: float = 75,
+                 medianFilterSize: int = 3, localContrastKernelSize: int = 7, intensityHistogramBins: int = 256,
                  localContrastHistogramBins: int = 256, FWHMFindingMethod: str = "mean", *FWHMFindingMethodArgs,
                  **FWHMFindingMethodKwargs):
         self.__imagePath = imagePath
-        self.__speckleCaracterizationObj = speckleCaracterization.SpeckleCaracerization(imagePath,
+        self.__speckleCaracterizationObj = speckleCaracterization.SpeckleCaracerization(imagePath, backgroundImage,
                                                                                         gaussianFilterNormalizationStdDev,
                                                                                         medianFilterSize)
         self.verticalFWHM, self.horizontalFWHM = self.__speckleCaracterizationObj.computeFWHMBothAxes(
@@ -116,7 +116,7 @@ class SpeckleStatsReport:
         fig.text(0.04, 0.5, ylabel, ha='center', va='center', rotation='vertical')
         fig.subplots_adjust(hspace=0.6)
 
-    def displaySpeckleImage(self, colorMap: str = None, connectYZoom:callable=None, connectXZoom:callable=None):
+    def displaySpeckleImage(self, colorMap: str = None, connectYZoom: callable = None, connectXZoom: callable = None):
         fig = plt.figure()
         ax = fig.add_subplot()
         self._displaySpeckleImagePrep(ax, colorMap)
@@ -232,7 +232,7 @@ class SpeckleStatsReport:
             self.__fullReport.savefig(fname=saveName, dpi=1000)
         return self.__fullReport
 
-    def fullGraphicsReportDisplay(self, saveName: str = None, useInGUI:bool=True):
+    def fullGraphicsReportDisplay(self, saveName: str = None, useInGUI: bool = True):
         fig = self.fullGrahicsReportCreation(saveName)
         if useInGUI:
             fig.show()
