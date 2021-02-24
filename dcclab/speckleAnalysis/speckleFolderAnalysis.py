@@ -117,7 +117,7 @@ class SpeckleFolderCaracterizations:
             sName = os.path.split(file)[-1]
             shortFnames.append(sName)
             try:
-                obj = caracterization.SpeckleCaracerization(file, **self.__caracKwargs)
+                obj = caracterization.SpeckleCaracerization(file, self.__bgImage, **self.__caracKwargs)
                 if self.__cropSize is not None:
                     obj = obj.centeredCrop(self.__cropSize[0], self.__cropSize[1], **self.__caracKwargs)
                 im = obj.speckleImageAfterFilters
