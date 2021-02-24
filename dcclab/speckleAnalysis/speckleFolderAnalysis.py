@@ -128,12 +128,13 @@ class SpeckleFolderCaracterizations:
                 globalContrasts.append(obj.globalContrast())
                 visibilities.append(obj.contrastModulation())
                 fullyDeveloped.append(obj.isFullyDevelopedSpecklePattern())
-            except:
+            except Exception as e:
                 diams.append(np.nan)
                 globalContrasts.append(np.nan)
                 visibilities.append(np.nan)
                 fullyDeveloped.append(-1)
                 print(f"Problem with {sName}")
+                print(e)
             i += 1
             print(f"Number of patterns treated : {i}/{nbFiles}")
         self.__allCaracObj = caracObjs
