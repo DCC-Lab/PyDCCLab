@@ -4,6 +4,8 @@ import sqlite3 as lite
 import urllib.parse as parse
 import pathlib
 import os
+from typing import NamedTuple
+
 """
 General-purpose Databse() object.
 
@@ -53,6 +55,25 @@ cafeine2 server.
 
 """
 
+from enum import Enum
+
+class Type(Enum):
+    Null = "NULL"
+    Integer = "INTEGER"
+    Real = "REAL"
+    Float = "REAL"
+    Text = "TEXT"
+    String = "TEXT"
+    Blob = "BLOB"
+
+class Constraint(Enum):
+    Primary = "PRIMARY KEY"
+    Default = ""
+
+class Column(NamedTuple):
+    name: str
+    type: Type
+    constraint: Constraint = Constraint.Default
 
 class Database:
     def __init__(self, databasePath, writePermission=False):
@@ -189,6 +210,17 @@ class Database:
                     attributes.append('{} {}'.format(key, keyType))
                 statement += ",".join(attributes) + ")"
                 self.execute(statement)
+
+    def createSimpleTable(self, name, columns):
+        if self.isConnected:
+            statement = f'CREATE TABLE IF NOT EXISTS "{name}" '
+
+            colStatements = []
+            for c in columns:
+                colStatements.append(f"{c.name} {c.type.value} {c.constraint.value}")
+
+            statement += '(' + ','.join(colStatements) + ')'
+            self.execute(statement)
 
     def dropTable(self, table: str):
         if self.isConnected:
