@@ -1,7 +1,7 @@
+import env
 from dcclab import Database as db
 from datetime import date
 from zipfile import ZipFile
-import env
 import unittest
 import os
 
