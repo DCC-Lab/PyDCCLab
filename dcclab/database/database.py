@@ -71,6 +71,9 @@ class Database:
         self.__rows = None
         self.cursor = None
 
+        if not os.path.exists(databasePath) and not writePermission:
+            raise ValueError(f"The database {databasePath} does not exist and cannot be created because writePermission is set to False")
+        
         self.connect()
 
     def __enter__(self):

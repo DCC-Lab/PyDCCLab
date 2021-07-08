@@ -1,8 +1,8 @@
+import env
 from dcclab import findFiles
 import os
 import unittest
 import re
-import env
 
 
 class TestDatabaseUtilities(env.DCCLabTestCase):
