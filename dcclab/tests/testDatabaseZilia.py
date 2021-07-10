@@ -52,6 +52,8 @@ class TestDatabase(env.DCCLabTestCase):
     #     db.createSimpleTable(name="table1", columns=[column])
 
 class ZiliaDB(Database):
+    statementFromAll = "from spectra as s, spectralFiles as f, monkeys as m where s.md5 = f.md5 and f.monkeyId = m.id"
+    statementFromSpectra = "from spectra as s"
     def __init__(self):
         super().__init__(ziliaDb, writePermission=False)
 
@@ -59,17 +61,15 @@ class ZiliaDB(Database):
         self.execute("select name from monkeys order by name")
         return self.fetchAll()
 
-    def getAllRawSpectra(self, nameOrId):
+    def getAllRawSpectra(self, monkey="%", target="%"):
         # self.execute("select wavelength, intensity from spectra where name like '%{0}%' or id like '%{0}%'".format(nameOrId))
-        self.execute(r"select wavelength, intensity, md5,column from spectra where md5 like '%d5f%' and column like '%raw%'".format(nameOrId))
+        self.execute(r"select s.wavelength, s.intensity, s.md5, s.column {0} where s.md5 like '%d5f%' and s.column like '%raw%'".format(self.statementFromSpectra))
         rows = self.fetchAll()
         nTotal = len(rows)
-        print(nTotal)
         spectra = np.zeros(shape=(nTotal,2))
         for i,row in enumerate(rows):
             spectra[i,0] = row['wavelength']
             spectra[i,1] = row['intensity']
-            print(row['md5'], row['column'])
 
         return spectra
 
@@ -95,7 +95,7 @@ class TestZilia(env.DCCLabTestCase):
     def testGetSpectra(self):
         db=ZiliaDB()
         self.assertIsNotNone(db)
-        spectra = db.getAllRawSpectra(nameOrId='Rwanda')
-        print(spectra.shape)
+        spectra = db.getAllRawSpectra()
+        print(spectra)
 if __name__ == '__main__':
     unittest.main()
