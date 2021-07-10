@@ -136,7 +136,7 @@ class ZiliaDB(Database):
 
         if type is not None:
             stmnt += " and f.acquisition = '{0}'".format(type)
-        print(stmnt)
+
         self.execute(stmnt)
         rows = self.fetchAll()
         nWavelengths = len(self.wavelengths)
@@ -146,11 +146,6 @@ class ZiliaDB(Database):
             spectra[i%nWavelengths, i//nWavelengths] = float(row['intensity'])
 
         return spectra
-
-    def reshapeSpectraAsMatrix(self, spectra):
-        for i,  in enumerate(spectra.shape[0]):
-            spectra[i,0]
-            spectra[i,1]
 
 
 class TestZilia(env.DCCLabTestCase):
