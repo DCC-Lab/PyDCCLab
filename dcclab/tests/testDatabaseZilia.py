@@ -52,17 +52,54 @@ class TestDatabase(env.DCCLabTestCase):
     #     db.createSimpleTable(name="table1", columns=[column])
 
 class ZiliaDB(Database):
-    statementFromAll = "from spectra as s, spectralFiles as f, monkeys as m where s.md5 = f.md5 and f.monkeyId = m.id"
+    statementFromAllJoin = "from spectra as s, spectralFiles as f, monkeys as m where s.md5 = f.md5 and f.monkeyId = m.id"
     statementFromSpectra = "from spectra as s"
+
     def __init__(self):
         super().__init__(ziliaDb, writePermission=False)
+        self._wavelengths = None
+
+    @property
+    def wavelengths(self):
+        if self._wavelengths is None:
+            self._wavelengths = self.getWavelengths()
+
+        return self._wavelengths
+
+    def getWavelengths(self):
+        self.execute(r"select distinct(wavelength) from spectra order by wavelength")
+        rows = self.fetchAll()
+        nTotal = len(rows)
+
+        wavelengths = np.zeros(shape=(nTotal))
+        for i,row in enumerate(rows):
+            wavelengths[i] = row['wavelength']
+
+        return wavelengths
+
+    def getAcquisitionType(self):
+        self.execute(r"select distinct(column) from spectra order by column")
+        rows = self.fetchAll()
+        nTotal = len(rows)
+
+        types = set()
+        for row in rows:
+            type = row['column']
+            if re.match('raw', type) is not None:
+                type = 'raw'
+            types.add(type)
+
+        return sorted(types)
 
     def getMonkeyNames(self):
         self.execute("select name from monkeys order by name")
-        return self.fetchAll()
+        rows = self.fetchAll()
+        names = []
+        for row in rows:
+            names.append(row['name'])
+        return names
 
     def getAllRawSpectra(self, monkey="%", target="%"):
-        # self.execute("select wavelength, intensity from spectra where name like '%{0}%' or id like '%{0}%'".format(nameOrId))
         self.execute(r"select s.wavelength, s.intensity, s.md5, s.column {0} where s.md5 like '%d5f%' and s.column like '%raw%'".format(self.statementFromSpectra))
         rows = self.fetchAll()
         nTotal = len(rows)
@@ -72,6 +109,12 @@ class ZiliaDB(Database):
             spectra[i,1] = row['intensity']
 
         return spectra
+
+    def reshapeSpectraAsMatrix(self, spectra):
+        for i,  in enumerate(spectra.shape[0]):
+            spectra[i,0]
+            spectra[i,1]
+
 
 class TestZilia(env.DCCLabTestCase):
     def testZiliaDBCreation(self):
@@ -85,17 +128,29 @@ class TestZilia(env.DCCLabTestCase):
         self.assertTrue(len(rows) == 4)
         self.assertEqual([ r['name'] for r in rows], ['Bresil', 'Kenya', 'Rwanda', 'Somalie'])
 
-    def testZiliaGetMonkeyNamesFromClass(self):
+    def testGetMonkeyNames(self):
         db=ZiliaDB()
         self.assertIsNotNone(db)
-        rows = db.getMonkeyNames()
-        self.assertTrue(len(rows) == 4)
-        self.assertEqual([ r['name'] for r in rows], ['Bresil', 'Kenya', 'Rwanda', 'Somalie'])
+        names = db.getMonkeyNames()
+        self.assertEqual(names, ['Bresil', 'Kenya', 'Rwanda', 'Somalie'])
+
+    def testGetWavelengths(self):
+        db=ZiliaDB()
+        self.assertIsNotNone(db)
+        wavelengths = db.getWavelengths()
+        self.assertTrue(wavelengths.shape == (512,))
 
     def testGetSpectra(self):
         db=ZiliaDB()
         self.assertIsNotNone(db)
         spectra = db.getAllRawSpectra()
-        print(spectra)
+        self.assertIsNotNone(spectra)
+        
+    def testGetAcquisitionType(self):
+        db=ZiliaDB()
+        self.assertIsNotNone(db)
+        types = db.getAcquisitionType()
+        self.assertEqual(types, ['bg','raw','ref'])
+
 if __name__ == '__main__':
     unittest.main()

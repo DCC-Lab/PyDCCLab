@@ -191,12 +191,10 @@ class Database:
     def select(self, table, columns='*', condition=None) -> lite.Row:
         if condition is None:
             self.execute("SELECT {0} FROM {1}".format(columns, table))
-            rows = self.fetchAll()
         else:
             self.execute("SELECT {0} FROM {1} WHERE {2}".format(
                 columns, table, condition))
-            rows = self.fetchAll()
-        return rows
+        return self.fetchAll()
 
     def createTable(self, metadata: dict):
         if self.isConnected:
