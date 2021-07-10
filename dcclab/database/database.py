@@ -89,7 +89,6 @@ class Database:
         self.__mode = mode
         self.__databasePath = databasePath
         self.__connection = None
-        self.__rows = None
         self.cursor = None
 
         if not os.path.exists(databasePath) and not writePermission:
@@ -171,13 +170,11 @@ class Database:
 
     def fetchAll(self) -> lite.Row:
         if self.isConnected:
-            self.__rows = self.cursor.fetchall()
-            return self.__rows
+            return self.cursor.fetchall()
 
     def fetchOne(self) -> lite.Row:
         if self.isConnected:
-            self.__rows = self.cursor.fetchone()
-            return self.__rows
+            return self.cursor.fetchone()
 
     @property
     def tables(self) -> list:
@@ -194,12 +191,12 @@ class Database:
     def select(self, table, columns='*', condition=None) -> lite.Row:
         if condition is None:
             self.execute("SELECT {0} FROM {1}".format(columns, table))
-            self.__rows = self.fetchAll()
+            rows = self.fetchAll()
         else:
             self.execute("SELECT {0} FROM {1} WHERE {2}".format(
                 columns, table, condition))
-            self.__rows = self.fetchAll()
-        return self.__rows
+            rows = self.fetchAll()
+        return rows
 
     def createTable(self, metadata: dict):
         if self.isConnected:
