@@ -216,7 +216,7 @@ class Dataset:
     def setModel(self, model: str=None):
         if model is None:
             # infer model...
-            if self.info['type'] is "Semantic classification":
+            if self.info['type'] == "Semantic classification":
                 # use resnet50... check size...
                 pass
 
