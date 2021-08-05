@@ -14,9 +14,9 @@ rm dist/*; python setup.py sdist bdist_wheel; python -m twine upload dist/*
 
 setuptools.setup(
     name="dcclab",
-    version="0.9.5",
-    url="https://github.com/DCC-Lab/dcclab.py",
-    author="Daniel Cote",
+    version="1.0.0",
+    url="https://github.com/DCC-Lab/PyDCCLab",
+    author="Daniel Côté, Gabriel Genest, Mathieu Fournier, Ludovick Bégin",
     author_email="dccote@cervo.ulaval.ca",
     description="A Python library to read, transform, manipulate images",
     long_description=open('README.md').read(),
