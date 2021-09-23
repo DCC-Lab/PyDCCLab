@@ -131,7 +131,7 @@ class TestImageCollection(env.DCCLabTestCase):
             ImageCollection(imageList)
 
 
-class TesImageCollectionMethods(env.dcclabTestCase):
+class TestImageCollectionMethods(env.DCCLabTestCase):
 
     def setUp(self) -> None:
         self.imageList = []
