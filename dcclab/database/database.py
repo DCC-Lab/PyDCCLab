@@ -259,17 +259,6 @@ class Database:
         if self.isConnected:
             self.execute('END TRANSACTION')
 
-    def createArchive(self):
-        # Before using this function, make sure that you have enough disk space available.
-        # TODO Should we check for available disk space?
-        if self.__rows is not None:
-            archive = '{}_query_archive.zip'.format(str(date.today()).replace('-', ''))
-            with ZipFile(archive, 'w') as zeep:
-                for row in self.__rows:
-                    filePath = row['file_path']
-                    fileName = os.path.basename(filePath)
-                    zeep.write(filePath, fileName)
-
     # TODO Is this a necessary function?
     # If not, delete.
     def update(self, table: str, value: dict):
