@@ -1,15 +1,15 @@
+import env
 from dcclab import Database as db
 from datetime import date
 from zipfile import ZipFile
-import env
 import unittest
 import os
 
 
 class TestDatabase(env.DCCLabTestCase):
     def setUp(self):
-        self.filePath = os.path.join(str(self.dataDir), 'unittest.db')
-        self.wrongFile = os.path.join(str(self.dataDir), 'wrongfile.db')
+        self.filePath = os.path.join(str(self.tmpDir), 'unittest.db')
+        self.wrongFile = os.path.join(str(self.tmpDir), 'wrongfile.db')
 
         with db(self.filePath, True) as testDB:
             testDB.beginTransaction()
@@ -34,9 +34,8 @@ class TestDatabase(env.DCCLabTestCase):
         database.disconnect()
 
     def testConnectUnsuccessful(self):
-        database = db(self.wrongFile)
-        self.assertFalse(database.connect())
-        database.disconnect()
+        with self.assertRaises(Exception):
+            database = db(self.wrongFile)
 
     def testConnectWithWrongMode(self):
         with self.assertRaises(Exception):
@@ -74,19 +73,14 @@ class TestDatabase(env.DCCLabTestCase):
         database.disconnect()
 
     def testIsNotConnected(self):
-        database = db("notADatabase")
-        self.assertFalse(database.isConnected)
+        with self.assertRaises(Exception):
+            database = db("notADatabase")
 
     def testChangeConnectionModeToValidMode(self):
         database = db(self.filePath)
         database.connect()
         database.changeConnectionMode('rw')
         self.assertNotEqual(database.mode, 'ro')
-        database.disconnect()
-
-    def testPathReadOnlyMode(self):
-        database = db('unittest.db', writePermission=False)
-        self.assertEqual(database.path, 'file:unittest.db?mode=ro')
         database.disconnect()
 
     # Linux and MacOS are 'posix', windows is 'nt'.
@@ -228,34 +222,6 @@ class TestDatabase(env.DCCLabTestCase):
             self.assertTrue(database.isConnected)
 
         self.assertFalse(database.isConnected)
-
-    def testCreateArchive(self):
-        textFile = os.path.join(str(self.dataDir), 'ziptest.txt')
-        with open(textFile, 'w') as testFile:
-            testFile.write('This is a test file to be deleted.')
-
-        with db(self.filePath, True) as database:
-            database.dropTable('test_table')
-            database.commit()
-
-            testTable = {'test_table': {'column_1': 'INTEGER PRIMARY KEY', 'column_2': 'TEXT', 'column_3': 'REAL',
-                                        'file_path': 'TEXT'}}
-            database.createTable(testTable)
-            database.commit()
-
-            testValue = {'column_1': 9876, 'column_2': 'bleh', 'column_3': 0.1121, 'file_path': textFile}
-            database.insert('test_table', testValue)
-            database.commit()
-
-            database.select('test_table')
-            database.createArchive()
-
-        archive = '{}_query_archive.zip'.format(str(date.today()).replace('-', ''))
-        with ZipFile(archive) as zeep:
-            self.assertTrue(zeep.namelist())
-
-        os.remove(textFile)
-        os.remove(archive)
 
 
 if __name__ == '__main__':

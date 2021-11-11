@@ -14,9 +14,9 @@ rm dist/*; python setup.py sdist bdist_wheel; python -m twine upload dist/*
 
 setuptools.setup(
     name="dcclab",
-    version="0.9.65",
-    url="https://github.com/DCC-Lab/dcclab.py",
-    author="Daniel Cote",
+    version="1.0.1",
+    url="https://github.com/DCC-Lab/PyDCCLab",
+    author="Daniel Côté, Gabriel Genest, Mathieu Fournier, Ludovick Bégin",
     author_email="dccote@cervo.ulaval.ca",
     description="A Python library to read, transform, manipulate images",
     long_description=open('README.md').read(),
@@ -24,7 +24,7 @@ setuptools.setup(
     license='MIT',
     keywords='image analysis stack movies',
     packages=setuptools.find_packages(),
-    install_requires=['matplotlib','numpy','scikit-image','scipy','czifile >= 2019.6.18','tifffile','read-lif','opencv-python'],
+    install_requires=['matplotlib','numpy','scikit-image','scipy','czifile >= 2019.6.18','tifffile','read-lif','opencv-python','xlrd','seaborn','imagecodecs','deprecated'],
     python_requires='>=3',
     package_data={
         # If any package contains *.txt or *.rst files, include them:

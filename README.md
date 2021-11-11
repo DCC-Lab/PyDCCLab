@@ -1,4 +1,5 @@
 # CERVO-dcclab Python module
+
 This simple module is meant to simplify the loading and treatment of images at CERVO. The ultimate goal of this module is to rapidly be able to extract useful and pertinent information about microscopy images taken at the CERVO research center.
 
 ## Image Analysis
@@ -101,4 +102,4 @@ The database is ready to use (i.e. `connected`) upon creation.  To begin using t
 
 ## Disclaimer
 
-Copyrights DCCote + Anais (2019).
+Copyrights DCCLab Members (2019).

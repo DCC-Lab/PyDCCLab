@@ -23,5 +23,6 @@ from .database import *
 from .metadata import *
 from . import speckleAnalysis
 
-__version__ = "0.9.65"
+
+__version__ = "1.0.1"
 __author__ = "Daniel Cote <dccote@cervo.ulaval.ca>"
