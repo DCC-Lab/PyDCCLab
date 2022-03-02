@@ -118,6 +118,7 @@ class Database:
                     self.path, uri=True, isolation_level=None)
                 self.__connection.row_factory = lite.Row
                 self.cursor = self.__connection.cursor()
+                self.enforceForeignKeys()
             return True
         except:
             # Cleanup
@@ -133,6 +134,9 @@ class Database:
             self.__connection.close()
             self.__connection = None
             self.cursor = None
+
+    def enforceForeignKeys(self):
+        self.execute("PRAGMA foreign_keys = ON;")
 
     @property
     def isConnected(self):
