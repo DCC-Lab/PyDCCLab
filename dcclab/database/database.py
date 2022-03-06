@@ -115,7 +115,7 @@ class Database:
         try:
             if not self.isConnected:
                 self.__connection = lite.connect(
-                    self.path, uri=True, isolation_level=None)
+                    self.path, uri=True, isolation_level=None, detect_types=lite.PARSE_DECLTYPES)
                 self.__connection.row_factory = lite.Row
                 self.cursor = self.__connection.cursor()
                 self.enforceForeignKeys()
@@ -246,7 +246,7 @@ class Database:
     # if the database crashed or there is a power failure. 
     # However, asynchronus mode is much faster.
         if self.isConnected:
-                self.execute('PRAGMA synchronous = OFF')
+            self.execute('PRAGMA synchronous = OFF')
 
     def beginTransaction(self):
     # With isolation_level = None for our connection, we disable 
