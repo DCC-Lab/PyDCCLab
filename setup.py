@@ -18,13 +18,13 @@ setuptools.setup(
     url="https://github.com/DCC-Lab/PyDCCLab",
     author="Daniel Côté, Gabriel Genest, Mathieu Fournier, Ludovick Bégin",
     author_email="dccote@cervo.ulaval.ca",
-    description="A Python library to read, transform, manipulate images",
+    description="A Python library to read, transform, manipulate images and manage databases",
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     license='MIT',
     keywords='image analysis stack movies',
     packages=setuptools.find_packages(),
-    install_requires=['matplotlib','numpy','scikit-image','scipy','czifile >= 2019.6.18','tifffile','read-lif','opencv-python','xlrd','seaborn','imagecodecs','deprecated'],
+    install_requires=['keyring', 'mysql-connector-python','sqlite3', 'matplotlib','numpy','scikit-image','scipy','czifile >= 2019.6.18','tifffile','read-lif','opencv-python','xlrd','seaborn','imagecodecs','deprecated'],
     python_requires='>=3',
     package_data={
         # If any package contains *.txt or *.rst files, include them:

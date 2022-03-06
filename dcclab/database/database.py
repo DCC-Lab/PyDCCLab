@@ -78,7 +78,7 @@ class Column(NamedTuple):
     constraint: Constraint = Constraint.Default
 
 class Database:
-    def __init__(self, databasePath, writePermission=False, host=None, user=None):
+    def __init__(self, databasePath, writePermission=False):
         if writePermission is True:
             # Possible modes are read-only, read write and read write create
             # which are 'ro', 'rw', and 'rwc' respectively
@@ -90,14 +90,12 @@ class Database:
 
         self.__mode = mode
         self.__databasePath = databasePath
-        self.host = host
-        self.user = user
         self.connection = None
         self.cursor = None
 
-        if not os.path.exists(databasePath) and not writePermission:
-            raise ValueError(f"The database {databasePath} does not exist and cannot be created because writePermission is set to False")
-        
+        # if not os.path.exists(databasePath) and not writePermission:
+        #     raise ValueError(f"The database {databasePath} does not exist and cannot be created because writePermission is set to False")
+
         self.connect()
 
     def __enter__(self):
@@ -253,7 +251,7 @@ class Database:
             self.execute('PRAGMA synchronous = OFF')
 
     def beginTransaction(self):
-    # With isolation_level = None for our connection, we disable 
+    # With isolation_level = None for our connection, we disable
     # the python auto-handling of BEGIN, etc. We reset to the
     # default SQLite handling. By default, SQLite is in auto-commit mode.
     # It means that for each command, SQLite starts, processes, and
@@ -276,10 +274,7 @@ class MySQLDatabase(Database):
         self.port = port
         self.user = user
         self.usePassword = usePassword
-        self.connection = None
-        self.cursor = None
-
-        self.connect()
+        super().__init__(database)
 
     @property
     def url(self):
