@@ -254,9 +254,8 @@ class TestMySQLDatabase(env.DCCLabTestCase):
     def testConnectRemoteDatabase(self):
         # An ssh tunnel must be in place: ssh dcclab@cafeine2.crulrg.ulaval.ca -L3336:127.0.0.1:3306 -N
         # or get https://apps.apple.com/us/app/core-tunnel/id1354318707?mt=12
-        # pwd = keyring.get_password("mysql-cafeine2", "dcclab")
         # If you get an error, you need to write the password to the keyring once with:
-        # keyring.set_password("mysql-cafeine2", "dcclab", "thepassword")
+        # python -m keyring set mysql-127.0.0.1:3336 dcclab
         db = MySQLDatabase(database='questions', host='127.0.0.1', port=3336, user='dcclab', usePassword=True)
         self.assertTrue(db.isConnected)
         names = self.db.tables
