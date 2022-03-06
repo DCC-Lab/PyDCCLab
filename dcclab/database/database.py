@@ -1,13 +1,15 @@
 from zipfile import ZipFile
 from datetime import date
 import sqlite3 as lite
+import mysql.connector as mysql
 import urllib.parse as parse
 import pathlib
 import os
 from typing import NamedTuple
+import keyring
 
 """
-General-purpose Databse() object.
+General-purpose Database() object.
 
 The database is ready to use (i.e. `connected`) upon creation.
 To begin using the `Database`, making queries or inserting into it,
@@ -76,7 +78,7 @@ class Column(NamedTuple):
     constraint: Constraint = Constraint.Default
 
 class Database:
-    def __init__(self, databasePath, writePermission=False):
+    def __init__(self, databasePath, writePermission=False, host=None, user=None):
         if writePermission is True:
             # Possible modes are read-only, read write and read write create
             # which are 'ro', 'rw', and 'rwc' respectively
@@ -88,7 +90,9 @@ class Database:
 
         self.__mode = mode
         self.__databasePath = databasePath
-        self.__connection = None
+        self.host = host
+        self.user = user
+        self.connection = None
         self.cursor = None
 
         if not os.path.exists(databasePath) and not writePermission:
@@ -114,16 +118,16 @@ class Database:
     def connect(self):
         try:
             if not self.isConnected:
-                self.__connection = lite.connect(
+                self.connection = lite.connect(
                     self.path, uri=True, isolation_level=None, detect_types=lite.PARSE_DECLTYPES)
-                self.__connection.row_factory = lite.Row
-                self.cursor = self.__connection.cursor()
+                self.connection.row_factory = lite.Row
+                self.cursor = self.connection.cursor()
                 self.enforceForeignKeys()
             return True
         except:
             # Cleanup
-            if self.__connection is not None:
-                self.__connection.close()
+            if self.connection is not None:
+                self.connection.close()
                 self.cursor = None
 
             return False
@@ -131,8 +135,8 @@ class Database:
     def disconnect(self):
         if self.isConnected:
             self.commit()
-            self.__connection.close()
-            self.__connection = None
+            self.connection.close()
+            self.connection = None
             self.cursor = None
 
     def enforceForeignKeys(self):
@@ -140,7 +144,7 @@ class Database:
 
     @property
     def isConnected(self):
-        return self.__connection is not None
+        return self.connection is not None
 
     def setPermissionToWrite(self):
         if self.isConnected:
@@ -162,11 +166,11 @@ class Database:
 
     def commit(self):
         if self.isConnected:
-            self.__connection.commit()
+            self.connection.commit()
 
     def rollback(self):
         if self.isConnected:
-            self.__connection.rollback()
+            self.connection.rollback()
 
     def execute(self, statement):
         if self.isConnected:
@@ -263,12 +267,94 @@ class Database:
         if self.isConnected:
             self.execute('END TRANSACTION')
 
-    # TODO Is this a necessary function?
-    # If not, delete.
-    def update(self, table: str, value: dict):
-        pass
 
-    # TODO Is this a necessary function?
-    # If not, delete.
-    def upsert(self, table: str, value: dict):
-        pass
+class MySQLDatabase(Database):
+
+    def __init__(self, database, host="127.0.0.1", port=3306, user="root", usePassword=False):
+        self.database = database
+        self.host = host
+        self.port = port
+        self.user = user
+        self.usePassword = usePassword
+        self.connection = None
+        self.cursor = None
+
+        self.connect()
+
+    @property
+    def url(self):
+        return self.host
+
+    @property
+    def mode(self):
+        return None
+
+    def connect(self):
+        try:
+            if not self.isConnected:
+                if self.usePassword is True:
+                    serviceName = "mysql-{0}:{1}".format(self.host, self.port)
+                    pwd = keyring.get_password(serviceName, self.user)
+                    if pwd is None:
+                        raise Exception(""" Set the password in the system password manager on the command line with:
+                        python -m keyring set {0} {1}""".format(serviceName, self.user))
+                else:
+                    pwd = None
+
+                self.connection = mysql.connect(host=self.host,
+                                                port=self.port,
+                                                 database=self.database,
+                                                 user=self.user,
+                                                 password=pwd)
+
+                self.cursor = self.connection.cursor(dictionary=True)
+                self.enforceForeignKeys()
+            return True
+        except Exception as err:
+            # Cleanup
+            if self.connection is not None:
+                self.connection.close()
+                self.cursor = None
+            raise(err)
+
+    def enforceForeignKeys(self):
+        self.execute("set foreign_key_checks = 1")
+
+    def disableForeignKeys(self):
+        self.execute("set foreign_key_checks = 0")
+
+    @property
+    def isConnected(self):
+        return self.connection is not None
+
+    @property
+    def tables(self) -> list:
+        self.execute("show tables")
+        name = self.cursor.column_names[0]
+        rows = self.fetchAll()
+        print(rows)
+        results = [row[name] for row in rows]
+        return results
+
+    def columns(self, table) -> list:  # FixMe Find a better name?
+        self.execute('SELECT * FROM "{}"'.format(table))
+        columns = [description[0] for description in self.cursor.description]
+        return columns
+
+    def asynchronous(self):
+        # Asynchronous mode means the database doesn't wait for
+        # something to be entirely written before it begins
+        # to write something else. It has the potential of corrupting entries
+        # if the database crashed or there is a power failure.
+        # However, asynchronus mode is much faster.
+        if self.isConnected:
+            self.execute('PRAGMA synchronous = OFF')
+
+    def beginTransaction(self):
+        if self.isConnected:
+            self.execute('BEGIN')
+
+    def endTransaction(self):
+        if self.isConnected:
+            self.execute('END')
+
