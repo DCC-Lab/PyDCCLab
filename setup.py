@@ -14,7 +14,7 @@ rm dist/*; python setup.py sdist bdist_wheel; python -m twine upload dist/*
 
 setuptools.setup(
     name="dcclab",
-    version="1.0.1",
+    version="1.0.2",
     url="https://github.com/DCC-Lab/PyDCCLab",
     author="Daniel Côté, Gabriel Genest, Mathieu Fournier, Ludovick Bégin",
     author_email="dccote@cervo.ulaval.ca",
