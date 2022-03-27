@@ -24,7 +24,7 @@ setuptools.setup(
     license='MIT',
     keywords='image analysis stack movies',
     packages=setuptools.find_packages(),
-    install_requires=['matplotlib','numpy','scikit-image','scipy','czifile >= 2019.6.18','tifffile','read-lif','opencv-python','xlrd','seaborn','imagecodecs','deprecated'],
+    install_requires=['matplotlib','numpy','scikit-image','scipy','czifile >= 2019.6.18','tifffile','read-lif','opencv-python','xlrd','seaborn','imagecodecs','deprecated','keyring','sshtunnel'],
     python_requires='>=3',
     package_data={
         # If any package contains *.txt or *.rst files, include them:
