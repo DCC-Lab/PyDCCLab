@@ -29,9 +29,6 @@ class Cafeine:
         self.mysqlTunnel.start()
         return self.localMySQLPort
 
-    def __del__(self):
-        self.stopMySQLTunnel()
-
     @property
     def localMySQLPort(self):
         return self.mysqlTunnel.local_bind_port

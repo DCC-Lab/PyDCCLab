@@ -1,10 +1,11 @@
 import env
 from dcclab import Database as db
+from dcclab import MySQLDatabase
 from datetime import date
 from zipfile import ZipFile
 import unittest
 import os
-
+import keyring
 
 class TestDatabase(env.DCCLabTestCase):
     def setUp(self):
@@ -222,6 +223,49 @@ class TestDatabase(env.DCCLabTestCase):
             self.assertTrue(database.isConnected)
 
         self.assertFalse(database.isConnected)
+
+
+class TestMySQLDatabase(env.DCCLabTestCase):
+    def setUp(self):
+        super().setUp()
+        self.db = MySQLDatabase(database='questions', host='127.0.0.1', user='root')
+        self.assertIsNotNone(self.db)
+        self.db.connect()
+        self.assertTrue(self.db.isConnected)
+
+    def tearDown(self):
+        super().tearDown()
+        self.db.disconnect()
+
+    def testInitDatabase(self):
+        db = MySQLDatabase(database='questions', host='127.0.0.1', user='root')
+        self.assertIsNotNone(db)
+
+    def testConnectDatabase(self):
+        db = MySQLDatabase(database='questions', host='127.0.0.1', user='root')
+        self.assertTrue(db.isConnected)
+
+    def testDisconnectDatabase(self):
+        db = MySQLDatabase(database='questions', host='127.0.0.1', user='root')
+        self.assertTrue(db.isConnected)
+        db.disconnect()
+        self.assertFalse(db.isConnected)
+
+    def testConnectRemoteDatabase(self):
+        # An ssh tunnel must be in place: ssh dcclab@cafeine2.crulrg.ulaval.ca -L3336:127.0.0.1:3306 -N
+        # or get https://apps.apple.com/us/app/core-tunnel/id1354318707?mt=12
+        # If you get an error, you need to write the password to the keyring once with:
+        # python -m keyring set mysql-127.0.0.1:3336 dcclab
+        db = MySQLDatabase(database='questions', host='127.0.0.1', port=3336, user='dcclab', usePassword=True)
+        self.assertTrue(db.isConnected)
+        names = self.db.tables
+        self.assertTrue(len(names) > 1)
+
+    def testShowTables(self):
+        names = self.db.tables
+        self.assertTrue(len(names) > 1)
+
+
 
 
 if __name__ == '__main__':

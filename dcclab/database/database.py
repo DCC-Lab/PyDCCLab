@@ -1,13 +1,17 @@
 from zipfile import ZipFile
 from datetime import date
-import sqlite3 as lite
+# import sqlite3 as lite
+import mysql.connector as mysql
 import urllib.parse as parse
 import pathlib
 import os
 from typing import NamedTuple
+import keyring
+import re
+import sys
 
 """
-General-purpose Databse() object.
+General-purpose Database() object.
 
 The database is ready to use (i.e. `connected`) upon creation.
 To begin using the `Database`, making queries or inserting into it,
@@ -75,26 +79,40 @@ class Column(NamedTuple):
     type: Type
     constraint: Constraint = Constraint.Default
 
+class Engine(Enum):
+    mysql = "mysql"
+    sqlite3 = "sqlite3"
+
 class Database:
-    def __init__(self, databasePath, writePermission=False):
-        if writePermission is True:
-            # Possible modes are read-only, read write and read write create
-            # which are 'ro', 'rw', and 'rwc' respectively
-            mode = 'rwc'
-        elif writePermission is False:
-            mode = 'ro'
-        else:
-            raise ValueError("writePermission parameter must be true or false")
-
-        self.__mode = mode
-        self.__databasePath = databasePath
-        self.__connection = None
+    def __init__(self, databaseURL, writePermission=False):
+        self.writePermission = writePermission
+        self.databaseURL = databaseURL
+        self.connection = None
         self.cursor = None
+        self.databaseEngine = None
 
-        if not os.path.exists(databasePath) and not writePermission:
-            raise ValueError(f"The database {databasePath} does not exist and cannot be created because writePermission is set to False")
-        
+        self.database = "dcclab"
+        self.host = "cafeine2.crulrg.ulaval.ca"
+        self.user = "dcclab"
+        self.port = None
+        self.usePassword = True
+
+        self.databaseEngine, self.sshuser, self.host, self.user, self.database = self.parseURL(databaseURL)
+
         self.connect()
+
+    def parseURL(self, url):
+        #mysql://sshusername:sshpassword@cafeine2.crulrg.ulaval.ca/mysqlusername:mysqlpassword@questions
+        match = re.search("(.+?)://(.+?)@(.+?)/(.+?)@(.+)", url)
+        if match is not None:
+            protocol = Engine.mysql
+            sshuser = match.group(2)
+            host = match.group(3)
+            mysqluser = match.group(4)
+            database = match.group(5)
+            return (protocol, sshuser, host, mysqluser, database)
+        else:
+            return (Engine.sqlite3, None, "127.0.0.1", None, url)
 
     def __enter__(self):
         return self
@@ -114,16 +132,50 @@ class Database:
     def connect(self):
         try:
             if not self.isConnected:
-                self.__connection = lite.connect(
-                    self.path, uri=True, isolation_level=None)
-                self.__connection.row_factory = lite.Row
-                self.cursor = self.__connection.cursor()
+                if self.databaseEngine == Engine.sqlite3:
+                    self.connection = lite.connect(
+                        self.database, uri=True, isolation_level=None, detect_types=lite.PARSE_DECLTYPES)
+                    self.connection.row_factory = lite.Row
+                    self.cursor = self.connection.cursor()
+                else:
+                    if self.usePassword is True:
+                        serviceName = "mysql-{0}".format(self.host)
+                        pwd = keyring.get_password(serviceName, self.user)
+                        if pwd is None:
+                            raise Exception(""" Set the password in the system password manager on the command line with:
+                            python -m keyring set {0} {1}""".format(serviceName, self.user))
+                    else:
+                        pwd = None
+
+                    actualHost = self.host
+                    if self.host == "cafeine2.crulrg.ulaval.ca":
+                        from dcclab import Cafeine
+                        actualHost = "127.0.0.1"
+                        self.server = Cafeine()
+                        self.port = self.server.startMySQLTunnel()
+                        print("Forwarding 127.0.0.1:{2} to {0}@{1}:3306 through SSH tunnel".format(self.user, self.host, self.port))
+                    else:
+                        self.port = 3306
+
+                    self.connection = mysql.connect(host=actualHost,
+                                                    port=self.port,
+                                                     database=self.database,
+                                                     user=self.user,
+                                                     password=pwd,
+                                                     autocommit=True,
+                                                     use_pure=True)
+
+                    self.cursor = self.connection.cursor(dictionary=True)
+
                 self.enforceForeignKeys()
+
             return True
-        except:
+        except Exception as err:
             # Cleanup
-            if self.__connection is not None:
-                self.__connection.close()
+            print(err)
+            if self.connection is not None:
+                self.connection.close()
+                self.server.stopMySQLTunnel()
                 self.cursor = None
 
             return False
@@ -131,16 +183,74 @@ class Database:
     def disconnect(self):
         if self.isConnected:
             self.commit()
-            self.__connection.close()
-            self.__connection = None
+            self.connection.close()
+            self.connection = None
             self.cursor = None
 
     def enforceForeignKeys(self):
-        self.execute("PRAGMA foreign_keys = ON;")
+        if self.databaseEngine == Engine.sqlite3:
+            self.execute("PRAGMA foreign_keys = ON")
+        else:
+            self.execute("set foreign_key_checks = 1")
+
+    def disableForeignKeys(self):
+        if self.databaseEngine == Engine.sqlite3:
+            self.execute("PRAGMA foreign_keys = OFF")
+        else:
+            self.execute("set foreign_key_checks = 0")
+
+
+    def asynchronous(self):
+    # Asynchronous mode means the database doesn't wait for 
+    # something to be entirely written before it begins
+    # to write something else. It has the potential of corrupting entries
+    # if the database crashed or there is a power failure. 
+    # However, asynchronus mode is much faster.
+        if self.isConnected:
+            self.execute('PRAGMA synchronous = OFF')
+
+    def beginTransaction(self):
+    # With isolation_level = None for our connection, we disable
+    # the python auto-handling of BEGIN, etc. We reset to the
+    # default SQLite handling. By default, SQLite is in auto-commit mode.
+    # It means that for each command, SQLite starts, processes, and
+    # commits the transaction automatically. By issuing a BEGIN, we
+    # override this and manually handle transaction commits. This allows
+    # faster writing to the database.
+        if self.isConnected:
+            self.execute('BEGIN TRANSACTION')
+
+    def endTransaction(self):
+        if self.isConnected:
+            self.execute('END TRANSACTION')
+
+
+    def asynchronous(self):
+        # Asynchronous mode means the database doesn't wait for
+        # something to be entirely written before it begins
+        # to write something else. It has the potential of corrupting entries
+        # if the database crashed or there is a power failure.
+        # However, asynchronus mode is much faster.
+        if self.isConnected:
+            self.execute('PRAGMA synchronous = OFF')
+
+    def beginTransaction(self):
+        if self.databaseEngine == Engine.mysql:
+            if self.isConnected:
+                self.execute('BEGIN')
+        else:
+            self.execute('BEGIN TRANSACTION')
+
+    def endTransaction(self):
+        if self.databaseEngine == Engine.mysql:
+            if self.isConnected:
+                self.execute('END')
+        else:
+            self.execute('END TRANSACTION')
 
     @property
     def isConnected(self):
-        return self.__connection is not None
+        return self.connection is not None
 
     def setPermissionToWrite(self):
         if self.isConnected:
@@ -162,37 +272,43 @@ class Database:
 
     def commit(self):
         if self.isConnected:
-            self.__connection.commit()
+            self.connection.commit()
 
     def rollback(self):
         if self.isConnected:
-            self.__connection.rollback()
+            self.connection.rollback()
 
     def execute(self, statement):
         if self.isConnected:
             self.cursor.execute(statement)
 
-    def fetchAll(self) -> lite.Row:
+    def fetchAll(self):
         if self.isConnected:
             return self.cursor.fetchall()
 
-    def fetchOne(self) -> lite.Row:
+    def fetchOne(self):
         if self.isConnected:
             return self.cursor.fetchone()
 
     @property
     def tables(self) -> list:
-        self.execute("SELECT name FROM sqlite_master WHERE type='table'")
-        rows = self.fetchAll()
-        results = list(map(lambda row: row['name'], rows))
-        return results
+        if self.databaseEngine == Engine.mysql:
+            self.execute("show tables")
+            rows = self.fetchAll()
+            results = [ list(row.values())[0] for row in rows ]
+            return results
+        else:
+            self.execute(".tables")
+            rows = self.fetchAll()
+            results = [ list(row.values())[0] for row in rows ]
+            return results
 
     def columns(self, table) -> list:  # FixMe Find a better name?
         self.execute('SELECT * FROM "{}"'.format(table))
         columns = [description[0] for description in self.cursor.description]
         return columns
 
-    def select(self, table, columns='*', condition=None) -> lite.Row:
+    def select(self, table, columns='*', condition=None):
         if condition is None:
             self.execute("SELECT {0} FROM {1}".format(columns, table))
         else:
@@ -239,36 +355,12 @@ class Database:
                 table, keys, values)
             self.execute(statement)
 
-    def asynchronous(self):
-    # Asynchronous mode means the database doesn't wait for 
-    # something to be entirely written before it begins
-    # to write something else. It has the potential of corrupting entries
-    # if the database crashed or there is a power failure. 
-    # However, asynchronus mode is much faster.
-        if self.isConnected:
-                self.execute('PRAGMA synchronous = OFF')
+if __name__ == "__main__":
+    sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+    db = Database("mysql://dcclab@cafeine2.crulrg.ulaval.ca/dcclab@raman")
+    db.execute('select * from files')
+    print(db.fetchAll())
+    # db = Database("/Users/dccote/GitHub/PyVino/raman.db")
+    # db.execute('select * from files')
+    # print(db.fetchAll())
 
-    def beginTransaction(self):
-    # With isolation_level = None for our connection, we disable 
-    # the python auto-handling of BEGIN, etc. We reset to the
-    # default SQLite handling. By default, SQLite is in auto-commit mode.
-    # It means that for each command, SQLite starts, processes, and
-    # commits the transaction automatically. By issuing a BEGIN, we
-    # override this and manually handle transaction commits. This allows
-    # faster writing to the database.
-        if self.isConnected:
-            self.execute('BEGIN TRANSACTION')
-
-    def endTransaction(self):
-        if self.isConnected:
-            self.execute('END TRANSACTION')
-
-    # TODO Is this a necessary function?
-    # If not, delete.
-    def update(self, table: str, value: dict):
-        pass
-
-    # TODO Is this a necessary function?
-    # If not, delete.
-    def upsert(self, table: str, value: dict):
-        pass
