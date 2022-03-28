@@ -162,7 +162,8 @@ class Database:
                                                      database=self.database,
                                                      user=self.user,
                                                      password=pwd,
-                                                     autocommit=True)
+                                                     autocommit=True,
+                                                     use_pure=True)
 
                     self.cursor = self.connection.cursor(dictionary=True)
 
