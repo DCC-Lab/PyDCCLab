@@ -153,7 +153,7 @@ class Database:
                         actualHost = "127.0.0.1"
                         self.server = Cafeine()
                         self.port = self.server.startMySQLTunnel()
-                        print("Using port={0}".format(self.port))
+                        print("Forwarding 127.0.0.1:{2} to {0}@{1}:3306 through SSH tunnel".format(self.user, self.host, self.port))
                     else:
                         self.port = 3306
 
@@ -358,7 +358,6 @@ class Database:
 if __name__ == "__main__":
     sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
     db = Database("mysql://dcclab@cafeine2.crulrg.ulaval.ca/dcclab@raman")
-    print(db.server.localMySQLPort)
     db.execute('select * from files')
     print(db.fetchAll())
     # db = Database("/Users/dccote/GitHub/PyVino/raman.db")
