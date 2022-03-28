@@ -1,6 +1,6 @@
 from zipfile import ZipFile
 from datetime import date
-import sqlite3 as lite
+# import sqlite3 as lite
 import mysql.connector as mysql
 import urllib.parse as parse
 import pathlib
@@ -114,8 +114,6 @@ class Database:
         else:
             return (Engine.sqlite3, None, "127.0.0.1", None, url)
 
-
-
     def __enter__(self):
         return self
 
@@ -151,15 +149,20 @@ class Database:
 
                     actualHost = self.host
                     if self.host == "cafeine2.crulrg.ulaval.ca":
+                        from dcclab import Cafeine
                         actualHost = "127.0.0.1"
                         self.server = Cafeine()
                         self.port = self.server.startMySQLTunnel()
+                        print("Using port={0}".format(self.port))
+                    else:
+                        self.port = 3306
 
                     self.connection = mysql.connect(host=actualHost,
                                                     port=self.port,
                                                      database=self.database,
                                                      user=self.user,
-                                                     password=pwd)
+                                                     password=pwd,
+                                                     autocommit=True)
 
                     self.cursor = self.connection.cursor(dictionary=True)
 
@@ -278,11 +281,11 @@ class Database:
         if self.isConnected:
             self.cursor.execute(statement)
 
-    def fetchAll(self) -> lite.Row:
+    def fetchAll(self):
         if self.isConnected:
             return self.cursor.fetchall()
 
-    def fetchOne(self) -> lite.Row:
+    def fetchOne(self):
         if self.isConnected:
             return self.cursor.fetchone()
 
@@ -304,7 +307,7 @@ class Database:
         columns = [description[0] for description in self.cursor.description]
         return columns
 
-    def select(self, table, columns='*', condition=None) -> lite.Row:
+    def select(self, table, columns='*', condition=None):
         if condition is None:
             self.execute("SELECT {0} FROM {1}".format(columns, table))
         else:
@@ -353,9 +356,11 @@ class Database:
 
 if __name__ == "__main__":
     sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
-    from dcclab import Cafeine
-    db = Database("mysql://dcclab@cafeine2.crulrg.ulaval.ca/dcclab@questions")
-    print(db.tables)
-    db = Database("/Users/dccote/GitHub/QuestionsDB/questions.db")
-    print(db.tables)
+    db = Database("mysql://dcclab@cafeine2.crulrg.ulaval.ca/dcclab@raman")
+    print(db.server.localMySQLPort)
+    db.execute('select * from files')
+    print(db.fetchAll())
+    # db = Database("/Users/dccote/GitHub/PyVino/raman.db")
+    # db.execute('select * from files')
+    # print(db.fetchAll())
 
