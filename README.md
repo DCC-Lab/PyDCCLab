@@ -1,6 +1,6 @@
 # CERVO-dcclab Python module
 
-This simple module is meant to simplify the loading and treatment of images at CERVO. The ultimate goal of this module is to rapidly be able to extract useful and pertinent information about microscopy images taken at the CERVO research center.
+This simple module is meant to simplify the loading and treatment of images at CERVO (or in any lab) but also to manage databases for data. The ultimate goal of this module is to rapidly be able to extract useful and pertinent information about microscopy images.
 
 ## Image Analysis
 
@@ -90,16 +90,16 @@ coll.align()
 
 ## Database
 
-Currently under development, a `Database` class allows one to manage files that may be spread over different fileservers. A local example at CERVO — the  **Plateforme d'Outils Moléculaires** — is supported, but the DCCLab, PDK, and Martin Levesque groups will be supported in the near future. 
+A `Database` class allows one to manage files that may be spread over different fileservers. A local example at CERVO — the  **Plateforme d'Outils Moléculaires** — is supported, but the DCCLab, PDK, and Martin Levesque groups will be supported in the near future. 
 
-For each specific database, a new class inheriting from the `Database` object can be queried through a general SQL API but also specific-task-oriented API.  For example, the database allow requests such as:
+For each specific database, a new class inheriting from the `Database` object can be queried through a general SQL API but also specific-task-oriented API. MySQL and sqlite3 are supported.  MySQL over ssh is also supported.  For example, the database allow requests such as:
 
 1. all images using the viral vector AAV-173,
 2. all images of microglia,
 3. all images of neurons from the subthalamic nucleus.
 
-The database is ready to use (i.e. `connected`) upon creation.  To begin using the `Database`, making queries or inserting into it, use the exposed API (e.g., `select(table, columns, condition) -> lite.Row:`) or execute an explicit SQL command (e.g., `    execute(statement)`). To create a new database, a `Database` object has to be created with `writePermission=True`. If it does not exist yet, the database will be created at the `Database.path` location (in **URI**).
+The database is ready to use (i.e. `connected`) upon creation.  To begin using the `Database`, making queries or inserting into it, use the exposed API (e.g., `select(table, columns, condition) -> Row:`) or execute an explicit SQL command (e.g., `    execute(statement)`). To create a new database, a `Database` object has to be created with `writePermission=True` (sqlite3) or created on the MySQL server directly. If it does not exist yet, the database will be created at the `Database.path` location (in **URI**).
 
 ## Disclaimer
 
-Copyrights DCCLab Members (2019).
+Copyrights DCCLab Members (2019-).
