@@ -103,7 +103,7 @@ class Database:
 
     def parseURL(self, url):
         #mysql://sshusername:sshpassword@cafeine2.crulrg.ulaval.ca/mysqlusername:mysqlpassword@questions
-        match = re.search("(mysql)://(.+?)@?(.+?)/(.+?)@(.+)", url)
+        match = re.search("(mysql)://(.*?)@?(.+?\..+?)/(.*?)@(.+)", url)
         if match is not None:
             protocol = Engine.mysql
             sshuser = match.group(2)
