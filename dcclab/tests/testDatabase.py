@@ -1,6 +1,6 @@
 import env
 from dcclab import Database as db
-from dcclab import MySQLDatabase
+from dcclab import Database
 from datetime import date
 from zipfile import ZipFile
 import unittest
@@ -27,7 +27,10 @@ class TestDatabase(env.DCCLabTestCase):
             testDB.commit()
 
     def tearDown(self):
-        os.remove(self.filePath)
+        try:
+            os.remove(self.filePath)
+        except Exception as err:
+            pass
 
     def testConnectSuccessful(self):
         database = db(self.filePath)
@@ -265,8 +268,22 @@ class TestMySQLDatabase(env.DCCLabTestCase):
         names = self.db.tables
         self.assertTrue(len(names) > 1)
 
+class TestMySQLDatabase(env.DCCLabTestCase):
+    def testLocalMySQLDatabase(self):
+        db = Database("mysql://127.0.0.1/root@raman")
+        db.execute("select * from spectra where datatype = 'raw'")
 
+        rows = []
+        row = db.fetchOne()
+        i = 0
+        while row is not None:
+            if i % 10000 == 0:
+                print(i)
+            i += 1
+            rows.append(row)
+            row = db.fetchOne()
 
+        self.assertTrue(len(rows) > 0)
 
 if __name__ == '__main__':
     unittest.main()
