@@ -1,6 +1,6 @@
 from zipfile import ZipFile
 from datetime import date
-# import sqlite3 as lite
+import sqlite3 as lite
 import mysql.connector as mysql
 import urllib.parse as parse
 import pathlib
@@ -103,7 +103,7 @@ class Database:
 
     def parseURL(self, url):
         #mysql://sshusername:sshpassword@cafeine2.crulrg.ulaval.ca/mysqlusername:mysqlpassword@questions
-        match = re.search("(mysql)://(.*?)@?(.+?\..+?)/(.*?)@(.+)", url)
+        match = re.search("(mysql)://(.*?)@?([^@]+?)/(.*?)@(.+)", url)
         if match is not None:
             protocol = Engine.mysql
             sshuser = match.group(2)
@@ -162,7 +162,6 @@ class Database:
                                                      database=self.database,
                                                      user=self.user,
                                                      password=pwd,
-                                                     autocommit=True,
                                                      use_pure=True)
 
                     self.cursor = self.connection.cursor(dictionary=True)
