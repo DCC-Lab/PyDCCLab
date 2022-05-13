@@ -163,42 +163,6 @@ class SpectraDB(Database):
 
         return dataTypes
 
-    def getWineIds(self):
-        self.execute(r"select count(*) as count, wineId as id from files group by wineId order by wineId;")
-        rows = self.fetchAll()
-        identifiers = {}
-        for row in rows:
-            id = row["id"]
-            nSamples = row["count"]
-            identifiers[id] = nSamples
-        return identifiers
-
-    def getWinesSummary(self):
-        # mysql.connector.errors.ProgrammingError: 1055(
-        #     42000): Expression  # 4 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'raman.wines.dateOpened' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by
-
-        self.execute(r"select files.wineId,  count(*) as nSamples, wines.* from files inner join wines on wines.wineId = files.wineId group by files.wineId order by files.wineId")
-        rows = self.fetchAll()
-        wines = []
-        for row in rows:
-            wines.append(dict(row))
-        return wines
-
-    def getFileCount(self):
-        self.execute(r"select count(*) as count from files")
-        rows = self.fetchAll()
-        if rows is None:
-            return 0
-        return rows[0]["count"]
-
-    def getSpectraPaths(self):
-        self.execute("select path from files order by path")
-        rows = self.fetchAll()
-        paths = []
-        for row in rows:
-            paths.append(row['path'])
-        return paths
-
     def getSpectrum(self, spectrumId):
         self.execute("select datasetId from spectra where spectrumId = %s",(spectrumId,))
         singleRecord = self.fetchOne()
@@ -231,58 +195,6 @@ class SpectraDB(Database):
             intensity.append(float(row['y']))
 
         return np.array(intensity), spectrumId
-
-    def getSpectraWithId(self, dataType=None, color=None, limit=None):
-        whereConstraints = []
-        possibleDataTypes = self.getDataTypes()
-
-        if dataType is None:
-            dataType = 'raw'
-        if dataType not in possibleDataTypes:
-            raise ValueError('Possible dataTypes are {0}'.format(possibleDataTypes))
-        whereConstraints.append("dataType = '{0}'".format(dataType))
-
-        if color is not None:
-            whereConstraints.append(' wineId in (select wineId from wines where color="{0}") '.format(color))
-
-        if len(whereConstraints) != 0:
-            whereClause = "where " + " and ".join(whereConstraints)
-        else:
-            whereClause = ""
-
-        stmnt = """
-        select wavelength, intensity, spectra.spectrumId 
-            from spectra
-            {0}
-        order by spectra.spectrumId, spectra.wavelength """.format(whereClause )
-
-        wavelengths = self.wavelengths
-        nWavelengths = len(wavelengths)
-
-        if limit is not None:
-            stmnt += " limit {0}".format(limit*nWavelengths)
-
-        self.execute(stmnt)
-
-        rows = []
-        row = self.fetchOne()
-        while row is not None:
-            rows.append(row)
-            if len(rows) % 100 == 0:
-                print(".", end='')
-            row = self.fetchOne()
-
-        nSamples = len(rows)//nWavelengths
-        if nSamples == 0:
-            return None
-
-        spectra = np.zeros(shape=(nWavelengths, nSamples))
-        spectrumIdentifiers = [""]*nSamples
-        for i,row in enumerate(rows):
-            spectra[i%nWavelengths, i//nWavelengths] = float(row['intensity'])
-            spectrumIdentifiers[i//nWavelengths] = row['spectrumId']
-
-        return spectra, spectrumIdentifiers
 
     def subtractFluorescence(self, rawSpectra, polynomialDegree=5):
 
