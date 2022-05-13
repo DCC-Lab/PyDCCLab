@@ -116,16 +116,16 @@ class SpectraDB(Database):
         bigStatement = "insert into spectra (x, y, dataType, wineId, sampleId, spectrumId, dateAdded, algorithm) values" + ','.join(values)
         self.execute( bigStatement)
 
-    def getWavelengths(self):
-        self.execute(r"select distinct(x) from spectra where dataType='raw' order by x")
+    def getFrequencies(self, dataset):
+        self.execute(r"select distinct(x) from datapoints left join spectra on spectra.uid = datapoints.uid where spectra.datasetId = {0}".format(dataset))
         rows = self.fetchAll()
         nTotal = len(rows)
 
-        wavelengths = np.zeros(shape=(nTotal))
+        freq = np.zeros(shape=(nTotal))
         for i,row in enumerate(rows):
-            wavelengths[i] = row['x']
+            freq[i] = row['x']
 
-        return wavelengths
+        return freq
 
     def getProjects(self):
         self.execute('select distinct(name) from projects')
@@ -137,22 +137,22 @@ class SpectraDB(Database):
         return projects
 
     def getDatasets(self):
-        self.execute('select distinct(name) from datasets')
+        self.execute('select distinct(name), datasetId from datasets')
         rows = self.fetchAll()
         datasets = []
         for row in rows:
-            datasets.append(row["name"])
+            datasets.append((row["name"], row["datasetId"]))
 
         return datasets
 
     def getSpectrumIds(self, dataset):
-        self.execute('select distinct(name) from datasets')
+        self.execute('select spectrumId from spectra where datasetId={0}'.format(dataset))
         rows = self.fetchAll()
-        datasets = []
+        spectrumIds = []
         for row in rows:
-            datasets.append(row["name"])
+            spectrumIds.append(row["spectrumId"])
 
-        return datasets
+        return spectrumIds
 
     def getDataTypes(self):
         self.execute('select distinct dataType from spectra')
@@ -200,9 +200,18 @@ class SpectraDB(Database):
         return paths
 
     def getSpectrum(self, spectrumId):
+        self.execute("select datasetId from spectra where spectrumId = %s",(spectrumId,))
+        singleRecord = self.fetchOne()
+        keys = list(singleRecord.keys())
+        if len(keys) == 1:
+            datasetId = singleRecord[keys[0]]
+        else:
+            datasetId = None
+
+
         whereConstraints = []
 
-        whereConstraints.append("spectrumId = '{0}'".format(spectrumId))
+        whereConstraints.append("spectra.spectrumId = '{0}'".format(spectrumId))
 
         if len(whereConstraints) != 0:
             whereClause = "where " + " and ".join(whereConstraints)
@@ -210,34 +219,18 @@ class SpectraDB(Database):
             whereClause = ""
 
         stmnt = """
-        select x, y, spectra.spectrumId from spectra
+        select x, y from datapoints left join spectra on datapoints.uid = spectra.uid
         {0} 
-        order by spectra.spectrumId, spectra.x """.format(whereClause )
-
-        frequencies = self.getFrequencies()
-        nFrequencies = len(frequencies)
+        order by x """.format(whereClause )
 
         self.execute(stmnt)
 
-        rows = []
-        row = self.fetchOne()
-        while row is not None:
-            rows.append(row)
-            if len(rows) % 100 == 0:
-                print(".", end='')
-            row = self.fetchOne()
-
-        nSamples = len(rows)//nFrequencies
-        if nSamples == 0:
-            return None, None
-
-        spectra = np.zeros(shape=(nFrequencies, nSamples))
-        spectrumIdentifiers = [""]*nSamples
+        rows = self.fetchAll()
+        intensity = []
         for i,row in enumerate(rows):
-            spectra[i%nFrequencies, i//nFrequencies] = float(row['y'])
-            spectrumIdentifiers[i//nFrequencies] = row['spectrumId']
+            intensity.append(float(row['y']))
 
-        return spectra, spectrumIdentifiers
+        return np.array(intensity), spectrumId
 
     def getSpectraWithId(self, dataType=None, color=None, limit=None):
         whereConstraints = []
