@@ -9,13 +9,12 @@ class SpectraDB(Database):
         The Database is a MySQL database called `spectra`.
         """
         if databaseURL is None:
-            databaseURL = "mysql://127.0.0.1/root@spectra"
+            databaseURL = "mysql://dcclab@cafeine3.crulrg.ulaval.ca/dcclab@spectra"
 
         self._wavelengths = None
         self._wavelengthMask = None
         self.progressStart = None
         self.constraints = []
-        self.pumpWavelengthInNm = 785
         super().__init__(databaseURL)
 
     def showHelp(self):
@@ -67,7 +66,9 @@ class SpectraDB(Database):
             wavelengths = []
             intensities = []
             for line in lines:
-                match = re.match(r'^\s*(\d+\.?\d+)\s+(-?\d*\.?\d*)', line)
+                line = re.sub(",", ".", line)
+
+                match = re.match(r'^\s*(\d+[\.,]?\d+)\s+(-?\d*[\.,]?\d*)', line)
                 if match is not None:
                     intensity = match.group(2)
                     wavelength = match.group(1)
