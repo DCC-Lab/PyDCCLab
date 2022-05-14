@@ -35,60 +35,6 @@ class LabdataDB(Database):
         directly. However, as of May 13th 2022, it is not possible on cafeine3.
         """)
 
-    def readOceanInsightFile(self, filePath):
-        # text_file = open(filePath, "br")
-        # hash = hashlib.md5(text_file.read()).hexdigest()
-        # text_file.close()
-
-        # We collect all the extra lines and assumes they contain the header info
-        userInfo = []
-        with open(filePath, "r") as text_file:
-            lines = text_file.read().splitlines()
-
-            wavelengths = []
-            intensities = []
-            for line in lines:
-                # FIXME? On some computers with French settings, a comma is used. We substitute blindly.
-                line = re.sub(",", ".", line) 
-
-                match = re.match(r'^\s*(\d+[\.,]?\d+)\s+(-?\d*[\.,]?\d*)', line)
-                if match is not None:
-                    intensity = match.group(2)
-                    wavelength = match.group(1)
-                    wavelengths.append(wavelength)
-                    intensities.append(intensity)
-                else:
-                    userInfo.append(line)
-
-        return wavelengths, intensities, "\n".join(userInfo)
-
-    def insertSpectralDataFromFiles(self, filePaths, dataType='raw'):
-        inserted = 0
-        for filePath in filePaths:
-            match = re.search(r'([A-Z]{1,2})_?(\d{1,3})\.', filePath)
-            if match is None:
-                raise ValueError("The file does not appear to have a valid name: {0}".format(filePath))
-
-            wineId = int(ord(match.group(1))-ord('A'))
-            sampleId = int(match.group(2))
-            spectrumId = "{0:04}-{1:04d}".format(wineId, sampleId)
-
-            wavelengths, intensities = self.readOceanInsightFile(filePath)
-            try:
-                self.insertSpectralData(wavelengths, intensities, dataType, wineId, sampleId)
-                print("Inserted {0}".format(filePath))
-                inserted += 1
-            except ValueError as err:
-                print(err)
-
-        return inserted
-
-    def insertSpectralData(self, spectrumId, x, y):
-        self.beginTransaction()
-        for i,j in zip(x, y):
-            statement = "insert into datapoints (spectrumId, x, y) values(%s, %s, %s, %s)"
-            self.execute( statement, (spectrumId, i, j))
-        self.endTransaction()
 
     def getFrequencies(self, datasetId):
         self.execute(r"select distinct(x) from datapoints left join spectra on spectra.spectrumId = datapoints.spectrumId where spectra.datasetId = %s", (datasetId,))
@@ -210,3 +156,63 @@ class LabdataDB(Database):
         
         if iteration == total: 
             self.progressStart = None
+
+
+class SpectraDB(LabdataDB):
+    def __init__(self, databaseURL = None):
+        super().__init__(databaseURL)
+        
+    def readOceanInsightFile(self, filePath):
+        # text_file = open(filePath, "br")
+        # hash = hashlib.md5(text_file.read()).hexdigest()
+        # text_file.close()
+
+        # We collect all the extra lines and assumes they contain the header info
+        userInfo = []
+        with open(filePath, "r") as text_file:
+            lines = text_file.read().splitlines()
+
+            wavelengths = []
+            intensities = []
+            for line in lines:
+                # FIXME? On some computers with French settings, a comma is used. We substitute blindly.
+                line = re.sub(",", ".", line) 
+
+                match = re.match(r'^\s*(\d+[\.,]?\d+)\s+(-?\d*[\.,]?\d*)', line)
+                if match is not None:
+                    intensity = match.group(2)
+                    wavelength = match.group(1)
+                    wavelengths.append(wavelength)
+                    intensities.append(intensity)
+                else:
+                    userInfo.append(line)
+
+        return wavelengths, intensities, "\n".join(userInfo)
+
+    def insertSpectralDataFromFiles(self, filePaths, dataType='raw'):
+        inserted = 0
+        for filePath in filePaths:
+            match = re.search(r'([A-Z]{1,2})_?(\d{1,3})\.', filePath)
+            if match is None:
+                raise ValueError("The file does not appear to have a valid name: {0}".format(filePath))
+
+            wineId = int(ord(match.group(1))-ord('A'))
+            sampleId = int(match.group(2))
+            spectrumId = "{0:04}-{1:04d}".format(wineId, sampleId)
+
+            wavelengths, intensities = self.readOceanInsightFile(filePath)
+            try:
+                self.insertSpectralData(wavelengths, intensities, dataType, wineId, sampleId)
+                print("Inserted {0}".format(filePath))
+                inserted += 1
+            except ValueError as err:
+                print(err)
+
+        return inserted
+
+    def insertSpectralData(self, spectrumId, x, y):
+        self.beginTransaction()
+        for i,j in zip(x, y):
+            statement = "insert into datapoints (spectrumId, x, y) values(%s, %s, %s, %s)"
+            self.execute( statement, (spectrumId, i, j))
+        self.endTransaction()

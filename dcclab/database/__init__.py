@@ -3,4 +3,4 @@ namespace because it is simpler for everyone """
 
 from .database import *
 from .databaseUtilities import *
-from .labdatadb import LabdataDB
+from .labdatadb import LabdataDB, SpectraDB

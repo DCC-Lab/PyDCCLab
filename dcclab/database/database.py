@@ -230,6 +230,13 @@ class Database:
         else:
             self.execute('END TRANSACTION')
 
+    def rollbackTransaction(self):
+        if self.databaseEngine == Engine.mysql:
+            if self.isConnected:
+                self.execute('ROLLBACK')
+        else:
+            self.execute('ROLLBACK')
+
     @property
     def isConnected(self):
         return self.connection is not None
