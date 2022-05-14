@@ -3,70 +3,53 @@ import numpy as np
 import requests
 import re
 
-class SpectraDB(Database):
+class LabdataDB(Database):
     def __init__(self, databaseURL = None):
         """
-        The Database is a MySQL database called `spectra`.
+        The Database is a MySQL database called `labdata`.
         """
         if databaseURL is None:
-            databaseURL = "mysql://dcclab@cafeine3.crulrg.ulaval.ca/dcclab@spectra"
+            databaseURL = "mysql://dcclab@cafeine3.crulrg.ulaval.ca/dcclab@labdata"
 
-        self._wavelengths = None
-        self._wavelengthMask = None
         self.progressStart = None
         self.constraints = []
         super().__init__(databaseURL)
 
     def showHelp(self):
         print("""
+        This is a general database tool to access all information about projects, files,
+        and spectral datasets of the DCCLab. The database is on Cafeine3 and can be accessed
+        with the dcclab username and normal password via a secure shell, and then via
+        mysql also with dcclab and the same password. Te database is called labdata.
 
+        mysql://dcclab@cafeine3.crulrg.ulaval.ca/dcclab@labdata
+        
+        which can be interpreted as:
+        mysql://ssh_username@ssh_host/mysql_user@mysql_database
+
+        You can provide your own link if you have a local version on your computer, such as:
+        
+        db = LabdataDB("mysql://127.0.0.1/dcclab@labdata")
+
+        In the case of 127.0.0.1 (or localhost), it will not use ssh and will connnect
+        directly. However, as of May 13th 2022, it is not possible on cafeine3.
         """)
-
-    def execute(self, statement, bindings=None):
-        """
-        This function with "bindings" is necessary to handle binary data: it cannot be inserted with a string statement.
-        The bindings are explained here: https://zetcode.com/db/sqlitepythontutorial/ and are similar to .format()
-        but are handled properly by the sqlite3 module instead of a python string. Without it, binary data
-        is inserted as a string, which is not good.
-
-        See insertFileContentIntoSources() for an example.
-
-        """
-        if bindings is None:
-            super().execute(statement) # Call the original function from dcclab.database
-        else:
-            self.cursor.execute(statement, bindings)
-
-    def executeCount(self, statement, bindings=None):
-        """
-        This function with "bindings" is necessary to handle binary data: it cannot be inserted with a string statement.
-        The bindings are explained here: https://zetcode.com/db/sqlitepythontutorial/ and are similar to .format()
-        but are handled properly by the sqlite3 module instead of a python string. Without it, binary data
-        is inserted as a string, which is not good.
-
-        See insertFileContentIntoSources() for an example.
-
-        """
-        self.execute(statement, bindings)
-        singleRecord = self.fetchOne()
-        keys = list(singleRecord.keys())
-        if len(keys) == 1:
-            return int(singleRecord[keys[0]])
-        else:
-            return None
 
     def readOceanInsightFile(self, filePath):
         # text_file = open(filePath, "br")
         # hash = hashlib.md5(text_file.read()).hexdigest()
         # text_file.close()
 
+        # We collect all the extra lines and assumes they contain the header info
+        userInfo = []
         with open(filePath, "r") as text_file:
             lines = text_file.read().splitlines()
 
             wavelengths = []
             intensities = []
             for line in lines:
-                line = re.sub(",", ".", line)
+                # FIXME? On some computers with French settings, a comma is used. We substitute blindly.
+                line = re.sub(",", ".", line) 
 
                 match = re.match(r'^\s*(\d+[\.,]?\d+)\s+(-?\d*[\.,]?\d*)', line)
                 if match is not None:
@@ -75,9 +58,9 @@ class SpectraDB(Database):
                     wavelengths.append(wavelength)
                     intensities.append(intensity)
                 else:
-                    pass
-                    # print("Line does not match: {0}".format(line))
-        return wavelengths, intensities
+                    userInfo.append(line)
+
+        return wavelengths, intensities, "\n".join(userInfo)
 
     def insertSpectralDataFromFiles(self, filePaths, dataType='raw'):
         inserted = 0
@@ -100,25 +83,15 @@ class SpectraDB(Database):
 
         return inserted
 
-    def insertSpectralData(self, wavelengths, intensities, dataType, id1, id2, id3):
-        if wineId is None or sampleId is None:
-            spectrumId = None
-        else:
-            spectrumId = "{0:04}-{1:04d}".format(wineId, sampleId)
+    def insertSpectralData(self, spectrumId, x, y):
+        self.beginTransaction()
+        for i,j in zip(x, y):
+            statement = "insert into datapoints (spectrumId, x, y) values(%s, %s, %s, %s)"
+            self.execute( statement, (spectrumId, i, j))
+        self.endTransaction()
 
-        count = self.executeCount('select count(*) as count from spectra where spectrumId = "{0}" and dataType = "{1}"'.format(spectrumId, dataType))
-        if count != 0 :
-            raise ValueError("Spectrum {0} already exists with dataType='{1}'".format(spectrumId, dataType))
-
-        values = []
-        for x,y in zip(wavelengths, intensities):
-            values.append("({0}, {1}, '{2}', '{3}', '{4}', '{5}', now(), '{6}') ".format(x,float(y), dataType, wineId, sampleId, spectrumId, algorithm))
-
-        bigStatement = "insert into spectra (x, y, dataType, wineId, sampleId, spectrumId, dateAdded, algorithm) values" + ','.join(values)
-        self.execute( bigStatement)
-
-    def getFrequencies(self, dataset):
-        self.execute(r"select distinct(x) from datapoints left join spectra on spectra.uid = datapoints.uid where spectra.datasetId = {0}".format(dataset))
+    def getFrequencies(self, datasetId):
+        self.execute(r"select distinct(x) from datapoints left join spectra on spectra.spectrumId = datapoints.spectrumId where spectra.datasetId = %s", (datasetId,))
         rows = self.fetchAll()
         nTotal = len(rows)
 
@@ -128,17 +101,17 @@ class SpectraDB(Database):
 
         return freq
 
-    def getProjects(self):
-        self.execute('select distinct(name) from projects')
+    def getProjectIds(self):
+        self.execute('select projectId from projects')
         rows = self.fetchAll()
         projects = []
         for row in rows:
-            projects.append(row["name"])
+            projects.append(row["projectId"])
 
         return projects
 
     def getDatasets(self):
-        self.execute('select distinct(name), datasetId from datasets')
+        self.execute('select datasetId from datasets')
         rows = self.fetchAll()
         datasets = []
         for row in rows:
@@ -146,8 +119,8 @@ class SpectraDB(Database):
 
         return datasets
 
-    def getSpectrumIds(self, dataset):
-        self.execute('select spectrumId from spectra where datasetId={0}'.format(dataset))
+    def getSpectrumIds(self, datasetId):
+        self.execute('select spectrumId from spectra where datasetId=%s', (datasetId,))
         rows = self.fetchAll()
         spectrumIds = []
         for row in rows:
@@ -164,18 +137,14 @@ class SpectraDB(Database):
 
         return dataTypes
 
-    def getSpectrum(self, spectrumId):
-        self.execute("select datasetId from spectra where spectrumId = %s",(spectrumId,))
-        singleRecord = self.fetchOne()
-        keys = list(singleRecord.keys())
-        if len(keys) == 1:
-            datasetId = singleRecord[keys[0]]
-        else:
-            datasetId = None
 
+    def getDatasetId(self, spectrumId):
+        return self.executeSelectOne("select datasetId from spectra where spectrumId = %s",(spectrumId,))
+
+    def getSpectrum(self, spectrumId):
+        datasetId = self.getDatasetId(spectrumId)
 
         whereConstraints = []
-
         whereConstraints.append("spectra.spectrumId = '{0}'".format(spectrumId))
 
         if len(whereConstraints) != 0:
@@ -184,7 +153,7 @@ class SpectraDB(Database):
             whereClause = ""
 
         stmnt = """
-        select x, y from datapoints left join spectra on datapoints.uid = spectra.uid
+        select x, y from datapoints left join spectra on datapoints.spectrumId = spectra.spectrumId
         {0} 
         order by x """.format(whereClause )
 
@@ -195,7 +164,7 @@ class SpectraDB(Database):
         for i,row in enumerate(rows):
             intensity.append(float(row['y']))
 
-        return np.array(intensity), spectrumId
+        return np.array(intensity)
 
     def subtractFluorescence(self, rawSpectra, polynomialDegree=5):
 
