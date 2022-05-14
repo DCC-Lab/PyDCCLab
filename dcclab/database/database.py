@@ -198,7 +198,6 @@ class Database:
         else:
             self.execute("set foreign_key_checks = 0")
 
-
     def asynchronous(self):
     # Asynchronous mode means the database doesn't wait for 
     # something to be entirely written before it begins
@@ -207,22 +206,6 @@ class Database:
     # However, asynchronus mode is much faster.
         if self.isConnected:
             self.execute('PRAGMA synchronous = OFF')
-
-    def beginTransaction(self):
-    # With isolation_level = None for our connection, we disable
-    # the python auto-handling of BEGIN, etc. We reset to the
-    # default SQLite handling. By default, SQLite is in auto-commit mode.
-    # It means that for each command, SQLite starts, processes, and
-    # commits the transaction automatically. By issuing a BEGIN, we
-    # override this and manually handle transaction commits. This allows
-    # faster writing to the database.
-        if self.isConnected:
-            self.execute('BEGIN TRANSACTION')
-
-    def endTransaction(self):
-        if self.isConnected:
-            self.execute('END TRANSACTION')
-
 
     def asynchronous(self):
         # Asynchronous mode means the database doesn't wait for
@@ -243,7 +226,7 @@ class Database:
     def endTransaction(self):
         if self.databaseEngine == Engine.mysql:
             if self.isConnected:
-                self.execute('END')
+                self.execute('COMMIT')
         else:
             self.execute('END TRANSACTION')
 
@@ -277,9 +260,48 @@ class Database:
         if self.isConnected:
             self.connection.rollback()
 
-    def execute(self, statement):
+    def execute(self, statement, bindings=None):
+        """
+        This function with "bindings" is necessary to handle binary data: it cannot be inserted with a string statement.
+        The bindings are explained here: https://zetcode.com/db/sqlitepythontutorial/ and are similar to .format()
+        but are handled properly by the sqlite3 module instead of a python string. Without it, binary data
+        is inserted as a string, which is not good.
+
+        """
         if self.isConnected:
-            self.cursor.execute(statement)
+            self.cursor.execute(statement, bindings)
+
+    def executeCount(self, statement, bindings=None):
+        """
+        This function with "bindings" is necessary to handle binary data: it cannot be inserted with a string statement.
+        The bindings are explained here: https://zetcode.com/db/sqlitepythontutorial/ and are similar to .format()
+        but are handled properly by the sqlite3 module instead of a python string. Without it, binary data
+        is inserted as a string, which is not good.
+
+        """
+        count = self.executeSelectOne(statement, bindings)
+        if count is not None:
+            return int(count)
+        else:
+            return count
+
+    def executeSelectOne(self, statement, bindings=None):
+        """
+        A select statement that returns a single field and is returned immediately
+
+        This function with "bindings" is necessary to handle binary data: it cannot be inserted with a string statement.
+        The bindings are explained here: https://zetcode.com/db/sqlitepythontutorial/ and are similar to .format()
+        but are handled properly by the sqlite3 module instead of a python string. Without it, binary data
+        is inserted as a string, which is not good.
+        """
+        self.execute(statement, bindings)
+        singleRecord = self.fetchOne()
+        keys = list(singleRecord.keys())
+        if len(keys) == 1:
+            return singleRecord[keys[0]]
+        else:
+            return None
+
 
     def fetchAll(self):
         if self.isConnected:
