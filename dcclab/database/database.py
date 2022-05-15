@@ -199,15 +199,6 @@ class Database:
             self.execute("set foreign_key_checks = 0")
 
     def asynchronous(self):
-    # Asynchronous mode means the database doesn't wait for 
-    # something to be entirely written before it begins
-    # to write something else. It has the potential of corrupting entries
-    # if the database crashed or there is a power failure. 
-    # However, asynchronus mode is much faster.
-        if self.isConnected:
-            self.execute('PRAGMA synchronous = OFF')
-
-    def asynchronous(self):
         # Asynchronous mode means the database doesn't wait for
         # something to be entirely written before it begins
         # to write something else. It has the potential of corrupting entries
@@ -240,24 +231,6 @@ class Database:
     @property
     def isConnected(self):
         return self.connection is not None
-
-    def setPermissionToWrite(self):
-        if self.isConnected:
-            self.disconnect()
-        self.__mode = 'rwc'
-        self.connect()
-
-    def setPermissionToReadOnly(self):
-        if self.isConnected:
-            self.disconnect()
-        self.__mode = 'ro'
-        self.connect()
-
-    def changeConnectionMode(self, mode):
-        if mode == 'ro':
-            self.setPermissionToReadOnly()
-        elif mode == 'rwc' or mode == 'rw':
-            self.setPermissionToWrite()
 
     def commit(self):
         if self.isConnected:
