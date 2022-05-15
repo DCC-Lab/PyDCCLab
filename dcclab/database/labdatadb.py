@@ -16,13 +16,14 @@ class LabdataDB(Database):
         self.constraints = []
         super().__init__(databaseURL)
 
+
     def showHelp(self):
         print(
             """
         This is a general database tool to access all information about projects, files,
         and spectral datasets of the DCCLab. The database is on Cafeine3 and can be accessed
         with the dcclab username and normal password via a secure shell, and then via
-        mysql also with dcclab and the same password. Te database is called labdata.
+        mysql also with dcclab and the same password. The database is called labdata.
 
         mysql://dcclab@cafeine3.crulrg.ulaval.ca/dcclab@labdata
         
@@ -157,21 +158,6 @@ class LabdataDB(Database):
 
         return np.array(intensity)
 
-    def subtractFluorescence(self, rawSpectra, polynomialDegree=5):
-
-        """
-        Remove fluorescence background from the data.
-        :return: A corrected data without the background.
-        """
-
-        correctedSpectra = np.empty_like(rawSpectra)
-        for i in range(rawSpectra.shape[1]):
-            spectrum = rawSpectra[:, i]
-            correctedSpectra[:, i] = BaselineRemoval(spectrum).IModPoly(
-                polynomialDegree
-            )
-
-        return correctedSpectra
 
     def showProgressBar(
         self,
@@ -277,13 +263,26 @@ class SpectraDB(LabdataDB):
 
     def insertSpectralData(self, spectrumId, x, y):
         try:
-            self.beginTransaction()
             for i, j in zip(x, y):
                 statement = (
                     "insert into datapoints (spectrumId, x, y) values(%s, %s, %s)"
                 )
                 self.execute(statement, (spectrumId, i, j))
-            self.endTransaction()
         except Exception as err:
-            print("Unable to insert spectral data: {0}".format(err))
-            self.rollbackTransaction()
+            raise ValueError("Unable to insert spectral data: {0}".format(err))
+
+    def subtractFluorescence(self, rawSpectra, polynomialDegree=5):
+
+        """
+        Remove fluorescence background from the data.
+        :return: A corrected data without the background.
+        """
+
+        correctedSpectra = np.empty_like(rawSpectra)
+        for i in range(rawSpectra.shape[1]):
+            spectrum = rawSpectra[:, i]
+            correctedSpectra[:, i] = BaselineRemoval(spectrum).IModPoly(
+                polynomialDegree
+            )
+
+        return correctedSpectra
