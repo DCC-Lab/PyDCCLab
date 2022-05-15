@@ -61,14 +61,34 @@ class LabdataDB(Database):
 
         return projects
 
+    def describeProjects(self):
+        self.execute("select projectId, description from projects order by projectId")
+        rows = self.fetchAll()
+        datasets = []
+        for row in rows:
+            description = "Dataset: {0}".format(row["projectId"])
+            print(description)
+            print("-"*len(description))
+            print("{0}\n".format(row["description"]))
+
     def getDatasets(self):
         self.execute("select datasetId from datasets")
         rows = self.fetchAll()
         datasets = []
         for row in rows:
-            datasets.append((row["name"], row["datasetId"]))
+            datasets.append(row["datasetId"])
 
         return datasets
+
+    def describeDatasets(self):
+        self.execute("select datasetId, description from datasets order by datasetId")
+        rows = self.fetchAll()
+        datasets = []
+        for row in rows:
+            description = "Dataset: {0}".format(row["datasetId"])
+            print(description)
+            print("-"*len(description))
+            print("{0}\n".format(row["description"]))
 
     def getSpectrumIds(self, datasetId):
         self.execute("select spectrumId from spectra where datasetId=%s", (datasetId,))
