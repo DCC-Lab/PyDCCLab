@@ -276,10 +276,14 @@ class SpectraDB(LabdataDB):
         return inserted
 
     def insertSpectralData(self, spectrumId, x, y):
-        self.beginTransaction()
-        for i, j in zip(x, y):
-            statement = (
-                "insert into datapoints (spectrumId, x, y) values(%s, %s, %s, %s)"
-            )
-            self.execute(statement, (spectrumId, i, j))
-        self.endTransaction()
+        try:
+            self.beginTransaction()
+            for i, j in zip(x, y):
+                statement = (
+                    "insert into datapoints (spectrumId, x, y) values(%s, %s, %s)"
+                )
+                self.execute(statement, (spectrumId, i, j))
+            self.endTransaction()
+        except Exception as err:
+            print("Unable to insert spectral data: {0}".format(err))
+            self.rollbackTransaction()
