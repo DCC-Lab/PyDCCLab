@@ -227,7 +227,7 @@ class SpectraDB(LabdataDB):
         # text_file.close()
 
         # We collect all the extra lines and assumes they contain the header info
-        userInfo = []
+        acquisitionInfo = []
         with open(filePath, "r") as text_file:
             lines = text_file.read().splitlines()
 
@@ -244,9 +244,9 @@ class SpectraDB(LabdataDB):
                     wavelengths.append(wavelength)
                     intensities.append(intensity)
                 else:
-                    userInfo.append(line)
+                    acquisitionInfo.append(line)
 
-        return wavelengths, intensities, "\n".join(userInfo)
+        return wavelengths, intensities, "\n".join(acquisitionInfo)
 
     def insertSpectralDataFromFiles(self, filePaths, dataType="raw"):
         inserted = 0
