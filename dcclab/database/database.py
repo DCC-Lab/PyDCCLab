@@ -198,32 +198,6 @@ class Database:
         else:
             self.execute("set foreign_key_checks = 0")
 
-
-    def asynchronous(self):
-    # Asynchronous mode means the database doesn't wait for 
-    # something to be entirely written before it begins
-    # to write something else. It has the potential of corrupting entries
-    # if the database crashed or there is a power failure. 
-    # However, asynchronus mode is much faster.
-        if self.isConnected:
-            self.execute('PRAGMA synchronous = OFF')
-
-    def beginTransaction(self):
-    # With isolation_level = None for our connection, we disable
-    # the python auto-handling of BEGIN, etc. We reset to the
-    # default SQLite handling. By default, SQLite is in auto-commit mode.
-    # It means that for each command, SQLite starts, processes, and
-    # commits the transaction automatically. By issuing a BEGIN, we
-    # override this and manually handle transaction commits. This allows
-    # faster writing to the database.
-        if self.isConnected:
-            self.execute('BEGIN TRANSACTION')
-
-    def endTransaction(self):
-        if self.isConnected:
-            self.execute('END TRANSACTION')
-
-
     def asynchronous(self):
         # Asynchronous mode means the database doesn't wait for
         # something to be entirely written before it begins
@@ -243,31 +217,20 @@ class Database:
     def endTransaction(self):
         if self.databaseEngine == Engine.mysql:
             if self.isConnected:
-                self.execute('END')
+                self.execute('COMMIT')
         else:
             self.execute('END TRANSACTION')
+
+    def rollbackTransaction(self):
+        if self.databaseEngine == Engine.mysql:
+            if self.isConnected:
+                self.execute('ROLLBACK')
+        else:
+            self.execute('ROLLBACK')
 
     @property
     def isConnected(self):
         return self.connection is not None
-
-    def setPermissionToWrite(self):
-        if self.isConnected:
-            self.disconnect()
-        self.__mode = 'rwc'
-        self.connect()
-
-    def setPermissionToReadOnly(self):
-        if self.isConnected:
-            self.disconnect()
-        self.__mode = 'ro'
-        self.connect()
-
-    def changeConnectionMode(self, mode):
-        if mode == 'ro':
-            self.setPermissionToReadOnly()
-        elif mode == 'rwc' or mode == 'rw':
-            self.setPermissionToWrite()
 
     def commit(self):
         if self.isConnected:
@@ -277,9 +240,63 @@ class Database:
         if self.isConnected:
             self.connection.rollback()
 
-    def execute(self, statement):
+    def execute(self, statement, bindings=None):
+        """
+        This function with "bindings" is necessary to handle binary data: it
+        cannot be inserted with a string statement. The bindings are
+        explained here: https://zetcode.com/db/sqlitepythontutorial/ and are
+        similar to .format() but are handled properly by the sqlite3 module
+        instead of a python string. Without it, binary data is inserted as a
+        string, which is not good.
+        """
         if self.isConnected:
-            self.cursor.execute(statement)
+            self.cursor.execute(statement, bindings)
+
+    def executeSelectOne(self, statement, bindings=None):
+        """
+        A select statement that selects a single field, fetches it and returns
+        the result immediately.
+        """
+        self.execute(statement, bindings)
+        singleRecord = self.fetchOne()
+        keys = list(singleRecord.keys())
+        if len(keys) == 1:
+            return singleRecord[keys[0]]
+        else:
+            return None
+
+    def executeSelectFetchInt(self, statement, bindings=None):
+        """
+        A select statement that selects a single field, fetches it, casts it
+        to an int and returns the result immediately.
+
+        If it is not an int, an exception will be raised.
+        """
+        return int(self.executeSelectOne(statement, bindings))
+
+    def executeSelectFetchOneRow(self, statement, bindings = None):
+        """
+        A select statement that selects a single row, fetches it, and returns the result immediately
+        as a dictionary.
+        """
+        self.execute(statement, bindings)
+        return dict(self.fetchOne())
+
+    def executeSelectFetchOneField(self, statement, bindings = None):
+        """
+        A select statement that selects a single field but from many rows,
+        fetches it, and returns the result immediately as a dictionary.
+        """
+        self.execute(statement, bindings)
+        rows = self.fetchAll()
+        values = []
+
+        for row in rows:
+            value = list(row.values())[0]
+            values.append(value)
+
+        return values
+
 
     def fetchAll(self):
         if self.isConnected:
@@ -356,7 +373,7 @@ class Database:
 
 if __name__ == "__main__":
     sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
-    db = Database("mysql://dcclab@cafeine2.crulrg.ulaval.ca/dcclab@raman")
+    db = Database("mysql://dcclab@cafeine3.crulrg.ulaval.ca/dcclab@labdata")
     db.execute('select * from files')
     print(db.fetchAll())
     # db = Database("/Users/dccote/GitHub/PyVino/raman.db")
