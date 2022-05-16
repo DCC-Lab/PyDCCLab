@@ -242,37 +242,20 @@ class Database:
 
     def execute(self, statement, bindings=None):
         """
-        This function with "bindings" is necessary to handle binary data: it cannot be inserted with a string statement.
-        The bindings are explained here: https://zetcode.com/db/sqlitepythontutorial/ and are similar to .format()
-        but are handled properly by the sqlite3 module instead of a python string. Without it, binary data
-        is inserted as a string, which is not good.
-
+        This function with "bindings" is necessary to handle binary data: it
+        cannot be inserted with a string statement. The bindings are
+        explained here: https://zetcode.com/db/sqlitepythontutorial/ and are
+        similar to .format() but are handled properly by the sqlite3 module
+        instead of a python string. Without it, binary data is inserted as a
+        string, which is not good.
         """
         if self.isConnected:
             self.cursor.execute(statement, bindings)
 
-    def executeCount(self, statement, bindings=None):
-        """
-        This function with "bindings" is necessary to handle binary data: it cannot be inserted with a string statement.
-        The bindings are explained here: https://zetcode.com/db/sqlitepythontutorial/ and are similar to .format()
-        but are handled properly by the sqlite3 module instead of a python string. Without it, binary data
-        is inserted as a string, which is not good.
-
-        """
-        count = self.executeSelectOne(statement, bindings)
-        if count is not None:
-            return int(count)
-        else:
-            return count
-
     def executeSelectOne(self, statement, bindings=None):
         """
-        A select statement that returns a single field and is returned immediately
-
-        This function with "bindings" is necessary to handle binary data: it cannot be inserted with a string statement.
-        The bindings are explained here: https://zetcode.com/db/sqlitepythontutorial/ and are similar to .format()
-        but are handled properly by the sqlite3 module instead of a python string. Without it, binary data
-        is inserted as a string, which is not good.
+        A select statement that selects a single field, fetches it and returns
+        the result immediately.
         """
         self.execute(statement, bindings)
         singleRecord = self.fetchOne()
@@ -282,12 +265,28 @@ class Database:
         else:
             return None
 
+    def executeSelectFetchInt(self, statement, bindings=None):
+        """
+        A select statement that selects a single field, fetches it, casts it
+        to an int and returns the result immediately.
+
+        If it is not an int, an exception will be raised.
+        """
+        return int(self.executeSelectOne(statement, bindings))
+
     def executeSelectFetchOneRow(self, statement, bindings = None):
+        """
+        A select statement that selects a single row, fetches it, and returns the result immediately
+        as a dictionary.
+        """
         self.execute(statement, bindings)
-        row = self.fetchOne()
-        return dict(row)
+        return dict(self.fetchOne())
 
     def executeSelectFetchOneField(self, statement, bindings = None):
+        """
+        A select statement that selects a single field but from many rows,
+        fetches it, and returns the result immediately as a dictionary.
+        """
         self.execute(statement, bindings)
         rows = self.fetchAll()
         values = []
@@ -374,7 +373,7 @@ class Database:
 
 if __name__ == "__main__":
     sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
-    db = Database("mysql://dcclab@cafeine2.crulrg.ulaval.ca/dcclab@raman")
+    db = Database("mysql://dcclab@cafeine3.crulrg.ulaval.ca/dcclab@labdata")
     db.execute('select * from files')
     print(db.fetchAll())
     # db = Database("/Users/dccote/GitHub/PyVino/raman.db")

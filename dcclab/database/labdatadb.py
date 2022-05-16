@@ -5,6 +5,27 @@ import re
 
 
 class LabdataDB(Database):
+    """
+    This is a general database tool to access all information about projects,
+    files, and spectral datasets of the DCCLab. The database is on Cafeine3
+    and can be accessed with the dcclab username and normal password via a
+    secure shell, and then via mysql also with dcclab and the same password.
+    The database is called labdata.
+
+    mysql://dcclab@cafeine3.crulrg.ulaval.ca/dcclab@labdata
+    
+    which can be interpreted as:
+    mysql://ssh_username@host/mysql_user@mysql_database
+
+    If the host is on the CERVO network, the actual host will be cafeine2 and the mysql
+    connection will be forwarded to the provided host.
+    You can provide your own link if you have a local version on your computer, such as:
+    
+    db = LabdataDB("mysql://127.0.0.1/dcclab@labdata")
+
+    In the case of 127.0.0.1 (or localhost), it will not use ssh and will connnect
+    directly. However, as of May 13th 2022, it is not possible on cafeine3.
+    """
     def __init__(self, databaseURL=None):
         """
         The Database is a MySQL database called `labdata`.
@@ -12,32 +33,12 @@ class LabdataDB(Database):
         if databaseURL is None:
             databaseURL = "mysql://dcclab@cafeine3.crulrg.ulaval.ca/dcclab@labdata"
 
-        self.progressStart = None
         self.constraints = []
         super().__init__(databaseURL)
 
-
-    def showHelp(self):
-        print(
-            """
-        This is a general database tool to access all information about projects, files,
-        and spectral datasets of the DCCLab. The database is on Cafeine3 and can be accessed
-        with the dcclab username and normal password via a secure shell, and then via
-        mysql also with dcclab and the same password. The database is called labdata.
-
-        mysql://dcclab@cafeine3.crulrg.ulaval.ca/dcclab@labdata
-        
-        which can be interpreted as:
-        mysql://ssh_username@ssh_host/mysql_user@mysql_database
-
-        You can provide your own link if you have a local version on your computer, such as:
-        
-        db = LabdataDB("mysql://127.0.0.1/dcclab@labdata")
-
-        In the case of 127.0.0.1 (or localhost), it will not use ssh and will connnect
-        directly. However, as of May 13th 2022, it is not possible on cafeine3.
-        """
-        )
+    @classmethod
+    def showHelp(cls):
+        help(cls)
 
     def getFrequencies(self, datasetId):
         self.execute(
@@ -203,49 +204,6 @@ class LabdataDB(Database):
         id4s = self.executeSelectFetchOneField(r"select distinct(id4) from spectra where datasetId = %s", (datasetId,))
 
         return {id1Label:id1s, id2Label:id2s, id3Label:id3s, id4Label:id4s}
-
-    def showProgressBar(
-        self,
-        iteration,
-        total,
-        prefix="",
-        suffix="",
-        decimals=1,
-        length=100,
-        fill="█",
-        printEnd="\r",
-    ):
-        """
-        From: https://stackoverflow.com/questions/3173320/text-progress-bar-in-the-console
-
-        Call in a loop to create terminal progress bar
-        @params:
-            iteration   - Required  : current iteration (Int)
-            total       - Required  : total iterations (Int)
-            prefix      - Optional  : prefix string (Str)
-            suffix      - Optional  : suffix string (Str)
-            decimals    - Optional  : positive number of decimals in percent complete (Int)
-            length      - Optional  : character length of bar (Int)
-            fill        - Optional  : bar fill character (Str)
-            printEnd    - Optional  : end character (e.g. "\r", "\r\n") (Str)
-        """
-
-        if self.progressStart is None:
-            self.progressStart = time.time()
-
-        if time.time() > self.progressStart + 3:
-            percent = ("{0:." + str(decimals) + "f}").format(
-                100 * (iteration / float(total))
-            )
-            filledLength = int(length * iteration // total)
-            bar = fill * filledLength + "-" * (length - filledLength)
-            print(f"\r{prefix} |{bar}| {percent}% {suffix}", end=printEnd)
-
-            if iteration == total:
-                print()
-
-        if iteration == total:
-            self.progressStart = None
 
 
 class SpectraDB(LabdataDB):
