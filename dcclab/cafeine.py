@@ -6,7 +6,7 @@ class Cafeine:
     def __init__(self, username='dcclab'):
         self.mysqlTunnel = None
 
-    def startMySQLTunnel(self):    
+    def startMySQLTunnel(self, remote_bind_address="127.0.0.1"):    
         password = keyring.get_password("cafeine2-ssh", "dcclab")
 
         if password is None:
@@ -23,7 +23,7 @@ class Cafeine:
             allow_agent = False,
             ssh_username="dcclab",
             ssh_password=password,
-            remote_bind_address=('127.0.0.1', 3306)
+            remote_bind_address=(remote_bind_address, 3306)
         )
 
         self.mysqlTunnel.start()
