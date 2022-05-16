@@ -154,12 +154,6 @@ class Database:
                         self.server = Cafeine()
                         self.port = self.server.startMySQLTunnel()
                         print("Forwarding 127.0.0.1:{2} to {0}@{1}:3306 through SSH tunnel".format(self.user, self.host, self.port))
-                    elif self.host == "cafeine3.crulrg.ulaval.ca":
-                        from dcclab import Cafeine
-                        self.host = "cafeine2.crulrg.ulaval.ca"
-                        self.server = Cafeine()
-                        self.port = self.server.startMySQLTunnel(actualHost)
-                        print("Forwarding 127.0.0.1:{2} to {0}@{1}:3306 through SSH tunnel".format(self.user, self.host, self.port))
                     else:
                         self.port = 3306
 
