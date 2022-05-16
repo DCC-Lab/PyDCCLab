@@ -282,6 +282,22 @@ class Database:
         else:
             return None
 
+    def executeSelectFetchOneRow(self, statement, bindings = None):
+        self.execute(statement, bindings)
+        row = self.fetchOne()
+        return dict(row)
+
+    def executeSelectFetchOneField(self, statement, bindings = None):
+        self.execute(statement, bindings)
+        rows = self.fetchAll()
+        values = []
+
+        for row in rows:
+            value = list(row.values())[0]
+            values.append(value)
+
+        return values
+
 
     def fetchAll(self):
         if self.isConnected:

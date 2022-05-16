@@ -158,6 +158,51 @@ class LabdataDB(Database):
 
         return np.array(intensity)
 
+    def getSpectra(self, spectrumIds):
+        spectra = None
+
+        for spectrumId in spectrumIds:
+            spectrum = self.getSpectrum(spectrumId)
+            if spectra is None:
+                spectra = spectrum
+            else:
+                spectra = np.concat(spectra, spectrum, axis = 1)
+
+        return spectra,  spectrumIds
+
+    def getFrequencies(self, datasetId=None, spectrumId=None):
+        if datasetId is not None:
+            self.execute(
+                r"select distinct(x) from datapoints left join spectra on spectra.spectrumId = datapoints.spectrumId where spectra.datasetId = %s",
+                (datasetId,)
+            )
+        else:
+            self.execute(
+                r"select distinct(x) from datapoints where spectrumId = %s",
+                (spectrumId,)
+            )
+
+        rows = self.fetchAll()
+        nTotal = len(rows)
+
+        freq = np.zeros(shape=(nTotal))
+        for i, row in enumerate(rows):
+            freq[i] = row["x"]
+
+        return freq
+
+    def getPossibleIdValues(self, datasetId):
+        self.execute(r"select id1Label, id2Label, id3Label, id4Label from datasets where datasetId = %s", (datasetId,))
+        row = self.fetchOne()
+        
+        id1Label, id2Label, id3Label, id4Label = (row["id1Label"],row["id2Label"],row["id3Label"],row["id4Label"])
+
+        id1s = self.executeSelectFetchOneField(r"select distinct(id1) from spectra where datasetId = %s", (datasetId,))
+        id2s = self.executeSelectFetchOneField(r"select distinct(id2) from spectra where datasetId = %s", (datasetId,))
+        id3s = self.executeSelectFetchOneField(r"select distinct(id3) from spectra where datasetId = %s", (datasetId,))
+        id4s = self.executeSelectFetchOneField(r"select distinct(id4) from spectra where datasetId = %s", (datasetId,))
+
+        return {id1Label:id1s, id2Label:id2s, id3Label:id3s, id4Label:id4s}
 
     def showProgressBar(
         self,
