@@ -96,6 +96,7 @@ class Database:
         self.user = "dcclab"
         self.port = None
         self.usePassword = True
+        self.server = None
 
         self.databaseEngine, self.sshuser, self.host, self.user, self.database = self.parseURL(databaseURL)
 
@@ -172,12 +173,13 @@ class Database:
         except Exception as err:
             # Cleanup
             print(err)
+        finally:
             if self.connection is not None:
                 self.connection.close()
-                self.server.stopMySQLTunnel()
                 self.cursor = None
+                if self.server is not None:
+                    self.server.stopMySQLTunnel()
 
-            return False
 
     def disconnect(self):
         if self.isConnected:
