@@ -31,7 +31,7 @@ class LabdataDB(Database):
         The Database is a MySQL database called `labdata`.
         """
         if databaseURL is None:
-            databaseURL = "mysql://dcclab@cafeine3.crulrg.ulaval.ca/dcclab@labdata"
+            databaseURL = "mysql+ssh://dcclab@cafeine2.crulrg.ulaval.ca:cafeine3.crulrg.ulaval.ca/dcclab@labdata"
 
         self.constraints = []
         super().__init__(databaseURL)

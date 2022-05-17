@@ -11,6 +11,34 @@ class TestLabdataDatabase(env.DCCLabTestCase):
         db = LabdataDB()
         db.connect()
 
+    def testConnectDBBadURL(self):
+        with self.assertRaises(Exception):
+            db = LabdataDB("abd://blabla")
+
+    def testConnectDBBadHost(self):
+        with self.assertRaises(Exception):
+            db = LabdataDB("mysql://somehost")
+
+    def testConnectDBGoodHost(self):
+        db = LabdataDB("mysql://127.0.0.1/root@labdata")
+
+    def testConnectOnCafeine3(self):
+        db = LabdataDB("mysql://cafeine3.crulrg.ulaval.ca/dcclab@labdata")
+
+    def testConnectOnCafeine3ViaSSH(self):
+        db = LabdataDB("mysql+ssh://dcclab@cafeine2.crulrg.ulaval.ca:cafeine3.crulrg.ulaval.ca/dcclab@labdata")
+
+    def testExecute(self):
+        db = LabdataDB("mysql://127.0.0.1/root@labdata")
+        db.execute("show tables")
+        rows = db.fetchAll()
+        self.assertTrue(len(rows) > 0)
+
+    def testExecuteOnCafeine3(self):
+        db = LabdataDB("mysql://cafeine3.crulrg.ulaval.ca/dcclab@labdata")
+        db.execute("show tables")
+        rows = db.fetchAll()
+        self.assertTrue(len(rows) > 0)
 
 
 class TestMySQLDatabase(env.DCCLabTestCase):
