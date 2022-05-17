@@ -23,15 +23,39 @@ class TestLabdataDatabase(env.DCCLabTestCase):
     def testConnectDBGoodHost(self):
         db = LabdataDB("mysql://127.0.0.1/root@labdata")
 
-    def testConnectOnCafeine2(self):
-        with self.assertRaises(Exception): # access denied, only localhost as of May 17th
-            db = LabdataDB("mysql://cafeine2.crulrg.ulaval.ca/dcclab@labdata")
+    def testLocalConnectOnCafeine2(self):
+        if self.isAtCERVO():
+            with self.assertRaises(Exception):  # access denied, only localhost as of May 17th
+                db = LabdataDB("mysql://cafeine2.crulrg.ulaval.ca/dcclab@labdata")
+        else:
+            self.skipTest("Not at CERVO: skipping local connections")
 
     def testConnectOnCafeine2ViaSSH(self):
         db = LabdataDB("mysql+ssh://dcclab@cafeine2.crulrg.ulaval.ca:127.0.0.1/dcclab@labdata")
 
-    def testConnectOnCafeine3(self):
-        db = LabdataDB("mysql://cafeine3.crulrg.ulaval.ca/dcclab@labdata")
+    def isAtCERVO(self, local_ip=None):
+        import ipaddress
+        if local_ip is None:
+            import socket
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.connect(("8.8.8.8", 80))
+            local_ip = ipaddress.ip_address(s.getsockname()[0])
+        else:
+            local_ip = ipaddress.ip_address(local_ip)
+
+        cervoNet = ipaddress.IPv4Network("172.16.1.0/24")
+
+        return (local_ip in cervoNet)
+
+    def testIsAtCervo(self):
+        self.assertTrue(self.isAtCERVO("172.16.1.106")) # cafeine2
+        self.assertFalse(self.isAtCERVO("192.168.2.1"))
+
+    def testLocalConnectOnCafeine3(self):
+        if self.isAtCERVO():
+            db = LabdataDB("mysql://cafeine3.crulrg.ulaval.ca/dcclab@labdata")
+        else:
+            self.skipTest("Not at CERVO: skipping local connections")
 
     def testConnectOnCafeine3ViaSSH(self):
         db = LabdataDB("mysql+ssh://dcclab@cafeine2.crulrg.ulaval.ca:cafeine3.crulrg.ulaval.ca/dcclab@labdata")
@@ -42,8 +66,8 @@ class TestLabdataDatabase(env.DCCLabTestCase):
         rows = db.fetchAll()
         self.assertTrue(len(rows) > 0)
 
-    def testExecuteOnCafeine3(self):
-        db = LabdataDB("mysql://cafeine3.crulrg.ulaval.ca/dcclab@labdata")
+    def testExecuteOnDefaultServer(self):
+        db = LabdataDB()
         db.execute("show tables")
         rows = db.fetchAll()
         self.assertTrue(len(rows) > 0)
@@ -57,10 +81,26 @@ class TestLabdataDatabase(env.DCCLabTestCase):
 
     def testGetDatasets(self):
         elements = self.db.getDatasets()
+
         for datasetId in elements:
             self.assertIsNotNone(r".+-\d+",datasetId)
+        self.assertTrue("WINE-001" in elements)
+        self.assertTrue("DRS-001" in elements)
+        self.assertTrue("SHAVASANA-001" in elements)
 
-    def testDeniedCreateAnythingDCCLab(self):
+    def testGetDataTypes(self):
+        elements = self.db.getDataTypes()
+        self.assertTrue("raw" in elements)
+        self.assertTrue("dark-reference" in elements)
+        self.assertTrue("white-reference" in elements)
+
+    def testGetSpectra(self):
+        elements = self.db.getDatasets()
+        for datasetId in elements:
+            data, ids = self.db.getSpectra(datasetId)
+            self.assertTrue(data.shape[0] > 10)
+
+    def testDeniedCreateAnythingUsername_dcclab(self):
         with self.assertRaises(AccessDeniedError):
             db = LabdataDB()
             db.execute("CREATE TABLE test (testfield int)")
@@ -83,7 +123,9 @@ class TestLabdataDatabase(env.DCCLabTestCase):
             self.db.execute("delete from datasets where datasetId = 'TEST-001'")
             self.db.execute("delete from projects where projectId = 'test'")
 
-
+    def testDescribeProjects(self):
+        self.db.describeProjects()
+        self.db.describeDatasets()
 
 class TestMySQLDatabase(env.DCCLabTestCase):
     def testLocalMySQLDatabase(self):

@@ -40,20 +40,6 @@ class LabdataDB(Database):
     def showHelp(cls):
         help(cls)
 
-    def getFrequencies(self, datasetId):
-        self.execute(
-            r"select distinct(x) from datapoints left join spectra on spectra.spectrumId = datapoints.spectrumId where spectra.datasetId = %s",
-            (datasetId,),
-        )
-        rows = self.fetchAll()
-        nTotal = len(rows)
-
-        freq = np.zeros(shape=(nTotal))
-        for i, row in enumerate(rows):
-            freq[i] = row["x"]
-
-        return freq
-
     def getProjectIds(self):
         self.execute("select projectId from projects")
         rows = self.fetchAll()

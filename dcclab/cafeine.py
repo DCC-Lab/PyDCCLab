@@ -23,6 +23,8 @@ class Cafeine:
             allow_agent = False,
             ssh_username="dcclab",
             ssh_password=password,
+            ssh_pkey="",
+            ssh_private_key_password=None,
             remote_bind_address=(remote_bind_address, 3306)
         )
 
