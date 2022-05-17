@@ -2,6 +2,9 @@ from zipfile import ZipFile
 from datetime import date
 import sqlite3 as lite
 import mysql.connector as mysql
+from mysql.connector.errors import Error as MySQLError
+from mysql.connector import errorcode as MySQLErrorCode
+
 import urllib.parse as parse
 import pathlib
 import os
@@ -58,6 +61,12 @@ dcclab/database as well as the metadata from their `.czi` files in the
 cafeine2 server.
 
 """
+
+class AccessDeniedError(Exception):
+    def __init__(self, err):
+        self.mysqlError:MySQLError = err
+        super().__init__("MySQL access error: the user cannot perform the requested action: {0}".format(err))
+
 
 from enum import Enum
 
@@ -265,7 +274,18 @@ class Database:
         string, which is not good.
         """
         if self.isConnected:
-            self.cursor.execute(statement, bindings)
+            try:
+                self.cursor.execute(statement, bindings)
+            except MySQLError as err:
+                accessDeniedErrors = [MySQLErrorCode.ER_DB_ACCESS_DENIED,
+                                      MySQLErrorCode.ER_DBACCESS_DENIED_ERROR,
+                                      MySQLErrorCode.ER_ACCESS_DENIED_ERROR,
+                                      MySQLErrorCode.ER_TABLEACCESS_DENIED_ERROR,
+                                      MySQLErrorCode.ER_COLUMNACCESS_DENIED_ERROR]
+                if err.errno in accessDeniedErrors:
+                    raise AccessDeniedError(err)
+                else:
+                    raise(err) # Nothing specific to say at this point
 
     def executeSelectOne(self, statement, bindings=None):
         """
