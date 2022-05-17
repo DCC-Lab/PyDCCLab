@@ -153,7 +153,11 @@ class Database:
                     self.cursor = self.connection.cursor()
                 else:
                     if self.usePassword is True:
-                        serviceName = "mysql-{0}".format(self.mysqlHost)
+                        if self.sshHost is not None:
+                            serviceName = "mysql-{0}-ssh-{1}".format(self.mysqlHost, self.sshHost)
+                        else:
+                            serviceName = "mysql-{0}".format(self.mysqlHost)
+
                         pwd = keyring.get_password(serviceName, self.mysqlUser)
                         if pwd is None:
                             raise Exception(""" Set the password in the system password manager on the command line with:
@@ -167,7 +171,7 @@ class Database:
                         self.server = Cafeine()
                         self.port = self.server.startMySQLTunnel(remote_bind_address=self.mysqlHost)
                         actualMysqlHost = "127.0.0.1"
-                        print("Forwarding {0}:{1} to {2}@{3}:3306 through SSH tunnel".format(actualMysqlHost, self.port, self.mysqlHost, self.mysqlUser))
+                        print("Forwarding {0}:{1} to {2}@{3}:3306 through SSH tunnel {4}@{5}".format(actualMysqlHost, self.port, self.mysqlHost, self.mysqlUser, self.sshHost, self.sshUser))
                     else:
                         self.port = 3306
 

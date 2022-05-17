@@ -22,6 +22,13 @@ class TestLabdataDatabase(env.DCCLabTestCase):
     def testConnectDBGoodHost(self):
         db = LabdataDB("mysql://127.0.0.1/root@labdata")
 
+    def testConnectOnCafeine2(self):
+        with self.assertRaises(Exception): # access denied, only localhost as of May 17th
+            db = LabdataDB("mysql://cafeine2.crulrg.ulaval.ca/dcclab@labdata")
+
+    def testConnectOnCafeine2ViaSSH(self):
+        db = LabdataDB("mysql+ssh://dcclab@cafeine2.crulrg.ulaval.ca:127.0.0.1/dcclab@labdata")
+
     def testConnectOnCafeine3(self):
         db = LabdataDB("mysql://cafeine3.crulrg.ulaval.ca/dcclab@labdata")
 
