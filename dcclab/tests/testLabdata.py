@@ -7,7 +7,7 @@ class TestLabdataDatabase(env.DCCLabTestCase):
     def testInitDB(self):
         self.assertIsNotNone(LabdataDB())
 
-    def testConnectDB(self):
+    def testConnectDBWithoutException(self):
         db = LabdataDB()
         db.connect()
 

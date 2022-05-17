@@ -170,9 +170,6 @@ class Database:
                 self.enforceForeignKeys()
 
             return True
-        except Exception as err:
-            # Cleanup
-            print(err)
         finally:
             if self.connection is not None:
                 self.connection.close()
