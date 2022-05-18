@@ -3,7 +3,6 @@ import numpy as np
 import requests
 import re
 
-
 class LabdataDB(Database):
     """
     This is a general database tool to access all information about projects,
@@ -158,7 +157,7 @@ class LabdataDB(Database):
             else:
                 spectra = np.vstack((spectra, spectrum))
 
-        return spectra,  spectrumIds
+        return spectra.T,  spectrumIds
 
     def getFrequencies(self, datasetId=None, spectrumId=None):
         if datasetId is not None:
