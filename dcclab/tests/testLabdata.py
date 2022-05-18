@@ -95,14 +95,17 @@ class TestLabdataDatabase(env.DCCLabTestCase):
         self.assertTrue("white-reference" in elements)
 
     def testGetSpectra(self):
-        elements = self.db.getDatasets()
-        for datasetId in elements:
-            data, ids = self.db.getSpectra(datasetId)
-            self.assertTrue(data.shape[0] > 10)
+        data, ids = self.db.getSpectra("DRS-001")
+        self.assertTrue(data.shape[0] > 10)
+
+    def testGetSpectrumIds(self):
+        datasets = self.db.getDatasets()
+        for datasetId in datasets:
+            spectrumIds = self.db.getSpectrumIds(datasetId)
 
     def testDeniedCreateAnythingUsername_dcclab(self):
         with self.assertRaises(AccessDeniedError):
-            db = LabdataDB()
+            db = LabdataDB() # defaults to dcclab
             db.execute("CREATE TABLE test (testfield int)")
 
     def testCreateNewProject(self):
@@ -126,6 +129,21 @@ class TestLabdataDatabase(env.DCCLabTestCase):
     def testDescribeProjects(self):
         self.db.describeProjects()
         self.db.describeDatasets()
+
+    def testIdValues(self):
+        idGeneric, idLabels, idValues,  = self.db.getPossibleIdValues("DRS-001")
+        self.assertIsNotNone(idValues)
+        self.assertIsNotNone(idLabels)
+        self.assertEqual(len(idValues), len(idLabels))
+
+    def testGetFormatString(self):
+        formatString = self.db.getSpectrumIdFormat(datasetId="DRS-001")
+        self.assertIsNotNone(formatString)
+
+    def testUseFormatString(self):
+        spectrumId = self.db.formatSpectrumId(datasetId="DRS-001", id1="Grey", id2=5.53, id3=1)
+        # spectrumId = self.db.formatSpectrumId(datasetId="DRS-001", region="Grey", distance=5.53, sampleId=1)
+
 
 class TestMySQLDatabase(env.DCCLabTestCase):
     def testLocalMySQLDatabase(self):

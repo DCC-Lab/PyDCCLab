@@ -182,18 +182,37 @@ class LabdataDB(Database):
         return freq
 
     def getPossibleIdValues(self, datasetId):
-        self.execute(r"select id1Label, id2Label, id3Label, id4Label from datasets where datasetId = %s", (datasetId,))
-        row = self.fetchOne()
-        
-        id1Label, id2Label, id3Label, id4Label = (row["id1Label"],row["id2Label"],row["id3Label"],row["id4Label"])
+        row = self.executeSelectFetchOneRow(r"select id1Label, id2Label, id3Label, id4Label from datasets where datasetId = %s", (datasetId,))
 
-        id1s = self.executeSelectFetchOneField(r"select distinct(id1) from spectra where datasetId = %s", (datasetId,))
-        id2s = self.executeSelectFetchOneField(r"select distinct(id2) from spectra where datasetId = %s", (datasetId,))
-        id3s = self.executeSelectFetchOneField(r"select distinct(id3) from spectra where datasetId = %s", (datasetId,))
-        id4s = self.executeSelectFetchOneField(r"select distinct(id4) from spectra where datasetId = %s", (datasetId,))
+        idLabels = list(filter(None, [row["id1Label"],row["id2Label"],row["id3Label"],row["id4Label"]]))
+        genericIdLabels = ["id1", "id2", "id3", "id4"][0:len(idLabels)]
+        idValues = []
+        for i in range(len(idLabels)):
+            fieldName = "id{0}".format(i+1)
+            values = self.executeSelectFetchOneField(f"select distinct({fieldName}) from spectra where datasetId = %s", (datasetId,))
+            idValues.append(values)
 
-        return {id1Label:id1s, id2Label:id2s, id3Label:id3s, id4Label:id4s}
+        return genericIdLabels, idLabels, idValues
 
+    def getSpectrumIdFormat(self, datasetId):
+        return self.executeSelectOne(r"select spectrumIdFormatString from datasets where datasetId = %s", (datasetId,))
+
+    def formatSpectrumId(self, **args):
+        if "datasetId" not in args:
+            raise ValueError("You must provide datasetId as a named argument")
+
+        datasetId = args["datasetId"]
+        genericIdLabels, idLabels, possibleIdValues = self.getPossibleIdValues(datasetId)
+
+        genericFieldNames = ["id1", "id2", "id3", "id4"]
+        isUsingGenericFieldNames = True in (fieldName in args.keys() for fieldName in genericFieldNames)
+
+        if isUsingGenericFieldNames:
+            theCoords = tuple(filter(None, ( args.get(idField) for idField in genericFieldNames)))
+            formatString = self.getSpectrumIdFormat(datasetId=datasetId)
+            print(formatString.format(*theCoords))
+
+        # datasetId="DRS-001", region="Grey", distance=5.53, sampleId=1):
 
 class SpectraDB(LabdataDB):
     def __init__(self, databaseURL=None):

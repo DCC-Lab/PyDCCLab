@@ -289,7 +289,7 @@ class Database:
 
     def executeSelectOne(self, statement, bindings=None):
         """
-        A select statement that selects a single field, fetches it and returns
+        A select statement that selects a single field from a single row, fetches it and returns
         the result immediately.
         """
         self.execute(statement, bindings)
