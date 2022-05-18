@@ -140,9 +140,9 @@ class TestLabdataDatabase(env.DCCLabTestCase):
         formatString = self.db.getSpectrumIdFormat(datasetId="DRS-001")
         self.assertIsNotNone(formatString)
 
-    def testUseFormatString(self):
-        spectrumId = self.db.formatSpectrumId(datasetId="DRS-001", id1="Grey", id2=5.53, id3=1)
-        # spectrumId = self.db.formatSpectrumId(datasetId="DRS-001", region="Grey", distance=5.53, sampleId=1)
+    # def testUseFormatString(self):
+    #     spectrumId = self.db.formatSpectrumId(datasetId="DRS-001", id1="Grey", id2=5.53, id3=1)
+    #     # spectrumId = self.db.formatSpectrumId(datasetId="DRS-001", region="Grey", distance=5.53, sampleId=1)
 
 
 class TestMySQLDatabase(env.DCCLabTestCase):
