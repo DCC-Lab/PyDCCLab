@@ -2,6 +2,9 @@ from zipfile import ZipFile
 from datetime import date
 import sqlite3 as lite
 import mysql.connector as mysql
+from mysql.connector.errors import Error as MySQLError
+from mysql.connector import errorcode as MySQLErrorCode
+
 import urllib.parse as parse
 import pathlib
 import os
@@ -59,6 +62,12 @@ cafeine2 server.
 
 """
 
+class AccessDeniedError(Exception):
+    def __init__(self, err):
+        self.mysqlError:MySQLError = err
+        super().__init__("MySQL access error: the user cannot perform the requested action: {0}".format(err))
+
+
 from enum import Enum
 
 class Type(Enum):
@@ -84,35 +93,49 @@ class Engine(Enum):
     sqlite3 = "sqlite3"
 
 class Database:
-    def __init__(self, databaseURL, writePermission=False):
+    def __init__(self, databaseURL, usePassword=True, writePermission=False):
         self.writePermission = writePermission
         self.databaseURL = databaseURL
         self.connection = None
         self.cursor = None
         self.databaseEngine = None
 
-        self.database = "dcclab"
-        self.host = "cafeine2.crulrg.ulaval.ca"
-        self.user = "dcclab"
+        self.database = None
         self.port = None
-        self.usePassword = True
+        self.usePassword = usePassword
+        self.server = None
 
-        self.databaseEngine, self.sshuser, self.host, self.user, self.database = self.parseURL(databaseURL)
+        self.databaseEngine, self.sshUser, self.sshHost, self.mysqlHost, self.mysqlUser, self.database = self.parseURL(databaseURL)
 
         self.connect()
 
     def parseURL(self, url):
-        #mysql://sshusername:sshpassword@cafeine2.crulrg.ulaval.ca/mysqlusername:mysqlpassword@questions
-        match = re.search("(mysql)://(.*?)@?([^@]+?)/(.*?)@(.+)", url)
+        #mysql://sshusername@cafeine2.crulrg.ulaval.ca/mysqlusername:mysqlpassword@questions
+        match = re.search("mysql://([^@]+?)/(.*?)@(.+)", url)
         if match is not None:
-            protocol = Engine.mysql
-            sshuser = match.group(2)
-            host = match.group(3)
-            mysqluser = match.group(4)
+            engine = Engine.mysql
+            sshUser = None
+            sshHost = None
+            mysqlHost = match.group(1)
+            mysqluser = match.group(2)
+            database = match.group(3)
+            return (engine, sshUser, sshHost, mysqlHost, mysqluser, database)
+
+        match = re.search("mysql.ssh://(.+?)@([^@]+?):([^@]+?)/(.*?)@(.+)", url)
+        if match is not None:
+            engine = Engine.mysql
+            sshUser = match.group(1)
+            sshHost = match.group(2)
+            mysqlHost = match.group(3)
+            mysqlUser = match.group(4)
             database = match.group(5)
-            return (protocol, sshuser, host, mysqluser, database)
-        else:
+            return (engine, sshUser, sshHost, mysqlHost, mysqlUser, database)
+
+        match = re.search("(sqlite|file)://(.*?)", url)
+        if match is not None:
             return (Engine.sqlite3, None, "127.0.0.1", None, url)
+
+        raise ValueError("Unrecognized or incomplete URL: {0}. Use mysql://host/mysqlusername@questions or mysql://sshusername@sshhost/mysqlusername@questions".format(url))
 
     def __enter__(self):
         return self
@@ -139,45 +162,46 @@ class Database:
                     self.cursor = self.connection.cursor()
                 else:
                     if self.usePassword is True:
-                        serviceName = "mysql-{0}".format(self.host)
-                        pwd = keyring.get_password(serviceName, self.user)
+                        if self.sshHost is not None:
+                            serviceName = "mysql-{0}-ssh-{1}".format(self.mysqlHost, self.sshHost)
+                        else:
+                            serviceName = "mysql-{0}".format(self.mysqlHost)
+
+                        pwd = keyring.get_password(serviceName, self.mysqlUser)
                         if pwd is None:
                             raise Exception(""" Set the password in the system password manager on the command line with:
-                            python -m keyring set {0} {1}""".format(serviceName, self.user))
+                            python -m keyring set {0} {1}""".format(serviceName, self.mysqlUser))
                     else:
                         pwd = None
 
-                    actualHost = self.host
-                    if self.host == "cafeine2.crulrg.ulaval.ca":
+                    actualMysqlHost = self.mysqlHost
+                    if self.sshHost == "cafeine2.crulrg.ulaval.ca":
                         from dcclab import Cafeine
-                        actualHost = "127.0.0.1"
                         self.server = Cafeine()
-                        self.port = self.server.startMySQLTunnel()
-                        print("Forwarding 127.0.0.1:{2} to {0}@{1}:3306 through SSH tunnel".format(self.user, self.host, self.port))
+                        self.port = self.server.startMySQLTunnel(remote_bind_address=self.mysqlHost)
+                        actualMysqlHost = "127.0.0.1"
+                        print("Forwarding {0}:{1} to {2}@{3}:3306 through SSH tunnel {4}@{5}".format(actualMysqlHost, self.port, self.mysqlHost, self.mysqlUser, self.sshHost, self.sshUser))
                     else:
                         self.port = 3306
 
-                    self.connection = mysql.connect(host=actualHost,
+                    self.connection = mysql.connect(host=actualMysqlHost,
                                                     port=self.port,
                                                      database=self.database,
-                                                     user=self.user,
+                                                     user=self.mysqlUser,
                                                      password=pwd,
                                                      use_pure=True)
 
                     self.cursor = self.connection.cursor(dictionary=True)
 
                 self.enforceForeignKeys()
-
-            return True
         except Exception as err:
-            # Cleanup
-            print(err)
             if self.connection is not None:
                 self.connection.close()
-                self.server.stopMySQLTunnel()
                 self.cursor = None
+                if self.server is not None:
+                    self.server.stopMySQLTunnel()
+            raise(err)
 
-            return False
 
     def disconnect(self):
         if self.isConnected:
@@ -250,11 +274,22 @@ class Database:
         string, which is not good.
         """
         if self.isConnected:
-            self.cursor.execute(statement, bindings)
+            try:
+                self.cursor.execute(statement, bindings)
+            except MySQLError as err:
+                accessDeniedErrors = [MySQLErrorCode.ER_DB_ACCESS_DENIED,
+                                      MySQLErrorCode.ER_DBACCESS_DENIED_ERROR,
+                                      MySQLErrorCode.ER_ACCESS_DENIED_ERROR,
+                                      MySQLErrorCode.ER_TABLEACCESS_DENIED_ERROR,
+                                      MySQLErrorCode.ER_COLUMNACCESS_DENIED_ERROR]
+                if err.errno in accessDeniedErrors:
+                    raise AccessDeniedError(err)
+                else:
+                    raise(err) # Nothing specific to say at this point
 
     def executeSelectOne(self, statement, bindings=None):
         """
-        A select statement that selects a single field, fetches it and returns
+        A select statement that selects a single field from a single row, fetches it and returns
         the result immediately.
         """
         self.execute(statement, bindings)
