@@ -2,7 +2,6 @@ from .database import *
 import numpy as np
 import requests
 import re
-import matplotlib.pyplot as plt
 
 class LabdataDB(Database):
     """
