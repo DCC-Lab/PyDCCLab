@@ -2,7 +2,7 @@ from .database import *
 import numpy as np
 import requests
 import re
-
+import matplotlib.pyplot as plt
 
 class LabdataDB(Database):
     """
@@ -158,7 +158,7 @@ class LabdataDB(Database):
             else:
                 spectra = np.vstack((spectra, spectrum))
 
-        return spectra,  spectrumIds
+        return spectra.T,  spectrumIds
 
     def getFrequencies(self, datasetId=None, spectrumId=None):
         if datasetId is not None:
