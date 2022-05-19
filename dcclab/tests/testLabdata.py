@@ -144,6 +144,8 @@ class TestLabdataDatabase(env.DCCLabTestCase):
     #     spectrumId = self.db.formatSpectrumId(datasetId="DRS-001", id1="Grey", id2=5.53, id3=1)
     #     # spectrumId = self.db.formatSpectrumId(datasetId="DRS-001", region="Grey", distance=5.53, sampleId=1)
 
+    def testShowInfo(self):
+        self.db.showTableInfo()
 
 class TestMySQLDatabase(env.DCCLabTestCase):
     def testLocalMySQLDatabase(self):

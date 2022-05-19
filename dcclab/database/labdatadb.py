@@ -2,32 +2,66 @@ from .database import *
 import numpy as np
 import requests
 import re
+import textwrap
+
+class color:
+   PURPLE = '\033[95m'
+   CYAN = '\033[96m'
+   DARKCYAN = '\033[36m'
+   BLUE = '\033[94m'
+   GREEN = '\033[92m'
+   YELLOW = '\033[93m'
+   RED = '\033[91m'
+   BOLD = '\033[1m'
+   UNDERLINE = '\033[4m'
+   END = '\033[0m'
 
 class LabdataDB(Database):
     """
     This is a general database tool to access all information about projects,
-    files, and spectral datasets of the DCCLab. The database is on Cafeine3
-    and can be accessed with the dcclab username and normal password via a
+    files, and spectral datasets of the DCCLab. You use it with:
+
+    ```
+    db = LabdatDB() # or db=SpectraDB() to get a few specific spectra functions
+    ```
+    The database has the following tables:
+
+    +-------------------+
+    | Tables_in_labdata |
+    +-------------------+
+    | datapoints        |
+    | datasets          |
+    | files             |
+    | projects          |
+    | scanlog           |
+    | spectra           |
+    | users             |
+    | volumes           |
+    | wines             |
+    +-------------------+
+
+
+    The database is on Cafeine3 and can be accessed with the dcclab username and normal password via a
     secure shell, and then via mysql also with dcclab and the same password.
-    The database is called labdata.
-
-    mysql://dcclab@cafeine3.crulrg.ulaval.ca/dcclab@labdata
-    
+    The database is called labdata, and the default value of the URL
+    to access it is set to:
+    mysql+ssh://dcclab@cafeine2.crulrg.ulaval.ca:cafeine3.crulrg.ulaval.ca/dcclab@labdata
     which can be interpreted as:
-    mysql://ssh_username@host/mysql_user@mysql_database
+    mysql://ssh_username@ssh_host:mysql_host/mysql_user@mysql_database
 
-    If the host is on the CERVO network, the actual host will be cafeine2 and the mysql
-    connection will be forwarded to the provided host.
     You can provide your own link if you have a local version on your computer, such as:
-    
     db = LabdataDB("mysql://127.0.0.1/dcclab@labdata")
 
     In the case of 127.0.0.1 (or localhost), it will not use ssh and will connnect
-    directly. However, as of May 13th 2022, it is not possible on cafeine3.
+    directly.
     """
     def __init__(self, databaseURL=None):
         """
-        The Database is a MySQL database called `labdata`.
+        The Database is initialized to:
+        mysql+ssh://dcclab@cafeine2.crulrg.ulaval.ca:cafeine3.crulrg.ulaval.ca/dcclab@labdata
+
+        which allows access from outside the CERVO Center.  The first time, you will have to provide the password for
+        dcclab on cafeine2.crulrg.ulaval.ca and on the MySQL server dcclab on cafeine3.crulrg.ulaval.ca
         """
         if databaseURL is None:
             databaseURL = "mysql+ssh://dcclab@cafeine2.crulrg.ulaval.ca:cafeine3.crulrg.ulaval.ca/dcclab@labdata"
@@ -37,9 +71,50 @@ class LabdataDB(Database):
 
     @classmethod
     def showHelp(cls):
+        """
+        Display the class help.
+
+        """
         help(cls)
+        self.showTableInfo()
+
+    def showTableInfo(self):
+        printWidth = 70
+
+        self.execute("select TABLE_NAME, TABLE_COMMENT from INFORMATION_SCHEMA.tables where table_schema = 'labdata'")
+        rows = self.fetchAll()
+
+        for row in rows:
+            header = "Table: " + color.BOLD + row["TABLE_NAME"] + color.END
+            print("="*printWidth)
+            print(header)
+            print("="*printWidth)
+            print("\n".join(textwrap.wrap(row["TABLE_COMMENT"])))
+
+            self.execute("SHOW FULL COLUMNS FROM {0}".format(row["TABLE_NAME"]))
+            tableRows = self.fetchAll()
+            maxFieldLength = max([ len(tableRow["Field"]) for tableRow in tableRows])
+
+            colWidth = max(maxFieldLength+1, 20)
+
+            formatString = "{0:" + f"{colWidth}" + "s}{1}"
+            print("-"*printWidth)
+            print(formatString.format("Field","Comment"))
+            print("-"*printWidth)
+            for tableRow in tableRows:
+                description = ("\n"+" "*colWidth).join(textwrap.wrap(tableRow["Comment"],width=printWidth-colWidth))
+                if len(description) <1:
+                    description = "No description"
+                print(formatString.format(tableRow["Field"], description))
+            print("\n\n")
 
     def getProjectIds(self):
+        """
+        The database
+
+        :return:
+        """
+
         self.execute("select projectId from projects")
         rows = self.fetchAll()
         projects = []
