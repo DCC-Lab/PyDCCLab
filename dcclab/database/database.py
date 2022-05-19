@@ -1,9 +1,8 @@
-from zipfile import ZipFile
-from datetime import date
 import sqlite3 as lite
 import mysql.connector as mysql
 from mysql.connector.errors import Error as MySQLError
 from mysql.connector import errorcode as MySQLErrorCode
+import textwrap
 
 import urllib.parse as parse
 import pathlib
@@ -108,6 +107,48 @@ class Database:
         self.databaseEngine, self.sshUser, self.sshHost, self.mysqlHost, self.mysqlUser, self.database = self.parseURL(databaseURL)
 
         self.connect()
+
+    def showDatabaseInfo(self):
+        class color:
+            PURPLE = '\033[95m'
+            CYAN = '\033[96m'
+            DARKCYAN = '\033[36m'
+            BLUE = '\033[94m'
+            GREEN = '\033[92m'
+            YELLOW = '\033[93m'
+            RED = '\033[91m'
+            BOLD = '\033[1m'
+            UNDERLINE = '\033[4m'
+            END = '\033[0m'
+
+        printWidth = 70
+
+        self.execute("select TABLE_NAME, TABLE_COMMENT from INFORMATION_SCHEMA.tables where table_schema = %s", (self.database,))
+        rows = self.fetchAll()
+
+        for row in rows:
+            header = "Table: " + color.BOLD + row["TABLE_NAME"] + color.END
+            print("="*printWidth)
+            print(header)
+            print("="*printWidth)
+            print("\n".join(textwrap.wrap(row["TABLE_COMMENT"])))
+
+            self.execute("SHOW FULL COLUMNS FROM {0}".format(row["TABLE_NAME"]))
+            tableRows = self.fetchAll()
+            maxFieldLength = max([ len(tableRow["Field"]) for tableRow in tableRows])
+
+            colWidth = max(maxFieldLength+1, 20)
+
+            formatString = "{0:" + f"{colWidth}" + "s}{1}"
+            print("-"*printWidth)
+            print(formatString.format("Field","Comment"))
+            print("-"*printWidth)
+            for tableRow in tableRows:
+                description = ("\n"+" "*colWidth).join(textwrap.wrap(tableRow["Comment"],width=printWidth-colWidth))
+                if len(description) <1:
+                    description = "No description"
+                print(formatString.format(tableRow["Field"], description))
+            print("\n\n")
 
     def parseURL(self, url):
         #mysql://sshusername@cafeine2.crulrg.ulaval.ca/mysqlusername:mysqlpassword@questions

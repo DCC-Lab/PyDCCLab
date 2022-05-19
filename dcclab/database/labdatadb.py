@@ -1,20 +1,6 @@
 from .database import *
 import numpy as np
-import requests
 import re
-import textwrap
-
-class color:
-   PURPLE = '\033[95m'
-   CYAN = '\033[96m'
-   DARKCYAN = '\033[36m'
-   BLUE = '\033[94m'
-   GREEN = '\033[92m'
-   YELLOW = '\033[93m'
-   RED = '\033[91m'
-   BOLD = '\033[1m'
-   UNDERLINE = '\033[4m'
-   END = '\033[0m'
 
 class LabdataDB(Database):
     """
@@ -69,45 +55,6 @@ class LabdataDB(Database):
         self.constraints = []
         super().__init__(databaseURL)
 
-    @classmethod
-    def showHelp(cls):
-        """
-        Display the class help.
-
-        """
-        help(cls)
-        self.showTableInfo()
-
-    def showTableInfo(self):
-        printWidth = 70
-
-        self.execute("select TABLE_NAME, TABLE_COMMENT from INFORMATION_SCHEMA.tables where table_schema = 'labdata'")
-        rows = self.fetchAll()
-
-        for row in rows:
-            header = "Table: " + color.BOLD + row["TABLE_NAME"] + color.END
-            print("="*printWidth)
-            print(header)
-            print("="*printWidth)
-            print("\n".join(textwrap.wrap(row["TABLE_COMMENT"])))
-
-            self.execute("SHOW FULL COLUMNS FROM {0}".format(row["TABLE_NAME"]))
-            tableRows = self.fetchAll()
-            maxFieldLength = max([ len(tableRow["Field"]) for tableRow in tableRows])
-
-            colWidth = max(maxFieldLength+1, 20)
-
-            formatString = "{0:" + f"{colWidth}" + "s}{1}"
-            print("-"*printWidth)
-            print(formatString.format("Field","Comment"))
-            print("-"*printWidth)
-            for tableRow in tableRows:
-                description = ("\n"+" "*colWidth).join(textwrap.wrap(tableRow["Comment"],width=printWidth-colWidth))
-                if len(description) <1:
-                    description = "No description"
-                print(formatString.format(tableRow["Field"], description))
-            print("\n\n")
-
     def getProjectIds(self):
         """
         The database
@@ -126,7 +73,6 @@ class LabdataDB(Database):
     def describeProjects(self):
         self.execute("select projectId, description from projects order by projectId")
         rows = self.fetchAll()
-        datasets = []
         for row in rows:
             description = "Dataset: {0}".format(row["projectId"])
             print(description)
@@ -145,7 +91,7 @@ class LabdataDB(Database):
     def describeDatasets(self):
         self.execute("select datasetId, description from datasets order by datasetId")
         rows = self.fetchAll()
-        datasets = []
+
         for row in rows:
             description = "Dataset: {0}".format(row["datasetId"])
             print(description)
@@ -308,7 +254,7 @@ class SpectraDB(LabdataDB):
                 # FIXME? On some computers with French settings, a comma is used. We substitute blindly.
                 line = re.sub(",", ".", line)
 
-                match = re.match(r"^\s*(\d+[\.,]?\d+)\s+(-?\d*[\.,]?\d*)", line)
+                match = re.match(r"^\s*(\d+[.,]?\d+)\s+(-?\d*[.,]?\d*)", line)
                 if match is not None:
                     intensity = match.group(2)
                     wavelength = match.group(1)
@@ -334,10 +280,10 @@ class SpectraDB(LabdataDB):
             sampleId = int(match.group(2))
             spectrumId = "{0:04}-{1:04d}".format(wineId, sampleId)
 
-            wavelengths, intensities = self.readOceanInsightFile(filePath)
+            wavelengths, intensities, acquisitionInfo = self.readOceanInsightFile(filePath)
             try:
                 self.insertSpectralData(
-                    wavelengths, intensities, dataType, wineId, sampleId
+                    spectrumId, wavelengths, intensities
                 )
                 print("Inserted {0}".format(filePath))
                 inserted += 1

@@ -1,7 +1,6 @@
 import env
 from dcclab.database import *
 import unittest
-import os
 
 class TestLabdataDatabase(env.DCCLabTestCase):
 
@@ -145,7 +144,7 @@ class TestLabdataDatabase(env.DCCLabTestCase):
     #     # spectrumId = self.db.formatSpectrumId(datasetId="DRS-001", region="Grey", distance=5.53, sampleId=1)
 
     def testShowInfo(self):
-        self.db.showTableInfo()
+        self.db.showDatabaseInfo()
 
 class TestMySQLDatabase(env.DCCLabTestCase):
     def testLocalMySQLDatabase(self):
