@@ -8,7 +8,7 @@ class LabdataDB(Database):
     files, and spectral datasets of the DCCLab. You use it with:
 
     ```
-    db = LabdatDB() # or db=SpectraDB() to get a few specific spectra functions
+    db = LabdataDB() # or db=SpectraDB() to get a few specific spectra functions
     ```
     The database has the following tables:
 
