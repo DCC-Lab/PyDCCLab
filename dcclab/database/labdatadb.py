@@ -1,33 +1,53 @@
 from .database import *
 import numpy as np
-import requests
 import re
 
 class LabdataDB(Database):
     """
     This is a general database tool to access all information about projects,
-    files, and spectral datasets of the DCCLab. The database is on Cafeine3
-    and can be accessed with the dcclab username and normal password via a
+    files, and spectral datasets of the DCCLab. You use it with:
+
+    ```
+    db = LabdataDB() # or db=SpectraDB() to get a few specific spectra functions
+    ```
+    The database has the following tables:
+
+    +-------------------+
+    | Tables_in_labdata |
+    +-------------------+
+    | datapoints        |
+    | datasets          |
+    | files             |
+    | projects          |
+    | scanlog           |
+    | spectra           |
+    | users             |
+    | volumes           |
+    | wines             |
+    +-------------------+
+
+
+    The database is on Cafeine3 and can be accessed with the dcclab username and normal password via a
     secure shell, and then via mysql also with dcclab and the same password.
-    The database is called labdata.
-
-    mysql://dcclab@cafeine3.crulrg.ulaval.ca/dcclab@labdata
-    
+    The database is called labdata, and the default value of the URL
+    to access it is set to:
+    mysql+ssh://dcclab@cafeine2.crulrg.ulaval.ca:cafeine3.crulrg.ulaval.ca/dcclab@labdata
     which can be interpreted as:
-    mysql://ssh_username@host/mysql_user@mysql_database
+    mysql://ssh_username@ssh_host:mysql_host/mysql_user@mysql_database
 
-    If the host is on the CERVO network, the actual host will be cafeine2 and the mysql
-    connection will be forwarded to the provided host.
     You can provide your own link if you have a local version on your computer, such as:
-    
     db = LabdataDB("mysql://127.0.0.1/dcclab@labdata")
 
     In the case of 127.0.0.1 (or localhost), it will not use ssh and will connnect
-    directly. However, as of May 13th 2022, it is not possible on cafeine3.
+    directly.
     """
     def __init__(self, databaseURL=None):
         """
-        The Database is a MySQL database called `labdata`.
+        The Database is initialized to:
+        mysql+ssh://dcclab@cafeine2.crulrg.ulaval.ca:cafeine3.crulrg.ulaval.ca/dcclab@labdata
+
+        which allows access from outside the CERVO Center.  The first time, you will have to provide the password for
+        dcclab on cafeine2.crulrg.ulaval.ca and on the MySQL server dcclab on cafeine3.crulrg.ulaval.ca
         """
         if databaseURL is None:
             databaseURL = "mysql+ssh://dcclab@cafeine2.crulrg.ulaval.ca:cafeine3.crulrg.ulaval.ca/dcclab@labdata"
@@ -35,11 +55,13 @@ class LabdataDB(Database):
         self.constraints = []
         super().__init__(databaseURL)
 
-    @classmethod
-    def showHelp(cls):
-        help(cls)
-
     def getProjectIds(self):
+        """
+        The database
+
+        :return:
+        """
+
         self.execute("select projectId from projects")
         rows = self.fetchAll()
         projects = []
@@ -51,7 +73,6 @@ class LabdataDB(Database):
     def describeProjects(self):
         self.execute("select projectId, description from projects order by projectId")
         rows = self.fetchAll()
-        datasets = []
         for row in rows:
             description = "Dataset: {0}".format(row["projectId"])
             print(description)
@@ -70,7 +91,7 @@ class LabdataDB(Database):
     def describeDatasets(self):
         self.execute("select datasetId, description from datasets order by datasetId")
         rows = self.fetchAll()
-        datasets = []
+
         for row in rows:
             description = "Dataset: {0}".format(row["datasetId"])
             print(description)
@@ -233,7 +254,7 @@ class SpectraDB(LabdataDB):
                 # FIXME? On some computers with French settings, a comma is used. We substitute blindly.
                 line = re.sub(",", ".", line)
 
-                match = re.match(r"^\s*(\d+[\.,]?\d+)\s+(-?\d*[\.,]?\d*)", line)
+                match = re.match(r"^\s*(\d+[.,]?\d+)\s+(-?\d*[.,]?\d*)", line)
                 if match is not None:
                     intensity = match.group(2)
                     wavelength = match.group(1)
@@ -259,10 +280,10 @@ class SpectraDB(LabdataDB):
             sampleId = int(match.group(2))
             spectrumId = "{0:04}-{1:04d}".format(wineId, sampleId)
 
-            wavelengths, intensities = self.readOceanInsightFile(filePath)
+            wavelengths, intensities, acquisitionInfo = self.readOceanInsightFile(filePath)
             try:
                 self.insertSpectralData(
-                    wavelengths, intensities, dataType, wineId, sampleId
+                    spectrumId, wavelengths, intensities
                 )
                 print("Inserted {0}".format(filePath))
                 inserted += 1
