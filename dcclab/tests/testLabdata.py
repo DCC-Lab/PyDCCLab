@@ -1,6 +1,7 @@
 import env
 from dcclab.database import *
 import unittest
+import numpy as np
 
 class TestLabdataDatabase(env.DCCLabTestCase):
 
@@ -97,6 +98,14 @@ class TestLabdataDatabase(env.DCCLabTestCase):
         data, ids = self.db.getSpectra("DRS-001")
         self.assertTrue(data.shape[0] > 10)
 
+    def testGetFrequencies(self):
+        elements = self.db.getDatasets()
+
+        for datasetId in elements:
+            x = self.db.getFrequencies(datasetId=datasetId)
+            self.assertTrue(len(x) > 10)
+            self.assertIsNotNone(r".+-\d+",datasetId)
+
     def testGetSpectrumIds(self):
         datasets = self.db.getDatasets()
         for datasetId in datasets:
@@ -130,18 +139,36 @@ class TestLabdataDatabase(env.DCCLabTestCase):
         self.db.describeDatasets()
 
     def testIdValues(self):
-        idGeneric, idLabels, idValues,  = self.db.getPossibleIdValues("DRS-001")
+        idGeneric, idLabels, idValues  = self.db.getPossibleIdValues("DRS-001")
         self.assertIsNotNone(idValues)
         self.assertIsNotNone(idLabels)
         self.assertEqual(len(idValues), len(idLabels))
+        idGeneric, idLabels, idValues  = self.db.getPossibleIdValues("SHAVASANA-001")
+        idGeneric, idLabels, idValues  = self.db.getPossibleIdValues("WINE-001")
 
     def testGetFormatString(self):
         formatString = self.db.getSpectrumIdFormat(datasetId="DRS-001")
         self.assertIsNotNone(formatString)
 
-    # def testUseFormatString(self):
-    #     spectrumId = self.db.formatSpectrumId(datasetId="DRS-001", id1="Grey", id2=5.53, id3=1)
-    #     # spectrumId = self.db.formatSpectrumId(datasetId="DRS-001", region="Grey", distance=5.53, sampleId=1)
+    def testUseSpecificFormatString(self):
+        spectrumId = self.db.formatSpectrumId(datasetId="DRS-001", id1="Grey", id2=5.53, id3=1)
+
+    def testValidateFormatString(self):
+        import itertools
+
+        self.db.execute("select datasetId, id1, id2, id3, id4 from spectra")
+        rows = self.db.fetchAll()
+
+        for row in rows:
+            row = self.db.castIdsToDatasetType(row)
+            spectrumId = self.db.formatSpectrumId(**row)
+            print(spectrumId)
+
+    def testInferTypes(self):
+        self.assertTrue( self.db._inferListType(["1","2","3"]) == int)
+        self.assertTrue( self.db._inferListType(["1","2","3.1"]) == float)
+        self.assertTrue( self.db._inferListType(["1","2", "allo"]) == str )
+        self.assertTrue( self.db._inferListType(["5.2", "4.2", "3.1"]) == float )
 
     def testShowInfo(self):
         self.db.showDatabaseInfo()
