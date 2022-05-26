@@ -245,8 +245,10 @@ class LabdataDB(Database):
     def getSpectrumIdFormat(self, datasetId):
         return self.executeSelectOne(r"select spectrumIdFormatString from datasets where datasetId = %s", (datasetId,))
 
-    def castIdsToDatasetType(self, row):
-        idTypes = self.getIdTypes(row["datasetId"])
+    def castIdsToDatasetType(self, row, idTypes=None):
+        if idTypes is None:
+            idTypes = self.getIdTypes(row["datasetId"])
+
         for fieldName in ["id1", "id2", "id3", "id4"]:
             if fieldName in row.keys():
                 typeToCastTo = idTypes[fieldName]
@@ -263,9 +265,12 @@ class LabdataDB(Database):
 
         if isUsingGenericFieldNames:
             row = self.castIdsToDatasetType(row)
-            theCoords = tuple(filter(None, ( row.get(idField) for idField in genericFieldNames)))
+            theCoords = tuple( row.get(idField) for idField in genericFieldNames)
             formatString = self.getSpectrumIdFormat(datasetId=datasetId)
-            return formatString.format(datasetId, *theCoords)
+            try:
+                return formatString.format(datasetId, *theCoords)
+            except Exception as err:
+                raise ValueError("Unable to convert {0} with format string '{1}'", row, formatString )
 
 class SpectraDB(LabdataDB):
     def __init__(self, databaseURL=None):

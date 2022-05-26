@@ -154,15 +154,15 @@ class TestLabdataDatabase(env.DCCLabTestCase):
         spectrumId = self.db.formatSpectrumId(datasetId="DRS-001", id1="Grey", id2=5.53, id3=1)
 
     def testValidateFormatString(self):
-        import itertools
+        datasets = self.db.getDatasets()
 
-        self.db.execute("select datasetId, id1, id2, id3, id4 from spectra")
-        rows = self.db.fetchAll()
+        for datasetId in datasets:
+            idTypes = self.db.getIdTypes(datasetId)
+            self.db.execute("select datasetId, id1, id2, id3, id4 from spectra where datasetId = %s limit 5", (datasetId,))
 
-        for row in rows:
-            row = self.db.castIdsToDatasetType(row)
-            spectrumId = self.db.formatSpectrumId(**row)
-            print(spectrumId)
+            rows = self.db.fetchAll()
+            for row in rows:
+                spectrumId = self.db.formatSpectrumId(**row)
 
     def testInferTypes(self):
         self.assertTrue( self.db._inferListType(["1","2","3"]) == int)
