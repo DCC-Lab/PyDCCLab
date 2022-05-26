@@ -174,7 +174,13 @@ class Database:
 
         match = re.search("(sqlite|file)://(.*?)", url)
         if match is not None:
-            return (Engine.sqlite3, None, "127.0.0.1", None, url)
+            engine = Engine.sqlite3
+            sshUser = None
+            sshHost = None
+            mysqlHost = "127.0.0.1"
+            mysqlUser = None
+            database = match.group(2)
+            return (engine, sshUser, sshHost, mysqlHost, mysqlUser, database)
 
         raise ValueError("Unrecognized or incomplete URL: {0}. Use mysql://host/mysqlusername@questions or mysql://sshusername@sshhost/mysqlusername@questions".format(url))
 
@@ -221,7 +227,6 @@ class Database:
                         self.server = Cafeine()
                         self.port = self.server.startMySQLTunnel(remote_bind_address=self.mysqlHost)
                         actualMysqlHost = "127.0.0.1"
-                        print("Forwarding {0}:{1} to {2}@{3}:3306 through SSH tunnel {4}@{5}".format(actualMysqlHost, self.port, self.mysqlHost, self.mysqlUser, self.sshHost, self.sshUser))
                     else:
                         self.port = 3306
 
