@@ -1,6 +1,8 @@
 from sshtunnel import SSHTunnelForwarder
 import time
 import keyring
+from contextlib import redirect_stderr
+
 
 class Cafeine:
     def __init__(self, username='dcclab'):
@@ -17,16 +19,20 @@ class Cafeine:
               """)
            exit(1)
 
+        import io
 
-        self.mysqlTunnel = SSHTunnelForwarder(
-            'cafeine2.crulrg.ulaval.ca',
-            allow_agent = False,
-            ssh_username="dcclab",
-            ssh_password=password,
-            remote_bind_address=(remote_bind_address, 3306)
-        )
+        f = io.StringIO()
+        with redirect_stderr(f):
+            self.mysqlTunnel = SSHTunnelForwarder(
+                'cafeine2.crulrg.ulaval.ca',
+                allow_agent=False,
+                ssh_username="dcclab",
+                ssh_password=password,
+                remote_bind_address=(remote_bind_address, 3306)
+            )
+            self.mysqlTunnel.start()
+        s = f.getvalue()
 
-        self.mysqlTunnel.start()
         return self.localMySQLPort
 
     @property
