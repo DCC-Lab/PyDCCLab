@@ -1,6 +1,7 @@
 from .database import *
 import numpy as np
 import re
+import typing
 
 class LabdataDB(Database):
     """
@@ -201,6 +202,15 @@ class LabdataDB(Database):
 
         return freq
 
+    def getIdTypes(self, datasetId):
+        idTypes = {}
+        for fieldName in ["id1", "id2", "id3", "id4"]:
+            values = self.executeSelectFetchOneField(f"select distinct({fieldName}) from spectra where datasetId = %s", (datasetId,))
+            inferredType = self._inferListType(values)
+            idTypes[fieldName] = inferredType
+
+        return idTypes
+
     def getPossibleIdValues(self, datasetId):
         row = self.executeSelectFetchOneRow(r"select id1Label, id2Label, id3Label, id4Label from datasets where datasetId = %s", (datasetId,))
 
@@ -210,29 +220,52 @@ class LabdataDB(Database):
         for i in range(len(idLabels)):
             fieldName = "id{0}".format(i+1)
             values = self.executeSelectFetchOneField(f"select distinct({fieldName}) from spectra where datasetId = %s", (datasetId,))
-            idValues.append(values)
+            inferredType = self._inferListType(values)
+            newValues = list(map(inferredType, values))
+            idValues.append(newValues)
 
         return genericIdLabels, idLabels, idValues
+
+    def _inferListType(self, values):
+        try :
+            if False not in [str(int(v)) == v for v in values]:
+                return int
+        except Exception as err:
+            pass
+
+        try :
+            if False not in [float(v) for v in values]:
+                return float
+
+        except Exception as err:
+            pass
+
+        return str
 
     def getSpectrumIdFormat(self, datasetId):
         return self.executeSelectOne(r"select spectrumIdFormatString from datasets where datasetId = %s", (datasetId,))
 
-    def formatSpectrumId(self, **args):
-        if "datasetId" not in args:
+    def castIdsToDatasetType(self, row):
+        idTypes = self.getIdTypes(row["datasetId"])
+        for fieldName in ["id1", "id2", "id3", "id4"]:
+            if fieldName in row.keys():
+                typeToCastTo = idTypes[fieldName]
+                row[fieldName] = typeToCastTo(row[fieldName])
+        return row
+
+    def formatSpectrumId(self, **row):
+        if "datasetId" not in row:
             raise ValueError("You must provide datasetId as a named argument")
 
-        datasetId = args["datasetId"]
-        genericIdLabels, idLabels, possibleIdValues = self.getPossibleIdValues(datasetId)
-
+        datasetId = row["datasetId"]
         genericFieldNames = ["id1", "id2", "id3", "id4"]
-        isUsingGenericFieldNames = True in (fieldName in args.keys() for fieldName in genericFieldNames)
+        isUsingGenericFieldNames = True in (fieldName in row.keys() for fieldName in genericFieldNames)
 
         if isUsingGenericFieldNames:
-            theCoords = tuple(filter(None, ( args.get(idField) for idField in genericFieldNames)))
+            row = self.castIdsToDatasetType(row)
+            theCoords = tuple(filter(None, ( row.get(idField) for idField in genericFieldNames)))
             formatString = self.getSpectrumIdFormat(datasetId=datasetId)
-            print(formatString.format(*theCoords))
-
-        # datasetId="DRS-001", region="Grey", distance=5.53, sampleId=1):
+            return formatString.format(datasetId, *theCoords)
 
 class SpectraDB(LabdataDB):
     def __init__(self, databaseURL=None):
