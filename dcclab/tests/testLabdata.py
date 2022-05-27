@@ -106,6 +106,16 @@ class TestLabdataDatabase(env.DCCLabTestCase):
             self.assertTrue(len(x) > 10)
             self.assertIsNotNone(r".+-\d+",datasetId)
 
+    def testGetFrequenciesSpecificId(self):
+        x = self.db.getFrequencies(datasetId="DRS-001", id1='White')
+        self.assertTrue(len(x) > 10)
+
+        x = self.db.getFrequencies(datasetId="DRS-001", id1='White', id2=1)
+        self.assertTrue(len(x) > 10)
+
+        x = self.db.getFrequencies(datasetId="DRS-001", region="White", sampleId=(1,2,3))
+        self.assertTrue(len(x) > 10)
+
     def testGetSpectrumIds(self):
         datasets = self.db.getDatasets()
         for datasetId in datasets:

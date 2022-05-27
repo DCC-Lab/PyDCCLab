@@ -192,12 +192,34 @@ class LabdataDB(Database):
 
         return spectra.T,  spectrumIds
 
-    def getFrequencies(self, datasetId=None, spectrumId=None):
+    def getFrequencies(self, datasetId=None, **args):
         if datasetId is not None:
-            self.execute(
-                r"select distinct(x) from datapoints left join spectra on spectra.spectrumId = datapoints.spectrumId where spectra.datasetId = %s",
-                (datasetId,)
-            )
+            genericToUserLabels, userToGenericLabels = self.getUserIdLabelsMapping(datasetId)
+
+            conditions = ['spectra.datasetId = %s']
+            bindings = [datasetId]
+            # for field, value in args.items():
+            #     if field in userToGenericLabels.keys():
+            #         field = userToGenericLabels.get(field)  # change userIdLabels to genericIdLabels
+            #
+            #     if value is not None:
+            #         if isinstance(value, tuple) or isinstance(value, list):
+            #             conditions.append("{0} in {1}".format(field, value))
+            #         else:
+            #             conditions.append("{0} = %s".format(field))
+            #             bindings.append(value)
+            whereClause = ' and '.join(conditions)
+
+            if len(whereClause) == 0:
+                self.execute(
+                    r"select distinct(x) from datapoints left join spectra on spectra.spectrumId = datapoints.spectrumId "
+                    r"where {0}".format(whereClause), bindings
+                )
+            else:
+                self.execute(
+                    r"select distinct(x) from datapoints left join spectra on spectra.spectrumId = datapoints.spectrumId "
+                    r"where {0}".format(whereClause), bindings
+                )
         else:
             self.execute(
                 r"select distinct(x) from datapoints where spectrumId = %s",
