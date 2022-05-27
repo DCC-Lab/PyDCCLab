@@ -116,6 +116,9 @@ class TestLabdataDatabase(env.DCCLabTestCase):
         x = self.db.getFrequencies(datasetId="DRS-001", region="White", sampleId=(1,2,3))
         self.assertTrue(len(x) > 10)
 
+        x = self.db.getFrequencies(datasetId="SHAVASANA-001", modality='DRS')
+        self.assertTrue(len(x) > 10)
+
     def testGetSpectrumIds(self):
         datasets = self.db.getDatasets()
         for datasetId in datasets:
