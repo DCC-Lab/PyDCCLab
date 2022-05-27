@@ -1,7 +1,7 @@
 from .database import *
 import numpy as np
 import re
-import typing
+from collections.abc import Iterable
 
 class LabdataDB(Database):
     """
@@ -99,14 +99,19 @@ class LabdataDB(Database):
             print("-"*len(description))
             print("{0}\n".format(row["description"]))
 
-    def getSpectrumIds(self, datasetId):
-        self.execute("select spectrumId from spectra where datasetId=%s", (datasetId,))
-        rows = self.fetchAll()
-        spectrumIds = []
-        for row in rows:
-            spectrumIds.append(row["spectrumId"])
+    def getSpectrumIds(self, **args ):
+        conditions = []
+        bindings = []
+        for field, value in args.items():
+            if value is not None:
+                if isinstance(value, tuple) or isinstance(value, list):
+                    conditions.append("{0} in {1}".format(field, value))
+                else:
+                    conditions.append("{0} = %s".format(field))
+                    bindings.append(value)
+        whereClause = ' and '.join(conditions)
 
-        return spectrumIds
+        return self.executeSelectFetchOneField("select spectrumId from spectra where {0}".format(whereClause), bindings )
 
     def getDataTypes(self):
         self.execute("select distinct dataType from spectra")
@@ -166,9 +171,9 @@ class LabdataDB(Database):
 
         return np.array(intensity)
 
-    def getSpectra(self, datasetId=None, spectrumIds=None):
+    def getSpectra(self, datasetId=None, id1=None, id2=None, id3=None, id4=None):
         if datasetId is not None:
-            spectrumIds = self.getSpectrumIds(datasetId)
+            spectrumIds = self.getSpectrumIds(datasetId, id1, id2, id3, id4)
 
         spectra = None
 

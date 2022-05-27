@@ -109,7 +109,34 @@ class TestLabdataDatabase(env.DCCLabTestCase):
     def testGetSpectrumIds(self):
         datasets = self.db.getDatasets()
         for datasetId in datasets:
-            spectrumIds = self.db.getSpectrumIds(datasetId)
+            spectrumIds = self.db.getSpectrumIds(datasetId=datasetId)
+
+    def testGetSpectrumIdsWithRestrictions(self):
+        rows = self.db.getSpectrumIds(datasetId="DRS-001")
+        self.assertIsNotNone(rows)
+        self.assertTrue(len(rows) > 1)
+
+        rows = self.db.getSpectrumIds(datasetId="DRS-001", id1='White')
+        self.assertIsNotNone(rows)
+        self.assertTrue(len(rows) > 1)
+
+        rows = self.db.getSpectrumIds(datasetId="DRS-001", id2=1)
+        self.assertIsNotNone(rows)
+        self.assertTrue(len(rows) > 1)
+
+        rows = self.db.getSpectrumIds(datasetId="DRS-001", id1='White', id2=1)
+        self.assertIsNotNone(rows)
+        self.assertTrue(len(rows) > 1)
+
+    def testGetSpectrumIdsWithRestrictionsInSets(self):
+        rows = self.db.getSpectrumIds(datasetId="DRS-001", id1='White', id2=(1,2,3,4))
+        self.assertIsNotNone(rows)
+        self.assertTrue(len(rows) > 1)
+
+    def testGetSpectrumIdsWithRestrictionsInSetsOnly(self):
+        rows = self.db.getSpectrumIds(datasetId="DRS-001", id4=(2,3))
+        self.assertIsNotNone(rows)
+        self.assertTrue(len(rows) > 1)
 
     def testDeniedCreateAnythingUsername_dcclab(self):
         with self.assertRaises(AccessDeniedError):
