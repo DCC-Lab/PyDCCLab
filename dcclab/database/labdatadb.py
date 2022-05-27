@@ -100,9 +100,15 @@ class LabdataDB(Database):
             print("{0}\n".format(row["description"]))
 
     def getSpectrumIds(self, **args ):
+        datasetId = args.get("datasetId")
+        genericToUserLabels, userToGenericLabels = self.getUserIdLabelsMapping(datasetId)
+
         conditions = []
         bindings = []
         for field, value in args.items():
+            if field in userToGenericLabels.keys():
+                field = userToGenericLabels.get(field) # change userIdLabels to genericIdLabels
+
             if value is not None:
                 if isinstance(value, tuple) or isinstance(value, list):
                     conditions.append("{0} in {1}".format(field, value))
@@ -173,7 +179,7 @@ class LabdataDB(Database):
 
     def getSpectra(self, datasetId=None, id1=None, id2=None, id3=None, id4=None):
         if datasetId is not None:
-            spectrumIds = self.getSpectrumIds(datasetId, id1, id2, id3, id4)
+            spectrumIds = self.getSpectrumIds(datasetId=datasetId, id1=id1, id2=id2, id3=id3, id4=id4)
 
         spectra = None
 
@@ -216,20 +222,26 @@ class LabdataDB(Database):
 
         return idTypes
 
-    def getPossibleIdValues(self, datasetId):
+    def getUserIdLabelsMapping(self, datasetId):
         row = self.executeSelectFetchOneRow(r"select id1Label, id2Label, id3Label, id4Label from datasets where datasetId = %s", (datasetId,))
 
-        idLabels = list(filter(None, [row["id1Label"],row["id2Label"],row["id3Label"],row["id4Label"]]))
-        genericIdLabels = ["id1", "id2", "id3", "id4"][0:len(idLabels)]
-        idValues = []
-        for i in range(len(idLabels)):
-            fieldName = "id{0}".format(i+1)
-            values = self.executeSelectFetchOneField(f"select distinct({fieldName}) from spectra where datasetId = %s", (datasetId,))
-            inferredType = self._inferListType(values)
-            newValues = list(map(inferredType, values))
-            idValues.append(newValues)
+        userIdLabels = list(filter(None, [row["id1Label"],row["id2Label"],row["id3Label"],row["id4Label"]]))
+        genericIdLabels = ["id1", "id2", "id3", "id4"][0:len(userIdLabels)]
 
-        return genericIdLabels, idLabels, idValues
+        return dict(zip(genericIdLabels, userIdLabels)), dict(zip(userIdLabels, genericIdLabels))
+
+    def getPossibleIdValues(self, datasetId):
+        genericToUserIdLabels, _ = self.getUserIdLabelsMapping(datasetId)
+
+        idValues = {}
+        for i, genericFieldName in enumerate(genericToUserIdLabels.keys()):
+            values = self.executeSelectFetchOneField(f"select distinct({genericFieldName}) from spectra where datasetId = %s", (datasetId,))
+            inferredType = self._inferListType(values)
+            idValues[genericFieldName] = list(map(inferredType, values))
+            userFieldName = genericToUserIdLabels[genericFieldName]
+            idValues[userFieldName] = idValues[genericFieldName]
+
+        return idValues
 
     def _inferListType(self, values):
         try :

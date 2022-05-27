@@ -128,13 +128,26 @@ class TestLabdataDatabase(env.DCCLabTestCase):
         self.assertIsNotNone(rows)
         self.assertTrue(len(rows) > 1)
 
+    def testGetSpectrumIdsWithUserLabelRestrictions(self):
+        rows = self.db.getSpectrumIds(datasetId="DRS-001", region='White')
+        self.assertIsNotNone(rows)
+        self.assertTrue(len(rows) > 1)
+
+        rows = self.db.getSpectrumIds(datasetId="SHAVASANA-001", modality='CARS')
+        self.assertIsNotNone(rows)
+        self.assertTrue(len(rows) > 1)
+
+        rows = self.db.getSpectrumIds(datasetId="SHAVASANA-001", modality='CARS', distance=1)
+        self.assertIsNotNone(rows)
+        self.assertTrue(len(rows) > 1)
+
     def testGetSpectrumIdsWithRestrictionsInSets(self):
         rows = self.db.getSpectrumIds(datasetId="DRS-001", id1='White', id2=(1,2,3,4))
         self.assertIsNotNone(rows)
         self.assertTrue(len(rows) > 1)
 
     def testGetSpectrumIdsWithRestrictionsInSetsOnly(self):
-        rows = self.db.getSpectrumIds(datasetId="DRS-001", id4=(2,3))
+        rows = self.db.getSpectrumIds(datasetId="DRS-001", id2=(2,3))
         self.assertIsNotNone(rows)
         self.assertTrue(len(rows) > 1)
 
@@ -166,12 +179,11 @@ class TestLabdataDatabase(env.DCCLabTestCase):
         self.db.describeDatasets()
 
     def testIdValues(self):
-        idGeneric, idLabels, idValues  = self.db.getPossibleIdValues("DRS-001")
+        idValues  = self.db.getPossibleIdValues("DRS-001")
         self.assertIsNotNone(idValues)
-        self.assertIsNotNone(idLabels)
-        self.assertEqual(len(idValues), len(idLabels))
-        idGeneric, idLabels, idValues  = self.db.getPossibleIdValues("SHAVASANA-001")
-        idGeneric, idLabels, idValues  = self.db.getPossibleIdValues("WINE-001")
+
+        self.db.getPossibleIdValues("SHAVASANA-001")
+        self.db.getPossibleIdValues("WINE-001")
 
     def testGetFormatString(self):
         formatString = self.db.getSpectrumIdFormat(datasetId="DRS-001")
