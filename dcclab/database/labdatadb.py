@@ -177,9 +177,9 @@ class LabdataDB(Database):
 
         return np.array(intensity)
 
-    def getSpectra(self, datasetId=None, id1=None, id2=None, id3=None, id4=None):
+    def getSpectra(self, datasetId=None, **args):
         if datasetId is not None:
-            spectrumIds = self.getSpectrumIds(datasetId=datasetId, id1=id1, id2=id2, id3=id3, id4=id4)
+            spectrumIds = self.getSpectrumIds(datasetId=datasetId, **args)
 
         spectra = None
 
