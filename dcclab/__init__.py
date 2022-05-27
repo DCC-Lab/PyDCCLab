@@ -25,5 +25,5 @@ from .cafeine import *
 from . import speckleAnalysis
 
 
-__version__ = "1.0.8"
+__version__ = "1.0.9"
 __author__ = "Daniel Cote <dccote@cervo.ulaval.ca>"

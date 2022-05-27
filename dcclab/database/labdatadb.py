@@ -1,6 +1,7 @@
 from .database import *
 import numpy as np
 import re
+from collections.abc import Iterable
 
 class LabdataDB(Database):
     """
@@ -88,8 +89,11 @@ class LabdataDB(Database):
 
         return datasets
 
-    def describeDatasets(self):
-        self.execute("select datasetId, description from datasets order by datasetId")
+    def describeDatasets(self, datasetId=None):
+        if datasetId is not None:
+            self.execute("select datasetId, description from datasets where datasetId = %s order by datasetId", (datasetId,))
+        else:
+            self.execute("select datasetId, description from datasets order by datasetId")
         rows = self.fetchAll()
 
         for row in rows:
@@ -98,14 +102,25 @@ class LabdataDB(Database):
             print("-"*len(description))
             print("{0}\n".format(row["description"]))
 
-    def getSpectrumIds(self, datasetId):
-        self.execute("select spectrumId from spectra where datasetId=%s", (datasetId,))
-        rows = self.fetchAll()
-        spectrumIds = []
-        for row in rows:
-            spectrumIds.append(row["spectrumId"])
+    def getSpectrumIds(self, **args ):
+        datasetId = args.get("datasetId")
+        genericToUserLabels, userToGenericLabels = self.getUserIdLabelsMapping(datasetId)
 
-        return spectrumIds
+        conditions = []
+        bindings = []
+        for field, value in args.items():
+            if field in userToGenericLabels.keys():
+                field = userToGenericLabels.get(field) # change userIdLabels to genericIdLabels
+
+            if value is not None:
+                if isinstance(value, tuple) or isinstance(value, list):
+                    conditions.append("{0} in {1}".format(field, value))
+                else:
+                    conditions.append("{0} = %s".format(field))
+                    bindings.append(value)
+        whereClause = ' and '.join(conditions)
+
+        return self.executeSelectFetchOneField("select spectrumId from spectra where {0}".format(whereClause), bindings )
 
     def getDataTypes(self):
         self.execute("select distinct dataType from spectra")
@@ -165,9 +180,9 @@ class LabdataDB(Database):
 
         return np.array(intensity)
 
-    def getSpectra(self, datasetId=None, spectrumIds=None):
+    def getSpectra(self, datasetId=None, **args):
         if datasetId is not None:
-            spectrumIds = self.getSpectrumIds(datasetId)
+            spectrumIds = self.getSpectrumIds(datasetId=datasetId, **args)
 
         spectra = None
 
@@ -180,12 +195,34 @@ class LabdataDB(Database):
 
         return spectra.T,  spectrumIds
 
-    def getFrequencies(self, datasetId=None, spectrumId=None):
+    def getFrequencies(self, datasetId=None, **args):
         if datasetId is not None:
-            self.execute(
-                r"select distinct(x) from datapoints left join spectra on spectra.spectrumId = datapoints.spectrumId where spectra.datasetId = %s",
-                (datasetId,)
-            )
+            genericToUserLabels, userToGenericLabels = self.getUserIdLabelsMapping(datasetId)
+
+            conditions = ['spectra.datasetId = %s']
+            bindings = [datasetId]
+            for field, value in args.items():
+                if field in userToGenericLabels.keys():
+                    field = userToGenericLabels.get(field)  # change userIdLabels to genericIdLabels
+
+                if value is not None:
+                    if isinstance(value, tuple) or isinstance(value, list):
+                        conditions.append("{0} in {1}".format(field, value))
+                    else:
+                        conditions.append("{0} = %s".format(field))
+                        bindings.append(value)
+            whereClause = ' and '.join(conditions)
+
+            if len(whereClause) == 0:
+                self.execute(
+                    r"select distinct(x) from datapoints left join spectra on spectra.spectrumId = datapoints.spectrumId "
+                    r"where {0}".format(whereClause), bindings
+                )
+            else:
+                self.execute(
+                    r"select distinct(x) from datapoints left join spectra on spectra.spectrumId = datapoints.spectrumId "
+                    r"where {0}".format(whereClause), bindings
+                )
         else:
             self.execute(
                 r"select distinct(x) from datapoints where spectrumId = %s",
@@ -201,38 +238,81 @@ class LabdataDB(Database):
 
         return freq
 
-    def getPossibleIdValues(self, datasetId):
+    def getIdTypes(self, datasetId):
+        idTypes = {}
+        for fieldName in ["id1", "id2", "id3", "id4"]:
+            values = self.executeSelectFetchOneField(f"select distinct({fieldName}) from spectra where datasetId = %s", (datasetId,))
+            inferredType = self._inferListType(values)
+            idTypes[fieldName] = inferredType
+
+        return idTypes
+
+    def getUserIdLabelsMapping(self, datasetId):
         row = self.executeSelectFetchOneRow(r"select id1Label, id2Label, id3Label, id4Label from datasets where datasetId = %s", (datasetId,))
 
-        idLabels = list(filter(None, [row["id1Label"],row["id2Label"],row["id3Label"],row["id4Label"]]))
-        genericIdLabels = ["id1", "id2", "id3", "id4"][0:len(idLabels)]
-        idValues = []
-        for i in range(len(idLabels)):
-            fieldName = "id{0}".format(i+1)
-            values = self.executeSelectFetchOneField(f"select distinct({fieldName}) from spectra where datasetId = %s", (datasetId,))
-            idValues.append(values)
+        userIdLabels = list(filter(None, [row["id1Label"],row["id2Label"],row["id3Label"],row["id4Label"]]))
+        genericIdLabels = ["id1", "id2", "id3", "id4"][0:len(userIdLabels)]
 
-        return genericIdLabels, idLabels, idValues
+        return dict(zip(genericIdLabels, userIdLabels)), dict(zip(userIdLabels, genericIdLabels))
+
+    def getPossibleIdValues(self, datasetId):
+        genericToUserIdLabels, _ = self.getUserIdLabelsMapping(datasetId)
+
+        idValues = {}
+        for i, genericFieldName in enumerate(genericToUserIdLabels.keys()):
+            values = self.executeSelectFetchOneField(f"select distinct({genericFieldName}) from spectra where datasetId = %s", (datasetId,))
+            inferredType = self._inferListType(values)
+            idValues[genericFieldName] = list(map(inferredType, values))
+            userFieldName = genericToUserIdLabels[genericFieldName]
+            idValues[userFieldName] = idValues[genericFieldName]
+
+        return idValues
+
+    def _inferListType(self, values):
+        try :
+            if False not in [str(int(v)) == v for v in values]:
+                return int
+        except Exception as err:
+            pass
+
+        try :
+            if False not in [float(v) for v in values]:
+                return float
+
+        except Exception as err:
+            pass
+
+        return str
 
     def getSpectrumIdFormat(self, datasetId):
         return self.executeSelectOne(r"select spectrumIdFormatString from datasets where datasetId = %s", (datasetId,))
 
-    def formatSpectrumId(self, **args):
-        if "datasetId" not in args:
+    def castIdsToDatasetType(self, row, idTypes=None):
+        if idTypes is None:
+            idTypes = self.getIdTypes(row["datasetId"])
+
+        for fieldName in ["id1", "id2", "id3", "id4"]:
+            if fieldName in row.keys():
+                typeToCastTo = idTypes[fieldName]
+                row[fieldName] = typeToCastTo(row[fieldName])
+        return row
+
+    def formatSpectrumId(self, **row):
+        if "datasetId" not in row:
             raise ValueError("You must provide datasetId as a named argument")
 
-        datasetId = args["datasetId"]
-        genericIdLabels, idLabels, possibleIdValues = self.getPossibleIdValues(datasetId)
-
+        datasetId = row["datasetId"]
         genericFieldNames = ["id1", "id2", "id3", "id4"]
-        isUsingGenericFieldNames = True in (fieldName in args.keys() for fieldName in genericFieldNames)
+        isUsingGenericFieldNames = True in (fieldName in row.keys() for fieldName in genericFieldNames)
 
         if isUsingGenericFieldNames:
-            theCoords = tuple(filter(None, ( args.get(idField) for idField in genericFieldNames)))
+            row = self.castIdsToDatasetType(row)
+            theCoords = tuple( row.get(idField) for idField in genericFieldNames)
             formatString = self.getSpectrumIdFormat(datasetId=datasetId)
-            print(formatString.format(*theCoords))
-
-        # datasetId="DRS-001", region="Grey", distance=5.53, sampleId=1):
+            try:
+                return formatString.format(datasetId, *theCoords)
+            except Exception as err:
+                raise ValueError("Unable to convert {0} with format string '{1}'", row, formatString )
 
 class SpectraDB(LabdataDB):
     def __init__(self, databaseURL=None):
