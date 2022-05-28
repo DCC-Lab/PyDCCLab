@@ -1,5 +1,6 @@
 from .database import *
 import numpy as np
+import pandas as pd
 import re
 from collections.abc import Iterable
 
@@ -381,6 +382,63 @@ class SpectraDB(LabdataDB):
                 self.execute(statement, (spectrumId, i, j))
         except Exception as err:
             raise ValueError("Unable to insert spectral data: {0}".format(err))
+
+    def getSpectralDataFrame(self, **args):
+        """
+        Get a dataset or a subset of the dataset and return it as a Panda DataFrame
+        If the data was downloaded recently, it will get it from a file instead.
+        The cache.hdf file is stored locally, in plain sight.  You may delete it 
+        to reset the cache.
+        """
+        with pd.HDFStore('cache.h5') as store:
+            hdfLabel = "-".join( "{0}".format(v) for v in args.values())
+
+            if "/"+hdfLabel not in store.keys():
+                print("Getting {0} from server".format(hdfLabel))
+                spectra, spectrumIds = self.getSpectra(**args)
+                frequencies = self.getFrequencies(**args)
+                df = pd.DataFrame(data=spectra, index=frequencies, columns=spectrumIds)
+                store[hdfLabel] = df
+            else:
+                print("Getting {0} from file".format(hdfLabel))
+                df = store[hdfLabel]
+            return df
+
+    def normalizeSpectra_mean_std(self, spectraDataFrame):
+        """
+        Normalize the spectra data so that each wavelength intensity has the
+        same importance.
+
+        Normaliztion can mean different things to different people: we can
+        normalize to the maximum value in a spectrum, the maximum value from 
+        all spectra, etc...
+
+        This function will subtract the mean spectrum from all spectra, then 
+        it will divide by the standard deviation of the intensities at each wavelength.
+
+        """
+        meanSpectra = spectraDataFrame.mean(axis='columns')
+        meanSpectraDataFrame = pd.concat([meanSpectra]*spectraDataFrame.shape[1], axis=1,ignore_index=True)
+        meanSpectraDataFrame.columns = spectraDataFrame.columns
+
+        stdSpectra = spectraDataFrame.std(axis='columns')
+        stdSpectraDataFrame = pd.concat([stdSpectra]*spectraDataFrame.shape[1], axis=1,ignore_index=True)
+        stdSpectraDataFrame.columns = spectraDataFrame.columns
+
+        normalized = (spectraDataFrame-meanSpectraDataFrame)/stdSpectraDataFrame
+        normalized.columns = spectraDataFrame.columns
+        return normalized
+
+    def removeEdgeWavelengths(self, spectraDataFrame, lower, higher):
+        """
+        Remove wavelengths in the spectra (typically when they are too noisy.)
+        """
+        for i in reversed(range(spectraDataFrame.shape[0])):
+            wavelength = spectraDataFrame.index[i]
+            if (wavelength < 450) or (wavelength > 900):
+                spectraDataFrame = spectraDataFrame.drop(labels=wavelength, axis='index')
+
+        return spectraDataFrame
 
     def subtractFluorescence(self, rawSpectra, polynomialDegree=5):
 
