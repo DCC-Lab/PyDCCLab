@@ -429,13 +429,13 @@ class SpectraDB(LabdataDB):
         normalized.columns = spectraDataFrame.columns
         return normalized
 
-    def removeEdgeWavelengths(self, spectraDataFrame, lower, higher):
+    def removeEdgeWavelengths(self, spectraDataFrame, lower=450, higher=900):
         """
         Remove wavelengths in the spectra (typically when they are too noisy.)
         """
         for i in reversed(range(spectraDataFrame.shape[0])):
             wavelength = spectraDataFrame.index[i]
-            if (wavelength < 450) or (wavelength > 900):
+            if (wavelength < lower) or (wavelength > higher):
                 spectraDataFrame = spectraDataFrame.drop(labels=wavelength, axis='index')
 
         return spectraDataFrame
