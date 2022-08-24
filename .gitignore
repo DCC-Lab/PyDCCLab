@@ -133,3 +133,4 @@ test.py
 .pytype/pyi/dcclab/channelFloat.pyi-1
 .pytype/pyi/dcclab/channelInteger.pyi-1
 dcclab/tests/testData/unittest.csv
+*.icloud
