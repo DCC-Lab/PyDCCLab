@@ -53,23 +53,42 @@ class LabPCA(PCA):
 
         return self.components_ + self.mean_
 
-    def recover_concentration(self, S, A):
+    def recover_concentrations_independently(self, S, A):
         """Using the principal components space, we model spectra S and A, then
         use a projection to recover the concentration.
 
         S is a set of (samples) spectra from which we are interested in extracting the concentration of W
         A is a set of (analytes) spectra of which we want to know the concentration
         """
-        normA = A@A.T
-        # print(normA)
 
         a_ap = self.transform(A)
         s_ip = self.transform(S)
         approx_analytes = a_ap @ self.components_ + self.mean_
-        approx_samples  = s_ip @ self.components_ + self.mean_
-        # print(approx_analytes.shape, approx_samples.shape)
-        recoveredConcentrations_ai = np.matmul(approx_analytes, approx_samples.T)
-        # recoveredConcentrations_ai = a_ap @ s_pi
+        approx_samples = s_ip @ self.components_ + self.mean_
+        recoveredConcentrations_ai = approx_analytes @ approx_samples.T
+
+        analytes_residuals = A - approx_analytes
+
+        return recoveredConcentrations_ai, approx_analytes, analytes_residuals
+
+    def recover_concentrations_fit(self, S, A):
+        """Using the principal components space, we model spectra S and A, then
+        use a projection to recover the concentration.
+
+        S is a set of (samples) spectra from which we are interested in extracting the concentration of W
+        A is a set of (analytes) spectra of which we want to know the concentration
+        """
+
+        a_ap = self.transform_noncentered(A)
+        s_ip = self.transform_noncentered(S)
+
+        invb_ap = np.linalg.pinv(a_ap).T
+
+        recoveredConcentrations_ai = invb_ap @ s_ip.T
+
+        approx_analytes = a_ap @ self.components_ + self.mean_
+        approx_samples = s_ip @ self.components_ + self.mean_
+
         analytes_residuals = A - approx_analytes
 
         return recoveredConcentrations_ai, approx_analytes, analytes_residuals
@@ -88,6 +107,7 @@ if __name__ == "__main__":
             center = random.choice(x)
             intensity += amplitude * np.exp(-((x - center) ** 2) / width**2)
 
+        intensity /= np.sqrt(intensity @ intensity)
         return intensity
 
     def createBasisSet(x, N, maxPeaks=5, maxAmplitude=1, maxWidth=30, minWidth=5):
@@ -106,20 +126,80 @@ if __name__ == "__main__":
 
     """ Create test data """
     X = np.linspace(0, 1000, 1001)
-    basis_set = createBasisSet(x=X, N=5, maxPeaks=3)
+    basis_set = createBasisSet(x=X, N=5, maxPeaks=5)
     data_set, concentrations = createDatasetFromBasisSet(100, basis_set)
 
     """ Analysis is as usual with PCA """
-    pca = LabPCA(n_components=10)
+    pca = LabPCA(n_components=5)
     pca.fit(data_set)
-
 
     """ Here is an example: you want to know the concentration of each basis_set 
     in the spectrum data_set[10] """
-    known_analyte_spectrum = basis_set
-    recovered_concentrations, approx_spectra, residuals = pca.recover_concentration(
-        data_set, known_analyte_spectrum
-    )
+    which = list((0, 1, 2,3))
+    known_analyte_spectrum = basis_set[which]
 
-    plt.plot(concentrations.T, recovered_concentrations.T,marker='o', linewidth=0)
+    (
+        recovered_concentrations_ind,
+        approx_spectra,
+        residuals,
+    ) = pca.recover_concentrations_independently(data_set, known_analyte_spectrum)
+
+    (
+        recovered_concentrations_fit,
+        approx_spectra,
+        residuals,
+    ) = pca.recover_concentrations_fit(data_set, known_analyte_spectrum)
+
+    (
+        recovered_concentrations_fit,
+        approx_spectra,
+        residuals,
+    ) = pca.recover_concentrations_fit(data_set, known_analyte_spectrum)
+
+    fig, (ax1, ax2, ax3) = plt.subplots(3)
+    fig.set_size_inches(8, 11)
+    fig.tight_layout(pad=5.0)
+
+    ax1.plot(basis_set.T, linewidth=1)
+    ax1.text(
+        0.1,
+        0.7,
+        "Analytes used to produced spectra.\nOrthogonal when they do not overlap.\nOverlap will make recovery inaccurate",
+        transform=ax1.transAxes,
+    )
+    ax1.set_title("Basis analytes")
+    ax1.set_xlabel("Frequency")
+    ax1.set_ylabel("Relative intensity")
+    ax2.plot(
+        concentrations[which].T,
+        recovered_concentrations_ind[which].T,
+        marker="o",
+        linewidth=0,
+    )
+    ax2.text(
+        0.1,
+        0.7,
+        "Each analyte is projected onto the spectrum\nin the principal components basis.\nLess acurate.",
+        transform=ax2.transAxes,
+    )
+    ax2.set_title("Accuracy of concentration recovery (independently)")
+    ax2.set_xlabel("Actual concentration")
+    ax2.set_ylabel("Recovered concentration")
+    ax2.set_ylim(0, 1.2)
+    ax3.plot(
+        concentrations[which].T,
+        recovered_concentrations_fit[which].T,
+        marker="o",
+        linewidth=0,
+    )
+    ax3.text(
+        0.1,
+        0.7,
+        "All analytes projected onto the spectrum in the principal\ncomponents basis as a group to minimize error.\nMore acurate.",
+        transform=ax3.transAxes,
+    )
+    ax3.set_title("Accuracy of concentration recovery (as a group) via fit")
+    ax3.set_xlabel("Actual concentration")
+    ax3.set_ylabel("Recovered concentration")
+    ax3.set_ylim(0, 1.2)
     plt.show()
