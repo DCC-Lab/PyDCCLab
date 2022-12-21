@@ -60,18 +60,23 @@ class LabPCA(PCA):
         S is a set of (samples) spectra from which we are interested in extracting the concentration of W
         A is a set of (analytes) spectra of which we want to know the concentration
         """
-        a_ap = self.transform_noncentered(A)
-        s_pi = self.transform_noncentered(S).T
-        invb_ap = np.linalg.pinv(a_ap).T
-        approx_spectra = a_ap @ self.components_
+        normA = A@A.T
+        # print(normA)
 
-        recoveredConcentrations_ki = (invb_ap @ s_pi).T
-        spectral_residuals = A - approx_spectra
+        a_ap = self.transform(A)
+        s_ip = self.transform(S)
+        approx_analytes = a_ap @ self.components_ + self.mean_
+        approx_samples  = s_ip @ self.components_ + self.mean_
+        # print(approx_analytes.shape, approx_samples.shape)
+        recoveredConcentrations_ai = np.matmul(approx_analytes, approx_samples.T)
+        # recoveredConcentrations_ai = a_ap @ s_pi
+        analytes_residuals = A - approx_analytes
 
-        return recoveredConcentrations_ki, approx_spectra, spectral_residuals
+        return recoveredConcentrations_ai, approx_analytes, analytes_residuals
 
 
 if __name__ == "__main__":
+    import matplotlib.pyplot as plt
 
     def createComponent(x, maxPeaks, maxAmplitude, maxWidth, minWidth):
         N = random.randint(1, maxPeaks)
@@ -101,22 +106,20 @@ if __name__ == "__main__":
 
     """ Create test data """
     X = np.linspace(0, 1000, 1001)
-    basis_set = createBasisSet(x=X, N=5)
+    basis_set = createBasisSet(x=X, N=5, maxPeaks=3)
     data_set, concentrations = createDatasetFromBasisSet(100, basis_set)
 
     """ Analysis is as usual with PCA """
-    pca = LabPCA(n_components=5)
+    pca = LabPCA(n_components=10)
     pca.fit(data_set)
 
-    print(data_set.shape)
-    print(basis_set.shape)
 
-    """ Here is an example: you want to know the concentration of basis_set[0] 
+    """ Here is an example: you want to know the concentration of each basis_set 
     in the spectrum data_set[10] """
-    known_analyte_spectrum = basis_set[0].reshape(1,-1)
-    print(known_analyte_spectrum.shape)
+    known_analyte_spectrum = basis_set
     recovered_concentrations, approx_spectra, residuals = pca.recover_concentration(
         data_set, known_analyte_spectrum
     )
-    print(concentrations.T)
-    print(recovered_concentrations)
+
+    plt.plot(concentrations.T, recovered_concentrations.T,marker='o', linewidth=0)
+    plt.show()
