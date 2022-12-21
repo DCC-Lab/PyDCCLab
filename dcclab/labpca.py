@@ -133,9 +133,9 @@ if __name__ == "__main__":
     pca = LabPCA(n_components=5)
     pca.fit(data_set)
 
-    """ Here is an example: you want to know the concentration of each basis_set 
-    in the spectrum data_set[10] """
-    which = list((0, 1, 2,3))
+    """ Here is an example: you want to know the concentration of the first 3 basis_set 
+    in the spectrum data_set """
+    which = list((0, 1, 2))
     known_analyte_spectrum = basis_set[which]
 
     (
@@ -143,12 +143,6 @@ if __name__ == "__main__":
         approx_spectra,
         residuals,
     ) = pca.recover_concentrations_independently(data_set, known_analyte_spectrum)
-
-    (
-        recovered_concentrations_fit,
-        approx_spectra,
-        residuals,
-    ) = pca.recover_concentrations_fit(data_set, known_analyte_spectrum)
 
     (
         recovered_concentrations_fit,
@@ -177,8 +171,8 @@ if __name__ == "__main__":
         linewidth=0,
     )
     ax2.text(
+        0.4,
         0.1,
-        0.7,
         "Each analyte is projected onto the spectrum\nin the principal components basis.\nLess acurate.",
         transform=ax2.transAxes,
     )
@@ -193,8 +187,8 @@ if __name__ == "__main__":
         linewidth=0,
     )
     ax3.text(
+        0.4,
         0.1,
-        0.7,
         "All analytes projected onto the spectrum in the principal\ncomponents basis as a group to minimize error.\nMore acurate.",
         transform=ax3.transAxes,
     )
