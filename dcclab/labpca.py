@@ -28,14 +28,14 @@ class LabPCA(PCA):
         return self.transform(X) + (-self.transform(originCoefficients))
 
     def approximate_spectrum(self, A):
-        """The reconstructed spectrum from the principal components and the residuals
+        """The reconstructed spectrum from the principal components, and the residuals
 
         The pca transform method will return the coefficients in the centered spectral
         space.  Sometimes, we want to compare the actual reconstructed spectrum with
         its original version to see how well the PCs can model the spectrum.
 
         Here we do so for a set of spectra and return the reconstructed spectra and
-        the residuals.
+        their residuals.
         """
         a_ap = self.transform_noncentered(A)
         approx_spectra = x_ap @ self.components_
