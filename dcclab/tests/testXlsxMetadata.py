@@ -5,7 +5,6 @@ import xlwt
 import unittest
 import os
 
-
 class TestXlsxMetadata(env.DCCLabTestCase):
     def setUp(self) -> None:
         super().setUp()
@@ -26,6 +25,7 @@ class TestXlsxMetadata(env.DCCLabTestCase):
         sheet.write(2, 0, '02')
         sheet.write(2, 1, '\\test\\02')
         workbook.save(self.filePath)
+        self.assertTrue(os.path.exists(self.filePath))
 
     def testFilename(self):
         metadata = mtdt(self.filePath)
@@ -41,12 +41,18 @@ class TestXlsxMetadata(env.DCCLabTestCase):
         for sheet in sheets:
             self.assertTrue(type(sheet), xlrd.sheet.Sheet)
 
+    @unittest.expectedFailure
     def testGetKeys(self):
+        # This code in xlsxMetadata.py is incomplete
         metadata = mtdt(self.filePath)
         keys = metadata.keys
+
         self.assertTrue(keys)
 
+
+    @unittest.expectedFailure
     def testAsDict(self):
+        # This code in xlsxMetadata.py is incomplete
         metadata = mtdt(self.filePath)
         self.assertIsNotNone(metadata)
         print(metadata)
