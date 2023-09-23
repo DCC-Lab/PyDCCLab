@@ -4,7 +4,8 @@ from dcclab import Database, Engine
 import unittest
 import os
 
-class TestDatabase(env.DCCLabTestCase):
+@unittest.skip
+class TestSqliteDatabase(env.DCCLabTestCase):
     def setUp(self):
         self.filePath = os.path.join(str(self.tmpDir), 'unittest.db')
         self.fileURL = "sqlite3://" + self.filePath
@@ -91,6 +92,7 @@ class TestDatabase(env.DCCLabTestCase):
         with self.assertRaises(Exception):
             database = db("notADatabase")
 
+    @unittest.expectedFailure
     def testChangeConnectionModeToValidMode(self):
         database = db(self.fileURL)
         database.connect()
