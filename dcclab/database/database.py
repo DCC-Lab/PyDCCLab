@@ -123,7 +123,8 @@ class Database:
 
         printWidth = 70
 
-        self.execute("select TABLE_NAME, TABLE_COMMENT from INFORMATION_SCHEMA.tables where table_schema = %s", (self.database,))
+        # self.execute("select TABLE_NAME, TABLE_COMMENT from INFORMATION_SCHEMA.tables where table_schema = %s", (self.database,))
+        self.execute("SELECT name FROM sqlite_schema WHERE type='table' ORDER BY name")
         rows = self.fetchAll()
 
         for row in rows:
@@ -172,7 +173,7 @@ class Database:
             database = match.group(5)
             return (engine, sshUser, sshHost, mysqlHost, mysqlUser, database)
 
-        match = re.search("(sqlite|file)://(.*?)", url)
+        match = re.search("(sqlite\d?|file)://(.*?)", url)
         if match is not None:
             engine = Engine.sqlite3
             sshUser = None
@@ -182,7 +183,7 @@ class Database:
             database = match.group(2)
             return (engine, sshUser, sshHost, mysqlHost, mysqlUser, database)
 
-        raise ValueError("Unrecognized or incomplete URL: {0}. Use mysql://host/mysqlusername@questions or mysql://sshusername@sshhost/mysqlusername@questions".format(url))
+        raise ValueError("Unrecognized or incomplete URL: {0}. Use mysql://host/mysqlusername@questions, mysql+ssh://sshusername@sshhost:mysql_host/mysqlusername@questions, or simply sqlite://filename".format(url))
 
     def __enter__(self):
         return self
@@ -258,7 +259,8 @@ class Database:
 
     def enforceForeignKeys(self):
         if self.databaseEngine == Engine.sqlite3:
-            self.execute("PRAGMA foreign_keys = ON")
+            pass
+            #self.execute("PRAGMA foreign_keys = ON")
         else:
             self.execute("set foreign_key_checks = 1")
 
@@ -321,7 +323,11 @@ class Database:
         """
         if self.isConnected:
             try:
-                self.cursor.execute(statement, bindings)
+                if bindings is None:
+                    self.cursor.execute(statement)
+                else:
+                    self.cursor.execute(statement, bindings)
+
             except MySQLError as err:
                 accessDeniedErrors = [MySQLErrorCode.ER_DB_ACCESS_DENIED,
                                       MySQLErrorCode.ER_DBACCESS_DENIED_ERROR,
@@ -332,6 +338,8 @@ class Database:
                     raise AccessDeniedError(err)
                 else:
                     raise(err) # Nothing specific to say at this point
+            except lite.ProgrammingError as err:
+                print(err)
 
     def executeSelectOne(self, statement, bindings=None):
         """
