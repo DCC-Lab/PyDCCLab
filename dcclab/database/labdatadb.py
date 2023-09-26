@@ -420,19 +420,26 @@ class SpectraDB(LabdataDB):
         The cache.hdf file is stored locally, in plain sight.  You may delete it 
         to reset the cache.
         """
-        with pd.HDFStore('cache.h5') as store:
-            hdfLabel = "-".join( "{0}".format(v) for v in args.values())
+        try:
+            with pd.HDFStore('cache.h5') as store:
+                hdfLabel = "-".join( "{0}".format(v) for v in args.values())
 
-            if "/"+hdfLabel not in store.keys():
-                print("Getting {0} from server".format(hdfLabel))
-                spectra, spectrumIds = self.getSpectra(**args)
-                frequencies = self.getFrequencies(**args)
-                df = pd.DataFrame(data=spectra, index=frequencies, columns=spectrumIds)
-                store[hdfLabel] = df
-            else:
-                print("Getting {0} from file".format(hdfLabel))
-                df = store[hdfLabel]
-            return df
+                if "/"+hdfLabel not in store.keys():
+                    print("Getting {0} from server".format(hdfLabel))
+                    spectra, spectrumIds = self.getSpectra(**args)
+                    frequencies = self.getFrequencies(**args)
+                    df = pd.DataFrame(data=spectra, index=frequencies, columns=spectrumIds)
+                    store[hdfLabel] = df
+                else:
+                    print("Getting {0} from file".format(hdfLabel))
+                    df = store[hdfLabel]
+        except Exception as err:
+            print("HDFStore does not appear operational. Retrieving the data from server.")
+            spectra, spectrumIds = self.getSpectra(**args)
+            frequencies = self.getFrequencies(**args)
+            df = pd.DataFrame(data=spectra, index=frequencies, columns=spectrumIds)
+
+        return df
 
     def normalizeSpectra_mean_std(self, spectraDataFrame):
         """
