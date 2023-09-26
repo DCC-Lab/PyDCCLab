@@ -5,7 +5,7 @@ import numpy as np
 
 class TestLabdataDatabaseFunctionality(env.DCCLabTestCase):
     def setUp(self):
-        self.db = LabdataDB()
+        self.db = SpectraDB()
 
     def tearDown(self) -> None:
         self.db.disconnect()
@@ -180,7 +180,7 @@ class TestLabdataDatabaseFunctionality(env.DCCLabTestCase):
 
 class TestLabdataDatabaseContent(env.DCCLabTestCase):
     def setUp(self):
-        self.db = LabdataDB()
+        self.db = SpectraDB()
 
     def tearDown(self) -> None:
         self.db.disconnect()
@@ -280,6 +280,9 @@ class TestLabdataDatabaseContent(env.DCCLabTestCase):
         rows = self.db.getSpectrumIds(datasetId="DRS-001", id2=(2,3))
         self.assertIsNotNone(rows)
         self.assertTrue(len(rows) > 1)
+
+    def testGetSpectralDataFrom(self):
+        self.db.getSpectralDataFrame(datasetId="WINE-001")
 
 # class TestMySQLDatabase(env.DCCLabTestCase):
 #     def testLocalMySQLDatabase(self):
