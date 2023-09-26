@@ -211,6 +211,10 @@ class TestLabdataDatabaseContent(env.DCCLabTestCase):
         data, ids = self.db.getSpectra("DRS-001")
         self.assertTrue(data.shape[0] > 10)
 
+    def testGetWineSpectra(self):
+        data, ids = self.db.getSpectra("WINE-001")
+        self.assertTrue(data.shape[0] > 10)
+
     def testGetFrequencies(self):
         elements = self.db.getDatasets()
 
