@@ -1,6 +1,6 @@
 import env
 from dcclab import Database as db
-from dcclab import Database, Engine
+from dcclab import Database, Engine, MySQLDatabase
 import unittest
 import os
 
@@ -245,7 +245,7 @@ class TestMySQLDatabase(env.DCCLabTestCase):
     def setUp(self):
         super().setUp()
 
-        self.db = Database("mysql://127.0.0.1/root@questions")
+        self.db = MySQLDatabase("mysql+ssh://dcclab@cafeine2.crulrg.ulaval.ca:cafeine3.crulrg.ulaval.ca/dcclab@labdata")
 
         self.assertIsNotNone(self.db)
         self.db.connect()
@@ -255,51 +255,25 @@ class TestMySQLDatabase(env.DCCLabTestCase):
         super().tearDown()
         self.db.disconnect()
 
-    def testInitDatabase(self):
-        db = Database("mysql://127.0.0.1/root@questions")
-        self.assertIsNotNone(db)
-
     def testConnectDatabase(self):
-        db = Database("mysql://127.0.0.1/root@questions")
         self.assertTrue(db.isConnected)
 
     def testDisconnectDatabase(self):
-        db = Database("mysql://127.0.0.1/root@questions")
-        self.assertTrue(db.isConnected)
-        db.disconnect()
-        self.assertFalse(db.isConnected)
-
-    def testConnectRemoteDatabase(self):
-        # An ssh tunnel must be in place: ssh dcclab@cafeine2.crulrg.ulaval.ca -L3336:127.0.0.1:3306 -N
-        # or get https://apps.apple.com/us/app/core-tunnel/id1354318707?mt=12
-        # If you get an error, you need to write the password to the keyring once with:
-        # python -m keyring set mysql-127.0.0.1:3336 dcclab
-        db = Database("mysql://127.0.0.1/root@questions")
-        self.assertTrue(db.isConnected)
-        names = db.tables
-        self.assertTrue(len(names) > 1)
+        self.assertTrue(self.db.isConnected)
+        self.db.disconnect()
+        self.assertFalse(self.db.isConnected)
 
     def testShowTables(self):
-        db = Database("mysql://127.0.0.1/root@questions")
-        names = db.tables
+        names = self.db.tables
         self.assertTrue(len(names) > 1)
 
-class TestMySQLLocalDatabase(env.DCCLabTestCase):
-    def testLocalMySQLDatabase(self):
-        db = Database("mysql://127.0.0.1/root@labdata")
-        db.execute("select * from spectra where datatype = 'raw'")
+    def testEnforceForeignKeys(self):
+        self.db.enforceForeignKeys()
+        self.assertEqual(self.db.areForeignKeysEnforced(), 1)
 
-        rows = []
-        row = db.fetchOne()
-        i = 0
-        while row is not None:
-            if i % 10000 == 0:
-                print(i)
-            i += 1
-            rows.append(row)
-            row = db.fetchOne()
-
-        self.assertTrue(len(rows) > 0)
+    def testDisableForeignKeys(self):
+        self.db.disableForeignKeys()
+        self.assertEqual(self.db.areForeignKeysEnforced(), 0)
 
 if __name__ == '__main__':
     unittest.main()
