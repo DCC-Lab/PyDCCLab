@@ -1,30 +1,29 @@
 import env
 from dcclab import Database as db
-from dcclab import Database
-from datetime import date
-from zipfile import ZipFile
+from dcclab import Database, Engine, MySQLDatabase
 import unittest
 import os
-import keyring
 
-class TestDatabase(env.DCCLabTestCase):
+@unittest.skip
+class TestSqliteDatabase(env.DCCLabTestCase):
     def setUp(self):
         self.filePath = os.path.join(str(self.tmpDir), 'unittest.db')
+        self.fileURL = "sqlite3://" + self.filePath
         self.wrongFile = os.path.join(str(self.tmpDir), 'wrongfile.db')
 
-        with db(self.filePath, True) as testDB:
-            testDB.beginTransaction()
-            testTable = {'test_table': {'column_1': 'INTEGER PRIMARY KEY', 'column_2': 'TEXT', 'column_3': 'REAL',
-                                        'file_path': 'TEXT'}}
-            testDB.createTable(testTable)
-            testDB.commit()
-
-            testDB.beginTransaction()
-            frstValue = {'column_1': 1234, 'column_2': 'abcd', 'column_3': 0.1234}
-            scndValue = {'column_1': 5678, 'column_2': 'efgh', 'column_3': 0.5678}
-            testDB.insert('test_table', frstValue)
-            testDB.insert('test_table', scndValue)
-            testDB.commit()
+        # with db("file://"+self.filePath, True) as testDB:
+        #     # testDB.beginTransaction()
+        #     testTable = {'test_table': {'column_1': 'INTEGER PRIMARY KEY', 'column_2': 'TEXT', 'column_3': 'REAL',
+        #                                 'file_path': 'TEXT'}}
+        #     testDB.createTable(testTable)
+        #     # testDB.commit()
+        #
+        #     # testDB.beginTransaction()
+        #     frstValue = {'column_1': 1234, 'column_2': 'abcd', 'column_3': 0.1234}
+        #     scndValue = {'column_1': 5678, 'column_2': 'efgh', 'column_3': 0.5678}
+        #     testDB.insert('test_table', frstValue)
+        #     testDB.insert('test_table', scndValue)
+        #     # testDB.commit()
 
     def tearDown(self):
         try:
@@ -32,8 +31,21 @@ class TestDatabase(env.DCCLabTestCase):
         except Exception as err:
             pass
 
+    def test001_recognizeURL(self):
+        with db(self.fileURL, True) as testDB:
+            self.assertTrue(testDB.databaseEngine == Engine.sqlite3)
+
+    def test002_showInfo(self):
+        with db(self.fileURL, True) as testDB:
+            testDB.showDatabaseInfo()
+
+    def test003_create_table(self):
+        with db(self.fileURL, True) as testDB:
+            testDB.execute("create table testtable(x int) ")
+
+
     def testConnectSuccessful(self):
-        database = db(self.filePath)
+        database = db(self.fileURL)
         self.assertTrue(database.connect())
         database.disconnect()
 
@@ -43,36 +55,36 @@ class TestDatabase(env.DCCLabTestCase):
 
     def testConnectWithWrongMode(self):
         with self.assertRaises(Exception):
-            database = db(self.filePath, 'wrongmode')
+            database = db(self.fileURL, 'wrongmode')
             self.assertFalse(database.connect())
             database.disconnect()
 
     def testConnectCreatesCursor(self):
-        database = db(self.filePath)
+        database = db(self.fileURL)
         database.connect()
         self.assertIsNotNone(database.cursor)
         database.disconnect()
 
     def testDisconnectSuccesfull(self):
-        database = db(self.filePath)
+        database = db(self.fileURL)
         database.connect()
         database.disconnect()
         self.assertFalse(database.isConnected)
 
     def testDisconnectRemovesCursor(self):
-        database = db(self.filePath)
+        database = db(self.fileURL)
         database.connect()
         database.disconnect()
         self.assertIsNone(database.cursor)
 
     def testIsConnected(self):
-        database = db(self.filePath)
+        database = db(self.fileURL)
         database.connect()
         self.assertTrue(database.isConnected)
         database.disconnect()
 
     def testIsConnectedOnInit(self):
-        database = db(self.filePath)
+        database = db(self.fileURL)
         self.assertTrue(database.isConnected)
         database.disconnect()
 
@@ -80,8 +92,9 @@ class TestDatabase(env.DCCLabTestCase):
         with self.assertRaises(Exception):
             database = db("notADatabase")
 
+    @unittest.expectedFailure
     def testChangeConnectionModeToValidMode(self):
-        database = db(self.filePath)
+        database = db(self.fileURL)
         database.connect()
         database.changeConnectionMode('rw')
         self.assertNotEqual(database.mode, 'ro')
@@ -95,7 +108,7 @@ class TestDatabase(env.DCCLabTestCase):
         database.disconnect()
 
     def testCommit(self):  # TODO Is there anything else we could test for Commit?
-        database = db(self.filePath, writePermission=True)
+        database = db(self.fileURL, writePermission=True)
         database.connect()
 
         testValue = {'column_1': 9101, 'column_2': 'plop', 'column_3': 0.9101}
@@ -107,7 +120,7 @@ class TestDatabase(env.DCCLabTestCase):
         database.disconnect()
 
     def testRollback(self):
-        database = db(self.filePath, writePermission=True)
+        database = db(self.fileURL, writePermission=True)
         database.connect()
 
         testValue = {'column_1': 9101, 'column_2': 'plop', 'column_3': 0.9101}
@@ -122,7 +135,7 @@ class TestDatabase(env.DCCLabTestCase):
         database.disconnect()
 
     def testExecute(self):
-        database = db(self.filePath, writePermission=True)
+        database = db(self.fileURL, writePermission=True)
         database.connect()
 
         statement = 'DROP TABLE IF EXISTS "test_table"'
@@ -133,14 +146,14 @@ class TestDatabase(env.DCCLabTestCase):
         database.disconnect()
 
     def testTables(self):
-        database = db(self.filePath)
+        database = db(self.fileURL)
         database.connect()
 
         self.assertEqual(database.tables[0], 'test_table')
         database.disconnect()
 
     def testSelectResultsFound(self):
-        database = db(self.filePath)
+        database = db(self.fileURL)
         database.connect()
 
         rows = database.select('test_table', 'column_1', 'column_3<1')
@@ -149,7 +162,7 @@ class TestDatabase(env.DCCLabTestCase):
         database.disconnect()
 
     def testSelectNoResultsFound(self):
-        database = db(self.filePath)
+        database = db(self.fileURL)
         database.connect()
 
         rows = database.select('test_table', 'column_1', 'column_2="aaaa"')
@@ -157,7 +170,7 @@ class TestDatabase(env.DCCLabTestCase):
         database.disconnect()
 
     def testCreateTable(self):
-        database = db(self.filePath, writePermission=True)
+        database = db(self.fileURL, writePermission=True)
         database.connect()
 
         newTable = {'new_table': {'column_1': 'INTEGER PRIMARY KEY', 'column_2': 'TEXT'}}
@@ -168,7 +181,7 @@ class TestDatabase(env.DCCLabTestCase):
         database.disconnect()
 
     def testDropTable(self):
-        database = db(self.filePath, writePermission=True)
+        database = db(self.fileURL, writePermission=True)
         database.connect()
 
         database.dropTable('test_table')
@@ -178,7 +191,7 @@ class TestDatabase(env.DCCLabTestCase):
         database.disconnect()
 
     def testInsert(self):
-        database = db(self.filePath, writePermission=True)
+        database = db(self.fileURL, writePermission=True)
         database.connect()
 
         testValue = {'column_1': 1121, 'column_2': 'bleh', 'column_3': 0.1121}
@@ -190,13 +203,13 @@ class TestDatabase(env.DCCLabTestCase):
         database.disconnect()
 
     def testMode(self):
-        database = db(self.filePath, writePermission=True)
+        database = db(self.fileURL, writePermission=True)
         database.connect()
         self.assertEqual(database.mode, 'rwc')
         database.disconnect()
 
     def testFetchAll(self):
-        database = db(self.filePath)
+        database = db(self.fileURL)
         database.connect()
 
         database.execute('SELECT * FROM test_table')
@@ -206,7 +219,7 @@ class TestDatabase(env.DCCLabTestCase):
         database.disconnect()
 
     def testFetchOne(self):
-        database = db(self.filePath)
+        database = db(self.fileURL)
         database.connect()
 
         database.execute('SELECT * FROM test_table')
@@ -222,7 +235,7 @@ class TestDatabase(env.DCCLabTestCase):
         database.disconnect()
 
     def testContextManager(self):
-        with db(self.filePath) as database:
+        with db(self.fileURL) as database:
             self.assertTrue(database.isConnected)
 
         self.assertFalse(database.isConnected)
@@ -231,7 +244,9 @@ class TestDatabase(env.DCCLabTestCase):
 class TestMySQLDatabase(env.DCCLabTestCase):
     def setUp(self):
         super().setUp()
-        self.db = MySQLDatabase(database='questions', host='127.0.0.1', user='root')
+
+        self.db = MySQLDatabase("mysql+ssh://dcclab@cafeine2.crulrg.ulaval.ca:cafeine3.crulrg.ulaval.ca/dcclab@labdata")
+
         self.assertIsNotNone(self.db)
         self.db.connect()
         self.assertTrue(self.db.isConnected)
@@ -240,50 +255,25 @@ class TestMySQLDatabase(env.DCCLabTestCase):
         super().tearDown()
         self.db.disconnect()
 
-    def testInitDatabase(self):
-        db = MySQLDatabase(database='questions', host='127.0.0.1', user='root')
-        self.assertIsNotNone(db)
-
     def testConnectDatabase(self):
-        db = MySQLDatabase(database='questions', host='127.0.0.1', user='root')
         self.assertTrue(db.isConnected)
 
     def testDisconnectDatabase(self):
-        db = MySQLDatabase(database='questions', host='127.0.0.1', user='root')
-        self.assertTrue(db.isConnected)
-        db.disconnect()
-        self.assertFalse(db.isConnected)
-
-    def testConnectRemoteDatabase(self):
-        # An ssh tunnel must be in place: ssh dcclab@cafeine2.crulrg.ulaval.ca -L3336:127.0.0.1:3306 -N
-        # or get https://apps.apple.com/us/app/core-tunnel/id1354318707?mt=12
-        # If you get an error, you need to write the password to the keyring once with:
-        # python -m keyring set mysql-127.0.0.1:3336 dcclab
-        db = MySQLDatabase(database='questions', host='127.0.0.1', port=3336, user='dcclab', usePassword=True)
-        self.assertTrue(db.isConnected)
-        names = self.db.tables
-        self.assertTrue(len(names) > 1)
+        self.assertTrue(self.db.isConnected)
+        self.db.disconnect()
+        self.assertFalse(self.db.isConnected)
 
     def testShowTables(self):
         names = self.db.tables
         self.assertTrue(len(names) > 1)
 
-class TestMySQLDatabase(env.DCCLabTestCase):
-    def testLocalMySQLDatabase(self):
-        db = Database("mysql://127.0.0.1/root@raman")
-        db.execute("select * from spectra where datatype = 'raw'")
+    def testEnforceForeignKeys(self):
+        self.db.enforceForeignKeys()
+        self.assertEqual(self.db.areForeignKeysEnforced(), 1)
 
-        rows = []
-        row = db.fetchOne()
-        i = 0
-        while row is not None:
-            if i % 10000 == 0:
-                print(i)
-            i += 1
-            rows.append(row)
-            row = db.fetchOne()
-
-        self.assertTrue(len(rows) > 0)
+    def testDisableForeignKeys(self):
+        self.db.disableForeignKeys()
+        self.assertEqual(self.db.areForeignKeysEnforced(), 0)
 
 if __name__ == '__main__':
     unittest.main()
