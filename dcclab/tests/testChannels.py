@@ -13,7 +13,7 @@ class TestChannels(env.DCCLabTestCase):
             Channel(array.T)
 
     def testInitWith2DIntArray(self):
-        array = np.ones((100, 100), dtype=np.int)
+        array = np.ones((100, 100), dtype=int)
         channel = Channel(pixels=array.T)
         self.assertIsNotNone(channel)
         self.assertIsInstance(channel, Channel)

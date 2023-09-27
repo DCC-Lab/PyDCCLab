@@ -485,7 +485,7 @@ class Channel:
         # Compute the distances between each pixels and its nearest 0 value pixel.
         distanceTransform = gaussianBin.getDistanceTransform()
         # We then find the local max of the distance transform array
-        localMax = feature.peak_local_max(distanceTransform, indices=False, min_distance=localPeaksMinDistance,
+        localMax = feature.peak_local_max(distanceTransform, min_distance=localPeaksMinDistance,
                                           labels=gaussianBin.pixels)
         # Let's get the markers of the connected components
         markers = Channel(localMax).getConnectedComponents(connectionStructure=ccKernel)[0].pixels

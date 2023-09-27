@@ -55,7 +55,7 @@ class ChannelInt(Channel):
         return floatChannel.getGaussianFilter(sigma)
 
     def getEntropyFilter(self, filterSize: int) -> Channel:
-        entropyFiltered = entropy(self.convertTo8BitsUnsignedInteger().pixels, morphology.selem.square(filterSize))
+        entropyFiltered = entropy(self.convertTo8BitsUnsignedInteger().pixels, morphology.square(filterSize))
         return Channel(entropyFiltered)
 
     def getStandardDeviationFilter(self, filterSize: int) -> Channel:

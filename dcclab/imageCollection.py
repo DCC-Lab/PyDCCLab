@@ -26,16 +26,22 @@ class ImageCollection:
         self.__shape = (len(self.__images),)
 
     @property
+    def shape(self):
+        return self.__shape
+
+    @property
     def dimension(self):
-        return len(self.__shape)
+        return len(self.shape)
 
     def reshape(self, tuple):
+        newCount = np.prod(tuple)
+        oldCount = np.prod(self.shape)
+
+        if newCount != oldCount:
+            raise ValueError("New shape {0} incompatible with old shape {1}, not same total number of elelements".format(newCount, oldCount))
+
         self.__shape = tuple
-        self.axes = ()
-        product = 1
-        for i in tuple:
-            product *= i
-            self.axes.append('.')
+        self.axes = ["."]*newCount
 
     def __getitem__(self, index):
         if isinstance(index, tuple):
