@@ -134,3 +134,4 @@ test.py
 .pytype/pyi/dcclab/channelInteger.pyi-1
 dcclab/tests/testData/unittest.csv
 *.icloud
+cache.h5

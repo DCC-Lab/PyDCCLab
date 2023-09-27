@@ -475,7 +475,9 @@ class Channel:
 
     def watershedSegmentation(self, gaussianFilterStdDev: float = 1.2, localPeaksMinDistance: int = 5,
                               use4Connectivity: bool = True) -> typing.Tuple["Channel", int]:
-        ccKernel = None
+        raise NotImplementedError("The current implementation does not pass tests can cannot be used.")
+
+        àccKernel = None
         if not use4Connectivity:
             ccKernel = np.ones((3, 3))
         # First, we apply a gaussian filter in order to remove some noise in the channel and smooth it.
@@ -485,7 +487,7 @@ class Channel:
         # Compute the distances between each pixels and its nearest 0 value pixel.
         distanceTransform = gaussianBin.getDistanceTransform()
         # We then find the local max of the distance transform array
-        localMax = feature.peak_local_max(distanceTransform, indices=False, min_distance=localPeaksMinDistance,
+        localMax = feature.peak_local_max(distanceTransform, min_distance=localPeaksMinDistance,
                                           labels=gaussianBin.pixels)
         # Let's get the markers of the connected components
         markers = Channel(localMax).getConnectedComponents(connectionStructure=ccKernel)[0].pixels

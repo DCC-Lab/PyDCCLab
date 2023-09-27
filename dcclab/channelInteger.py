@@ -55,22 +55,22 @@ class ChannelInt(Channel):
         return floatChannel.getGaussianFilter(sigma)
 
     def getEntropyFilter(self, filterSize: int) -> Channel:
-        entropyFiltered = entropy(self.convertTo8BitsUnsignedInteger().pixels, morphology.selem.square(filterSize))
+        entropyFiltered = entropy(self.convertTo8BitsUnsignedInteger().pixels, morphology.square(filterSize))
         return Channel(entropyFiltered)
 
     def getStandardDeviationFilter(self, filterSize: int) -> Channel:
         floatChannel = self.convertToNormalizedFloat()
         return floatChannel.getStandardDeviationFilter(filterSize)
 
-    def getHorizontalSobelFilter(self) -> Channel:
+    def __getHorizontalSobelFilter(self) -> Channel:
         floatChannel = self.convertToNormalizedFloat()
         return floatChannel.getHorizontalSobelFilter()
 
-    def getVerticalSobelFilter(self) -> Channel:
+    def __getVerticalSobelFilter(self) -> Channel:
         floatChannel = self.convertToNormalizedFloat()
         return floatChannel.getVerticalSobelFilter()
 
-    def getSobelFilter(self) -> Channel:
+    def __getSobelFilter(self) -> Channel:
         floatChannel = self.convertToNormalizedFloat()
         return floatChannel.getSobelFilter()
 
