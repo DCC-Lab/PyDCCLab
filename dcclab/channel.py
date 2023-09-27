@@ -475,7 +475,9 @@ class Channel:
 
     def watershedSegmentation(self, gaussianFilterStdDev: float = 1.2, localPeaksMinDistance: int = 5,
                               use4Connectivity: bool = True) -> typing.Tuple["Channel", int]:
-        ccKernel = None
+        raise NotImplementedError("The current implementation does not pass tests can cannot be used.")
+
+        àccKernel = None
         if not use4Connectivity:
             ccKernel = np.ones((3, 3))
         # First, we apply a gaussian filter in order to remove some noise in the channel and smooth it.

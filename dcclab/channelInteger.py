@@ -62,15 +62,15 @@ class ChannelInt(Channel):
         floatChannel = self.convertToNormalizedFloat()
         return floatChannel.getStandardDeviationFilter(filterSize)
 
-    def getHorizontalSobelFilter(self) -> Channel:
+    def __getHorizontalSobelFilter(self) -> Channel:
         floatChannel = self.convertToNormalizedFloat()
         return floatChannel.getHorizontalSobelFilter()
 
-    def getVerticalSobelFilter(self) -> Channel:
+    def __getVerticalSobelFilter(self) -> Channel:
         floatChannel = self.convertToNormalizedFloat()
         return floatChannel.getVerticalSobelFilter()
 
-    def getSobelFilter(self) -> Channel:
+    def __getSobelFilter(self) -> Channel:
         floatChannel = self.convertToNormalizedFloat()
         return floatChannel.getSobelFilter()
 
