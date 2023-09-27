@@ -1,10 +1,9 @@
 from .channel import *
 from scipy.signal import convolve2d
 from skimage.filters import *
-import scipy.ndimage.filters as filters
+from scipy.ndimage import uniform_filter
 import warnings
 from skimage.filters.rank import entropy
-
 
 class ChannelFloat(Channel):
 
@@ -29,7 +28,7 @@ class ChannelFloat(Channel):
 
     def getEntropyFilter(self, filterSize: int):
         pixels = self.convertTo8BitsUnsignedInteger().pixels
-        entropyFiltered = entropy(pixels, morphology.selem.square(filterSize, dtype=np.float32))
+        entropyFiltered = entropy(pixels, morphology.square(filterSize, dtype=np.float32))
         return Channel(entropyFiltered.astype(np.float32))
 
     def convolveWith(self, matrix: typing.Union[np.ndarray, list]):
@@ -37,14 +36,13 @@ class ChannelFloat(Channel):
         return Channel(convolvedArray.T)
 
     def getGaussianFilter(self, sigma: float = 1):
-        gaussianFiltered = gaussian(self.pixels, sigma, mode="nearest", multichannel=False,
-                                    preserve_range=True)
+        gaussianFiltered = gaussian(self.pixels, sigma, mode="nearest", preserve_range=True)
         return Channel(gaussianFiltered)
 
     def getStandardDeviationFilter(self, filterSize: int):
         pixels = self.pixels
-        stdDevFilter1 = filters.uniform_filter(pixels, filterSize, mode="nearest")
-        stdDevFilter2 = filters.uniform_filter(pixels * pixels, filterSize, mode="nearest")
+        stdDevFilter1 = uniform_filter(pixels, filterSize, mode="nearest")
+        stdDevFilter2 = uniform_filter(pixels * pixels, filterSize, mode="nearest")
         stdFiltered = np.sqrt(stdDevFilter2 - stdDevFilter1 * stdDevFilter1)
         if np.any(np.isnan(stdFiltered)):
             warnings.warn("Nan values encountered! Replacing them with 0.", category=RuntimeWarning)
