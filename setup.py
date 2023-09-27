@@ -14,7 +14,7 @@ rm dist/*; python setup.py sdist bdist_wheel; python -m twine upload dist/*
 
 setuptools.setup(
     name="dcclab",
-    version="1.0.11",
+    version="1.1.0",
     url="https://github.com/DCC-Lab/PyDCCLab",
     author="Daniel Côté, Gabriel Genest, Mathieu Fournier, Ludovick Bégin",
     author_email="dccote@cervo.ulaval.ca",
@@ -24,7 +24,7 @@ setuptools.setup(
     license='MIT',
     keywords='image analysis stack movies',
     packages=setuptools.find_packages(),
-    install_requires=['keyring', 'sshtunnel', 'mysql-connector-python', 'requests', 'matplotlib','numpy','scikit-image','scipy','czifile >= 2019.6.18','tifffile','read-lif','xlrd','seaborn','imagecodecs','deprecated'],
+    install_requires=['keyring', 'sshtunnel', 'mysql-connector-python', 'requests', 'matplotlib','numpy','scikit-image','scipy','czifile >= 2019.6.18','tifffile','read-lif','tables','xlwt','xlrd','seaborn','imagecodecs','deprecated'],
     python_requires='>=3',
     package_data={
         # If any package contains *.txt or *.rst files, include them:

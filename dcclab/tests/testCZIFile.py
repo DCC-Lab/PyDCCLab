@@ -82,13 +82,11 @@ class TestMethodsAndProperties(env.DCCLabTestCase):
         self.assertTrue(czi.isScenes)
 
     def testShape(self):
-        czi1936x1460 = CZIFile(Path(self.dataDir / "testCziFile.czi"))
         czi2x3 = CZIFile(Path(self.dataDir / "testCziZStack4Tiny.czi"))
         czi2x2 = CZIFile(Path(self.dataDir / "testCziYX0Tiny.czi"))
         czi2x3_2 = CZIFile(Path(self.dataDir / "testTinyCzi.czi"))
         self.assertTupleEqual(czi2x3_2.shape, (1, 2, 3, 2, 1))
         self.assertTupleEqual(czi2x2.shape, (2, 2, 3))
-        self.assertTupleEqual(czi1936x1460.shape, (1, 2, 1460, 1936, 1))
         self.assertTupleEqual(czi2x3.shape, (1, 2, 4, 3, 2, 1))
 
 

@@ -112,7 +112,11 @@ class TestCziMetadata(env.DCCLabTestCase):
         mdata.root = tree.getroot()
         self.assertIsNone(mdata.setYScale())
 
+    @unittest.expectedFailure
     def testSetXSizeExpectedValue(self):
+        # The original file testCziFile.czi was lost and has been replaced by a different file
+        # on sept 22 2023. This test cannot work until we find it back or rewrite
+        # the test
         mdata = mtdt(self.testPath)
         self.assertEqual(mdata.setXSize(), 1936)
 
@@ -122,7 +126,12 @@ class TestCziMetadata(env.DCCLabTestCase):
         mdata.root = tree.getroot()
         self.assertIsNone(mdata.setXSize())
 
+    @unittest.expectedFailure
     def testSetYSizeExpectedValue(self):
+        # The original file testCziFile.czi was lost and has been replaced by a different file
+        # on sept 22 2023. This test cannot work until we find it back or rewrite
+        # the test
+
         mdata = mtdt(self.testPath)
         self.assertEqual(mdata.setYSize(), 1460)
 
@@ -132,7 +141,12 @@ class TestCziMetadata(env.DCCLabTestCase):
         mdata.root = tree.getroot()
         self.assertIsNone(mdata.setYSize())
 
+    @unittest.expectedFailure
     def testXScaledExpectedValue(self):
+        # The original file testCziFile.czi was lost and has been replaced by a different file
+        # on sept 22 2023. This test cannot work until we find it back or rewrite
+        # the test
+
         mdata = mtdt(self.testPath)
         self.assertAlmostEqual(mdata.xScaled, 1.757888)
 
@@ -141,7 +155,12 @@ class TestCziMetadata(env.DCCLabTestCase):
         mdata.xScale = 'abcd'
         self.assertIsNone(mdata.xScaled)
 
+    @unittest.expectedFailure
     def testYScaledExpectedValue(self):
+        # The original file testCziFile.czi was lost and has been replaced by a different file
+        # on sept 22 2023. This test cannot work until we find it back or rewrite
+        # the test
+
         mdata = mtdt(self.testPath)
         self.assertAlmostEqual(mdata.yScaled, 1.325680)
 
@@ -199,7 +218,11 @@ class TestCziMetadata(env.DCCLabTestCase):
         mdata = mtdt(self.testPath)
         self.assertFalse(mdata.checkIfElementHasChildren(None))
 
+    @unittest.expectedFailure
     def testAsDictExpectedValue(self):
+        # The original file testCziFile.czi was lost and has been replaced by a different file
+        # on sept 22 2023. This test cannot work until we find it back or rewrite
+        # the test
         mdata = mtdt(self.testPath)
         expectedValue = {'channels': 2, 'file_path': self.testPath,
                          'injection_site': None, 'microscope': 'Axio Observer.Z1 / 7', 'mouse_id': None,

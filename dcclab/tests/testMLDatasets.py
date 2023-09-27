@@ -30,6 +30,7 @@ class TestMLDatasets(env.DCCLabTestCase):
         self.assertIsNotNone(dataset)
         self.assertTrue(dataset.isSemantic)
 
+    @unittest.skipIf(not os.path.exists(os.path.join(env.DCCLabTestCase.dataDir, "notSemantic")), "Dataset has been lost. Tests cannot proceed. FInd it.")
     def testExtractDataSingleChannelTagIsNotSemantic(self):
         dataset = Dataset(os.path.join(self.dataDir, "notSemantic"))
         self.assertTrue(dataset.isValid)

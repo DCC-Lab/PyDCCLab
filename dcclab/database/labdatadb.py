@@ -4,7 +4,7 @@ import pandas as pd
 import re
 from collections.abc import Iterable
 
-class LabdataDB(Database):
+class LabdataDB(MySQLDatabase):
     """
     This is a general database tool to access all information about projects,
     files, and spectral datasets of the DCCLab. You use it with:
@@ -240,11 +240,38 @@ class LabdataDB(Database):
         return freq
 
     def getIdTypes(self, datasetId):
+        return self.getIdTypesFromDatasetFormatString(datasetId)
+
+        # This code below sometimes fail. It has been replaced.
         idTypes = {}
         for fieldName in ["id1", "id2", "id3", "id4"]:
             values = self.executeSelectFetchOneField(f"select distinct({fieldName}) from spectra where datasetId = %s", (datasetId,))
             inferredType = self._inferListType(values)
             idTypes[fieldName] = inferredType
+
+        return idTypes
+
+    def getIdTypesFromDatasetFormatString(self, datasetId):
+        formatString = self.getSpectrumIdFormat(datasetId)
+
+        elements = formatString.split("-")
+
+        ids = ["id1", "id2", "id3", "id4"]
+
+        idTypes = {}
+        for id in ids:
+            idTypes[id] = 'None'
+
+        # The first element is always the dataset name in the format string
+        for i,singleFormat in enumerate(elements[1:]):
+            match = re.match(r"\{(\d):?.*?([sfd]?)\}", singleFormat)
+            formatTypeAsString = match.groups()[1]
+            if formatTypeAsString == '':
+                idTypes[ids[i]] = str
+            elif formatTypeAsString == 'd':
+                idTypes[ids[i]] = int
+            elif formatTypeAsString == 'f':
+                idTypes[ids[i]] = float
 
         return idTypes
 
@@ -270,6 +297,7 @@ class LabdataDB(Database):
         return idValues
 
     def _inferListType(self, values):
+        raise LogicalError("function _inferlist does not work.")
         try :
             if False not in [str(int(v)) == v for v in values]:
                 return int
@@ -277,6 +305,8 @@ class LabdataDB(Database):
             pass
 
         try :
+            if False not in [float(v) == int(v) for v in values]:
+                return int
             if False not in [float(v) for v in values]:
                 return float
 
@@ -290,7 +320,7 @@ class LabdataDB(Database):
 
     def castIdsToDatasetType(self, row, idTypes=None):
         if idTypes is None:
-            idTypes = self.getIdTypes(row["datasetId"])
+            idTypes = self.getIdTypesFromDatasetFormatString(row["datasetId"])
 
         for fieldName in ["id1", "id2", "id3", "id4"]:
             if fieldName in row.keys():
@@ -313,7 +343,7 @@ class LabdataDB(Database):
             try:
                 return formatString.format(datasetId, *theCoords)
             except Exception as err:
-                raise ValueError("Unable to convert {0} with format string '{1}'", row, formatString )
+                raise ValueError("Unable to convert {0} with format string '{1}'".format(row, formatString ))
 
 class SpectraDB(LabdataDB):
     def __init__(self, databaseURL=None):
@@ -390,19 +420,26 @@ class SpectraDB(LabdataDB):
         The cache.hdf file is stored locally, in plain sight.  You may delete it 
         to reset the cache.
         """
-        with pd.HDFStore('cache.h5') as store:
-            hdfLabel = "-".join( "{0}".format(v) for v in args.values())
+        try:
+            with pd.HDFStore('cache.h5') as store:
+                hdfLabel = "-".join( "{0}".format(v) for v in args.values())
 
-            if "/"+hdfLabel not in store.keys():
-                print("Getting {0} from server".format(hdfLabel))
-                spectra, spectrumIds = self.getSpectra(**args)
-                frequencies = self.getFrequencies(**args)
-                df = pd.DataFrame(data=spectra, index=frequencies, columns=spectrumIds)
-                store[hdfLabel] = df
-            else:
-                print("Getting {0} from file".format(hdfLabel))
-                df = store[hdfLabel]
-            return df
+                if "/"+hdfLabel not in store.keys():
+                    print("Getting {0} from server".format(hdfLabel))
+                    spectra, spectrumIds = self.getSpectra(**args)
+                    frequencies = self.getFrequencies(**args)
+                    df = pd.DataFrame(data=spectra, index=frequencies, columns=spectrumIds)
+                    store[hdfLabel] = df
+                else:
+                    print("Getting {0} from file".format(hdfLabel))
+                    df = store[hdfLabel]
+        except Exception as err:
+            print("HDFStore does not appear operational. Retrieving the data from server.")
+            spectra, spectrumIds = self.getSpectra(**args)
+            frequencies = self.getFrequencies(**args)
+            df = pd.DataFrame(data=spectra, index=frequencies, columns=spectrumIds)
+
+        return df
 
     def normalizeSpectra_mean_std(self, spectraDataFrame):
         """
