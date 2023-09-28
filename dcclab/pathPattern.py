@@ -89,7 +89,25 @@ class PathPattern:
             if re.match(self.basePattern, filename):
                 filePath = os.path.join(self.directory, filename)
                 paths.append(filePath)
+
         paths.sort()
+        return paths
+
+    def matchingFilesWithCaptureGroups(self) -> dict:
+        if self.isWritePattern:
+            raise ValueError("Patterns with format strings are for writing files, not reading")
+
+        if not self.hasCaptureGroups:
+            return None
+
+        paths = {}
+        for filename in os.listdir(self.directory):
+            match = re.match(self.basePattern, filename)
+            if match is not None:
+                filePath = os.path.join(self.directory, filename)
+                indices = tuple( int(v) for v in match.groups())
+                paths[indices] = filePath
+
         return paths
 
     def filePathWithIndex(self, i: int, j: int = None, k: int = None):
