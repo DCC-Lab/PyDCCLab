@@ -1,6 +1,6 @@
 from .imageFile import *
 from .channel import Channel
-from .DCCExceptions import *
+from dcclab.DCCExceptions import *
 import numpy as np
 import PIL.Image
 import matplotlib.pyplot as plt

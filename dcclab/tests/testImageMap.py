@@ -1,5 +1,5 @@
 import env
-from dcclab.imageCollection import *
+from dcclab.images.imageCollection import *
 from unittest.mock import Mock, patch
 import unittest
 import numpy as np

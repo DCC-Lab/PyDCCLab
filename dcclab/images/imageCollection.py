@@ -1,6 +1,6 @@
 from .image import *
 from .image import Image
-from .pathPattern import *
+from dcclab.utils.pathPattern import *
 import numpy as np
 import matplotlib.pyplot as plt
 from typing import List, Union

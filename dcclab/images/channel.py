@@ -4,7 +4,7 @@ import typing
 from skimage import measure, morphology, feature, transform
 from scipy.ndimage import label, sum
 import scipy.ndimage as ndimage
-from .DCCExceptions import *
+from dcclab.DCCExceptions import *
 import cv2 as cv
 
 import matplotlib.pyplot as plt

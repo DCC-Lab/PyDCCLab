@@ -1,6 +1,6 @@
 import env
 import unittest
-from dcclab.cziFile import CZIFile
+from dcclab.metadata.cziMetadata.cziFile import CZIFile
 from dcclab.DCCExceptions import *
 import numpy as np
 from pathlib import Path
