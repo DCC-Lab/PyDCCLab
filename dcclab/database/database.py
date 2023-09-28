@@ -530,7 +530,7 @@ class MySQLDatabase:
 
                 actualMysqlHost = self.mysqlHost
                 if self.sshHost == "cafeine2.crulrg.ulaval.ca" or self.sshHost == "cafeine3.crulrg.ulaval.ca":
-                    from dcclab import Cafeine
+                    from dcclab.utils import Cafeine
                     self.server = Cafeine()
                     self.port = self.server.startMySQLTunnel(remote_bind_address=self.mysqlHost)
                     actualMysqlHost = "127.0.0.1"

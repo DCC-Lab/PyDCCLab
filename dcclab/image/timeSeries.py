@@ -1,5 +1,5 @@
 from .imageCollection import *
-from .pathPattern import *
+from dcclab.utils.pathPattern import *
 import cv2
 
 class TimeSeries(ImageCollection):

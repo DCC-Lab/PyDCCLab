@@ -13,20 +13,20 @@ class ImageFile(object):
 
     def zStackData(self):
         """
-        :return: images data as z-stack if possible
+        :return: image data as z-stack if possible
         """
         return None
 
 
     def timeSeriesData(self):
         """
-        :return: images data as a time series if possible
+        :return: image data as a time series if possible
         """
         return None
 
     def scenesData(self):
         """
-        :return: images data as scenes if possible
+        :return: image data as scenes if possible
         """
         return None
 
@@ -44,7 +44,7 @@ class ImageFile(object):
 
     def mapData(self):
         """
-        :return: images data as a map (key:x/y indexes, value: image data)
+        :return: image data as a map (key:x/y indexes, value: image data)
         """
         return None
 
@@ -95,7 +95,7 @@ class TIFFFile(ImageFile):
         ImageFile.__init__(self, path)
 
     def imageDataFromPath(self) -> np.ndarray:
-        # todo better method that return every images if multipage
+        # todo better method that return every image if multipage
         tiffFileObject = tifffile.TiffFile(self.path)
         imageAsArray = tiffFileObject.asarray().astype(dtype="float32")
         self.__metadata = tiffFileObject.ome_metadata

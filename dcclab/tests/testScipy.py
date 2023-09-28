@@ -8,7 +8,7 @@ class TestScipyFilters(env.DCCLabTestCase):
     """ Testing if scipy filters are dimension dependent """
 
     def setUp(self):
-        """ Generating a list of random images. All images are different """
+        """ Generating a list of random image. All image are different """
         self.imageList = [sparse.random(5, 5, density=0.5).A for i in range(10)]
         self.sampleStackArray = np.dstack(self.imageList)
 

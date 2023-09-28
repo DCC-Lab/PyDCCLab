@@ -1,5 +1,5 @@
 from .imageFile import *
-from .pathPattern import *
+from dcclab.utils.pathPattern import *
 import os
 import cv2
 import re

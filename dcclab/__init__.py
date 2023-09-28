@@ -5,25 +5,13 @@ Circular dependecies on modules, use forward references:
 Forward references: https://www.python.org/dev/peps/pep-0484/#forward-references
 
 """
-
-from .image import *
-from .channel import *
-from .imageCollection import *
-from .timeSeries import *
-from .DCCExceptions import *
-from .channelInteger import *
-from .channelFloat import *
-from .pathPattern import *
-from .cziFile import *
-from .movieFile import *
-from .lifFile import *
-from .dataset import *
-from .correlationMatrix import *
+from .analysis import *
 from .database import *
+from .image import *
 from .metadata import *
-from .cafeine import *
-from . import speckleAnalysis
+from .ml  import *
+from .utils import *
+from .DCCExceptions import *
 
-
-__version__ = "1.1.0"
+__version__ = "1.1.1"
 __author__ = "Daniel Cote <dccote@cervo.ulaval.ca>"

@@ -52,7 +52,7 @@ class NotBinaryImageException(Exception):
 
 class EmptyImageCollectionException(Exception):
     def __init__(self):
-        Exception.__init__(self, "There are no images in the collection.")
+        Exception.__init__(self, "There are no image in the collection.")
 
 class EmptyDCCImageCollectionException(EmptyImageCollectionException):
     pass

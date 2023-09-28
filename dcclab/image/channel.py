@@ -4,7 +4,7 @@ import typing
 from skimage import measure, morphology, feature, transform
 from scipy.ndimage import label, sum
 import scipy.ndimage as ndimage
-from .DCCExceptions import *
+from dcclab.DCCExceptions import *
 import cv2 as cv
 
 import matplotlib.pyplot as plt
@@ -25,7 +25,7 @@ class Channel:
             elif "int" in str(pixels.dtype) or "bool" in str(pixels.dtype):
                 return super(Channel, cls).__new__(ChannelInt)
             else:
-                raise PixelTypeException("Can't read images of type {}".format(pixels.dtype))
+                raise PixelTypeException("Can't read image of type {}".format(pixels.dtype))
 
     def __init__(self, pixels: np.ndarray):
         """
@@ -584,7 +584,7 @@ class Channel:
 
     def blobDetection(self, minStdDev: float = 1, maxStdDev: float = 50, threshold: float = 0.2,
                       overlap: float = 0.5) -> typing.Tuple["Channel", int]:
-        # Not good with low contrast images
+        # Not good with low contrast image
         blobs = feature.blob_log(self.pixels, maxStdDev, minStdDev, threshold=threshold, overlap=overlap)
         blobsDetected = Channel(np.zeros((self.width, self.height)))
         # Compute radii

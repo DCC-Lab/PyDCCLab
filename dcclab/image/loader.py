@@ -20,9 +20,9 @@ Examples:
     # with czi files.
     czi = loader.load()
     if czi.isZStack:
-        images = czi.zstack
+        image = czi.zstack
     elif czi.isTimeSeries:
-        images = czi.timeSeries
+        image = czi.timeSeries
 """
 from dcclab.imageFile import *
 

@@ -1,6 +1,6 @@
-from .imageCollection import *
-from .timeSeries import TimeSeries
-from .zStack import ZStack
+from dcclab.image.imageCollection import *
+from dcclab.image.timeSeries import TimeSeries
+from dcclab.image.zStack import ZStack
 
 
 class CZIFile(ImageFile):

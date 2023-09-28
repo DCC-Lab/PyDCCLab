@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as et
 from .cziChannel import CZIChannel as chnnl
 from .cziFilter import CZIFilter as fltr
-from dcclab.cziUtil import readCziImage, extractMetadataFromCziFileObject
+from dcclab.image.cziUtil import readCziImage, extractMetadataFromCziFileObject
 import re
 import os
 
