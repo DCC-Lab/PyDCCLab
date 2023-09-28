@@ -11,9 +11,9 @@ import warnings
 from concurrent.futures import ThreadPoolExecutor
 
 """
-Python script containing utility functions to be used for handling .czi images.
+Python script containing utility functions to be used for handling .czi image.
 
-These functions are supposed to work with the CZI format files used with POM images.
+These functions are supposed to work with the CZI format files used with POM image.
 Since Python doesn't offer a lot of libraries (and those available are not well documented (some are just not) or
 requiring weird stuff) to play with that format, I needed to do a little file so that it's easier to breath in the
 .czi jungle.
@@ -74,9 +74,9 @@ def extractMetadataFromCziFileObject(cziObject, saveFileName=None):
 
 def getImagesFromCziFileObject(cziObject):
     """
-    Function that returns the images from a czi file object, with every channel.
+    Function that returns the image from a czi file object, with every channel.
     :param cziObject: The CziFile object
-    :return: Numpy array containing the images
+    :return: Numpy array containing the image
     """
     arrayReturn = []
     subblocksIters = cziObject.subblocks()
@@ -127,7 +127,7 @@ def decodeCZIFile(cziObj, showProgress=False):
 
 def showImagesFromCziFileObject(cziObject):
     """
-    Function that shows the images in a czi file object. The function shows them one by one, no subplots.
+    Function that shows the image in a czi file object. The function shows them one by one, no subplots.
     :param cziObject: CziFile object
     :return: Numpy array of matplotlib.image.AxesImage (each of the matplotlib.image.AxesImage of the initial image)
     """
@@ -162,7 +162,7 @@ def getFormatedMetadata(metadata):
 def saveImagesToTIFF(imageArray, filename=None):
     """
     Function that saves every image in an array to a TIFF file.
-    :param imageArray: Array of images to be saved. If the array is empty, nothing is done.
+    :param imageArray: Array of image to be saved. If the array is empty, nothing is done.
     :param filename: The file name to save the new tiff image. If None (default), a default name is given.
     :return: bool. True if the image is saved, False if nothing is done.
     """

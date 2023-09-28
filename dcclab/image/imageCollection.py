@@ -159,7 +159,7 @@ class ImageCollection:
 
     def asArray(self) -> np.ndarray:
         # An ImageCollection may not always be put into
-        # an array: if all images have different sizes, this will
+        # an array: if all image have different sizes, this will
         # fail
         return np.stack([image.asArray() for image in self.images], axis=3)
 
@@ -248,7 +248,7 @@ class ImageCollection:
             raise NotImplementedError("ImageCollection from 4D arrays only.")
 
     def replaceFromArray(self, imagesArray):
-        assert self.numberOfImages == imagesArray.shape[3], "Array has to contain the same number of images."
+        assert self.numberOfImages == imagesArray.shape[3], "Array has to contain the same number of image."
 
         for i, image in enumerate(self.images):
             image.replaceFromArray(imagesArray[:, :, :, i])
@@ -266,7 +266,7 @@ class ImageCollection:
         del self.images[index]
 
     def removeChannels(self, channels: list):
-        """ These functions 'can' crash if images don't have the same numberOfChannels"""
+        """ These functions 'can' crash if image don't have the same numberOfChannels"""
         for image in self.images:
             image.removeChannels(channels)
 

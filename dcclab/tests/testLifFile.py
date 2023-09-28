@@ -1,7 +1,7 @@
 import env
 from pathlib import Path
 from dcclab import LIFFile, ZStack
-from dcclab.images.lifReader import LIFSerie
+from dcclab.image.lifReader import LIFSerie
 from unittest.mock import patch, Mock
 import unittest
 import os

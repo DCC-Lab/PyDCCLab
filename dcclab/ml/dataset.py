@@ -28,7 +28,7 @@ OR
 
 <SEMANTIC>
 data/
-|-- images
+|-- image
     |-- 0.png  # [each image might contain multiple classes]
     |-- ...
 |-- labels

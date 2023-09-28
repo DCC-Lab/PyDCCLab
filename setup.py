@@ -18,7 +18,7 @@ setuptools.setup(
     url="https://github.com/DCC-Lab/PyDCCLab",
     author="Daniel Côté, Gabriel Genest, Mathieu Fournier, Ludovick Bégin",
     author_email="dccote@cervo.ulaval.ca",
-    description="A Python library to read, transform, manipulate images and manage databases",
+    description="A Python library to read, transform, manipulate image and manage databases",
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     license='MIT',

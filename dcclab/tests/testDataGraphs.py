@@ -49,7 +49,7 @@
 #                                             bbox=dict(boxstyle="round", fc="w"),
 #                                             arrowprops=dict(arrowstyle="->"))
 #                         annot.set_visible(False)
-#                         title = "{} and {} of {} from the POM platform (normalized images)".format(xLabel, yLabel,
+#                         title = "{} and {} of {} from the POM platform (normalized image)".format(xLabel, yLabel,
 #                                                                                                    channelName)
 #
 #                         def update_annot(ind):

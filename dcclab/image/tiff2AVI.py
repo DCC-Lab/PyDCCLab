@@ -11,7 +11,7 @@ ap = argparse.ArgumentParser()
 ap.add_argument("-ext", "--extension", required=False, default='tiff', help="extension name. default is 'tiff'.")
 ap.add_argument("-o", "--output", required=False, default='output.avi', help="output video file")
 ap.add_argument("-i", "--input", required=False, default='.', help="input directory")
-ap.add_argument("-s", "--show", action="store_true", help="show images as they are processed")
+ap.add_argument("-s", "--show", action="store_true", help="show image as they are processed")
 args = vars(ap.parse_args())
 
 # Arguments
