@@ -2,9 +2,7 @@ import env
 import unittest
 import os
 
-from dcclab import Dataset
-
-from pathlib import Path
+from dcclab.ml.dataset import Dataset
 
 class TestMLDatasets(env.DCCLabTestCase):
 

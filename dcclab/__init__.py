@@ -5,22 +5,11 @@ Circular dependecies on modules, use forward references:
 Forward references: https://www.python.org/dev/peps/pep-0484/#forward-references
 
 """
-
-# from .image import *
-# from .channel import *
-# from .imageCollection import *
-# from .timeSeries import *
-# from .DCCExceptions import *
-# from .channelInteger import *
-# from .channelFloat import *
-# from .pathPattern import *
-# from .cziFile import *
-# from .movieFile import *
-# from .lifFile import *
-from .images import *
-from .ml  import *
+from .analysis import *
 from .database import *
+from .images import *
 from .metadata import *
+from .ml  import *
 from .utils import *
 
 __version__ = "1.1.0"
