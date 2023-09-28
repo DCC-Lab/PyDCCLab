@@ -5,6 +5,7 @@ import unittest
 import numpy as np
 import re
 
+
 class TestImageCollection(env.DCCLabTestCase):
     @classmethod
     def setUpClass(cls):
@@ -28,22 +29,28 @@ class TestImageCollection(env.DCCLabTestCase):
         self.assertIsNotNone(ImageCollection())
 
     def testInitWithPatternNoFile(self):
-        coll = ImageCollection(pathPattern=self.dataFile(r'abc-(\d).tiff'))
+        coll = ImageCollection(pathPattern=self.dataFile(r"abc-(\d).tiff"))
         self.assertIsNotNone(coll)
         self.assertTrue(coll.images == [])
 
     def testTestFilesArePresent(self):
-        pat = PathPattern(self.dataFile(r'test-(\d+).jpg'))
-        self.assertTrue(pat.matchingFiles() == [self.dataFile('test-001.jpg'),
-            self.dataFile('test-002.jpg'),self.dataFile('test-003.jpg')])
+        pat = PathPattern(self.dataFile(r"test-(\d+).jpg"))
+        self.assertTrue(
+            pat.matchingFiles()
+            == [
+                self.dataFile("test-001.jpg"),
+                self.dataFile("test-002.jpg"),
+                self.dataFile("test-003.jpg"),
+            ]
+        )
 
     def testInitWithPatternAndFiles(self):
-        coll = ImageCollection(pathPattern=self.dataFile(r'test-(\d+).jpg'))
+        coll = ImageCollection(pathPattern=self.dataFile(r"test-(\d+).jpg"))
         self.assertIsNotNone(coll)
         self.assertTrue(coll.numberOfImages != 0)
 
     def testInitWithPattern(self):
-        coll = ImageCollection(pathPattern=self.dataFile(r'abc-(\d).tiff'))
+        coll = ImageCollection(pathPattern=self.dataFile(r"abc-(\d).tiff"))
         self.assertIsNotNone(coll)
 
     def testInitWithImages(self):
@@ -56,7 +63,7 @@ class TestImageCollection(env.DCCLabTestCase):
             self.assertIsNotNone(ImageCollection("string"))
 
     def testInitImageCollection(self):
-        imgCollection = ImageCollection(pathPattern = self.dataFile(r"test-(\d+).jpg"))
+        imgCollection = ImageCollection(pathPattern=self.dataFile(r"test-(\d+).jpg"))
         self.assertTrue(len(imgCollection) != 0)
         self.assertIsNotNone(imgCollection.images)
         self.assertTrue(imgCollection.numberOfImages > 0)
@@ -132,11 +139,10 @@ class TestImageCollection(env.DCCLabTestCase):
 
 
 class TestImageCollectionMethods(env.DCCLabTestCase):
-
     def setUp(self) -> None:
         self.imageList = []
         for i in range(12):
-            array = (i+1)*np.ones((100,100,3), dtype=np.int8)
+            array = (i + 1) * np.ones((100, 100, 3), dtype=np.int8)
             image = Image(array)
             self.assertIsNotNone(image)
             self.imageList.append(image)
@@ -259,10 +265,10 @@ class TestImageCollectionMethods(env.DCCLabTestCase):
         self.assertTrue(listOfImage[0] == image)
 
     def testSaveCollection(self):
-        self.collection.save(self.tmpFile('test-{0:03d}.gif'))
-        self.collection.save(self.tmpFile('test-{0:03d}.png'))
-        self.collection.save(self.tmpFile('test-{0:03d}.jpg'))
-        self.collection.save(self.tmpFile('test-{0:03d}.tif'))
+        self.collection.save(self.tmpFile("test-{0:03d}.gif"))
+        self.collection.save(self.tmpFile("test-{0:03d}.png"))
+        self.collection.save(self.tmpFile("test-{0:03d}.jpg"))
+        self.collection.save(self.tmpFile("test-{0:03d}.tif"))
 
     def testCollectionDimension(self):
         self.assertTrue(self.collection.dimension == 1)
@@ -273,13 +279,22 @@ class TestImageCollectionMethods(env.DCCLabTestCase):
 
     def testCollectionReshape(self):
         self.assertTrue(self.collection.shape == (len(self.collection),))
-        self.collection.reshape((3,4))
-        self.assertTrue(self.collection.shape == (3,4))
+        self.collection.reshape((3, 4))
+        self.assertTrue(self.collection.shape == (3, 4))
         self.assertTrue(self.collection.dimension == 2)
 
-    def testCollectionReshapeAccess(self):
-        self.collection.reshape((3,4))
-        self.assertIsNotNone(self.collection[(1,2)])
+    def testCollectionBadReshape(self):
+        self.assertTrue(self.collection.shape == (len(self.collection),))
+        with self.assertRaises(ValueError):
+            self.collection.reshape((3, 3))
 
-if __name__ == '__main__':
+    def testCollectionReshapeAccess(self):
+        self.collection.reshape((3, 4))
+        self.assertIsNotNone(self.collection[(1, 2)])
+
+    def testCollectionKeepChannel(self):
+        self.collection.keepChannel(0)
+        self.assertEqual(len(self.collection[0].channels), 1)
+
+if __name__ == "__main__":
     unittest.main()
