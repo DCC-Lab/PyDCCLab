@@ -69,14 +69,17 @@ class Image:
         return totalSize
 
     def removeChannels(self, channels: list):
+        channels.sort().reverse()
         for index in channels:
-            del self.channels[index]
+            self.channels.pop(index)
 
     def keepChannel(self, channel: int):
-        allIndexes = list(range(0, len(self.channels)))
-        for index in allIndexes:
-            if index != channel:
-                del self.channels[index]
+        allIndexes = list(range(len(self.channels)))
+        if allIndexes is not None:
+            allIndexes.reverse()
+            for index in allIndexes:
+                if index != channel:
+                    self.channels.pop(index)
 
     def asChannelsArray(self):
         channelsPixels = list(map(lambda c: c.pixels, self.channels))
@@ -91,6 +94,10 @@ class Image:
         # or call asArray on an original Image Object (currently Channel.original is only np.ndarray)
         originalChannelArrays = list(map(lambda c: c.originalPixels, self.channels))
         return np.dstack(originalChannelArrays)
+
+    def restoreOriginal(self):
+        for channel in self.channels:
+            channel.restoreOriginal()
 
     def replaceFromArray(self, imageArray):
         assert len(self.channels) == imageArray.shape[2], "Array has to contain the same number of channels."

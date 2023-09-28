@@ -216,7 +216,8 @@ class Channel:
 
     def restoreOriginal(self) -> None:
         if self.__original is not None:
-            self._pixels = self.__original
+            self._pixels = np.copy(self.__original)
+            self.__original = None
 
     @property
     def originalPixels(self) -> np.ndarray:
