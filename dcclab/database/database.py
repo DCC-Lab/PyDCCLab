@@ -238,7 +238,7 @@ class Database:
                                                      password=pwd,
                                                      use_pure=True)
 
-                    self.cursor = self.connection.cursor(dictionary=True)
+                    self.cursor = self.connection.cursor(dictionary=True, buffered=True)
 
                 self.enforceForeignKeys()
         except Exception as err:
