@@ -5,12 +5,24 @@ import numpy as np
 import matplotlib.pyplot as plt
 from typing import List, Union
 import sys
+from enum import Enum
 
+class Axis(Enum):
+    x = 'x'
+    y = 'y'
+    z = 'z'
+    t = 't'
+    any = '.'
 
 class ImageCollection:
+    Axes = [Axis.x, Axis.y, Axis.z, Axis.t]
 
     def __init__(self, images: List['Image'] = None, imagesArray: np.ndarray = None, pathPattern: str = None):
         self.__images = []
+        self.__axes = None
+        self.__iteration = 0
+
+        shape = None
         if images is not None:
             if not all(isinstance(image, Image) for image in images):
                 raise NotDCCImageException
@@ -19,11 +31,14 @@ class ImageCollection:
         elif imagesArray is not None:
             self.fromArray(imagesArray)
         elif pathPattern is not None:
-            self.appendMatchingFiles(pathPattern)
-        # dimensions:x,y,c,z,t and '.' (any)
-        # 0,1,2 are always x,y and c
-        self.axes = ('.')
-        self.__shape = (len(self.__images),)
+            shape = self.appendMatchingFiles(pathPattern)
+
+        if shape is None:
+            self.__shape = (len(self.__images),)
+            self.__axes = ['.']
+        else:
+            self.__shape = shape
+            self.__axes = ImageCollection.Axes[0:self.dimension]
 
     @property
     def shape(self):
@@ -33,29 +48,60 @@ class ImageCollection:
     def dimension(self):
         return len(self.shape)
 
-    def reshape(self, tuple):
-        newCount = np.prod(tuple)
-        oldCount = np.prod(self.shape)
+    @property
+    def axes(self):
+        return self.__axes
 
-        if newCount != oldCount:
-            raise ValueError("New shape {0} incompatible with old shape {1}, not same total number of elelements".format(newCount, oldCount))
+    @axes.setter
+    def axes(self, value):
+        if len(value) != self.dimension:
+            raise ValueError("Axes must be an array {0} of dimension {1}".format(value, self.dimension))
+        else:
+            self.__axes = value
+
+    @property
+    def shape(self):
+        return self.__shape
+
+    def reshape(self, tuple, axes=None):
+        product = 1
+        for v in tuple:
+            product *= v
+
+        if product != len(self.__images):
+            raise ValueError("Shape {0} must be compatible with {1} elements".format(tuple, len(self.__images)))
 
         self.__shape = tuple
-        self.axes = ["."]*newCount
+
+        if axes is None:
+            self.axes = [ Axis.any ] * len(tuple)
+        else:
+            self.axes = axes
 
     def __getitem__(self, index):
         if isinstance(index, tuple):
-            indices = index
-            newIndex = 0
-            if len(indices) == 2:
-                newIndex = indices[1] * self.__shape[0] + indices[0]
-            elif len(indices) == 3:
-                newIndex = indices[2] * self.__shape[1] * self.__shape[0] + indices[1] * self.__shape[0] + indices[0]
-            else:
-                raise NotImplementedError("Only 2D and 3D collections are supported at this time")
-            return self.images[newIndex]
+            flatIndex = self.ravel(index)
         else:
-            return self.images[index]
+            flatIndex = index
+        return self.images[flatIndex]
+
+    def __iter__(self):
+        self.__iteration = 0
+        return self
+
+    def __next__(self):
+        try:
+            return self.unravel(self.__iteration)
+        except ValueError as err:
+            raise StopIteration
+        finally:
+            self.__iteration = self.__iteration + 1
+
+    def ravel(self, indexes):
+        return np.ravel_multi_index(indexes, self.shape)
+
+    def unravel(self, index):
+        return np.unravel_index(index, self.shape)
 
     def save(self, pathOrPattern: str):
         pattern = PathPattern(pathOrPattern)
@@ -122,7 +168,7 @@ class ImageCollection:
 
     @property
     def numberOfImages(self):
-        return len(self.images)
+        return len(self)
 
     def indexOf(self, image) -> int:
         if not isinstance(image, Image):
@@ -153,12 +199,30 @@ class ImageCollection:
 
     def appendMatchingFiles(self, pattern):
         paths = PathPattern(pattern)
-        for path in paths.matchingFiles():
+        if paths.hasCaptureGroups:
+            thePaths = paths.matchingFilesWithCaptureGroups()
+            allIndexes = sorted(thePaths.keys())
+        else:
+            thePaths = paths.matchingFiles()
+            allIndexes = [ (v,) for v in range(len(thePaths)) ]
+            thePaths = dict(zip(allIndexes, thePaths))
+
+        for indexes in allIndexes:
+            path = thePaths[indexes]
             try:
                 image = Image(path=path)
                 self.append(image)
             except:
                 pass
+
+        if len(allIndexes) >= 2:
+            firstIndex = allIndexes[0]
+            lastIndex = allIndexes[-1]
+            newShape = np.array(lastIndex)-np.array(firstIndex)+1
+        else:
+            newShape = (1,)
+
+        return tuple([v for v in newShape])
 
     def appendFromImagesArray(self, imagesArray):
         if imagesArray.ndim == 4:
@@ -169,7 +233,7 @@ class ImageCollection:
             raise NotImplementedError("ImageCollection from 4D arrays only: [width][height][channel][collection]")
 
     def fromArray(self, imagesArray):
-        """ Intentiate self.__images from an Array."""
+        """ Instantiate self.__images from an Array."""
         # FIXME (?) : ImageCollection already has appendFromImagesArray. but the method doesn't overwrite self.__images
 
         self.__images = []
@@ -209,6 +273,10 @@ class ImageCollection:
     def keepChannel(self, channel: int):
         for image in self.images:
             image.keepChannel(channel)
+
+    def restoreOriginal(self):
+        for image in self.images:
+            image.restoreOriginal()
 
     def showAllSequentially(self, showInGray: object = True):
         for image in self.images:
