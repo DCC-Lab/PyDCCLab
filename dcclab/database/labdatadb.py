@@ -2,7 +2,6 @@ from .database import *
 import numpy as np
 import pandas as pd
 import re
-from collections.abc import Iterable
 
 class LabdataDB(MySQLDatabase):
     """

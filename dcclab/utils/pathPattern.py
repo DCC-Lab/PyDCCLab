@@ -1,6 +1,6 @@
 import re
 import os
-from pathlib import Path, PureWindowsPath, PurePosixPath
+from pathlib import Path, PurePosixPath
 
 
 class PathPattern:

@@ -2,7 +2,6 @@ from dcclab import ImageCollection, Image
 from typing import List
 import pandas as pd
 import numpy as np
-import json
 import os
 
 """
