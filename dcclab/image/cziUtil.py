@@ -6,9 +6,7 @@ import time
 import xml.etree.ElementTree as ET
 import os
 import fnmatch
-import multiprocessing
 import warnings
-from concurrent.futures import ThreadPoolExecutor
 
 """
 Python script containing utility functions to be used for handling .czi image.

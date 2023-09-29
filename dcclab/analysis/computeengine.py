@@ -2,9 +2,8 @@ from multiprocessing import Pool, Queue, Process, SimpleQueue, cpu_count
 from threading import Thread
 from queue import Empty
 import time
-from json import dumps
 import signal
-from database import *
+from dcclab.database import *
 
 """
 A class to run many tasks in parallel when they are mostly independent.  This engine is perfectly
