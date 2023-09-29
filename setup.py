@@ -8,7 +8,7 @@ To distribute:
 =============
 rm dist/*; python setup.py sdist --formats=gztar,zip
 or
-rm dist/*; python setup.py sdist bdist_wheel; python -m twine upload dist/* 
+rm dist/*; python3 setup.py sdist; python3 -m twine upload dist/* 
 
 """
 

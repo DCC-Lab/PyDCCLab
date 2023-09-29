@@ -2,7 +2,7 @@ from sshtunnel import SSHTunnelForwarder
 import time
 import keyring
 from contextlib import redirect_stderr
-
+import sys
 
 class Cafeine:
     def __init__(self, username='dcclab'):
@@ -12,11 +12,9 @@ class Cafeine:
         password = keyring.get_password("cafeine2-ssh", "dcclab")
 
         if password is None:
-           print("""
-              Run the following command in the terminal to add the dcclab password to your Keychain:
-              keyring set cafeine2-ssh dcclab
-              (you will be prompted for the password)
-              """)
+           print("""Run the following command in the terminal to add the dcclab password to your Keychain:
+{0} -m keyring set cafeine2-ssh dcclab 
+(you will be prompted for the password)""".format(sys.executable))
            exit(1)
 
         import io

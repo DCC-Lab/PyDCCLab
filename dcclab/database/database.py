@@ -218,7 +218,7 @@ class Database:
                         pwd = keyring.get_password(serviceName, self.mysqlUser)
                         if pwd is None:
                             raise Exception(""" Set the password in the system password manager on the command line with:
-                            python -m keyring set {0} {1}""".format(serviceName, self.mysqlUser))
+{2} -m keyring set {0} {1}""".format(serviceName, self.mysqlUser, sys.executable))
                     else:
                         pwd = None
 
@@ -524,7 +524,7 @@ class MySQLDatabase:
                     pwd = keyring.get_password(serviceName, self.mysqlUser)
                     if pwd is None:
                         raise Exception(""" Set the password in the system password manager on the command line with:
-                        python -m keyring set {0} {1}""".format(serviceName, self.mysqlUser))
+{2} -m keyring set {0} {1}""".format(serviceName, self.mysqlUser, sys.executable))
                 else:
                     pwd = None
 

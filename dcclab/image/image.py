@@ -5,7 +5,6 @@ import numpy as np
 import PIL.Image
 import matplotlib.pyplot as plt
 import os
-import re
 from typing import List, Union
 
 
