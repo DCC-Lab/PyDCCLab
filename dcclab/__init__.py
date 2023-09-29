@@ -13,5 +13,5 @@ from .ml  import *
 from .utils import *
 from .DCCExceptions import *
 
-__version__ = "1.1.1"
+__version__ = "1.1.2"
 __author__ = "Daniel Cote <dccote@cervo.ulaval.ca>"
