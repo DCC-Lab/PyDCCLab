@@ -124,7 +124,7 @@ class TestPatterns(env.DCCLabTestCase):
 
     def testFindFiles(self):
         # Use this test directory
-        pat = PathPattern(r'test.+\.py')
+        pat = PathPattern(str(self.testsDir / r'test.+\.py'))
         files = pat.matchingFiles()
         self.assertTrue(len(files) != 0)
 
