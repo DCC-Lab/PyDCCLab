@@ -95,13 +95,10 @@ class TIFFFile(ImageFile):
     def imageDataFromPath(self) -> np.ndarray:
         # todo better method that return every image if multipage
         import tifffile
-        tiffFileObject = tifffile.TiffFile(self.path)
-        imageAsArray = tiffFileObject.asarray().astype(dtype="float32")
-        self.__metadata = tiffFileObject.ome_metadata
-        imageList = []
-        for i in range(imageAsArray.shape[0]):
-            imageList.append(imageAsArray[i])
-        return imageAsArray
+        with tifffile.TiffFile(self.path) as tiffFileObject:
+            imageAsArray = tiffFileObject.asarray().astype(dtype="float32")
+            self.__metadata = tiffFileObject.ome_metadata
+            return imageAsArray
 
 
 class PILFile(ImageFile):
