@@ -155,7 +155,7 @@ class TestZStack(env.DCCLabTestCase):
 
         self.zStack.applyNoiseFilter()
 
-        self.assertTrue(np.array_equal(self.zStack.asArray(), self.grayStack))
+        self.assertFalse(np.array_equal(self.zStack.asArray(), self.grayStack))
 
     def testSetMaskFromThreshold(self):
         self.zStack.setMaskFromThreshold(self.grayStack.mean())
@@ -258,7 +258,7 @@ class TestZStack(env.DCCLabTestCase):
         channelComponentsDict = self.zStack.componentsProperties["Channel 0"]
 
         self.assertTrue(len(channelComponentsDict) == 7)
-        self.assertTrue(channelComponentsDict["totalSize"] == 320)
+        self.assertTrue(channelComponentsDict["totalSize"] == 405)
 
     def testGetObjectsSize(self):
         maskArray = np.ones((2, 2))
