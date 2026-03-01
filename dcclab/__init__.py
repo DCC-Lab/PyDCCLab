@@ -13,5 +13,8 @@ from .ml  import *
 from .utils import *
 from .DCCExceptions import *
 
-__version__ = "1.1.3"
+try:
+    from ._version import version as __version__
+except ImportError:
+    __version__ = "unknown"
 __author__ = "Daniel Cote <dccote@cervo.ulaval.ca>"
