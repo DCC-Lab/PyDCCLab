@@ -1,8 +1,11 @@
 import env
 from dcclab.database import *
+from dcclab.database.labdatadb import LabdataDB, SpectraDB
 import unittest
 import numpy as np
 
+
+@unittest.skipUnless(env.isOnCERVONetwork(), "Requires CERVO network (cafeine3 unreachable)")
 class TestLabdataDatabaseFunctionality(env.DCCLabTestCase):
     def setUp(self):
         self.db = SpectraDB()
@@ -178,6 +181,7 @@ class TestLabdataDatabaseFunctionality(env.DCCLabTestCase):
     def testShowInfo(self):
         self.db.showDatabaseInfo()
 
+@unittest.skipUnless(env.isOnCERVONetwork(), "Requires CERVO network (cafeine3 unreachable)")
 class TestLabdataDatabaseContent(env.DCCLabTestCase):
     def setUp(self):
         self.db = SpectraDB()

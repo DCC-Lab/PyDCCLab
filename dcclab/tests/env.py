@@ -1,8 +1,18 @@
 import sys
 import os
+import socket
 import unittest
 import tempfile
 from pathlib import Path
+
+
+def isOnCERVONetwork(host="cafeine3.crulrg.ulaval.ca", port=22, timeout=1):
+    try:
+        s = socket.create_connection((host, port), timeout=timeout)
+        s.close()
+        return True
+    except (socket.timeout, socket.error, OSError):
+        return False
 
 
 class DCCLabTestCase(unittest.TestCase):
