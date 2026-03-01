@@ -68,7 +68,10 @@ class TestChannels(env.DCCLabTestCase):
         self.assertTrue(np.array_equal(sub.pixels, supposedSub.pixels))
 
     def testAddWithInvalidType(self):
-        import numpy.core._exceptions as npExcep
+        try:
+            import numpy._core._exceptions as npExcep
+        except ImportError:
+            import numpy.core._exceptions as npExcep
         array = np.array([[3, 3, 3, 3], [3, 3, 3, 3], [3, 3, 3, 3], [3, 3, 3, 3]])
         channel1 = Channel(pixels=array.T)
         with self.assertRaises(npExcep.UFuncTypeError):
@@ -113,7 +116,10 @@ class TestChannels(env.DCCLabTestCase):
         self.assertTrue(np.array_equal(sub.pixels, supposedSub.pixels))
 
     def testSubWithInvalidType(self):
-        import numpy.core._exceptions as npExcep
+        try:
+            import numpy._core._exceptions as npExcep
+        except ImportError:
+            import numpy.core._exceptions as npExcep
         array = np.array([[3, 3, 3, 3], [3, 3, 3, 3], [3, 3, 3, 3], [3, 3, 3, 3]])
         channel1 = Channel(pixels=array.T)
         with self.assertRaises(npExcep.UFuncTypeError):

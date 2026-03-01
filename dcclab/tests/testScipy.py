@@ -9,7 +9,7 @@ class TestScipyFilters(env.DCCLabTestCase):
 
     def setUp(self):
         """ Generating a list of random image. All image are different """
-        self.imageList = [sparse.random(5, 5, density=0.5).A for i in range(10)]
+        self.imageList = [sparse.random(5, 5, density=0.5).toarray() for i in range(10)]
         self.sampleStackArray = np.dstack(self.imageList)
 
     def testSampleStackSize(self):

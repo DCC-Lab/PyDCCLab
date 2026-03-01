@@ -1,6 +1,7 @@
 import env
 from dcclab import *
 import unittest
+import warnings
 import numpy as np
 
 
@@ -145,7 +146,7 @@ class TestChannelFloat(env.DCCLabTestCase):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", category=RuntimeWarning)
             stdDevFiltered = Channel(array).getStandardDeviationFilter(3)
-        self.assertFalse(np.alltrue(np.isnan(stdDevFiltered.pixels)))
+        self.assertFalse(np.all(np.isnan(stdDevFiltered.pixels)))
 
 
 if __name__ == '__main__':

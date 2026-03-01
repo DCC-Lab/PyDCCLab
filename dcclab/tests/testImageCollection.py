@@ -106,7 +106,7 @@ class TestImageCollection(env.DCCLabTestCase):
         self.assertTrue(valid)
 
     def testValidConstructorOneElement(self):
-        array = np.ones((130, 145), dtype=np.int8)
+        array = np.ones((130, 145), dtype=np.uint8)
         image = Image(array)
         collection = ImageCollection([image])
         self.assertIsInstance(collection, ImageCollection)
@@ -114,7 +114,7 @@ class TestImageCollection(env.DCCLabTestCase):
     def testValidConstructor100Elements(self):
         imageList = []
         for i in range(100):
-            array = np.ones((256, 257), dtype=np.int8)
+            array = np.ones((256, 257), dtype=np.uint8)
             array[i][i] = i
             image = Image(array)
             imageList.append(image)
@@ -129,7 +129,7 @@ class TestImageCollection(env.DCCLabTestCase):
     def testInvalidConstructor11Elements(self):
         imageList = []
         for i in range(10):
-            array = np.ones((256, 257), dtype=np.int8)
+            array = np.ones((256, 257), dtype=np.uint8)
             array[i][i] = i
             image = Image(array)
             imageList.append(image)
@@ -142,7 +142,7 @@ class TestImageCollectionMethods(env.DCCLabTestCase):
     def setUp(self) -> None:
         self.imageList = []
         for i in range(12):
-            array = (i + 1) * np.ones((100, 100, 3), dtype=np.int8)
+            array = (i + 1) * np.ones((100, 100, 3), dtype=np.uint8)
             image = Image(array)
             self.assertIsNotNone(image)
             self.imageList.append(image)
@@ -151,11 +151,11 @@ class TestImageCollectionMethods(env.DCCLabTestCase):
         self.assertTrue(self.collection.numberOfImages > 0)
 
     def testImageInCollectionInvalidImage(self):
-        invalidImage = np.ones((256, 257), dtype=np.int8)
+        invalidImage = np.ones((256, 257), dtype=np.uint8)
         self.assertFalse(self.collection.contains(invalidImage))
 
     def testImageNotInCollection(self):
-        arrayNotInCollection = np.ones((256, 257), dtype=np.int8)
+        arrayNotInCollection = np.ones((256, 257), dtype=np.uint8)
         arrayNotInCollection[0][0] = 0.00001
         imageNotInCollection = Image(arrayNotInCollection)
         self.assertFalse(self.collection.contains(imageNotInCollection))
@@ -165,12 +165,12 @@ class TestImageCollectionMethods(env.DCCLabTestCase):
         self.assertTrue(self.collection.contains(imageInCollection))
 
     def testGetIndexOfInvalidImage(self):
-        invalidImage = np.ones((256, 257), dtype=np.int8)
+        invalidImage = np.ones((256, 257), dtype=np.uint8)
         index = self.collection.indexOf(invalidImage)
         self.assertIsNone(index)
 
     def testindexOfNotInCollection(self):
-        arrayNotInCollection = np.ones((256, 257), dtype=np.int8)
+        arrayNotInCollection = np.ones((256, 257), dtype=np.uint8)
         arrayNotInCollection[0][0] = 0.00001
         imageNotInCollection = Image(arrayNotInCollection)
 
@@ -182,7 +182,7 @@ class TestImageCollectionMethods(env.DCCLabTestCase):
         self.assertEqual(self.collection.indexOf(anImage), 2)
 
     def testAddInvalidImage(self):
-        invalidImage = np.ones((256, 257), dtype=np.int8)
+        invalidImage = np.ones((256, 257), dtype=np.uint8)
         with self.assertRaises(NotImageException):
             self.collection.append(invalidImage)
 
@@ -192,7 +192,7 @@ class TestImageCollectionMethods(env.DCCLabTestCase):
             self.collection.append(existingImage)
 
     def testAddImageNotAlreadyIn(self):
-        newImage = Image(np.zeros((256, 257, 3), dtype=np.int8))
+        newImage = Image(np.zeros((256, 257, 3), dtype=np.uint8))
         self.assertIsNotNone(newImage)
         lastIndex = self.collection.numberOfImages - 1
         self.collection.append(newImage)
@@ -209,12 +209,12 @@ class TestImageCollectionMethods(env.DCCLabTestCase):
         self.assertTrue(imageToRemove == removedImage)
 
     def testRemoveImageWithInvalidImage(self):
-        invalidImage = np.ones((125, 12547), dtype=np.int8)
+        invalidImage = np.ones((125, 12547), dtype=np.uint8)
         with self.assertRaises(NotImageException):
             self.collection.remove(invalidImage)
 
     def testRemoveImageWithImageNotInCollection(self):
-        arrayNotInStack = np.ones((256, 257), dtype=np.int8)
+        arrayNotInStack = np.ones((256, 257), dtype=np.uint8)
         arrayNotInStack[0][0] = 0.00001
         imageNotInStack = Image(arrayNotInStack)
         with self.assertRaises(ImageNotInCollectionException):
@@ -231,7 +231,7 @@ class TestImageCollectionMethods(env.DCCLabTestCase):
 
     def testGetNumberOfImagesAddedImage(self):
         numberOfImages = len(self.imageList)
-        imageNotAlreadyIn = Image(np.zeros((256, 257), dtype=np.int8))
+        imageNotAlreadyIn = Image(np.zeros((256, 257), dtype=np.uint8))
         self.collection.append(imageNotAlreadyIn)
         self.assertEqual(self.collection.numberOfImages, numberOfImages + 1)
 
@@ -254,13 +254,13 @@ class TestImageCollectionMethods(env.DCCLabTestCase):
     #     self.assertEqual(nbOfImagesShown, 5)
 
     def testIndexingOutOfBound(self):
-        image = Image(np.ones((5, 5), dtype=np.int8))
+        image = Image(np.ones((5, 5), dtype=np.uint8))
         listOfImage = ImageCollection([image])
         with self.assertRaises(IndexError):
             listOfImage[2]
 
     def testIndexing(self):
-        image = Image(np.ones((5, 5), dtype=np.int8))
+        image = Image(np.ones((5, 5), dtype=np.uint8))
         listOfImage = ImageCollection([image])
         self.assertTrue(listOfImage[0] == image)
 
