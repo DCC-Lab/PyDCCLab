@@ -225,10 +225,10 @@ class Database:
                         pwd = None
 
                     actualMysqlHost = self.mysqlHost
-                    if self.sshHost == "cafeine2.crulrg.ulaval.ca" or self.sshHost == "cafeine3.crulrg.ulaval.ca":
+                    if self.sshHost is not None:
                         from dcclab import Cafeine
-                        self.server = Cafeine()
-                        self.port = self.server.startMySQLTunnel(remote_bind_address=self.mysqlHost)
+                        self.server = Cafeine(username=self.sshUser)
+                        self.port = self.server.startMySQLTunnel(ssh_host=self.sshHost, remote_bind_address=self.mysqlHost)
                         actualMysqlHost = "127.0.0.1"
                     else:
                         self.port = 3306
@@ -555,6 +555,8 @@ class MySQLDatabase:
                         serviceName = "mysql-{0}".format(self.mysqlHost)
 
                     pwd = keyring.get_password(serviceName, self.mysqlUser)
+                    if pwd is None and self.sshHost is not None:
+                        pwd = keyring.get_password("mysql-{0}".format(self.mysqlHost), self.mysqlUser)
                     if pwd is None:
                         raise Exception(""" Set the password in the system password manager on the command line with:
 {2} -m keyring set {0} {1}""".format(serviceName, self.mysqlUser, sys.executable))
@@ -562,10 +564,10 @@ class MySQLDatabase:
                     pwd = None
 
                 actualMysqlHost = self.mysqlHost
-                if self.sshHost == "cafeine2.crulrg.ulaval.ca" or self.sshHost == "cafeine3.crulrg.ulaval.ca":
+                if self.sshHost is not None:
                     from dcclab.utils import Cafeine
-                    self.server = Cafeine()
-                    self.port = self.server.startMySQLTunnel(remote_bind_address=self.mysqlHost)
+                    self.server = Cafeine(username=self.sshUser)
+                    self.port = self.server.startMySQLTunnel(ssh_host=self.sshHost, remote_bind_address=self.mysqlHost)
                     actualMysqlHost = "127.0.0.1"
 
                 self.connection = mysql.connect(host=actualMysqlHost,

@@ -29,7 +29,7 @@ class LabdataDB(MySQLDatabase):
 
 
     The database is on Cafeine3 and can be accessed with the dcclab username and normal password via a
-    secure shell, and then via mysql also with dcclab and the same password.
+    secure shell through cafeine2, and then via mysql also with dcclab and the same password.
     The database is called labdata, and the default value of the URL
     to access it is set to:
     mysql+ssh://dcclab@cafeine2.crulrg.ulaval.ca:cafeine3.crulrg.ulaval.ca/dcclab@labdata
@@ -37,18 +37,14 @@ class LabdataDB(MySQLDatabase):
     mysql://ssh_username@ssh_host:mysql_host/mysql_user@mysql_database
 
     You can provide your own link if you have a local version on your computer, such as:
-    db = LabdataDB("mysql://127.0.0.1/dcclab@labdata")
-
-    In the case of 127.0.0.1 (or localhost), it will not use ssh and will connnect
-    directly.
+    db = LabdataDB("mysql://127.0.0.1:3308/dcclab@labdata")
     """
     def __init__(self, databaseURL=None):
         """
         The Database is initialized to:
         mysql+ssh://dcclab@cafeine2.crulrg.ulaval.ca:cafeine3.crulrg.ulaval.ca/dcclab@labdata
 
-        which allows access from outside the CERVO Center.  The first time, you will have to provide the password for
-        dcclab on cafeine2.crulrg.ulaval.ca and on the MySQL server dcclab on cafeine3.crulrg.ulaval.ca
+        which creates an SSH tunnel through cafeine2 to reach the MySQL server on cafeine3.
         """
         if databaseURL is None:
             databaseURL = "mysql+ssh://dcclab@cafeine2.crulrg.ulaval.ca:cafeine3.crulrg.ulaval.ca/dcclab@labdata"

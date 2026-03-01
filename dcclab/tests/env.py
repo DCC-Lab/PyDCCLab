@@ -5,8 +5,11 @@ import unittest
 import tempfile
 from pathlib import Path
 
+# Force macOS Keychain backend to avoid gsheet_keyring errors in tests
+os.environ.setdefault('PYTHON_KEYRING_BACKEND', 'keyring.backends.macOS.Keyring')
 
-def isOnCERVONetwork(host="cafeine3.crulrg.ulaval.ca", port=22, timeout=1):
+
+def canAccessLabdata(host="cafeine2.crulrg.ulaval.ca", port=22, timeout=3):
     try:
         s = socket.create_connection((host, port), timeout=timeout)
         s.close()
@@ -16,7 +19,7 @@ def isOnCERVONetwork(host="cafeine3.crulrg.ulaval.ca", port=22, timeout=1):
 
 
 class DCCLabTestCase(unittest.TestCase):
-    moduleDir = Path(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))) 
+    moduleDir = Path(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
     tmpDir = Path(os.path.join(tempfile.gettempdir(), "testfiles"))
     testsDir = Path(os.path.dirname(os.path.abspath(__file__)))
     dataDir = Path(testsDir, 'testData')

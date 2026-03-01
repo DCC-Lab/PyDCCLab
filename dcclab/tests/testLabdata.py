@@ -5,7 +5,7 @@ import unittest
 import numpy as np
 
 
-@unittest.skipUnless(env.isOnCERVONetwork(), "Requires CERVO network (cafeine3 unreachable)")
+@unittest.skipUnless(env.canAccessLabdata(), "Requires access to cafeine2 for SSH tunnel")
 class TestLabdataDatabaseFunctionality(env.DCCLabTestCase):
     def setUp(self):
         self.db = SpectraDB()
@@ -42,10 +42,6 @@ class TestLabdataDatabaseFunctionality(env.DCCLabTestCase):
         else:
             self.skipTest("Not at CERVO: skipping local connections")
 
-    # def testConnectOnCafeine3ViaSSH(self):
-    #     db = LabdataDB("mysql+ssh://dcclab@cafeine3.crulrg.ulaval.ca:127.0.0.1/dcclab@labdata")
-    #     db.disconnect()
-
     def isAtCERVO(self, local_ip=None):
         import ipaddress
         if local_ip is None:
@@ -70,9 +66,6 @@ class TestLabdataDatabaseFunctionality(env.DCCLabTestCase):
         else:
             self.skipTest("Not at CERVO: skipping local connections")
 
-    def testConnectOnCafeine3ViaSSH(self):
-        db = LabdataDB("mysql+ssh://dcclab@cafeine2.crulrg.ulaval.ca:cafeine3.crulrg.ulaval.ca/dcclab@labdata")
-
     def testExecute(self):
         self.db.execute("show tables")
         rows = self.db.fetchAll()
@@ -86,7 +79,7 @@ class TestLabdataDatabaseFunctionality(env.DCCLabTestCase):
 
     def testDeniedCreateAnythingUsername_dcclab(self):
         with self.assertRaises(AccessDeniedError):
-            db = LabdataDB() # defaults to dcclab
+            db = LabdataDB()
             db.execute("CREATE TABLE test (testfield int)")
 
 
@@ -181,7 +174,7 @@ class TestLabdataDatabaseFunctionality(env.DCCLabTestCase):
     def testShowInfo(self):
         self.db.showDatabaseInfo()
 
-@unittest.skipUnless(env.isOnCERVONetwork(), "Requires CERVO network (cafeine3 unreachable)")
+@unittest.skipUnless(env.canAccessLabdata(), "Requires access to cafeine2 for SSH tunnel")
 class TestLabdataDatabaseContent(env.DCCLabTestCase):
     def setUp(self):
         self.db = SpectraDB()

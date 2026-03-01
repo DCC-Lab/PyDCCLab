@@ -241,7 +241,7 @@ class TestSqliteDatabase(env.DCCLabTestCase):
         self.assertFalse(database.isConnected)
 
 
-@unittest.skipUnless(env.isOnCERVONetwork(), "Requires CERVO network (cafeine3 unreachable)")
+@unittest.skipUnless(env.canAccessLabdata(), "Requires access to cafeine2 for SSH tunnel")
 class TestMySQLDatabase(env.DCCLabTestCase):
     def setUp(self):
         super().setUp()
