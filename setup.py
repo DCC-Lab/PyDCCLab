@@ -14,7 +14,7 @@ rm dist/*; python3 setup.py sdist; python3 -m twine upload dist/*
 
 setuptools.setup(
     name="dcclab",
-    version="1.1.3",
+    version="1.1.4",
     url="https://github.com/DCC-Lab/PyDCCLab",
     author="Daniel Côté, Gabriel Genest, Mathieu Fournier, Ludovick Bégin",
     author_email="dccote@cervo.ulaval.ca",
