@@ -558,7 +558,7 @@ class TestChannels(env.DCCLabTestCase):
         self.assertNotEqual(channel, channelCopy)
 
     def testApplyGaussianFilter(self):
-        array = np.sin(np.array([[i * np.pi / 100 for i in range(100)]] * 100))
+        array = np.random.rand(100, 100)
         sigma = np.random.randint(1, 6) * np.random.rand(1) + 0.0001
         channel = Channel(array)
         channelCopy = channel.copy()
