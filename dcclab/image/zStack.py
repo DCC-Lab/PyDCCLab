@@ -3,9 +3,7 @@ import numpy as np
 import json
 import inspect
 
-from matplotlib.widgets import RectangleSelector
 from collections import OrderedDict
-import PIL.Image as PILImage
 
 
 class ZStack(ImageCollection):
@@ -228,6 +226,9 @@ class ZStack(ImageCollection):
 
     def ask2DCropIndices(self, channelArray, axis=-1):
         # todo: move 2D / 3D crop logic to Channel / Image
+        import matplotlib.pyplot as plt
+        from matplotlib.widgets import RectangleSelector
+
         self.cropX = [0, channelArray.shape[axis+1]]
         self.cropY = [0, channelArray.shape[-axis]]
 
@@ -241,6 +242,8 @@ class ZStack(ImageCollection):
         plt.show()
 
     def __drawRectangleCallback(self, clickEvent, releaseEvent):
+        import matplotlib.pyplot as plt
+
         x1, y1 = clickEvent.xdata, clickEvent.ydata
         x2, y2 = releaseEvent.xdata, releaseEvent.ydata
 
@@ -252,11 +255,13 @@ class ZStack(ImageCollection):
         self.cropY = [int(y1), int(y2)]
 
     def show(self, channel: int, axis=-1):
+        import matplotlib.pyplot as plt
         stack4DArray = self.asChannelArray(channel)
         plt.imshow(stack4DArray.mean(axis))
         plt.show()
 
     def showAllStacks(self, channel: int=None, axis=-1):
+        import matplotlib.pyplot as plt
         if channel is None:
             raise NotImplementedError("Can only plot single channel stacks.")  # TODO
         stacksDict = self.channelStacksInMemory(channel)
@@ -285,6 +290,8 @@ class ZStack(ImageCollection):
 # notice that the folder contains one 2Dimage per channel per layer
 def getZStackFromFolder(inputDir, channelsToSegment=[0], crop=True):
     files = list(os.walk(inputDir))[0][2]
+
+    import PIL.Image as PILImage
 
     channelStacks = []
     for i, channel in enumerate(channelsToSegment):

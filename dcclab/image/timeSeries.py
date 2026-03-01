@@ -1,6 +1,5 @@
 from .imageCollection import *
 from dcclab.utils.pathPattern import *
-import cv2
 
 class TimeSeries(ImageCollection):
     def __init__(self, images:List['Image']=None, imagesArray:np.ndarray=None, pathPattern: str=None, keepOriginal: bool=True):
@@ -23,6 +22,7 @@ class TimeSeries(ImageCollection):
         return np.stack([ image.asArray() for image in self.images ], axis=3)
 
     def show(self, axis=-1):
+        import matplotlib.pyplot as plt
         stack4DArray = self.asArray()
         plt.imshow(stack4DArray.mean(axis))
         plt.show()
@@ -43,8 +43,9 @@ class TimeSeries(ImageCollection):
 
                 
     def saveAsAVI(self, path):
+        import cv2
         # Define the codec and create VideoWriter object
-        # fourcc = cv2.VideoWriter_fourcc(*'DIB ') 
+        # fourcc = cv2.VideoWriter_fourcc(*'DIB ')
         # use fourcc = 0 for uncompressed.
         out = cv2.VideoWriter(path, 0, 20.0, (self.width, self.height))
         for image in self.images:

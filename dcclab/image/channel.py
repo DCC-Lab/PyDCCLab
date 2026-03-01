@@ -5,15 +5,8 @@ from skimage import measure, morphology, feature, transform
 from scipy.ndimage import label, sum
 import scipy.ndimage as ndimage
 from dcclab.DCCExceptions import *
-import cv2 as cv
 
-import matplotlib.pyplot as plt
 import json
-
-try:
-    from deprecated import deprecated
-except:
-    exit("need 'deprecated' module: pip install deprecated")
 
 
 class Channel:
@@ -114,6 +107,7 @@ class Channel:
     """ Display-related functions """
 
     def display(self, colorMap=None):
+        import matplotlib.pyplot as plt
         plt.imshow(self.pixels.copy().T, cmap=colorMap)
         plt.show()
         return self
@@ -122,6 +116,7 @@ class Channel:
         pass
 
     def displayHistogram(self, normed: bool = False) -> typing.Tuple[np.ndarray, np.ndarray]:
+        import matplotlib.pyplot as plt
         histogram, bins = self.getHistogramValues(normed)
         plt.bar(bins[:-1], histogram, width=np.diff(bins), ec="k", align="edge", color="black", alpha=0.5)
         plt.show()
@@ -584,6 +579,7 @@ class Channel:
 
     def blobDetection(self, minStdDev: float = 1, maxStdDev: float = 50, threshold: float = 0.2,
                       overlap: float = 0.5) -> typing.Tuple["Channel", int]:
+        import cv2 as cv
         # Not good with low contrast image
         blobs = feature.blob_log(self.pixels, maxStdDev, minStdDev, threshold=threshold, overlap=overlap)
         blobsDetected = Channel(np.zeros((self.width, self.height)))
@@ -599,6 +595,7 @@ class Channel:
 
     def houghTransform(self, thresholdValue: int = 10, minLineLength: int = 50, maxLineGap: int = 10) -> typing.Tuple[
         "Channel", int]:
+        import cv2 as cv
         # Uses Probabilistic Hough Transform algorithm
         edges = self.getCannyEdgeDetection()
         lines = transform.probabilistic_hough_line(edges.pixels, thresholdValue, minLineLength, maxLineGap)
@@ -619,6 +616,7 @@ class Channel:
 
     @staticmethod
     def multiChannelDisplay(channels: list, colorMaps: list = None) -> list:
+        import matplotlib.pyplot as plt
         if colorMaps is not None and len(channels) != len(colorMaps) and len(colorMaps) != 1:
             raise ValueError(
                 "'channels' and 'colorMaps' must have the same length or 'colorMaps' must have a single element.")
@@ -751,6 +749,7 @@ class Channel:
         return powerSpectrum
 
     def displayPowerSpectrum(self, logScale: bool = True) -> np.ndarray:
+        import matplotlib.pyplot as plt
         powerSpectrum = self.powerSpectrum()
         cols, rows = powerSpectrum.shape
         if logScale:
@@ -766,6 +765,7 @@ class Channel:
         return ps1D
 
     def displayPowerSpectrumAzimuthalAverage(self, logBase: float = None) -> np.ndarray:
+        import matplotlib.pyplot as plt
         ps1D = self.powerSpectrumAzimuthalAverage()
         x = range(len(ps1D))
         plt.plot(x, ps1D)
@@ -782,6 +782,7 @@ class Channel:
         return returnValues
 
     def displayPowerSpectrumAngularAverage(self, logBase: float = None, useRadians: bool = False) -> np.ndarray:
+        import matplotlib.pyplot as plt
         psAngAvg, index = self.powerSpectrumAngularAverage(True)
         x = index
         label = "degrees"
@@ -818,6 +819,7 @@ class Channel:
         return angles
 
     def displayPhaseSpectrum(self, radians: bool = True) -> np.ndarray:
+        import matplotlib.pyplot as plt
         phaseSpectrum = self.phaseSpectrum(radians)
         rows, cols = phaseSpectrum.shape
         plt.imshow(phaseSpectrum, extent=(-cols // 2, cols // 2, -rows // 2, rows // 2))

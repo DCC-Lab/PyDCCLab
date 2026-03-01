@@ -101,6 +101,7 @@ class TestImageMap(env.DCCLabTestCase):
         i = np.ravel_multi_index((1, 1), (2, 2))
         self.assertEqual(i, 3)
 
+    @patch("matplotlib.pyplot.show", new=Mock())
     def testShow(self):
         myMap = ImageCollection(pathPattern=self.filePathPattern)
         myMap.showAllSequentially()
@@ -116,6 +117,7 @@ class TestImageMap(env.DCCLabTestCase):
         img = myMap[0,0]
         self.assertEqual(len(img.channels), 1)
 
+    @patch("matplotlib.pyplot.show", new=Mock())
     def testGaussianFilter(self):
         myMap = ImageCollection(pathPattern=self.filePathPattern)
         myMap.applyGaussianFilter(sigma=20)
@@ -133,6 +135,7 @@ class TestImageMap(env.DCCLabTestCase):
         myMap.applyGaussianFilter(sigma=20)
         self.assertTrue(myMap.hasOriginal)
 
+    @patch("matplotlib.pyplot.show", new=Mock())
     def testRestoreOriginal(self):
         myMap = ImageCollection(pathPattern=self.filePathPattern)
         myMap.applyGaussianFilter(sigma=20)

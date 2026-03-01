@@ -1,14 +1,10 @@
 import sqlite3 as lite
-import mysql.connector as mysql
-from mysql.connector.errors import Error as MySQLError
-from mysql.connector import errorcode as MySQLErrorCode
 import textwrap
 
 import urllib.parse as parse
 import pathlib
 import os
 from typing import NamedTuple
-import keyring
 import re
 import sys
 
@@ -63,7 +59,7 @@ cafeine2 server.
 
 class AccessDeniedError(Exception):
     def __init__(self, err):
-        self.mysqlError:MySQLError = err
+        self.mysqlError = err
         super().__init__("MySQL access error: the user cannot perform the requested action: {0}".format(err))
 
 
@@ -212,6 +208,9 @@ class Database:
                     self.connection.row_factory = lite.Row
                     self.cursor = self.connection.cursor()
                 else:
+                    import mysql.connector as mysql
+                    import keyring
+
                     if self.usePassword is True:
                         if self.sshHost is not None:
                             serviceName = "mysql-{0}-ssh-{1}".format(self.mysqlHost, self.sshHost)
@@ -331,18 +330,23 @@ class Database:
                 else:
                     self.cursor.execute(statement, bindings)
 
-            except MySQLError as err:
-                accessDeniedErrors = [MySQLErrorCode.ER_DB_ACCESS_DENIED,
-                                      MySQLErrorCode.ER_DBACCESS_DENIED_ERROR,
-                                      MySQLErrorCode.ER_ACCESS_DENIED_ERROR,
-                                      MySQLErrorCode.ER_TABLEACCESS_DENIED_ERROR,
-                                      MySQLErrorCode.ER_COLUMNACCESS_DENIED_ERROR]
-                if err.errno in accessDeniedErrors:
-                    raise AccessDeniedError(err)
+            except Exception as err:
+                from mysql.connector.errors import Error as MySQLError
+                from mysql.connector import errorcode as MySQLErrorCode
+                if isinstance(err, MySQLError):
+                    accessDeniedErrors = [MySQLErrorCode.ER_DB_ACCESS_DENIED,
+                                          MySQLErrorCode.ER_DBACCESS_DENIED_ERROR,
+                                          MySQLErrorCode.ER_ACCESS_DENIED_ERROR,
+                                          MySQLErrorCode.ER_TABLEACCESS_DENIED_ERROR,
+                                          MySQLErrorCode.ER_COLUMNACCESS_DENIED_ERROR]
+                    if err.errno in accessDeniedErrors:
+                        raise AccessDeniedError(err)
+                    else:
+                        raise(err)
+                elif isinstance(err, lite.ProgrammingError):
+                    print(err)
                 else:
-                    raise(err) # Nothing specific to say at this point
-            except lite.ProgrammingError as err:
-                print(err)
+                    raise(err)
 
     def executeSelectOne(self, statement, bindings=None):
         """
@@ -541,6 +545,9 @@ class MySQLDatabase:
     def connect(self):
         try:
             if not self.isConnected:
+                import mysql.connector as mysql
+                import keyring
+
                 if self.usePassword is True:
                     if self.sshHost is not None:
                         serviceName = "mysql-{0}-ssh-{1}".format(self.mysqlHost, self.sshHost)
@@ -636,16 +643,21 @@ class MySQLDatabase:
                 else:
                     self.cursor.execute(statement, bindings)
 
-            except MySQLError as err:
-                accessDeniedErrors = [MySQLErrorCode.ER_DB_ACCESS_DENIED,
-                                      MySQLErrorCode.ER_DBACCESS_DENIED_ERROR,
-                                      MySQLErrorCode.ER_ACCESS_DENIED_ERROR,
-                                      MySQLErrorCode.ER_TABLEACCESS_DENIED_ERROR,
-                                      MySQLErrorCode.ER_COLUMNACCESS_DENIED_ERROR]
-                if err.errno in accessDeniedErrors:
-                    raise AccessDeniedError(err)
+            except Exception as err:
+                from mysql.connector.errors import Error as MySQLError
+                from mysql.connector import errorcode as MySQLErrorCode
+                if isinstance(err, MySQLError):
+                    accessDeniedErrors = [MySQLErrorCode.ER_DB_ACCESS_DENIED,
+                                          MySQLErrorCode.ER_DBACCESS_DENIED_ERROR,
+                                          MySQLErrorCode.ER_ACCESS_DENIED_ERROR,
+                                          MySQLErrorCode.ER_TABLEACCESS_DENIED_ERROR,
+                                          MySQLErrorCode.ER_COLUMNACCESS_DENIED_ERROR]
+                    if err.errno in accessDeniedErrors:
+                        raise AccessDeniedError(err)
+                    else:
+                        raise(err)
                 else:
-                    raise(err) # Nothing specific to say at this point
+                    raise(err)
 
     def executeSelectOne(self, statement, bindings=None):
         """

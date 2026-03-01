@@ -2,7 +2,6 @@ from .image import *
 from .image import Image
 from dcclab.utils.pathPattern import *
 import numpy as np
-import matplotlib.pyplot as plt
 from typing import List, Union
 import sys
 from enum import Enum
@@ -283,6 +282,7 @@ class ImageCollection:
             image.display()
 
     def showAllOnGrid(self, showInGray: bool = True) -> int:
+        import matplotlib.pyplot as plt
         colorMap = "gray" if showInGray else None
         imagesShown = 0
         fig = plt.figure()

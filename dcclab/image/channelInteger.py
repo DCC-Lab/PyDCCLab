@@ -1,6 +1,5 @@
 from skimage.filters.rank import entropy
 from .channel import *
-import cv2 as cv
 import warnings
 
 
@@ -130,12 +129,14 @@ class ChannelInt(Channel):
         return Channel(threshArray.astype(np.uint8))
 
     def getAdaptiveThresholdMean(self, oddRegionSize: int = 3) -> Channel:
+        import cv2 as cv
         threshArray = cv.adaptiveThreshold(self.convertTo8BitsUnsignedInteger().pixels, 1, cv.ADAPTIVE_THRESH_MEAN_C,
                                            cv.THRESH_BINARY,
                                            oddRegionSize, 0)
         return Channel(threshArray.astype(np.uint8))
 
     def getAdaptiveThresholdGaussian(self, oddRegionSize: int = 3) -> Channel:
+        import cv2 as cv
         threshArray = cv.adaptiveThreshold(self.convertTo8BitsUnsignedInteger().pixels, 1,
                                            cv.ADAPTIVE_THRESH_GAUSSIAN_C,
                                            cv.THRESH_BINARY, oddRegionSize, 0)

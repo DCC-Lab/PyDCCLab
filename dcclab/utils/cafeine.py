@@ -1,6 +1,4 @@
-from sshtunnel import SSHTunnelForwarder
 import time
-import keyring
 from contextlib import redirect_stderr
 import sys
 
@@ -8,7 +6,10 @@ class Cafeine:
     def __init__(self, username='dcclab'):
         self.mysqlTunnel = None
 
-    def startMySQLTunnel(self, remote_bind_address="127.0.0.1"):    
+    def startMySQLTunnel(self, remote_bind_address="127.0.0.1"):
+        from sshtunnel import SSHTunnelForwarder
+        import keyring
+
         password = keyring.get_password("cafeine2-ssh", "dcclab")
 
         if password is None:
