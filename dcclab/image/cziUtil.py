@@ -1,7 +1,4 @@
-import czifile
 import numpy as np
-import matplotlib.pyplot as plt
-import tifffile
 import time
 import xml.etree.ElementTree as ET
 import os
@@ -41,6 +38,7 @@ def readCziImage(filename):
     :return: CziFile object (from czifile package). The file must be closed at the end of the process.
     See close() function below.
     """
+    import czifile
     czi = czifile.CziFile(filename)
     return czi
 
@@ -96,6 +94,7 @@ def decodeCZIFile(cziObj, showProgress=False):
     if showProgress:
         print("Reading the pixels value of {} tile{}. This may take a few minutes.".format(maxSize,
                                                                                            "s" if maxSize > 1 else ""))
+    import tifffile
     out = tifffile.create_output(None, cziObj.shape, cziObj.dtype)
     returnList = []
 
@@ -129,6 +128,7 @@ def showImagesFromCziFileObject(cziObject):
     :param cziObject: CziFile object
     :return: Numpy array of matplotlib.image.AxesImage (each of the matplotlib.image.AxesImage of the initial image)
     """
+    import matplotlib.pyplot as plt
     subblocksIters = cziObject.subblocks()
     imagesReturn = []
     for iterator in subblocksIters:
@@ -164,6 +164,7 @@ def saveImagesToTIFF(imageArray, filename=None):
     :param filename: The file name to save the new tiff image. If None (default), a default name is given.
     :return: bool. True if the image is saved, False if nothing is done.
     """
+    import tifffile
     isSaved = False
     if len(imageArray) != 0:
         isSaved = True

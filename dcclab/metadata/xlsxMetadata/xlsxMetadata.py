@@ -1,4 +1,3 @@
-import xlrd
 import os
 
 
@@ -14,7 +13,8 @@ class XLSXMetadata:
         file = os.path.basename(self.path)
         return os.path.splitext(file)[0]
 
-    def getWorkbook(self) -> xlrd.book:
+    def getWorkbook(self):
+        import xlrd
         try:
             return xlrd.open_workbook(self.path)
         except:

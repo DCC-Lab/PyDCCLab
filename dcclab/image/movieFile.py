@@ -1,7 +1,6 @@
 from .imageFile import *
 from dcclab.utils.pathPattern import *
 import os
-import cv2
 import re
 
 class MovieFile(ImageFile):
@@ -22,6 +21,7 @@ class MovieFile(ImageFile):
 
     @property
     def isUsingOpenCV(self):
+        import cv2
         return isinstance(self.movieHandle, cv2.VideoCapture)
 
     @property
@@ -60,6 +60,7 @@ class MovieFile(ImageFile):
         return self.cachedData
 
     def beginReading(self):
+        import cv2
         self.cachedData = None
         if PathPattern(self.path).extension == 'raw':
             if self.rawFormat is None:
@@ -154,6 +155,7 @@ class MovieFile(ImageFile):
             self.movieHandle.close()
 
     def beginWriting(self, path, frameData):
+        import cv2
         if self.frameRate is None:
             raise ValueError("No frame rate determined. You must set frameRate")
 

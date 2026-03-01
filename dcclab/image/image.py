@@ -2,8 +2,6 @@ from .imageFile import *
 from .channel import Channel
 from dcclab.DCCExceptions import *
 import numpy as np
-import PIL.Image
-import matplotlib.pyplot as plt
 import os
 from typing import List, Union
 
@@ -105,6 +103,7 @@ class Image:
             channel.replaceFromArray(imageArray[:, :, i])
 
     def save(self, filePath):
+        import PIL.Image
         imageAsArray = self.asArray()
 
         if len(self.channels) == 1:
@@ -119,6 +118,7 @@ class Image:
         if self.shape[-1] not in [1, 3]:
             Channel.multiChannelDisplay(self.channels)
         else:
+            import matplotlib.pyplot as plt
             plt.imshow(self.asArray().squeeze().swapaxes(0, 1), cmap=colorMap)
             plt.show()
 

@@ -24,10 +24,10 @@ setuptools.setup(
     license='MIT',
     keywords='image analysis stack movies',
     packages=setuptools.find_packages(),
-    install_requires=['keyring', 'gsheet-keyring', 'sshtunnel', 'mysql-connector-python',
-                      'requests', 'matplotlib','numpy','scikit-image','scipy',
+    install_requires=['keyring', 'sshtunnel', 'mysql-connector-python',
+                      'matplotlib','numpy','scikit-image','scipy',
                       'czifile >= 2019.6.18','tifffile','read-lif','tables','xlwt',
-                      'xlrd','seaborn','imagecodecs','deprecated'],
+                      'xlrd','Pillow','pandas','scikit-learn','opencv-python'],
     python_requires='>=3',
     package_data={
         # If any package contains *.txt or *.rst files, include them:

@@ -4,10 +4,6 @@ from .xlsxMetadata import PDKXLSXMetadata
 from .sciMetadata import sciMetadata
 import os
 import re
-try:
-    import deprecated
-except:
-    exit("pip install deprecated")
 
 
 class Metadata:

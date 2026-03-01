@@ -1,7 +1,5 @@
 from .cziUtil import *
 from .channel import *
-import scipy.io as sio
-import PIL
 
 class ImageFile(object):
     supportedFormats = []
@@ -96,6 +94,7 @@ class TIFFFile(ImageFile):
 
     def imageDataFromPath(self) -> np.ndarray:
         # todo better method that return every image if multipage
+        import tifffile
         tiffFileObject = tifffile.TiffFile(self.path)
         imageAsArray = tiffFileObject.asarray().astype(dtype="float32")
         self.__metadata = tiffFileObject.ome_metadata
@@ -113,6 +112,7 @@ class PILFile(ImageFile):
         ImageFile.__init__(self, path)
 
     def imageDataFromPath(self) -> np.ndarray:
+        import PIL.Image
         image = PIL.Image.open(self.path)
         imageAsArray = np.array(image)
         return imageAsArray
@@ -127,6 +127,7 @@ class MATLABFile(ImageFile):
         self.variable = variable
 
     def imageDataFromPath(self) -> np.ndarray:
+        import scipy.io as sio
         dataset = sio.loadmat(self.path)
         if self.variable is not None:
             array = dataset[self.variable]
