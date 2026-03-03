@@ -246,7 +246,7 @@ class TestMySQLDatabase(env.DCCLabTestCase):
     def setUp(self):
         super().setUp()
 
-        self.db = MySQLDatabase("mysql+ssh://dcclab@cafeine2.crulrg.ulaval.ca:cafeine3.crulrg.ulaval.ca/dcclab@labdata")
+        self.db = MySQLDatabase("mysql+ssh://dcclab@cafeine2.crulrg.ulaval.ca/dcclab@cafeine3.crulrg.ulaval.ca/labdata")
 
         self.assertIsNotNone(self.db)
         self.db.connect()

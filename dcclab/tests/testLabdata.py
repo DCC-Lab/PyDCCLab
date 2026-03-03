@@ -28,17 +28,17 @@ class TestLabdataDatabaseFunctionality(env.DCCLabTestCase):
 
     def testConnectDBBadHost(self):
         with self.assertRaises(Exception):
-            db = LabdataDB("mysql://somehost")
+            db = LabdataDB("mysql://user@somehost/db")
             db.disconnect()
 
     # def testConnectDBGoodHost(self):
-    #     db = LabdataDB("mysql://127.0.0.1/root@labdata")
+    #     db = LabdataDB("mysql://root@127.0.0.1/labdata")
     #     db.disconnect()
 
     def testLocalConnectOnCafeine2(self):
         if self.isAtCERVO():
             with self.assertRaises(Exception):  # access denied, only localhost as of May 17th
-                db = LabdataDB("mysql://cafeine3.crulrg.ulaval.ca/dcclab@labdata")
+                db = LabdataDB("mysql://dcclab@cafeine3.crulrg.ulaval.ca/labdata")
         else:
             self.skipTest("Not at CERVO: skipping local connections")
 
@@ -62,7 +62,7 @@ class TestLabdataDatabaseFunctionality(env.DCCLabTestCase):
 
     def testLocalConnectOnCafeine3(self):
         if self.isAtCERVO():
-            db = LabdataDB("mysql://cafeine3.crulrg.ulaval.ca/dcclab@labdata")
+            db = LabdataDB("mysql://dcclab@cafeine3.crulrg.ulaval.ca/labdata")
         else:
             self.skipTest("Not at CERVO: skipping local connections")
 
@@ -283,7 +283,7 @@ class TestLabdataDatabaseContent(env.DCCLabTestCase):
 
 # class TestMySQLDatabase(env.DCCLabTestCase):
 #     def testLocalMySQLDatabase(self):
-#         db = Database("mysql://127.0.0.1/root@raman")
+#         db = Database("mysql://root@127.0.0.1/raman")
 #         db.execute("select * from spectra where datatype = 'raw'")
 #
 #         rows = []

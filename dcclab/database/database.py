@@ -97,10 +97,11 @@ class Database:
 
         self.database = None
         self.port = None
+        self.mysqlPassword = None
         self.usePassword = usePassword
         self.server = None
 
-        self.databaseEngine, self.sshUser, self.sshHost, self.mysqlHost, self.port, self.mysqlUser, self.database = self.parseURL(databaseURL)
+        self.databaseEngine, self.sshUser, self.sshHost, self.mysqlHost, self.port, self.mysqlUser, self.mysqlPassword, self.database = self.parseURL(databaseURL)
 
         self.connect()
 
@@ -148,41 +149,44 @@ class Database:
             print("\n\n")
 
     def parseURL(self, url):
-        #mysql://sshusername@cafeine2.crulrg.ulaval.ca/mysqlusername:mysqlpassword@questions
-        match = re.search("mysql://([^@]+?):([^@]+?)/(.*?)@(.+)", url)
-        if match is not None:
-            engine = Engine.mysql
-            sshUser = None
-            sshHost = None
-            mysqlHost = match.group(1)
-            mysqlPort = match.group(2)
-            mysqluser = match.group(3)
-            database = match.group(4)
-            return (engine, sshUser, sshHost, mysqlHost, mysqlPort, mysqluser, database)
+        # Standard URL formats:
+        #   mysql://user[:password]@host[:port]/database
+        #   mysql+ssh://sshuser@sshhost/mysqluser[:password]@mysqlhost[:port]/database
+        #   sqlite3://path or file://path
+        parsed = parse.urlparse(url)
 
-        match = re.search("mysql.ssh://(.+?)@([^@]+?):([^@]+?)/(.*?)@(.+)", url)
-        if match is not None:
+        if parsed.scheme == 'mysql':
             engine = Engine.mysql
-            sshUser = match.group(1)
-            sshHost = match.group(2)
+            mysqlUser = parsed.username
+            mysqlPassword = parsed.password
+            mysqlHost = parsed.hostname
+            mysqlPort = parsed.port or 3306
+            database = parsed.path.lstrip('/')
+            if not mysqlUser or not mysqlHost or not database:
+                raise ValueError("Incomplete mysql URL: {0}. Use mysql://user@host[:port]/database".format(url))
+            return (engine, None, None, mysqlHost, mysqlPort, mysqlUser, mysqlPassword, database)
+
+        if parsed.scheme == 'mysql+ssh':
+            engine = Engine.mysql
+            sshUser = parsed.username
+            sshHost = parsed.hostname
+            # Path contains: /mysqluser[:password]@mysqlhost[:port]/database
+            match = re.match(r'^/([^:@]+)(?::([^@]*))?@([^:/]+)(?::(\d+))?/(.+)$', parsed.path)
+            if match is None:
+                raise ValueError("Incomplete mysql+ssh URL: {0}. Use mysql+ssh://sshuser@sshhost/mysqluser@mysqlhost/database".format(url))
+            mysqlUser = match.group(1)
+            mysqlPassword = match.group(2)
             mysqlHost = match.group(3)
-            mysqlPort = 3306
-            mysqlUser = match.group(4)
+            mysqlPort = int(match.group(4)) if match.group(4) else 3306
             database = match.group(5)
-            return (engine, sshUser, sshHost, mysqlHost, mysqlPort, mysqlUser, database)
+            return (engine, sshUser, sshHost, mysqlHost, mysqlPort, mysqlUser, mysqlPassword, database)
 
-        match = re.search(r"(sqlite\d?|file)://(.*?)", url)
-        if match is not None:
+        if parsed.scheme in ('sqlite3', 'sqlite', 'file'):
             engine = Engine.sqlite3
-            sshUser = None
-            sshHost = None
-            mysqlHost = "127.0.0.1"
-            mysqlPort = 3306
-            mysqlUser = None
-            database = match.group(2)
-            return (engine, sshUser, sshHost, mysqlHost, mysqlPort, mysqlUser, database)
+            database = url.split('://', 1)[1]
+            return (engine, None, None, "127.0.0.1", 3306, None, None, database)
 
-        raise ValueError("Unrecognized or incomplete URL: {0}. Use mysql://host/mysqlusername@questions, mysql+ssh://sshusername@sshhost:mysql_host/mysqlusername@questions, or simply sqlite://filename".format(url))
+        raise ValueError("Unrecognized URL scheme '{0}' in: {1}. Use mysql://user@host[:port]/database, mysql+ssh://sshuser@sshhost/mysqluser@mysqlhost/database, or sqlite3://path".format(parsed.scheme, url))
 
     def __enter__(self):
         return self
@@ -209,9 +213,12 @@ class Database:
                     self.cursor = self.connection.cursor()
                 else:
                     import mysql.connector as mysql
-                    import keyring
 
-                    if self.usePassword is True:
+                    if self.mysqlPassword is not None:
+                        pwd = self.mysqlPassword
+                    elif self.usePassword is True:
+                        import keyring
+
                         if self.sshHost is not None:
                             serviceName = "mysql-{0}-ssh-{1}".format(self.mysqlHost, self.sshHost)
                         else:
@@ -220,7 +227,8 @@ class Database:
                         pwd = keyring.get_password(serviceName, self.mysqlUser)
                         if pwd is None:
                             raise Exception(""" Set the password in the system password manager on the command line with:
-{2} -m keyring set {0} {1}""".format(serviceName, self.mysqlUser, sys.executable))
+{2} -m keyring set {0} {1}
+Or provide the password in the URL: mysql://user:password@host/database""".format(serviceName, self.mysqlUser, sys.executable))
                     else:
                         pwd = None
 
@@ -230,8 +238,6 @@ class Database:
                         self.server = Cafeine(username=self.sshUser)
                         self.port = self.server.startMySQLTunnel(ssh_host=self.sshHost, remote_bind_address=self.mysqlHost)
                         actualMysqlHost = "127.0.0.1"
-                    else:
-                        self.port = 3306
 
                     self.connection = mysql.connect(host=actualMysqlHost,
                                                     port=self.port,
@@ -478,10 +484,11 @@ class MySQLDatabase:
 
         self.database = None
         self.port = None
+        self.mysqlPassword = None
         self.usePassword = usePassword
         self.server = None
 
-        self.databaseEngine, self.sshUser, self.sshHost, self.mysqlHost, self.port, self.mysqlUser, self.database = self.parseURL(databaseURL)
+        self.databaseEngine, self.sshUser, self.sshHost, self.mysqlHost, self.port, self.mysqlUser, self.mysqlPassword, self.database = self.parseURL(databaseURL)
 
         self.connect()
 
@@ -489,51 +496,38 @@ class MySQLDatabase:
         pass
 
     def parseURL(self, url):
-        match = re.search("mysql://([^@]+?):([^@]+?)/(.*?)@(.+)", url)
-        if match is not None:
-            engine = Engine.mysql
-            sshUser = None
-            sshHost = None
-            mysqlHost = match.group(1)
-            mysqlPort = match.group(2)
-            mysqluser = match.group(3)
-            database = match.group(4)
-            return (engine, sshUser, sshHost, mysqlHost, mysqlPort, mysqluser, database)
+        # Standard URL formats:
+        #   mysql://user[:password]@host[:port]/database
+        #   mysql+ssh://sshuser@sshhost/mysqluser[:password]@mysqlhost[:port]/database
+        parsed = parse.urlparse(url)
 
-        match = re.search("mysql.ssh://(.+?)@([^@]+?):([^@]+?)/(.*?)@(.+)", url)
-        if match is not None:
+        if parsed.scheme == 'mysql':
             engine = Engine.mysql
+            mysqlUser = parsed.username
+            mysqlPassword = parsed.password
+            mysqlHost = parsed.hostname
+            mysqlPort = parsed.port or 3306
+            database = parsed.path.lstrip('/')
+            if not mysqlUser or not mysqlHost or not database:
+                raise ValueError("Incomplete mysql URL: {0}. Use mysql://user@host[:port]/database".format(url))
+            return (engine, None, None, mysqlHost, mysqlPort, mysqlUser, mysqlPassword, database)
 
-            sshUser = match.group(1)
-            sshHost = match.group(2)
+        if parsed.scheme == 'mysql+ssh':
+            engine = Engine.mysql
+            sshUser = parsed.username
+            sshHost = parsed.hostname
+            # Path contains: /mysqluser[:password]@mysqlhost[:port]/database
+            match = re.match(r'^/([^:@]+)(?::([^@]*))?@([^:/]+)(?::(\d+))?/(.+)$', parsed.path)
+            if match is None:
+                raise ValueError("Incomplete mysql+ssh URL: {0}. Use mysql+ssh://sshuser@sshhost/mysqluser@mysqlhost/database".format(url))
+            mysqlUser = match.group(1)
+            mysqlPassword = match.group(2)
             mysqlHost = match.group(3)
-            mysqlPort = 3306
-            mysqlUser = match.group(4)
+            mysqlPort = int(match.group(4)) if match.group(4) else 3306
             database = match.group(5)
-            return (engine, sshUser, sshHost, mysqlHost, mysqlPort, mysqlUser, database)
+            return (engine, sshUser, sshHost, mysqlHost, mysqlPort, mysqlUser, mysqlPassword, database)
 
-        # #mysql://sshusername@cafeine2.crulrg.ulaval.ca/mysqlusername:mysqlpassword@questions
-        # match = re.search("mysql://([^@]+?)/(.*?)@(.+)", url)
-        # if match is not None:
-        #     engine = Engine.mysql
-        #     sshUser = None
-        #     sshHost = None
-        #     mysqlHost = match.group(1)
-        #     mysqluser = match.group(2)
-        #     database = match.group(3)
-        #     return (engine, sshUser, sshHost, mysqlHost, mysqluser, database)
-
-        # match = re.search("mysql.ssh://(.+?)@([^@]+?):([^@]+?)/(.*?)@(.+)", url)
-        # if match is not None:
-        #     engine = Engine.mysql
-        #     sshUser = match.group(1)
-        #     sshHost = match.group(2)
-        #     mysqlHost = match.group(3)
-        #     mysqlUser = match.group(4)
-        #     database = match.group(5)
-        #     return (engine, sshUser, sshHost, mysqlHost, mysqlUser, database)
-
-        raise ValueError("Unrecognized or incomplete URL: {0}. Use mysql://host/mysqlusername@questions, mysql+ssh://sshusername@sshhost:mysql_host/mysqlusername@questions, or simply sqlite://filename".format(url))
+        raise ValueError("Unrecognized URL scheme '{0}' in: {1}. Use mysql://user@host[:port]/database or mysql+ssh://sshuser@sshhost/mysqluser@mysqlhost/database".format(parsed.scheme, url))
 
     def __enter__(self):
         return self
@@ -546,9 +540,12 @@ class MySQLDatabase:
         try:
             if not self.isConnected:
                 import mysql.connector as mysql
-                import keyring
 
-                if self.usePassword is True:
+                if self.mysqlPassword is not None:
+                    pwd = self.mysqlPassword
+                elif self.usePassword is True:
+                    import keyring
+
                     if self.sshHost is not None:
                         serviceName = "mysql-{0}-ssh-{1}".format(self.mysqlHost, self.sshHost)
                     else:
@@ -559,7 +556,8 @@ class MySQLDatabase:
                         pwd = keyring.get_password("mysql-{0}".format(self.mysqlHost), self.mysqlUser)
                     if pwd is None:
                         raise Exception(""" Set the password in the system password manager on the command line with:
-{2} -m keyring set {0} {1}""".format(serviceName, self.mysqlUser, sys.executable))
+{2} -m keyring set {0} {1}
+Or provide the password in the URL: mysql://user:password@host/database""".format(serviceName, self.mysqlUser, sys.executable))
                 else:
                     pwd = None
 
@@ -777,7 +775,7 @@ class MySQLDatabase:
 
 if __name__ == "__main__":
     sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
-    db = Database("mysql+ssh://dcclab@cafeine3.crulrg.ulaval.ca/dcclab@labdata")
+    db = Database("mysql+ssh://dcclab@cafeine3.crulrg.ulaval.ca/dcclab@cafeine3.crulrg.ulaval.ca/labdata")
     db.execute('select * from files')
     print(db.fetchAll())
     # db = Database("/Users/dccote/GitHub/PyVino/raman.db")
