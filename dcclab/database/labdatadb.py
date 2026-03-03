@@ -32,22 +32,22 @@ class LabdataDB(MySQLDatabase):
     secure shell through cafeine2, and then via mysql also with dcclab and the same password.
     The database is called labdata, and the default value of the URL
     to access it is set to:
-    mysql+ssh://dcclab@cafeine2.crulrg.ulaval.ca:cafeine3.crulrg.ulaval.ca/dcclab@labdata
+    mysql+ssh://dcclab@cafeine2.crulrg.ulaval.ca/dcclab@cafeine3.crulrg.ulaval.ca/labdata
     which can be interpreted as:
-    mysql://ssh_username@ssh_host:mysql_host/mysql_user@mysql_database
+    mysql+ssh://ssh_user@ssh_host/mysql_user@mysql_host/database
 
     You can provide your own link if you have a local version on your computer, such as:
-    db = LabdataDB("mysql://127.0.0.1:3308/dcclab@labdata")
+    db = LabdataDB("mysql://dcclab@127.0.0.1:3308/labdata")
     """
     def __init__(self, databaseURL=None):
         """
         The Database is initialized to:
-        mysql+ssh://dcclab@cafeine2.crulrg.ulaval.ca:cafeine3.crulrg.ulaval.ca/dcclab@labdata
+        mysql+ssh://dcclab@cafeine2.crulrg.ulaval.ca/dcclab@cafeine3.crulrg.ulaval.ca/labdata
 
         which creates an SSH tunnel through cafeine2 to reach the MySQL server on cafeine3.
         """
         if databaseURL is None:
-            databaseURL = "mysql+ssh://dcclab@cafeine2.crulrg.ulaval.ca:cafeine3.crulrg.ulaval.ca/dcclab@labdata"
+            databaseURL = "mysql+ssh://dcclab@cafeine2.crulrg.ulaval.ca/dcclab@cafeine3.crulrg.ulaval.ca/labdata"
 
         self.constraints = []
         super().__init__(databaseURL)
