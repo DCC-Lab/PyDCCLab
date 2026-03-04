@@ -336,6 +336,10 @@ Or provide the password in the URL: mysql://user:password@host/database""".forma
                 else:
                     self.cursor.execute(statement, bindings)
 
+                if hasattr(self.cursor, 'statement'):
+                    return self.cursor.statement
+                return statement
+
             except Exception as err:
                 from mysql.connector.errors import Error as MySQLError
                 from mysql.connector import errorcode as MySQLErrorCode
@@ -353,6 +357,8 @@ Or provide the password in the URL: mysql://user:password@host/database""".forma
                     print(err)
                 else:
                     raise(err)
+
+        return None
 
     def executeSelectOne(self, statement, bindings=None):
         """
@@ -643,6 +649,10 @@ Or provide the password in the URL: mysql://user:password@host/database""".forma
                 else:
                     self.cursor.execute(statement, bindings)
 
+                if hasattr(self.cursor, 'statement'):
+                    return self.cursor.statement
+                return statement
+
             except Exception as err:
                 from mysql.connector.errors import Error as MySQLError
                 from mysql.connector import errorcode as MySQLErrorCode
@@ -658,6 +668,8 @@ Or provide the password in the URL: mysql://user:password@host/database""".forma
                         raise(err)
                 else:
                     raise(err)
+
+        return None
 
     def executeSelectOne(self, statement, bindings=None):
         """
