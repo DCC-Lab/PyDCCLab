@@ -29,6 +29,7 @@ classifiers = [
 ]
 dependencies = [
     "keyring",
+    "keyrings.alt",
     "mysql-connector-python",
     "matplotlib",
     "numpy",
