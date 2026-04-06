@@ -1,6 +1,6 @@
 import env
 from dcclab import Database as db
-from dcclab import Database, Engine, MySQLDatabase
+from dcclab import Database, Engine, MySQLDatabase, PostgresqlDatabase
 import unittest
 import os
 import socket
@@ -539,6 +539,190 @@ class TestLocalMySQLWithMySQLDatabase(env.DCCLabTestCase):
     def testDisableForeignKeys(self):
         self.db.disableForeignKeys()
         self.assertEqual(self.db.areForeignKeysEnforced(), 0)
+
+
+def isLocalPostgresRunning():
+    try:
+        s = socket.create_connection(("127.0.0.1", 5432), timeout=2)
+        s.close()
+        return True
+    except (socket.timeout, socket.error, OSError):
+        return False
+
+
+def canAccessLocalPostgres():
+    try:
+        import psycopg2
+        conn = psycopg2.connect(host="127.0.0.1", user="test", password="test", dbname="test")
+        conn.close()
+        return True
+    except Exception:
+        return False
+
+
+class TestLocalPostgresPrerequisites(env.DCCLabTestCase):
+    def testLocalPostgresIsRunning(self):
+        if not isLocalPostgresRunning():
+            self.fail(
+                "PostgreSQL is not running on 127.0.0.1:5432.\n"
+                "Start it with one of:\n\n"
+                "  brew services start postgresql       # macOS with Homebrew\n"
+                "  sudo systemctl start postgresql      # Linux with systemd\n"
+            )
+
+    def testLocalPostgresTestUserIsAvailable(self):
+        if not isLocalPostgresRunning():
+            self.skipTest("PostgreSQL is not running")
+        if not canAccessLocalPostgres():
+            self.fail(
+                "Cannot connect to local PostgreSQL as user 'test'.\n"
+                "An administrator must run the following commands to set up the test environment:\n\n"
+                "  sudo -u postgres psql -c \"\n"
+                "    CREATE USER test WITH PASSWORD 'test';\n"
+                "    CREATE DATABASE test OWNER test;\n"
+                "  \"\n"
+            )
+
+
+@unittest.skipUnless(canAccessLocalPostgres(), "Requires local PostgreSQL at 127.0.0.1")
+class TestLocalPostgresWithPostgresqlDatabase(env.DCCLabTestCase):
+    localURL = "postgresql://test:test@127.0.0.1/test"
+    tableName = "test_local_pgdb"
+
+    def setUp(self):
+        super().setUp()
+        self.db = PostgresqlDatabase(self.localURL)
+        self.db.execute(f'CREATE TABLE IF NOT EXISTS {self.tableName} (id INT PRIMARY KEY, name VARCHAR(100), value DOUBLE PRECISION)')
+        self.db.execute(f"DELETE FROM {self.tableName}")
+        self.db.execute(f"INSERT INTO {self.tableName} (id, name, value) VALUES (1, 'alpha', 1.5)")
+        self.db.execute(f"INSERT INTO {self.tableName} (id, name, value) VALUES (2, 'beta', 2.5)")
+        self.db.commit()
+
+    def tearDown(self):
+        if self.db.isConnected:
+            self.db.execute(f"DELETE FROM {self.tableName}")
+            self.db.commit()
+            self.db.disconnect()
+        super().tearDown()
+
+    def testIsConnected(self):
+        self.assertTrue(self.db.isConnected)
+
+    def testDisconnect(self):
+        self.db.disconnect()
+        self.assertFalse(self.db.isConnected)
+        self.assertIsNone(self.db.cursor)
+
+    def testContextManager(self):
+        with PostgresqlDatabase(self.localURL) as db2:
+            self.assertTrue(db2.isConnected)
+        self.assertFalse(db2.isConnected)
+
+    def testTables(self):
+        tables = self.db.tables
+        self.assertIn(self.tableName, tables)
+
+    def testSelect(self):
+        rows = self.db.select(self.tableName)
+        self.assertEqual(len(rows), 2)
+
+    def testSelectWithCondition(self):
+        rows = self.db.select(self.tableName, 'name', 'id=1')
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]['name'], 'alpha')
+
+    def testFetchAll(self):
+        self.db.execute(f"SELECT * FROM {self.tableName}")
+        rows = self.db.fetchAll()
+        self.assertEqual(len(rows), 2)
+
+    def testFetchOne(self):
+        self.db.execute(f"SELECT * FROM {self.tableName} ORDER BY id")
+        row = self.db.fetchOne()
+        self.assertEqual(row['id'], 1)
+        row = self.db.fetchOne()
+        self.assertEqual(row['id'], 2)
+        row = self.db.fetchOne()
+        self.assertIsNone(row)
+
+    def testExecuteSelectOne(self):
+        result = self.db.executeSelectOne(f"SELECT name FROM {self.tableName} WHERE id=1")
+        self.assertEqual(result, 'alpha')
+
+    def testExecuteSelectFetchInt(self):
+        result = self.db.executeSelectFetchInt(f"SELECT COUNT(*) FROM {self.tableName}")
+        self.assertEqual(result, 2)
+
+    def testExecuteSelectFetchOneRow(self):
+        row = self.db.executeSelectFetchOneRow(f"SELECT * FROM {self.tableName} WHERE id=1")
+        self.assertEqual(row['id'], 1)
+        self.assertEqual(row['name'], 'alpha')
+
+    def testExecuteSelectFetchOneField(self):
+        values = self.db.executeSelectFetchOneField(f"SELECT name FROM {self.tableName} ORDER BY id")
+        self.assertEqual(values, ['alpha', 'beta'])
+
+    def testBeginEndTransaction(self):
+        self.db.beginTransaction()
+        self.db.execute(f"INSERT INTO {self.tableName} (id, name, value) VALUES (3, 'gamma', 3.5)")
+        self.db.endTransaction()
+        rows = self.db.select(self.tableName)
+        self.assertEqual(len(rows), 3)
+
+    def testRollbackTransaction(self):
+        self.db.beginTransaction()
+        self.db.execute(f"INSERT INTO {self.tableName} (id, name, value) VALUES (4, 'delta', 4.5)")
+        self.db.rollbackTransaction()
+        rows = self.db.select(self.tableName)
+        self.assertEqual(len(rows), 2)
+
+    def testColumns(self):
+        cols = self.db.columns(self.tableName)
+        self.assertIn('id', cols)
+        self.assertIn('name', cols)
+        self.assertIn('value', cols)
+
+    def testCreateAndDropTable(self):
+        self.db.execute('CREATE TABLE IF NOT EXISTS test_temp_pg (id INT PRIMARY KEY, label TEXT)')
+        self.db.commit()
+        self.assertIn('test_temp_pg', self.db.tables)
+        self.db.dropTable('test_temp_pg')
+        self.db.commit()
+        self.assertNotIn('test_temp_pg', self.db.tables)
+
+    def testInsert(self):
+        self.db.insert(self.tableName, {'id': 10, 'name': 'zeta', 'value': 10.5})
+        self.db.commit()
+        rows = self.db.select(self.tableName, '*', 'id=10')
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]['name'], 'zeta')
+
+    def testParseURLDirect(self):
+        result = self.db.parseURL("postgresql://myuser:mypass@myhost:5433/mydb")
+        engine, sshUser, sshHost, pgHost, port, pgUser, pgPassword, database = result
+        self.assertEqual(engine, Engine.postgresql)
+        self.assertIsNone(sshUser)
+        self.assertEqual(pgHost, 'myhost')
+        self.assertEqual(port, 5433)
+        self.assertEqual(pgUser, 'myuser')
+        self.assertEqual(pgPassword, 'mypass')
+        self.assertEqual(database, 'mydb')
+
+    def testParseURLSSH(self):
+        result = self.db.parseURL("postgresql+ssh://sshuser@sshhost/pguser:pgpass@pghost:5433/mydb")
+        engine, sshUser, sshHost, pgHost, port, pgUser, pgPassword, database = result
+        self.assertEqual(engine, Engine.postgresql)
+        self.assertEqual(sshUser, 'sshuser')
+        self.assertEqual(sshHost, 'sshhost')
+        self.assertEqual(pgHost, 'pghost')
+        self.assertEqual(port, 5433)
+        self.assertEqual(pgUser, 'pguser')
+        self.assertEqual(pgPassword, 'pgpass')
+        self.assertEqual(database, 'mydb')
+
+    def testParseURLInvalid(self):
+        with self.assertRaises(ValueError):
+            self.db.parseURL("ftp://bad/url")
 
 
 if __name__ == '__main__':

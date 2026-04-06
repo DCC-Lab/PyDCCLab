@@ -47,6 +47,9 @@ dependencies = [
     "opencv-python",
 ]
 
+[project.optional-dependencies]
+postgresql = ["psycopg2-binary"]
+
 [project.urls]
 Homepage = "https://github.com/DCC-Lab/PyDCCLab"
 
