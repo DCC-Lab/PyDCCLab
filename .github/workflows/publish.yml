@@ -1,0 +1,96 @@
+name: Publish to PyPI & GitHub Release
+
+on:
+  push:
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]+"
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # needed for setuptools-scm
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install build tools
+        run: pip install build
+
+      - name: Build package
+        run: python -m build
+
+      - name: Verify version matches tag
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          PKG_VERSION=$(python -c "from setuptools_scm import get_version; print(get_version())")
+          echo "Tag: $TAG, Package version: $PKG_VERSION"
+          if [ "$TAG" != "$PKG_VERSION" ]; then
+            echo "::error::Tag $TAG does not match package version $PKG_VERSION"
+            exit 1
+          fi
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  pypi:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+  github-release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Generate release notes
+        id: notes
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          PREV_TAG=$(git tag --sort=-v:refname | grep -A1 "^${TAG}$" | tail -1)
+          if [ "$PREV_TAG" != "$TAG" ] && [ -n "$PREV_TAG" ]; then
+            echo "## Changes since ${PREV_TAG}" > notes.md
+            git log --pretty=format:"- %s" ${PREV_TAG}..${TAG} >> notes.md
+          else
+            echo "## Release ${TAG}" > notes.md
+          fi
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: notes.md
+          files: dist/*
+          generate_release_notes: false
