@@ -9,7 +9,13 @@ from pathlib import Path
 os.environ.setdefault('PYTHON_KEYRING_BACKEND', 'keyring.backends.macOS.Keyring')
 
 
+def isCI():
+    return os.environ.get('CI', '').lower() in ('true', '1')
+
+
 def canAccessLabdata(host="cafeine2.crulrg.ulaval.ca", port=22, timeout=3):
+    if isCI():
+        return False
     try:
         s = socket.create_connection((host, port), timeout=timeout)
         s.close()

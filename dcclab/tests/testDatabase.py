@@ -296,42 +296,28 @@ def canAccessLocalMySQL():
         return False
 
 
+@unittest.skipIf(env.isCI(), "Local database not available in CI")
 class TestLocalMySQLPrerequisites(env.DCCLabTestCase):
     def testLocalMySQLIsRunning(self):
         if not isLocalMySQLRunning():
-            self.fail(
-                "MySQL is not running on 127.0.0.1:3306.\n"
-                "Start it with one of:\n\n"
-                "  brew services start mysql        # macOS with Homebrew\n"
-                "  sudo systemctl start mysql       # Linux with systemd\n"
-                "  mysql.server start               # macOS alternate\n"
+            self.skipTest(
+                "MySQL is not running on 127.0.0.1:3306. "
+                "Start with: brew services start mysql"
             )
 
     def testLocalMySQLTestUserIsAvailable(self):
         if not isLocalMySQLRunning():
             self.skipTest("MySQL is not running")
         if not canAccessLocalMySQL():
-            self.fail(
-                "Cannot connect to local MySQL as user 'test'.\n"
-                "An administrator must run the following commands to set up the test environment:\n\n"
-                "  mysql -u root -p -e \"\n"
-                "    CREATE DATABASE IF NOT EXISTS test;\n"
-                "    CREATE USER IF NOT EXISTS 'test'@'127.0.0.1' IDENTIFIED BY 'test';\n"
-                "    CREATE USER IF NOT EXISTS 'test'@'localhost' IDENTIFIED BY 'test';\n"
-                "    GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, INDEX, REFERENCES,\n"
-                "          CREATE TEMPORARY TABLES, LOCK TABLES, EXECUTE, CREATE VIEW, SHOW VIEW,\n"
-                "          CREATE ROUTINE, ALTER ROUTINE, EVENT, TRIGGER\n"
-                "          ON test.* TO 'test'@'127.0.0.1';\n"
-                "    GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, INDEX, REFERENCES,\n"
-                "          CREATE TEMPORARY TABLES, LOCK TABLES, EXECUTE, CREATE VIEW, SHOW VIEW,\n"
-                "          CREATE ROUTINE, ALTER ROUTINE, EVENT, TRIGGER\n"
-                "          ON test.* TO 'test'@'localhost';\n"
-                "    FLUSH PRIVILEGES;\n"
-                "  \"\n"
+            self.skipTest(
+                "Cannot connect to local MySQL as user 'test'. "
+                "Create with: mysql -u root -p -e \"CREATE DATABASE IF NOT EXISTS test; "
+                "CREATE USER IF NOT EXISTS 'test'@'127.0.0.1' IDENTIFIED BY 'test'; "
+                "GRANT ALL ON test.* TO 'test'@'127.0.0.1'; FLUSH PRIVILEGES;\""
             )
 
 
-@unittest.skipUnless(canAccessLocalMySQL(), "Requires local MySQL at 127.0.0.1")
+@unittest.skipIf(env.isCI() or not canAccessLocalMySQL(), "Requires local MySQL at 127.0.0.1")
 class TestLocalMySQLWithDatabase(env.DCCLabTestCase):
     localURL = "mysql://test:test@127.0.0.1/test"
     tableName = "test_local_db"
@@ -436,7 +422,7 @@ class TestLocalMySQLWithDatabase(env.DCCLabTestCase):
         self.assertEqual(list(row.values())[0], 0)
 
 
-@unittest.skipUnless(canAccessLocalMySQL(), "Requires local MySQL at 127.0.0.1")
+@unittest.skipIf(env.isCI() or not canAccessLocalMySQL(), "Requires local MySQL at 127.0.0.1")
 class TestLocalMySQLWithMySQLDatabase(env.DCCLabTestCase):
     localURL = "mysql://test:test@127.0.0.1/test"
     tableName = "test_local_mysqldb"
@@ -560,31 +546,27 @@ def canAccessLocalPostgres():
         return False
 
 
+@unittest.skipIf(env.isCI(), "Local database not available in CI")
 class TestLocalPostgresPrerequisites(env.DCCLabTestCase):
     def testLocalPostgresIsRunning(self):
         if not isLocalPostgresRunning():
-            self.fail(
-                "PostgreSQL is not running on 127.0.0.1:5432.\n"
-                "Start it with one of:\n\n"
-                "  brew services start postgresql       # macOS with Homebrew\n"
-                "  sudo systemctl start postgresql      # Linux with systemd\n"
+            self.skipTest(
+                "PostgreSQL is not running on 127.0.0.1:5432. "
+                "Start with: brew services start postgresql"
             )
 
     def testLocalPostgresTestUserIsAvailable(self):
         if not isLocalPostgresRunning():
             self.skipTest("PostgreSQL is not running")
         if not canAccessLocalPostgres():
-            self.fail(
-                "Cannot connect to local PostgreSQL as user 'test'.\n"
-                "An administrator must run the following commands to set up the test environment:\n\n"
-                "  sudo -u postgres psql -c \"\n"
-                "    CREATE USER test WITH PASSWORD 'test';\n"
-                "    CREATE DATABASE test OWNER test;\n"
-                "  \"\n"
+            self.skipTest(
+                "Cannot connect to local PostgreSQL as user 'test'. "
+                "Create with: psql -d postgres -c \"CREATE USER test WITH PASSWORD 'test'; "
+                "CREATE DATABASE test OWNER test;\""
             )
 
 
-@unittest.skipUnless(canAccessLocalPostgres(), "Requires local PostgreSQL at 127.0.0.1")
+@unittest.skipIf(env.isCI() or not canAccessLocalPostgres(), "Requires local PostgreSQL at 127.0.0.1")
 class TestLocalPostgresWithPostgresqlDatabase(env.DCCLabTestCase):
     localURL = "postgresql://test:test@127.0.0.1/test"
     tableName = "test_local_pgdb"
