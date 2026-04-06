@@ -37,7 +37,7 @@ dependencies = [
     "numpy",
     "scikit-image",
     "scipy",
-    "czifile>=2019.6.18",
+    "czifile>=2019.6.18,<2026",
     "tifffile",
     "read-lif",
     "tables",
