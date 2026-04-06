@@ -86,6 +86,7 @@ class Column(NamedTuple):
 class Engine(Enum):
     mysql = "mysql"
     sqlite3 = "sqlite3"
+    postgresql = "postgresql"
 
 class Database:
     def __init__(self, databaseURL, usePassword=True, writePermission=False):
@@ -784,6 +785,260 @@ Or provide the password in the URL: mysql://user:password@host/database""".forma
             statement = 'INSERT OR REPLACE INTO "{}" ({}) VALUES ({})'.format(
                 table, keys, values)
             self.execute(statement)
+
+class PostgresqlDatabase:
+    def __init__(self, databaseURL, usePassword=True, writePermission=False):
+        self.writePermission = writePermission
+        self.databaseURL = databaseURL
+        self.connection = None
+        self.cursor = None
+        self.databaseEngine = None
+
+        self.database = None
+        self.port = None
+        self.pgPassword = None
+        self.usePassword = usePassword
+        self.server = None
+
+        self.databaseEngine, self.sshUser, self.sshHost, self.pgHost, self.port, self.pgUser, self.pgPassword, self.database = self.parseURL(databaseURL)
+
+        self.connect()
+
+    def showDatabaseInfo(self):
+        pass
+
+    def parseURL(self, url):
+        # Standard URL formats:
+        #   postgresql://user[:password]@host[:port]/database
+        #   postgresql+ssh://sshuser@sshhost/pguser[:password]@pghost[:port]/database
+        parsed = parse.urlparse(url)
+
+        if parsed.scheme in ('postgresql', 'postgres'):
+            engine = Engine.postgresql
+            pgUser = parsed.username
+            pgPassword = parsed.password
+            pgHost = parsed.hostname
+            pgPort = parsed.port or 5432
+            database = parsed.path.lstrip('/')
+            if not pgUser or not pgHost or not database:
+                raise ValueError("Incomplete postgresql URL: {0}. Use postgresql://user@host[:port]/database".format(url))
+            return (engine, None, None, pgHost, pgPort, pgUser, pgPassword, database)
+
+        if parsed.scheme in ('postgresql+ssh', 'postgres+ssh'):
+            engine = Engine.postgresql
+            sshUser = parsed.username
+            sshHost = parsed.hostname
+            # Path contains: /pguser[:password]@pghost[:port]/database
+            match = re.match(r'^/([^:@]+)(?::([^@]*))?@([^:/]+)(?::(\d+))?/(.+)$', parsed.path)
+            if match is None:
+                raise ValueError("Incomplete postgresql+ssh URL: {0}. Use postgresql+ssh://sshuser@sshhost/pguser@pghost/database".format(url))
+            pgUser = match.group(1)
+            pgPassword = match.group(2)
+            pgHost = match.group(3)
+            pgPort = int(match.group(4)) if match.group(4) else 5432
+            database = match.group(5)
+            return (engine, sshUser, sshHost, pgHost, pgPort, pgUser, pgPassword, database)
+
+        raise ValueError("Unrecognized URL scheme '{0}' in: {1}. Use postgresql://user@host[:port]/database or postgresql+ssh://sshuser@sshhost/pguser@pghost/database".format(parsed.scheme, url))
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.disconnect()
+
+    def connect(self):
+        try:
+            if not self.isConnected:
+                import psycopg2
+                import psycopg2.extras
+
+                if self.pgPassword is not None:
+                    pwd = self.pgPassword
+                elif self.usePassword is True:
+                    import keyring
+
+                    if self.sshHost is not None:
+                        serviceName = "postgresql-{0}-ssh-{1}".format(self.pgHost, self.sshHost)
+                    else:
+                        serviceName = "postgresql-{0}".format(self.pgHost)
+
+                    pwd = keyring.get_password(serviceName, self.pgUser)
+                    if pwd is None and self.sshHost is not None:
+                        pwd = keyring.get_password("postgresql-{0}".format(self.pgHost), self.pgUser)
+                    if pwd is None:
+                        raise Exception(""" Set the password in the system password manager on the command line with:
+{2} -m keyring set {0} {1}
+Or provide the password in the URL: postgresql://user:password@host/database""".format(serviceName, self.pgUser, sys.executable))
+                else:
+                    pwd = None
+
+                actualPgHost = self.pgHost
+                if self.sshHost is not None:
+                    from dcclab.utils import Cafeine
+                    self.server = Cafeine(username=self.sshUser)
+                    self.port = self.server.startTunnel(ssh_host=self.sshHost, remote_bind_address=self.pgHost, remote_port=self.port)
+                    actualPgHost = "127.0.0.1"
+
+                self.connection = psycopg2.connect(
+                    host=actualPgHost,
+                    port=self.port,
+                    dbname=self.database,
+                    user=self.pgUser,
+                    password=pwd
+                )
+
+                self.cursor = self.connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        except Exception as err:
+            if self.connection is not None:
+                self.connection.close()
+                self.cursor = None
+                if self.server is not None:
+                    self.server.stopMySQLTunnel()
+            raise(err)
+
+    def disconnect(self):
+        if self.isConnected:
+            self.commit()
+            self.connection.close()
+            self.connection = None
+            self.cursor = None
+
+    def enforceForeignKeys(self):
+        pass  # Foreign keys are always enforced in PostgreSQL
+
+    def disableForeignKeys(self):
+        self.execute("SET session_replication_role = 'replica'")
+
+    def beginTransaction(self):
+        if self.isConnected:
+            self.execute('BEGIN')
+
+    def endTransaction(self):
+        if self.isConnected:
+            self.execute('COMMIT')
+
+    def rollbackTransaction(self):
+        if self.isConnected:
+            self.execute('ROLLBACK')
+
+    @property
+    def isConnected(self):
+        return self.connection is not None
+
+    def commit(self):
+        if self.isConnected:
+            self.connection.commit()
+
+    def rollback(self):
+        if self.isConnected:
+            self.connection.rollback()
+
+    def execute(self, statement, bindings=None):
+        if self.isConnected:
+            try:
+                if bindings is None:
+                    self.cursor.execute(statement)
+                else:
+                    self.cursor.execute(statement, bindings)
+
+                return statement
+
+            except Exception as err:
+                raise(err)
+
+        return None
+
+    def executeSelectOne(self, statement, bindings=None):
+        self.execute(statement, bindings)
+        singleRecord = self.fetchOne()
+        keys = list(singleRecord.keys())
+        if len(keys) == 1:
+            return singleRecord[keys[0]]
+        else:
+            return None
+
+    def executeSelectFetchInt(self, statement, bindings=None):
+        return int(self.executeSelectOne(statement, bindings))
+
+    def executeSelectFetchOneRow(self, statement, bindings = None):
+        self.execute(statement, bindings)
+        return dict(self.fetchOne())
+
+    def executeSelectFetchOneField(self, statement, bindings = None):
+        self.execute(statement, bindings)
+        rows = self.fetchAll()
+        values = []
+
+        for row in rows:
+            value = list(row.values())[0]
+            values.append(value)
+
+        return values
+
+    def fetchAll(self):
+        if self.isConnected:
+            return self.cursor.fetchall()
+
+    def fetchOne(self):
+        if self.isConnected:
+            return self.cursor.fetchone()
+
+    @property
+    def tables(self) -> list:
+        self.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name")
+        rows = self.fetchAll()
+        return [row['table_name'] for row in rows]
+
+    def columns(self, table) -> list:
+        self.execute('SELECT * FROM "{}" LIMIT 0'.format(table))
+        columns = [description[0] for description in self.cursor.description]
+        return columns
+
+    def select(self, table, columns='*', condition=None):
+        if condition is None:
+            self.execute("SELECT {0} FROM {1}".format(columns, table))
+        else:
+            self.execute("SELECT {0} FROM {1} WHERE {2}".format(
+                columns, table, condition))
+        return self.fetchAll()
+
+    def createTable(self, metadata: dict):
+        if self.isConnected:
+            for table, keys in metadata.items():
+                statement = 'CREATE TABLE IF NOT EXISTS "{}" ('.format(table)
+                attributes = []
+                for key, keyType in keys.items():
+                    attributes.append('{} {}'.format(key, keyType))
+                statement += ",".join(attributes) + ")"
+                self.execute(statement)
+
+    def createSimpleTable(self, name, columns):
+        if self.isConnected:
+            statement = f'CREATE TABLE IF NOT EXISTS "{name}" '
+
+            colStatements = []
+            for c in columns:
+                colStatements.append(f"{c.name} {c.type.value} {c.constraint.value}")
+
+            statement += '(' + ','.join(colStatements) + ')'
+            self.execute(statement)
+
+    def dropTable(self, table: str):
+        if self.isConnected:
+            statement = 'DROP TABLE IF EXISTS "{}"'.format(table)
+            self.execute(statement)
+
+    def insert(self, table: str, entry: dict):
+        if self.isConnected:
+            keys = ', '.join('"{}"'.format(k) for k in entry.keys())
+            placeholders = ', '.join(['%s'] * len(entry))
+            values = list(entry.values())
+            statement = 'INSERT INTO "{}" ({}) VALUES ({})'.format(
+                table, keys, placeholders)
+            self.execute(statement, values)
+
 
 if __name__ == "__main__":
     sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
